@@ -20,23 +20,27 @@ SIGAP adalah portal pelaporan masalah permukiman berbasis peta untuk warga dan p
 Prasyarat: **Node 20+** dan **npm**.
 
 1. Buat proyek gratis di [supabase.com](https://supabase.com).
-2. Buka **SQL Editor**, jalankan isi `supabase/schema.sql`, lalu jalankan isi `supabase/seed.sql`.
-3. Salin **Project URL** dan **anon key** dari Project Settings → API ke file `.env.local`
-   (contoh format ada di `.env.local.example`):
+2. Isi `.env.local` dari Project Settings → API (contoh format ada di `.env.local.example`):
 
    ```env
    NEXT_PUBLIC_SUPABASE_URL=https://PROJECT-REF.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=ISI-ANON-KEY-DISINI
+   SUPABASE_SERVICE_ROLE_KEY=ISI-SERVICE-ROLE-KEY
    ```
 
-4. Pasang dependensi dan jalankan:
+3. Buka **SQL Editor**, jalankan isi `supabase/schema.sql`.
+4. Buat akun demo: `node scripts/buat-user-demo.mjs` (butuh `SUPABASE_SERVICE_ROLE_KEY`
+   di `.env.local`; bisa juga manual lewat Dashboard → Authentication → Add user,
+   email `@sigap.demo`, sandi `sigap123456`).
+5. Masih di SQL Editor, jalankan isi `supabase/seed.sql`.
+6. Pasang dependensi dan jalankan:
 
    ```bash
    npm install
    npm run dev
    ```
 
-5. Buka http://localhost:3000
+7. Buka http://localhost:3000
 
 ## Akun Demo
 

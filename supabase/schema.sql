@@ -484,3 +484,27 @@ create policy "foto_laporan_delete_owner" on storage.objects
     and owner = auth.uid()
     and (storage.foldername(name))[1] = auth.uid()::text
   );
+
+-- ============================================================
+-- 15. REALTIME: daftarkan tabel ke publikasi supabase_realtime
+-- ============================================================
+do $$
+begin
+  alter publication supabase_realtime add table public.reports;
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  alter publication supabase_realtime add table public.comments;
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  alter publication supabase_realtime add table public.votes;
+exception
+  when duplicate_object then null;
+end $$;

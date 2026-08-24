@@ -1,80 +1,14 @@
 -- ============================================================
 -- SIGAP seed v1 — data demo untuk juri.
--- Jalankan SETELAH supabase/schema.sql.
+-- Urutan: 1) schema.sql  2) node scripts/buat-user-demo.mjs
+--         3) seed.sql ini.
+-- Butuh 6 akun @sigap.demo sudah ada di Auth (dibuat langkah 2);
+-- trigger handle_new_user otomatis membuat profiles-nya.
 -- Semua blok idempotent (aman dijalankan ulang).
 -- ============================================================
 
-create extension if not exists pgcrypto;
-
 -- ------------------------------------------------------------
--- 1. Enam akun auth.users (pola resmi seeding Supabase)
---    Sandi semua akun: sigap123456
--- ------------------------------------------------------------
-insert into auth.users (
-  instance_id, id, aud, role, email,
-  encrypted_password, email_confirmed_at,
-  raw_app_meta_data, raw_user_meta_data,
-  created_at, updated_at,
-  confirmation_token, recovery_token
-) values (
-  '00000000-0000-0000-0000-000000000000', gen_random_uuid(),
-  'authenticated', 'authenticated', 'budi@sigap.demo',
-  crypt('sigap123456', gen_salt('bf')), now(),
-  '{"provider":"email","providers":["email"]}'::jsonb,
-  '{"nama_lengkap":"Budi Santoso","username":"budi_s"}'::jsonb,
-  now(), now(), '', ''
-), (
-  '00000000-0000-0000-0000-000000000000', gen_random_uuid(),
-  'authenticated', 'authenticated', 'sari@sigap.demo',
-  crypt('sigap123456', gen_salt('bf')), now(),
-  '{"provider":"email","providers":["email"]}'::jsonb,
-  '{"nama_lengkap":"Sari Melati","username":"sari_m"}'::jsonb,
-  now(), now(), '', ''
-), (
-  '00000000-0000-0000-0000-000000000000', gen_random_uuid(),
-  'authenticated', 'authenticated', 'agus@sigap.demo',
-  crypt('sigap123456', gen_salt('bf')), now(),
-  '{"provider":"email","providers":["email"]}'::jsonb,
-  '{"nama_lengkap":"Agus Pratama","username":"agus_p"}'::jsonb,
-  now(), now(), '', ''
-), (
-  '00000000-0000-0000-0000-000000000000', gen_random_uuid(),
-  'authenticated', 'authenticated', 'dewi@sigap.demo',
-  crypt('sigap123456', gen_salt('bf')), now(),
-  '{"provider":"email","providers":["email"]}'::jsonb,
-  '{"nama_lengkap":"Dewi Kartika","username":"dewi_k"}'::jsonb,
-  now(), now(), '', ''
-), (
-  '00000000-0000-0000-0000-000000000000', gen_random_uuid(),
-  'authenticated', 'authenticated', 'rafa@sigap.demo',
-  crypt('sigap123456', gen_salt('bf')), now(),
-  '{"provider":"email","providers":["email"]}'::jsonb,
-  '{"nama_lengkap":"Rafa Alfarizi","username":"rafa_a"}'::jsonb,
-  now(), now(), '', ''
-), (
-  '00000000-0000-0000-0000-000000000000', gen_random_uuid(),
-  'authenticated', 'authenticated', 'dewan@sigap.demo',
-  crypt('sigap123456', gen_salt('bf')), now(),
-  '{"provider":"email","providers":["email"]}'::jsonb,
-  '{"nama_lengkap":"Dewan Kota Harapan","username":"dewan_kota"}'::jsonb,
-  now(), now(), '', ''
-)
-on conflict (email) do nothing;
-
--- Identitas provider email agar login password berfungsi normal
-insert into auth.identities (id, user_id, provider_id, identity_data, last_sign_in_at, created_at, updated_at, email)
-select
-  gen_random_uuid(),
-  u.id,
-  'email',
-  jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true),
-  u.email_confirmed_at, u.created_at, u.updated_at, u.email
-from auth.users u
-where u.email like '%@sigap.demo'
-on conflict do nothing;
-
--- ------------------------------------------------------------
--- 2. Profiles eksplisit (id sama dengan auth.users)
+-- 1. Profiles eksplisit (upsert: set role & poin final)
 --    dewan_kota = admin; poin sesuai aktivitas demo
 -- ------------------------------------------------------------
 insert into public.profiles (id, username, nama_lengkap, role, poin) values
@@ -84,7 +18,11 @@ insert into public.profiles (id, username, nama_lengkap, role, poin) values
   ((select id from auth.users where email = 'dewi@sigap.demo'),  'dewi_k',     'Dewi Kartika',       'warga', 11),
   ((select id from auth.users where email = 'rafa@sigap.demo'),  'rafa_a',     'Rafa Alfarizi',      'warga', 5),
   ((select id from auth.users where email = 'dewan@sigap.demo'), 'dewan_kota', 'Dewan Kota Harapan', 'admin', 0)
-on conflict do nothing;
+on conflict (id) do update
+  set username = excluded.username,
+      nama_lengkap = excluded.nama_lengkap,
+      role = excluded.role,
+      poin = excluded.poin;
 
 -- ------------------------------------------------------------
 -- 3. 16 laporan di sekitar Jakarta

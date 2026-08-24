@@ -24,7 +24,7 @@ export default async function HalamanLaporan({
     .from("reports")
     .select(
       `*, categories(slug,nama,warna,emoji),
-       profiles(id,username,nama_lengkap,avatar_url),
+       profiles!reports_user_id_fkey(id,username,nama_lengkap,avatar_url),
        votes(count), comments(count),
        report_events(id,status,catatan,created_at)`
     )
