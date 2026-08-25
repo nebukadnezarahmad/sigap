@@ -5,6 +5,12 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import { useEffect, useRef } from "react";
 import type * as LeafletNS from "leaflet";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/lib/use-theme";
+
+const TILE_TERANG =
+  "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+const TILE_GELAP =
+  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
 
 export type TitikPeta = {
   id: string;
@@ -42,8 +48,10 @@ export function LeafletMap({
   const refPeta = useRef<LeafletNS.Map | null>(null);
   const refL = useRef<typeof LeafletNS | null>(null);
   const refLayer = useRef<LeafletNS.Layer | null>(null);
+  const refTile = useRef<LeafletNS.TileLayer | null>(null);
   const refPanas = useRef<LeafletNS.Layer | null>(null);
   const refSudahFit = useRef(false);
+  const gelap = useTheme();
   const cbRef = useRef({ onPilih, onKlikTitik });
 
   useEffect(() => {
@@ -69,15 +77,11 @@ export function LeafletMap({
       });
       L.control.zoom({ position: "bottomright" }).addTo(peta);
 
-      L.tileLayer(
-          "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-          {
-            attribution:
-              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-            maxZoom: 19,
-          }
-        )
-        .addTo(peta);
+      refTile.current = L.tileLayer(gelap ? TILE_GELAP : TILE_TERANG, {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        maxZoom: 19,
+      }).addTo(peta);
 
       if (mode === "pilih") {
         peta.on("click", (e: LeafletNS.LeafletMouseEvent) => {
@@ -113,9 +117,7 @@ export function LeafletMap({
             blur: 24,
             maxZoom: 16,
             gradient: { 0.2: "#fbbf24", 0.55: "#f97316", 0.9: "#dc2626" },
-          })
-            .addTo(peta)
-            .bringToBack();
+          }).addTo(peta);
         }
       }
 
@@ -161,9 +163,16 @@ export function LeafletMap({
   }, [titik, terpilih, mode, panas, pusat, zoom]);
 
   useEffect(() => {
+    if (refTile.current) {
+      refTile.current.setUrl(gelap ? TILE_GELAP : TILE_TERANG);
+    }
+  }, [gelap]);
+
+  useEffect(() => {
     return () => {
       refPeta.current?.remove();
       refPeta.current = null;
+      refTile.current = null;
       refLayer.current = null;
       refPanas.current = null;
       refSudahFit.current = false;

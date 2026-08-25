@@ -29,14 +29,37 @@ export type Laporan = {
   category_id: number;
   judul: string;
   deskripsi: string;
-  lokasi: { type: "Point"; coordinates: [number, number] };
+  lokasi?: { type: "Point"; coordinates: [number, number] };
+  lat?: number | null;
+  lng?: number | null;
   alamat_teks: string | null;
   foto_url: string | null;
+  petugas?: string | null;
+  assigned_at?: string | null;
   status: StatusLaporan;
   created_at: string;
   updated_at: string;
   vote_count?: number;
   comment_count?: number;
+};
+
+export type FotoLaporan = {
+  id: string;
+  report_id: string;
+  url: string;
+  fase: "sebelum" | "sesudah";
+  created_at: string;
+};
+
+export type Notifikasi = {
+  id: string;
+  user_id: string;
+  jenis: "status" | "konfirmasi" | "poin" | "tugas";
+  judul: string;
+  isi: string | null;
+  report_id: string | null;
+  dibaca: boolean;
+  created_at: string;
 };
 
 export type LaporanDenganRelasi = Laporan & {

@@ -112,3 +112,37 @@ export const BADGES: BadgeDef[] = [
     emoji: "🔥",
   },
 ];
+
+export type LevelDef = {
+  key: string;
+  nama: string;
+  min: number;
+  emoji: string;
+};
+
+export const LEVELS: LevelDef[] = [
+  { key: "semai", nama: "Semai", min: 0, emoji: "🌱" },
+  { key: "tunas", nama: "Tunas", min: 50, emoji: "🌿" },
+  { key: "pohon", nama: "Pohon", min: 150, emoji: "🌳" },
+  { key: "rimbawan", nama: "Rimbawan", min: 400, emoji: "🦉" },
+];
+
+export function levelDari(poin: number) {
+  let idx = 0;
+  for (let i = 0; i < LEVELS.length; i++) {
+    if (poin >= LEVELS[i].min) idx = i;
+  }
+  const sekarang = LEVELS[idx];
+  const berikut = LEVELS[idx + 1] ?? null;
+  const maju = berikut ? berikut.min - sekarang.min : 1;
+  const progres = berikut
+    ? Math.min(100, Math.round(((poin - sekarang.min) / maju) * 100))
+    : 100;
+  return { sekarang, berikut, progres };
+}
+
+export const SLA_HARI = 7;
+
+export function umurHari(iso: string) {
+  return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+}

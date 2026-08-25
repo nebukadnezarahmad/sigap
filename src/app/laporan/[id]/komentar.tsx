@@ -115,7 +115,7 @@ export function KomentarSection({
               <div className="min-w-0 flex-1 rounded-2xl rounded-tl-md bg-panel-2 px-4 py-2.5">
                 <p className="text-xs">
                   <span className="font-semibold">{k.profiles?.nama_lengkap ?? "Warga"}</span>{" "}
-                  <span className="text-muted">· {waktuRelatif(k.created_at)}</span>
+                  <span className="text-muted" suppressHydrationWarning>· {waktuRelatif(k.created_at)}</span>
                 </p>
                 <p className="mt-0.5 whitespace-pre-line break-words text-sm leading-relaxed">
                   {k.isi}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { Jelajah } from "@/components/map/jelajah";
@@ -21,7 +22,7 @@ export default async function HalamanPeta() {
       const { data, error } = await supabase
         .from("reports")
         .select(
-          `*, categories(slug,nama,warna,emoji),
+          `*, lat, lng, categories(slug,nama,warna,emoji),
            profiles!reports_user_id_fkey(id,username,nama_lengkap,avatar_url),
            votes(count), comments(count)`
         )
@@ -38,5 +39,9 @@ export default async function HalamanPeta() {
     dbAktif = false;
   }
 
-  return <Jelajah laporanAwal={awal} dbAktif={dbAktif} />;
+  return (
+    <Suspense fallback={<main className="mx-auto max-w-7xl px-4 py-6" />}>
+      <Jelajah laporanAwal={awal} dbAktif={dbAktif} />
+    </Suspense>
+  );
 }

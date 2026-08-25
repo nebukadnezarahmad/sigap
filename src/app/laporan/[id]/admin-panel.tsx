@@ -1,0 +1,133 @@
+"use client";
+
+import { useState } from "react";
+import { ImagePlus, Save } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { STATUS, type StatusKey } from "@/lib/constants";
+import { useUser } from "@/lib/use-user";
+import { Button, Card, Input, Label, Select } from "@/components/ui";
+
+export function AdminPanel({
+  reportId,
+  statusAwal,
+  petugasAwal,
+}: {
+  reportId: string;
+  statusAwal: StatusKey;
+  petugasAwal: string;
+}) {
+  const router = useRouter();
+  const { user } = useUser();
+  const [status, setStatus] = useState<StatusKey>(statusAwal);
+  const [petugas, setPetugas] = useState(petugasAwal);
+  const [file, setFile] = useState<File | null>(null);
+  const [proses, setProses] = useState(false);
+  const [pesan, setPesan] = useState<string | null>(null);
+
+  async function simpan() {
+    if (!user) return;
+    setProses(true);
+    setPesan(null);
+    try {
+      const supabase = createClient();
+
+      if (status === "selesai" && file) {
+        if (file.size > 5 * 1024 * 1024)
+          throw new Error("Foto maksimal 5 MB.");
+        const path = `${user.id}/selesai-${Date.now()}-${file.name.replace(/[^\w.-]/g, "_")}`;
+        const { error: upErr } = await supabase.storage
+          .from("foto-laporan")
+          .upload(path, file, { contentType: file.type });
+        if (upErr) throw new Error(upErr.message);
+        const { data: pub } = supabase.storage
+          .from("foto-laporan")
+          .getPublicUrl(path);
+        await supabase.from("report_photos").insert({
+          report_id: reportId,
+          url: pub.publicUrl,
+          fase: "sesudah",
+        });
+      }
+
+      const ubah: Record<string, unknown> = { status };
+      if (petugas.trim() !== petugasAwal) {
+        ubah.petugas = petugas.trim() || null;
+        ubah.assigned_at = petugas.trim() ? new Date().toISOString() : null;
+      }
+
+      const { error } = await supabase
+        .from("reports")
+        .update(ubah)
+        .eq("id", reportId);
+      if (error) throw new Error(error.message);
+
+      setPesan("Tersimpan ✓");
+      router.refresh();
+    } catch (e) {
+      setPesan(e instanceof Error ? e.message : "Gagal menyimpan.");
+    } finally {
+      setProses(false);
+    }
+  }
+
+  return (
+    <Card className="border-kunyit-500/40 bg-kunyit-100/30 p-5 dark:bg-kunyit-500/5">
+      <h2 className="mb-4 font-display font-bold">🛠️ Panel dewan</h2>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <Label htmlFor="status-admin">Status penanganan</Label>
+          <Select
+            id="status-admin"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as StatusKey)}
+          >
+            {(Object.keys(STATUS) as StatusKey[]).map((s) => (
+              <option key={s} value={s}>
+                {STATUS[s].label}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="petugas">Petugas penanganan</Label>
+          <Input
+            id="petugas"
+            list="daftar-petugas"
+            value={petugas}
+            onChange={(e) => setPetugas(e.target.value)}
+            placeholder="cth. Tim DLH Kecamatan"
+          />
+          <datalist id="daftar-petugas">
+            <option value="Tim DLH Kecamatan" />
+            <option value="Petugas Kebersihan 1" />
+            <option value="Dinas PU Bina Marga" />
+            <option value="PLN Area" />
+          </datalist>
+        </div>
+      </div>
+      {status === "selesai" && (
+        <label
+          htmlFor="foto-sesudah"
+          className="mt-3 flex cursor-pointer items-center gap-2 rounded-xl border border-dashed garis-halus px-3.5 py-3 text-sm text-muted transition hover:border-daun-400 hover:text-ink"
+        >
+          <ImagePlus size={17} />
+          {file ? file.name : "Unggah foto bukti sesudah (opsional)"}
+          <input
+            id="foto-sesudah"
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+        </label>
+      )}
+      <div className="mt-4 flex items-center gap-3">
+        <Button onClick={simpan} disabled={proses}>
+          <Save size={16} /> {proses ? "Menyimpan…" : "Simpan perubahan"}
+        </Button>
+        {pesan && <span className="text-sm text-muted">{pesan}</span>}
+      </div>
+    </Card>
+  );
+}

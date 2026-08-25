@@ -24,7 +24,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   const [slugKategori, setSlugKategori] = useState(KATEGORI[0].slug);
   const [alamat, setAlamat] = useState("");
   const [posisi, setPosisi] = useState<{ lat: number; lng: number } | null>(null);
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [proses, setProses] = useState(false);
   const [pesan, setPesan] = useState<string | null>(null);
 
@@ -61,16 +61,20 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       const supabase = createClient();
       let foto_url: string | null = null;
 
-      if (file) {
-        if (file.size > 5 * 1024 * 1024) throw new Error("Foto maksimal 5 MB.");
-        const path = `${pelapor.id}/${Date.now()}-${file.name.replace(/[^\w.-]/g, "_")}`;
+      for (const f of files) {
+        if (f.size > 5 * 1024 * 1024) throw new Error("Setiap foto maksimal 5 MB.");
+      }
+
+      if (files.length > 0) {
+        const pertama = files[0];
+        const path0 = `${pelapor.id}/${Date.now()}-${pertama.name.replace(/[^\w.-]/g, "_")}`;
         const { error: upErr } = await supabase.storage
           .from("foto-laporan")
-          .upload(path, file, { contentType: file.type });
+          .upload(path0, pertama, { contentType: pertama.type });
         if (upErr) throw new Error(`Gagal unggah foto: ${upErr.message}`);
         const { data: pub } = supabase.storage
           .from("foto-laporan")
-          .getPublicUrl(path);
+          .getPublicUrl(path0);
         foto_url = pub.publicUrl;
       }
 
@@ -91,6 +95,41 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         lokasi: `SRID=4326;POINT(${posisi.lng} ${posisi.lat})`,
       });
       if (error) throw new Error(error.message);
+
+      if (files.length > 0) {
+        const { data: laporanBaru } = await supabase
+          .from("reports")
+          .select("id")
+          .eq("user_id", pelapor.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+        if (laporanBaru) {
+          const baris = await Promise.all(
+            files.map(async (f, i) => {
+              const path = `${pelapor.id}/${Date.now()}-${i}-${f.name.replace(/[^\w.-]/g, "_")}`;
+              const { error: upErr } = await supabase.storage
+                .from("foto-laporan")
+                .upload(path, f, { contentType: f.type });
+              if (upErr) return null;
+              const { data: pub } = supabase.storage
+                .from("foto-laporan")
+                .getPublicUrl(path);
+              return {
+                report_id: laporanBaru.id,
+                url: pub.publicUrl,
+                fase: "sebelum",
+              };
+            })
+          );
+          const valid = baris.filter(
+            (b): b is { report_id: string; url: string; fase: string } => !!b
+          );
+          if (valid.length > 0) {
+            await supabase.from("report_photos").insert(valid);
+          }
+        }
+      }
 
       selesai();
       router.refresh();
@@ -150,21 +189,38 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           />
         </div>
         <div>
-          <Label htmlFor="foto">Foto (opsional)</Label>
+          <Label htmlFor="foto">Foto kondisi (maks. 4, opsional)</Label>
           <label
             htmlFor="foto"
             className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed garis-halus px-3.5 py-3 text-sm text-muted transition hover:border-daun-400 hover:text-ink"
           >
             <ImagePlus size={18} />
-            {file ? file.name : "Pilih foto kondisi terbaru…"}
+            {files.length > 0
+              ? `${files.length} foto dipilih`
+              : "Pilih foto kondisi terbaru…"}
             <input
               id="foto"
               type="file"
               accept="image/*"
+              multiple
               className="sr-only"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              onChange={(e) =>
+                setFiles(Array.from(e.target.files ?? []).slice(0, 4))
+              }
             />
           </label>
+          {files.length > 0 && (
+            <div className="mt-2 flex gap-2">
+              {files.map((f, i) => (
+                <span
+                  key={i}
+                  className="max-w-36 truncate rounded-lg bg-panel-2 px-2 py-1 text-xs text-muted"
+                >
+                  {f.name}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

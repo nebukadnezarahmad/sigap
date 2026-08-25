@@ -2,37 +2,19 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useSyncExternalStore } from "react";
-import { LogOut, MapPin, Moon, ShieldCheck, Sun, Trophy } from "lucide-react";
+import { LogOut, MapPin, Moon, ShieldCheck, Sun, Trophy, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
+import { useTheme, toggleTema } from "@/lib/use-theme";
 import { Avatar, Button } from "@/components/ui";
-
-function langgananTema(cb: () => void) {
-  const pengamat = new MutationObserver(cb);
-  pengamat.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ["class"],
-  });
-  return () => pengamat.disconnect();
-}
-
-function ambilTema() {
-  return document.documentElement.classList.contains("dark");
-}
-
-function temaAwal() {
-  return false;
-}
+import { NotifikasiBel } from "@/components/notifikasi-bel";
 
 function ToggleTema() {
-  const gelap = useSyncExternalStore(langgananTema, ambilTema, temaAwal);
+  const gelap = useTheme();
 
   function ubah() {
-    const berikutnya = !gelap;
-    document.documentElement.classList.toggle("dark", berikutnya);
-    localStorage.setItem("tema", berikutnya ? "dark" : "light");
+    toggleTema();
   }
 
   return (
@@ -41,7 +23,12 @@ function ToggleTema() {
       aria-label={gelap ? "Mode terang" : "Mode gelap"}
       className="rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink"
     >
-      {gelap ? <Sun size={18} /> : <Moon size={18} />}
+      <span className="hidden dark:block">
+        <Sun size={18} />
+      </span>
+      <span className="block dark:hidden">
+        <Moon size={18} />
+      </span>
     </button>
   );
 }
@@ -54,6 +41,7 @@ export function SiteHeader() {
   const tautan = [
     { href: "/peta", label: "Peta" },
     { href: "/papan-skor", label: "Papan Skor" },
+    { href: "/transparansi", label: "Transparansi" },
   ];
 
   async function keluar() {
@@ -107,6 +95,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-1.5">
           <ToggleTema />
+          {user && <NotifikasiBel />}
           {user ? (
             <div className="group relative">
               <button
@@ -123,10 +112,16 @@ export function SiteHeader() {
                   <p className="truncate text-xs text-muted">@{profil?.username ?? "warga"}</p>
                 </div>
                 <Link
-                  href="/papan-skor"
+                  href={`/warga/${profil?.username ?? ""}`}
                   className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
                 >
-                  <Trophy size={15} /> Papan skor saya
+                  <UserRound size={15} /> Profil saya
+                </Link>
+                <Link
+                  href="/papan-skor"
+                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
+                >
+                  <Trophy size={15} /> Papan skor
                 </Link>
                 <button
                   onClick={keluar}

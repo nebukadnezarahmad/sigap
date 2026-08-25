@@ -38,7 +38,7 @@ export default async function HalamanDewan() {
   const { data: semua } = await supabase
     .from("reports")
     .select(
-      `*, categories(slug,nama,warna,emoji),
+      `*, lat, lng, categories(slug,nama,warna,emoji),
        profiles!reports_user_id_fkey(id,username,nama_lengkap,avatar_url),
        votes(count), comments(count)`
     )
@@ -83,8 +83,7 @@ export default async function HalamanDewan() {
     const tgl = r.created_at.slice(5, 10);
     if (trenMap.has(tgl)) trenMap.set(tgl, (trenMap.get(tgl) ?? 0) + 1);
 
-    const c = r.lokasi?.coordinates;
-    if (c) panas.push([c[1], c[0]]);
+    if (r.lat != null && r.lng != null) panas.push([r.lat, r.lng]);
   }
 
   return (

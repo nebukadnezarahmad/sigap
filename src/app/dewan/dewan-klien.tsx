@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   Activity,
+  AlarmClock,
   CheckCircle2,
+  Download,
   Flame,
   Users,
 } from "lucide-react";
@@ -21,10 +23,10 @@ import {
   YAxis,
 } from "recharts";
 import { motion } from "motion/react";
-import { STATUS, type StatusKey } from "@/lib/constants";
+import { STATUS, SLA_HARI, umurHari, type StatusKey } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
-import { Card, Select, StatusChip } from "@/components/ui";
+import { Button, Card, Select, StatusChip } from "@/components/ui";
 import { waktuRelatif } from "@/lib/utils";
 
 const LeafletMap = dynamic(
@@ -64,7 +66,12 @@ export function DewanClient({
             setDaftar((s) =>
               s.map((r) =>
                 r.id === upd.id
-                  ? { ...r, status: upd.status, updated_at: upd.updated_at }
+                  ? {
+                      ...r,
+                      status: upd.status,
+                      petugas: upd.petugas ?? null,
+                      updated_at: upd.updated_at,
+                    }
                   : r
               )
             );
@@ -95,9 +102,61 @@ export function DewanClient({
     await supabase.from("reports").update({ status }).eq("id", id);
   }
 
+  async function tugaskan(id: string, petugas: string) {
+    const supabase = createClient();
+    await supabase
+      .from("reports")
+      .update({
+        petugas: petugas || null,
+        assigned_at: petugas ? new Date().toISOString() : null,
+      })
+      .eq("id", id);
+  }
+
+  function eksporCsv() {
+    const kepala = [
+      "Judul",
+      "Kategori",
+      "Status",
+      "Petugas",
+      "Tanggal",
+      "Lat",
+      "Lng",
+      "Dukungan",
+      "Komentar",
+    ];
+    const baris = daftar
+      .filter((r) => filterStatus === "semua" || r.status === filterStatus)
+      .map((r) =>
+        [
+          `"${r.judul.replace(/"/g, '""')}"`,
+          r.categories?.nama ?? "Lainnya",
+          STATUS[r.status].label,
+          r.petugas ?? "",
+          new Date(r.created_at).toLocaleString("id-ID"),
+          r.lat ?? "",
+          r.lng ?? "",
+          r.vote_count ?? 0,
+          r.comment_count ?? 0,
+        ].join(";")
+      );
+    const csv = "\uFEFF" + [kepala.join(";"), ...baris].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `sigap-laporan-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
   const selesai = hitungStatus.selesai ?? 0;
   const total = daftar.length;
   const aktif = (hitungStatus.baru ?? 0) + (hitungStatus.dikerjakan ?? 0);
+  const lewatSla = daftar.filter(
+    (r) =>
+      umurHari(r.created_at) > SLA_HARI &&
+      !["selesai", "ditolak"].includes(r.status)
+  ).length;
 
   const titikPeta = useMemo(
     () =>
@@ -105,8 +164,8 @@ export function DewanClient({
         .filter((r) => filterStatus === "semua" || r.status === filterStatus)
         .map((r) => ({
           id: r.id,
-          lat: r.lokasi?.coordinates?.[1] ?? 0,
-          lng: r.lokasi?.coordinates?.[0] ?? 0,
+          lat: r.lat ?? 0,
+          lng: r.lng ?? 0,
           warna: r.categories?.warna ?? "#64748b",
           emoji: r.categories?.emoji ?? "📌",
           judul: `${r.judul} · ${STATUS[r.status].label}`,
@@ -139,6 +198,15 @@ export function DewanClient({
       ikon: <Users size={20} />,
       warna: "text-violet-600 dark:text-violet-400 bg-violet-500/10",
     },
+    {
+      label: `Melewati SLA ${SLA_HARI} hari`,
+      nilai: lewatSla,
+      ikon: <AlarmClock size={20} />,
+      warna:
+        lewatSla > 0
+          ? "text-danger bg-danger/10"
+          : "text-daun-700 dark:text-daun-300 bg-daun-500/10",
+    },
   ];
 
   return (
@@ -150,7 +218,7 @@ export function DewanClient({
         </p>
       </header>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
         {kartu.map((k) => (
           <motion.div
             key={k.label}
@@ -242,26 +310,40 @@ export function DewanClient({
         <Card className="overflow-hidden p-0">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b garis-halus px-5 py-3.5">
             <h2 className="font-display font-bold">Kelola laporan</h2>
-            <Select
-              aria-label="Filter status"
-              className="w-44"
-              value={filterStatus}
-              onChange={(e) =>
-                setFilterStatus(e.target.value as "semua" | StatusKey)
-              }
-            >
-              <option value="semua">Semua status</option>
-              {(Object.keys(STATUS) as StatusKey[]).map((s) => (
-                <option key={s} value={s}>
-                  {STATUS[s].label}
-                </option>
-              ))}
-            </Select>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="sekunder"
+                size="sm"
+                onClick={eksporCsv}
+                className="!px-3 !py-1.5 text-xs"
+              >
+                <Download size={14} /> Ekspor CSV
+              </Button>
+              <Select
+                aria-label="Filter status"
+                className="w-40"
+                value={filterStatus}
+                onChange={(e) =>
+                  setFilterStatus(e.target.value as "semua" | StatusKey)
+                }
+              >
+                <option value="semua">Semua status</option>
+                {(Object.keys(STATUS) as StatusKey[]).map((s) => (
+                  <option key={s} value={s}>
+                    {STATUS[s].label}
+                  </option>
+                ))}
+              </Select>
+            </div>
           </div>
           <div className="max-h-[520px] overflow-y-auto divide-y garis-halus">
             {daftar
               .filter((r) => filterStatus === "semua" || r.status === filterStatus)
-              .map((r) => (
+              .map((r) => {
+                const telat =
+                  umurHari(r.created_at) > SLA_HARI &&
+                  !["selesai", "ditolak"].includes(r.status);
+                return (
                 <div key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
                   <div className="min-w-0 flex-1 basis-56">
                     <p className="truncate text-sm font-semibold">{r.judul}</p>
@@ -270,10 +352,25 @@ export function DewanClient({
                       {waktuRelatif(r.created_at)} · 👍 {r.vote_count}
                     </p>
                   </div>
+                  {telat && (
+                    <span className="rounded-full bg-danger/10 px-2 py-1 text-[11px] font-bold text-danger">
+                      ⏰ {umurHari(r.created_at)} hr — lewat SLA
+                    </span>
+                  )}
                   <StatusChip status={r.status} />
+                  <input
+                    defaultValue={r.petugas ?? ""}
+                    placeholder="Petugas…"
+                    aria-label={`Petugas untuk ${r.judul}`}
+                    onBlur={(e) => {
+                      if (e.target.value !== (r.petugas ?? ""))
+                        tugaskan(r.id, e.target.value);
+                    }}
+                    className="w-36 rounded-lg border garis-halus bg-panel px-2.5 py-1.5 text-xs outline-none focus:border-daun-500"
+                  />
                   <Select
                     aria-label={`Ubah status ${r.judul}`}
-                    className="w-40"
+                    className="w-36"
                     value={r.status}
                     onChange={(e) => ubahStatus(r.id, e.target.value as StatusKey)}
                   >
@@ -284,7 +381,8 @@ export function DewanClient({
                     ))}
                   </Select>
                 </div>
-              ))}
+                );
+              })}
             {daftar.length === 0 && (
               <p className="px-5 py-10 text-center text-sm text-muted">
                 Belum ada laporan masuk.

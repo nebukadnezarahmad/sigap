@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
+import { CommandPalette } from "@/components/command-palette";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,6 +23,12 @@ export const metadata: Metadata = {
     "Platform pelaporan masalah permukiman berbasis peta interaktif. Warga melapor, saling dukung, pemerintah menindaklanjuti — transparan dan terukur.",
 };
 
+export const viewport = {
+  themeColor: "#237f45",
+  width: "device-width",
+  initialScale: 1,
+};
+
 const temaScript = `
 (function(){try{var t=localStorage.getItem("tema");if(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches)){document.documentElement.classList.add("dark")}}catch(e){}})();
 `;
@@ -36,6 +43,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <SiteHeader />
+        <CommandPalette />
         {children}
         <footer className="border-t garis-halus mt-16">
           <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-muted flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
