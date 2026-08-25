@@ -16,7 +16,15 @@ import {
 import type { LaporanDenganRelasi } from "@/types/database";
 import { KATEGORI, STATUS, kategoriBySlug, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { History, MessageSquare, ThumbsUp } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  History,
+  MessageSquare,
+  SlidersHorizontal,
+  ThumbsUp,
+  X,
+} from "lucide-react";
 import { waktuRelatif } from "@/lib/utils";
 import { StatusChip, Button, Card } from "@/components/ui";
 import { Modal } from "@/components/modal";
@@ -86,6 +94,15 @@ export function Jelajah({
     null
   );
   const [cariLokasi, setCariLokasi] = useState(false);
+  const [pop, setPop] = useState<"kategori" | "status" | null>(null);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setPop(null);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   useEffect(() => {
     if (!mainkan || periodeIdx === null) return;
@@ -242,100 +259,189 @@ export function Jelajah({
 
       <div className="mb-4 rounded-2xl border garis-halus bg-panel p-2.5">
         <div className="flex flex-wrap items-center gap-2">
-          <label className="relative">
+          <label className="relative min-w-48 flex-1">
             <Search
               size={15}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
             />
             <input
               value={kueri}
               onChange={(e) => setKueri(e.target.value)}
               placeholder="Cari judul atau isi laporan…"
-              className="w-56 rounded-full border garis-halus bg-panel-2 py-2 pl-9 pr-3 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15"
+              className="h-10 w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15"
             />
           </label>
 
-          <button
-            onClick={aktifkanSekitarSaya}
-            aria-pressed={!!pusatSaya}
-            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-              pusatSaya
-                ? "border-transparent bg-daun-600 text-white"
-                : "garis-halus text-muted hover:text-ink"
-            }`}
-          >
-            <Crosshair size={14} />
-            {cariLokasi
-              ? "Mencari…"
-              : pusatSaya
-                ? "≤ 2 km dari saya"
-                : "Di sekitar saya"}
-          </button>
-
-          <span aria-hidden className="mx-1 hidden h-5 w-px bg-line sm:block" />
-
-          {KATEGORI.map((k) => (
+          <div className="relative">
             <button
-              key={k.slug}
-              onClick={() =>
-                setFKategori((arr) =>
-                  arr.includes(k.slug)
-                    ? arr.filter((x) => x !== k.slug)
-                    : [...arr, k.slug]
-                )
-              }
-              aria-pressed={fKategori.includes(k.slug)}
-              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                fKategori.includes(k.slug)
-                  ? "border-transparent text-white"
+              onClick={() => setPop(pop === "kategori" ? null : "kategori")}
+              aria-expanded={pop === "kategori"}
+              className={`flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+                pop === "kategori" || fKategori.length > 0
+                  ? "border-daun-500/50 bg-daun-500/5 text-daun-700 dark:text-daun-300"
                   : "text-muted hover:text-ink"
               }`}
               style={
-                fKategori.includes(k.slug)
-                  ? { backgroundColor: k.warna, borderColor: k.warna }
-                  : { borderColor: "var(--line)" }
-              }
-            >
-              <IkonKategori slug={k.slug} ukuran={14} />
-              {k.nama}
-            </button>
-          ))}
-
-          <span aria-hidden className="mx-1 hidden h-5 w-px bg-line sm:block" />
-
-          {(Object.keys(STATUS) as StatusKey[]).map((s) => (
-            <button
-              key={s}
-              onClick={() =>
-                setFStatus((arr) =>
-                  arr.includes(s) ? arr.filter((x) => x !== s) : [...arr, s]
-                )
-              }
-              aria-pressed={fStatus.includes(s)}
-              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                fStatus.includes(s)
-                  ? STATUS[s].chip + " border-current/30"
-                  : "text-muted hover:text-ink"
-              }`}
-              style={
-                fStatus.includes(s)
+                pop === "kategori" || fKategori.length > 0
                   ? undefined
                   : { borderColor: "var(--line)" }
               }
             >
-              <span
-                className="size-1.5 rounded-full"
-                style={{
-                  backgroundColor: fStatus.includes(s)
-                    ? undefined
-                    : STATUS[s].warna,
-                }}
+              <SlidersHorizontal size={15} />
+              Kategori
+              {fKategori.length > 0 && (
+                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-daun-600 text-[11px] font-bold text-white">
+                  {fKategori.length}
+                </span>
+              )}
+              <ChevronDown
+                size={14}
+                className={`transition-transform duration-300 ${pop === "kategori" ? "rotate-180" : ""}`}
               />
-              {STATUS[s].label}
             </button>
-          ))}
+            {pop === "kategori" && (
+              <div className="absolute right-0 top-full z-30 mt-2 w-64 rounded-2xl border garis-halus bg-panel p-2 shadow-xl">
+                {KATEGORI.map((k) => {
+                  const aktif = fKategori.includes(k.slug);
+                  return (
+                    <button
+                      key={k.slug}
+                      onClick={() =>
+                        setFKategori((arr) =>
+                          arr.includes(k.slug)
+                            ? arr.filter((x) => x !== k.slug)
+                            : [...arr, k.slug]
+                        )
+                      }
+                      aria-pressed={aktif}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition hover:bg-panel-2"
+                    >
+                      <span
+                        className={`flex size-4 items-center justify-center rounded border transition ${
+                          aktif
+                            ? "border-daun-600 bg-daun-600 text-white"
+                            : "border-line"
+                        }`}
+                      >
+                        {aktif && <Check size={11} strokeWidth={3} />}
+                      </span>
+                      <span style={{ color: k.warna }}>
+                        <IkonKategori slug={k.slug} ukuran={14} />
+                      </span>
+                      {k.nama}
+                    </button>
+                  );
+                })}
+                {fKategori.length > 0 && (
+                  <button
+                    onClick={() => setFKategori([])}
+                    className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink"
+                  >
+                    <X size={12} /> Reset kategori
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
 
-          <span aria-hidden className="mx-1 hidden h-5 w-px bg-line sm:block" />
+          <div className="relative">
+            <button
+              onClick={() => setPop(pop === "status" ? null : "status")}
+              aria-expanded={pop === "status"}
+              className={`flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+                pop === "status" || fStatus.length > 0
+                  ? "border-daun-500/50 bg-daun-500/5 text-daun-700 dark:text-daun-300"
+                  : "text-muted hover:text-ink"
+              }`}
+              style={
+                pop === "status" || fStatus.length > 0
+                  ? undefined
+                  : { borderColor: "var(--line)" }
+              }
+            >
+              <span className="relative flex items-center">
+                <span className="size-2 rounded-full bg-kunyit-500" />
+                <span className="-ml-1 size-2 rounded-full bg-sky-500" />
+                <span className="-ml-1 size-2 rounded-full bg-violet-500" />
+              </span>
+              Status
+              {fStatus.length > 0 && (
+                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-daun-600 text-[11px] font-bold text-white">
+                  {fStatus.length}
+                </span>
+              )}
+              <ChevronDown
+                size={14}
+                className={`transition-transform duration-300 ${pop === "status" ? "rotate-180" : ""}`}
+              />
+            </button>
+            {pop === "status" && (
+              <div className="absolute right-0 top-full z-30 mt-2 w-52 rounded-2xl border garis-halus bg-panel p-2 shadow-xl">
+                {(Object.keys(STATUS) as StatusKey[]).map((st) => {
+                  const aktif = fStatus.includes(st);
+                  return (
+                    <button
+                      key={st}
+                      onClick={() =>
+                        setFStatus((arr) =>
+                          arr.includes(st)
+                            ? arr.filter((x) => x !== st)
+                            : [...arr, st]
+                        )
+                      }
+                      aria-pressed={aktif}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition hover:bg-panel-2"
+                    >
+                      <span
+                        className={`flex size-4 items-center justify-center rounded border transition ${
+                          aktif
+                            ? "border-daun-600 bg-daun-600 text-white"
+                            : "border-line"
+                        }`}
+                      >
+                        {aktif && <Check size={11} strokeWidth={3} />}
+                      </span>
+                      <span
+                        className="size-2 rounded-full"
+                        style={{ backgroundColor: STATUS[st].warna }}
+                      />
+                      {STATUS[st].label}
+                    </button>
+                  );
+                })}
+                {fStatus.length > 0 && (
+                  <button
+                    onClick={() => setFStatus([])}
+                    className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink"
+                  >
+                    <X size={12} /> Reset status
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          <span aria-hidden className="mx-1 hidden h-6 w-px bg-line sm:block" />
+
+          <button
+            onClick={aktifkanSekitarSaya}
+            aria-pressed={!!pusatSaya}
+            className={`flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+              pusatSaya
+                ? "border-transparent bg-daun-600 text-white"
+                : "text-muted hover:text-ink"
+            }`}
+            style={
+              pusatSaya ? undefined : { borderColor: "var(--line)" }
+            }
+          >
+            <Crosshair size={15} />
+            {cariLokasi
+              ? "Mencari…"
+              : pusatSaya
+                ? "≤ 2 km"
+                : "Sekitar saya"}
+          </button>
 
           <button
             onClick={() => {
@@ -346,18 +452,17 @@ export function Jelajah({
               }
             }}
             aria-pressed={periodeIdx !== null}
-            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+            className={`flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
               periodeIdx !== null
                 ? "border-transparent bg-daun-600 text-white"
                 : "text-muted hover:text-ink"
             }`}
             style={
-              periodeIdx !== null
-                ? undefined
-                : { borderColor: "var(--line)" }
+              periodeIdx !== null ? undefined : { borderColor: "var(--line)" }
             }
           >
-            <History size={14} /> Garis waktu
+            <History size={15} />
+            Garis waktu
           </button>
         </div>
 
@@ -391,6 +496,14 @@ export function Jelajah({
           </div>
         )}
       </div>
+
+      {pop && (
+        <div
+          className="fixed inset-0 z-20"
+          onClick={() => setPop(null)}
+          aria-hidden
+        />
+      )}
 
       <div className="grid h-[64dvh] min-h-[460px] grid-rows-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_360px]">
         <Card className="relative min-h-0 overflow-hidden p-0">
