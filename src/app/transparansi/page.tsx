@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { TrendingDown, TrendingUp, Timer, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
+import { IkonKategori } from "@/lib/ikon-vektor";
 import { Card, StatusChip } from "@/components/ui";
 import { GrafikBulanan, GrafikKategori } from "./grafik";
 
@@ -22,7 +23,7 @@ type BarisLaporan = {
   created_at: string;
   lat: number | null;
   lng: number | null;
-  categories: { slug: string; nama: string; warna: string; emoji: string } | null;
+  categories: { slug: string; nama: string; warna: string } | null;
   report_events: { status: string; created_at: string }[];
 };
 
@@ -53,7 +54,7 @@ export default async function HalamanTransparansi() {
   const { data: semua } = await supabase
     .from("reports")
     .select(
-      `id, judul, status, created_at, lat, lng, categories(slug,nama,warna,emoji),
+      `id, judul, status, created_at, lat, lng, categories(slug,nama,warna),
        report_events(status, created_at)`
     )
     .order("created_at", { ascending: false })
@@ -130,7 +131,7 @@ export default async function HalamanTransparansi() {
       arr.filter((r) => (r.categories?.slug ?? "lainnya") === k.slug).length;
     const kini = hitung(mingguIni);
     const lalu = hitung(mingguLalu);
-    return { nama: k.nama, emoji: k.emoji, kini, lalu, naik: kini - lalu };
+    return { slug: k.slug, nama: k.nama, kini, lalu, naik: kini - lalu };
   })
     .filter((d) => d.naik > 0)
     .sort((a, b) => b.naik - a.naik);
@@ -207,7 +208,10 @@ export default async function HalamanTransparansi() {
             <div>
               <p className="font-display font-bold">Insight otomatis</p>
               <p className="mt-1 text-sm text-muted">
-                Laporan <b className="text-ink">{teratas.emoji} {teratas.nama}</b>{" "}
+                Laporan{" "}
+                <b className="inline-flex items-center gap-1 text-ink">
+                  <IkonKategori slug={teratas.slug} ukuran={13} /> {teratas.nama}
+                </b>{" "}
                 naik <b className="text-ink">{teratas.naik} laporan</b> dibanding
                 minggu lalu ({teratas.kini} vs {teratas.lalu}). Perlu perhatian
                 khusus dewan.

@@ -2,26 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { Compass, History, MapPin, Map as IkonPeta } from "lucide-react";
 import { Button } from "@/components/ui";
 
 const LANGKAH = [
   {
-    emoji: "🗺️",
+    Ikon: IkonPeta,
     judul: "Selamat datang di peta SIGAP",
     isi: "Setiap pin adalah laporan warga — warnanya menunjukkan jenis masalahnya.",
   },
   {
-    emoji: "🧭",
+    Ikon: Compass,
     judul: "Saring sesukamu",
     isi: "Gunakan chip kategori/status, pencarian, atau 'Di sekitar saya' untuk fokus pada lingkunganmu.",
   },
   {
-    emoji: "⏳",
+    Ikon: History,
     judul: "Putar garis waktu",
     isi: "Lihat bagaimana warga dan dewan menyelesaikan masalah dari bulan ke bulan.",
   },
   {
-    emoji: "📍",
+    Ikon: MapPin,
     judul: "Siap melapor?",
     isi: "Klik 'Laporkan Masalah', tempel pin di peta, selesai dalam 30 detik.",
   },
@@ -62,7 +63,12 @@ export function TurPeta() {
               />
             ))}
           </div>
-          <p className="text-3xl">{LANGKAH[langkah].emoji}</p>
+          <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+            {(() => {
+              const Ikon = LANGKAH[langkah].Ikon;
+              return <Ikon size={20} strokeWidth={1.8} />;
+            })()}
+          </span>
           <h3 className="mt-2 font-display text-lg font-bold">
             {LANGKAH[langkah].judul}
           </h3>

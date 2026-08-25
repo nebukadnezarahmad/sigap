@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { BADGES } from "@/lib/constants";
+import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
+import { Lock } from "lucide-react";
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
 
@@ -62,7 +64,13 @@ export function BadgeSaya() {
               }`}
               title={b.deskripsi}
             >
-              <span aria-hidden>{punya ? b.emoji : "🔒"}</span>
+              <span aria-hidden className="flex items-center">
+                {punya ? (
+                  <IkonVektor node={nodeBadge(b)} ukuran={13} />
+                ) : (
+                  <Lock size={12} />
+                )}
+              </span>
               {b.nama}
             </li>
           );

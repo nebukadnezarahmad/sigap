@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
+import { CheckCircle2, Clock, Zap } from "lucide-react";
 import { Card } from "@/components/ui";
+import { svgUriKategori } from "@/lib/ikon-vektor";
 
 export function AngkaHidup({ nilai }: { nilai: number }) {
   const [tampil, setTampil] = useState(0);
@@ -50,27 +52,28 @@ export function Terungkap({
 }
 
 const PIN_HERO = [
-  { emoji: "🗑️", warna: "#65a30d", x: "18%", y: "26%", delay: 0.15 },
-  { emoji: "🌊", warna: "#0284c7", x: "58%", y: "22%", delay: 0.3 },
-  { emoji: "💡", warna: "#f59e0b", x: "74%", y: "54%", delay: 0.45 },
-  { emoji: "🛣️", warna: "#78716c", x: "34%", y: "64%", delay: 0.6 },
-  { emoji: "🌳", warna: "#059669", x: "64%", y: "78%", delay: 0.75 },
-  { emoji: "📌", warna: "#64748b", x: "12%", y: "76%", delay: 0.9 },
+  { slug: "sampah", warna: "#65a30d", x: "18%", y: "26%", delay: 0.15 },
+  { slug: "drainase", warna: "#0284c7", x: "58%", y: "22%", delay: 0.3 },
+  { slug: "lampu", warna: "#f59e0b", x: "74%", y: "54%", delay: 0.45 },
+  { slug: "jalan", warna: "#78716c", x: "34%", y: "64%", delay: 0.6 },
+  { slug: "ruang-hijau", warna: "#059669", x: "64%", y: "78%", delay: 0.75 },
+  { slug: "lainnya", warna: "#64748b", x: "12%", y: "76%", delay: 0.9 },
 ];
 
 function Pin({
-  emoji,
+  slug,
   warna,
   x,
   y,
   delay,
 }: {
-  emoji: string;
+  slug: string;
   warna: string;
   x: string;
   y: string;
   delay: number;
 }) {
+  const ikon = svgUriKategori(slug, "#ffffff", 16);
   return (
     <motion.div
       aria-hidden
@@ -88,10 +91,11 @@ function Pin({
           transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
         />
         <span
-          className="relative flex size-[38px] items-center justify-center rounded-full border-[3px] border-white text-lg shadow-lg"
+          className="relative flex size-[38px] items-center justify-center rounded-full border-[3px] border-white shadow-lg"
           style={{ backgroundColor: warna }}
         >
-          {emoji}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ikon} width={16} height={16} alt="" />
         </span>
       </span>
     </motion.div>
@@ -152,23 +156,23 @@ export function PetaHeroVisual() {
         )}
 
         {PIN_HERO.map((p) => (
-          <Pin key={p.emoji} {...p} />
+          <Pin key={p.slug} {...p} />
         ))}
 
         <ChipMelayang
-          isi={<>✅ Selesai ditangani</>}
+          isi={<><CheckCircle2 size={13} className="text-daun-600" /> Selesai ditangani</>}
           kelas="border garis-halus bg-panel text-ink right-4 top-12"
           durasi={4}
           delay={0}
         />
         <ChipMelayang
-          isi={<>⏳ Status: Dikerjakan</>}
+          isi={<><Clock size={13} className="text-kunyit-600" /> Status: Dikerjakan</>}
           kelas="border garis-halus bg-panel text-ink bottom-16 left-4"
           durasi={5}
           delay={0.6}
         />
         <ChipMelayang
-          isi={<>+10 poin 🎉</>}
+          isi={<><Zap size={13} /> +10 poin</>}
           kelas="bottom-6 right-6 border-transparent bg-daun-600 text-white"
           durasi={6}
           delay={1.1}

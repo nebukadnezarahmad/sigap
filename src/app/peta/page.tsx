@@ -22,7 +22,7 @@ export default async function HalamanPeta() {
       const { data, error } = await supabase
         .from("reports")
         .select(
-          `*, lat, lng, categories(slug,nama,warna,emoji),
+          `*, lat, lng, categories(slug,nama,warna),
            profiles!reports_user_id_fkey(id,username,nama_lengkap,avatar_url),
            votes(count), comments(count)`
         )

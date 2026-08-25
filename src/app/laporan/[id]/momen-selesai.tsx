@@ -49,7 +49,7 @@ export function MomenSelesai({
   if (awalSelesai && !baru) {
     return (
       <div className="mb-5 flex items-center gap-3 rounded-2xl border border-daun-500/40 bg-daun-500/10 px-5 py-4">
-        <PartyPopper className="text-daun-700 dark:text-daun-300" size={22} />
+        <PartyPopper className="shrink-0 text-daun-700 dark:text-daun-300" size={22} />
         <p className="text-sm font-semibold text-daun-800 dark:text-daun-200">
           Masalah ini sudah selesai ditangani. Terima kasih kepada semua warga
           yang berpartisipasi!
@@ -66,7 +66,7 @@ export function MomenSelesai({
       animate={{ scale: 1, opacity: 1 }}
       className="mb-5 rounded-2xl border border-daun-500/40 bg-daun-500/10 p-6 text-center"
     >
-      <p className="text-4xl">🎉</p>
+      <PartyPopper size={44} className="mx-auto text-daun-700 dark:text-daun-300" />
       <h2 className="mt-2 font-display text-xl font-bold text-daun-800 dark:text-daun-200">
         Laporan ini baru saja SELESAI!
       </h2>

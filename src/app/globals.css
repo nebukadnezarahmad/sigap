@@ -170,10 +170,9 @@ img.foto-laporan {
   transform: rotate(-45deg);
 }
 
-.pin-emoji {
+.pin-ikon {
   transform: rotate(45deg);
-  font-size: 15px;
-  line-height: 1;
+  display: block;
 }
 
 .pin-sigap.pin-aktif {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Crown, Medal } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { BADGES } from "@/lib/constants";
+import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
 import { Avatar, Card } from "@/components/ui";
 import { BadgeSaya } from "./badge-saya";
 
@@ -112,8 +113,8 @@ export default async function HalamanPapanSkor() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {BADGES.map((b) => (
             <Card key={b.key} className="p-4">
-              <span className="text-3xl" role="img" aria-label={b.nama}>
-                {b.emoji}
+              <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+                <IkonVektor node={nodeBadge(b)} ukuran={20} />
               </span>
               <p className="mt-2 font-display text-sm font-bold">{b.nama}</p>
               <p className="mt-0.5 text-xs text-muted">{b.deskripsi}</p>

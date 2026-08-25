@@ -38,7 +38,7 @@ export default async function HalamanDewan() {
   const { data: semua } = await supabase
     .from("reports")
     .select(
-      `*, lat, lng, categories(slug,nama,warna,emoji),
+      `*, lat, lng, categories(slug,nama,warna),
        profiles!reports_user_id_fkey(id,username,nama_lengkap,avatar_url),
        votes(count), comments(count)`
     )

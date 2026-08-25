@@ -96,10 +96,7 @@ export default async function Gambar({ params }: { params: { id: string } }) {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div style={{ fontSize: 26, color: "#5c6b64", display: "flex", gap: 10 }}>
-            <span>{kat.emoji}</span>
-            <span>{kategori}</span>
-          </div>
+          <div style={{ fontSize: 26, color: "#5c6b64" }}>{kategori}</div>
           <div
             style={{
               fontSize: 58,

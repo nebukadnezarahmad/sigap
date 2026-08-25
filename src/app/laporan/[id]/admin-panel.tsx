@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ImagePlus, Save } from "lucide-react";
+import { ImagePlus, Save, Wrench } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { STATUS, type StatusKey } from "@/lib/constants";
@@ -73,7 +73,9 @@ export function AdminPanel({
 
   return (
     <Card className="border-kunyit-500/40 bg-kunyit-100/30 p-5 dark:bg-kunyit-500/5">
-      <h2 className="mb-4 font-display font-bold">🛠️ Panel dewan</h2>
+      <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
+        <Wrench size={16} /> Panel dewan
+      </h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <Label htmlFor="status-admin">Status penanganan</Label>

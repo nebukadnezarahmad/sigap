@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Flame } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { BADGES, LEVELS, levelDari } from "@/lib/constants";
+import { IkonKategori, IkonVektor, nodeBadge, nodeLevel } from "@/lib/ikon-vektor";
+import { FileText, Flame, Lock } from "lucide-react";
 import type { StatusLaporan } from "@/types/database";
 import { waktuRelatif } from "@/lib/utils";
 import { Avatar, Card, StatusChip } from "@/components/ui";
@@ -14,7 +15,7 @@ type LaporanRingkas = {
   judul: string;
   status: string;
   created_at: string;
-  categories: { slug: string; nama: string; warna: string; emoji: string } | null;
+  categories: { slug: string; nama: string; warna: string } | null;
 };
 
 function hitungStreak(tanggal: string[]) {
@@ -45,7 +46,7 @@ export default async function HalamanWarga({
   const [laporan, komentar, votes, badges] = await Promise.all([
     supabase
       .from("reports")
-      .select("id, judul, status, created_at, categories(slug,nama,warna,emoji)")
+      .select("id, judul, status, created_at, categories(slug,nama,warna)")
       .eq("user_id", p.id)
       .order("created_at", { ascending: false })
       .limit(6),
@@ -98,8 +99,9 @@ export default async function HalamanWarga({
               </div>
             </div>
             <div className="flex gap-2 pb-1">
-              <span className="rounded-full bg-panel-2 px-3.5 py-1.5 text-xs font-semibold text-muted">
-                📋 {(laporan.data ?? []).length} laporan terakhir
+              <span className="flex items-center gap-1.5 rounded-full bg-panel-2 px-3.5 py-1.5 text-xs font-semibold text-muted">
+                <FileText size={12} /> {(laporan.data ?? []).length} laporan
+                terakhir
               </span>
               <span className="flex items-center gap-1 rounded-full bg-panel-2 px-3.5 py-1.5 text-xs font-semibold text-muted">
                 <Flame size={13} className="text-kunyit-500" /> {streak} hari
@@ -111,8 +113,9 @@ export default async function HalamanWarga({
           <div className="mt-6 grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
             <div>
               <div className="mb-1.5 flex items-center justify-between text-sm">
-                <span className="font-display font-bold">
-                  {lv.sekarang.emoji} Level {lv.sekarang.nama}
+                <span className="flex items-center gap-2 font-display font-bold">
+                  <IkonVektor node={nodeLevel(lv.sekarang)} ukuran={16} />
+                  Level {lv.sekarang.nama}
                 </span>
                 <span className="text-muted">
                   {p.poin} poin
@@ -127,8 +130,16 @@ export default async function HalamanWarga({
               </div>
               <div className="mt-1.5 flex gap-3 text-[11px] text-muted">
                 {LEVELS.map((l) => (
-                  <span key={l.key} className={p.poin >= l.min ? "font-semibold text-daun-700 dark:text-daun-300" : ""}>
-                    {l.emoji} {l.nama} ({l.min}+)
+                  <span
+                    key={l.key}
+                    className={`flex items-center gap-1 ${
+                      p.poin >= l.min
+                        ? "font-semibold text-daun-700 dark:text-daun-300"
+                        : ""
+                    }`}
+                  >
+                    <IkonVektor node={nodeLevel(l)} ukuran={12} />
+                    {l.nama} ({l.min}+)
                   </span>
                 ))}
               </div>
@@ -152,7 +163,11 @@ export default async function HalamanWarga({
                     : "garis-halus text-muted opacity-55"
                 }`}
               >
-                <span aria-hidden>{punya ? b.emoji : "🔒"}</span>
+                {punya ? (
+                  <IkonVektor node={nodeBadge(b)} ukuran={13} />
+                ) : (
+                  <Lock size={12} />
+                )}
                 {b.nama}
               </span>
             );
@@ -173,7 +188,9 @@ export default async function HalamanWarga({
           {laporanTerakhir.map((r) => (
             <Link key={r.id} href={`/laporan/${r.id}`} className="block">
               <Card className="flex items-center gap-3 p-4 transition hover:border-daun-400">
-                <span className="text-xl">{r.categories?.emoji ?? "📌"}</span>
+                <span style={{ color: r.categories?.warna }}>
+                  <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={18} />
+                </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">{r.judul}</p>
                   <p className="text-xs text-muted" suppressHydrationWarning>

@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { KATEGORI, STATUS, kategoriBySlug, type StatusKey } from "@/lib/constants";
+import { IkonKategori } from "@/lib/ikon-vektor";
+import { History, MessageSquare, ThumbsUp } from "lucide-react";
 import { waktuRelatif } from "@/lib/utils";
 import { StatusChip, Button, Card } from "@/components/ui";
 import { Modal } from "@/components/modal";
@@ -176,7 +178,7 @@ export function Jelajah({
             r.categories?.warna ??
             STATUS[r.status as StatusKey]?.warna ??
             "#64748b",
-          emoji: r.categories?.emoji ?? "📌",
+          slug: r.categories?.slug ?? "lainnya",
           judul: r.judul,
         })),
     [tersaring]
@@ -291,7 +293,8 @@ export function Jelajah({
                 : undefined
             }
           >
-            {k.emoji} {k.nama}
+            <IkonKategori slug={k.slug} ukuran={14} />
+            {k.nama}
           </button>
         ))}
 
@@ -331,7 +334,7 @@ export function Jelajah({
               : "garis-halus bg-panel-2 text-muted hover:text-ink"
           }`}
         >
-          ⏳ Garis waktu
+          <History size={14} className="inline" /> Garis waktu
         </button>
         {periodeIdx !== null && (
           <>
@@ -352,7 +355,8 @@ export function Jelajah({
               aria-label="Pilih periode waktu"
             />
             <span className="text-xs font-semibold text-muted">
-              s.d. {BULAN[periodeIdx].label} · {tersaring.length} laporan
+              s.d. {BULAN[periodeIdx].label} ·{" "}
+              <span className="angka-tabular">{tersaring.length}</span> laporan
               kumulatif
             </span>
           </>
@@ -372,7 +376,8 @@ export function Jelajah({
           />
           {periodeIdx !== null && (
             <div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-xl bg-panel/90 px-3 py-1.5 font-display text-sm font-bold shadow backdrop-blur">
-              ⏳ s.d. {BULAN[periodeIdx].label}
+              <History size={13} className="inline align-[-2px]" /> s.d.{" "}
+              {BULAN[periodeIdx].label}
             </div>
           )}
         </Card>
@@ -401,7 +406,8 @@ export function Jelajah({
                       className="flex items-center gap-1.5 text-xs font-semibold"
                       style={{ color: r.categories?.warna }}
                     >
-                      {r.categories?.emoji} {r.categories?.nama ?? "Lainnya"}
+                      <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={13} />
+                      {r.categories?.nama ?? "Lainnya"}
                     </span>
                     <span className="text-xs text-muted" suppressHydrationWarning>
                       {waktuRelatif(r.created_at)}
@@ -415,8 +421,12 @@ export function Jelajah({
                   </p>
                   <div className="mt-2.5 flex items-center gap-3 text-xs text-muted">
                     <StatusChip status={r.status} />
-                    <span>👍 {r.vote_count}</span>
-                    <span>💬 {r.comment_count}</span>
+                    <span className="flex items-center gap-1">
+                      <ThumbsUp size={11} /> {r.vote_count}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <MessageSquare size={11} /> {r.comment_count}
+                    </span>
                   </div>
                 </Card>
               </motion.div>
@@ -451,11 +461,16 @@ export function Jelajah({
                   color: terpilih.categories?.warna,
                 }}
               >
-                {terpilih.categories?.emoji}{" "}
+                <IkonKategori slug={terpilih.categories?.slug ?? "lainnya"} ukuran={13} />{" "}
                 {kategoriBySlug(terpilih.categories?.slug ?? "").nama}
               </span>
               <span className="text-xs text-muted">
-                👍 {terpilih.vote_count} · 💬 {terpilih.comment_count}
+                <span className="flex items-center gap-1">
+                  <ThumbsUp size={12} /> {terpilih.vote_count}
+                </span>
+                <span className="flex items-center gap-1">
+                  <MessageSquare size={12} /> {terpilih.comment_count}
+                </span>
               </span>
             </div>
             <p className="whitespace-pre-line text-sm leading-relaxed">

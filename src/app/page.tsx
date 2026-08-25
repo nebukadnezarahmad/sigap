@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Building2, CheckCircle2, MapPin, Megaphone } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { Card } from "@/components/ui";
+import { IkonKategori } from "@/lib/ikon-vektor";
 import { AngkaHidup, PetaHeroVisual, Terungkap } from "./landing-visual";
 
 export const dynamic = "force-dynamic";
@@ -11,21 +12,21 @@ export const dynamic = "force-dynamic";
 const LANGKAH = [
   {
     nomor: "01",
-    emoji: "📍",
+    ikon: MapPin,
     judul: "Lapor dalam 30 detik",
     isi: "Klik titik di peta, tempel foto, pilih kategori. Selesai. Setiap laporan langsung terlihat oleh dewan.",
     lebar: "md:ml-0 md:max-w-xl",
   },
   {
     nomor: "02",
-    emoji: "📣",
+    ikon: Megaphone,
     judul: "Warga serentak mendukung",
     isi: "Dukungan dan komentar warga lain menaikkan prioritas laporan — dan membuatnya sulit diabaikan.",
     lebar: "md:ml-auto md:max-w-xl md:text-right",
   },
   {
     nomor: "03",
-    emoji: "✅",
+    ikon: CheckCircle2,
     judul: "Ditindaklanjuti transparan",
     isi: "Semua orang melihat perubahan status: baru, diverifikasi, dikerjakan, selesai — lengkap dengan bukti foto.",
     lebar: "md:ml-0 md:max-w-xl",
@@ -72,7 +73,8 @@ export default async function Beranda() {
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
           <div className="animate-muncul">
             <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-daun-500/30 bg-daun-500/10 px-3.5 py-1.5 text-xs font-semibold text-daun-700 dark:text-daun-300">
-              🏙️ Untuk Kota & Permukiman Berkelanjutan · SDG 11
+              <Building2 size={13} className="inline align-[-2px]" /> Untuk Kota
+              & Permukiman Berkelanjutan · SDG 11
             </p>
             <h1 className="font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
               Masalah lingkungan di sekitarmu,{" "}
@@ -159,8 +161,10 @@ export default async function Beranda() {
                   {l.nomor}
                 </span>
                 <div className={l.lebar.includes("text-right") ? "sm:ml-auto" : ""}>
-                  <h3 className="font-serif text-2xl font-semibold tracking-tight">
-                    <span className="mr-2">{l.emoji}</span>
+                  <h3 className="flex items-center gap-2.5 font-serif text-2xl font-semibold tracking-tight">
+                    <span className="flex size-9 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+                      <l.ikon size={18} strokeWidth={1.8} />
+                    </span>
                     {l.judul}
                   </h3>
                   <p className="mt-2 leading-relaxed text-muted teks-pretty">
@@ -200,12 +204,12 @@ export default async function Beranda() {
                   className="flex items-center gap-2 rounded-full border garis-halus bg-panel py-2.5 pl-4 pr-3 text-sm font-semibold shadow-[0_1px_2px_rgb(23_67_42/0.04)]"
                 >
                   <span
-                    className="flex size-7 items-center justify-center rounded-full text-sm"
-                    style={{ backgroundColor: `${k.warna}22` }}
+                    className="flex size-7 items-center justify-center rounded-full"
+                    style={{ backgroundColor: `${k.warna}22`, color: k.warna }}
                     role="img"
                     aria-label={k.nama}
                   >
-                    {k.emoji}
+                    <IkonKategori slug={k.slug} ukuran={14} />
                   </span>
                   {k.nama}
                   <span className="angka-tabular rounded-full bg-panel-2 px-2 py-0.5 text-xs text-muted">

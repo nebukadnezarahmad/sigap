@@ -13,7 +13,6 @@ export type Kategori = {
   slug: string;
   nama: string;
   warna: string;
-  emoji: string;
 };
 
 export type StatusLaporan =
@@ -63,7 +62,7 @@ export type Notifikasi = {
 };
 
 export type LaporanDenganRelasi = Laporan & {
-  categories: Pick<Kategori, "slug" | "nama" | "warna" | "emoji"> | null;
+  categories: Pick<Kategori, "slug" | "nama" | "warna"> | null;
   profiles:
     | Pick<Profil, "id" | "username" | "nama_lengkap" | "avatar_url">
     | null;

@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import type * as LeafletNS from "leaflet";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/lib/use-theme";
+import { svgUriKategori } from "@/lib/ikon-vektor";
 
 const TILE_TERANG =
   "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
@@ -17,7 +18,7 @@ export type TitikPeta = {
   lat: number;
   lng: number;
   warna: string;
-  emoji: string;
+  slug: string;
   judul: string;
 };
 
@@ -139,7 +140,7 @@ export function LeafletMap({
         });
         titik.forEach((t) => {
           const m = L.marker([t.lat, t.lng], {
-            icon: buatIkon(L, t.warna, t.emoji, t.id === terpilih),
+            icon: buatIkon(L, t.warna, t.slug, t.id === terpilih),
           }).bindTooltip(t.judul, { direction: "top", offset: [0, -22] });
           m.on("click", () => cbRef.current.onKlikTitik?.(t.id));
           cluster.addLayer(m);
@@ -154,7 +155,7 @@ export function LeafletMap({
         const t = titik[titik.length - 1];
         const layer = L.layerGroup().addTo(peta);
         L.marker([t.lat, t.lng], {
-          icon: buatIkon(L, t.warna, t.emoji, true),
+          icon: buatIkon(L, t.warna, t.slug, true),
         }).addTo(layer);
         refLayer.current = layer;
         peta.setView([t.lat, t.lng], Math.max(peta.getZoom(), 15));
@@ -205,12 +206,13 @@ export function LeafletMap({
 function buatIkon(
   L: typeof LeafletNS,
   warna: string,
-  emoji: string,
+  slug: string,
   aktif?: boolean
 ) {
+  const ikon = svgUriKategori(slug, "#ffffff", 15);
   return L.divIcon({
     className: "",
-    html: `<span class="pin-sigap${aktif ? " pin-aktif" : ""}" style="--pin:${warna}"><span class="pin-emoji">${emoji}</span></span>`,
+    html: `<span class="pin-sigap${aktif ? " pin-aktif" : ""}" style="--pin:${warna}"><img src="${ikon}" width="15" height="15" alt="" class="pin-ikon" /></span>`,
     iconSize: [34, 34],
     iconAnchor: [17, 34],
     tooltipAnchor: [0, -26],

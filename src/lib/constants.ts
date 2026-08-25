@@ -43,16 +43,15 @@ export type KategoriDef = {
   slug: string;
   nama: string;
   warna: string;
-  emoji: string;
 };
 
 export const KATEGORI: KategoriDef[] = [
-  { slug: "sampah", nama: "Sampah Menumpuk", warna: "#65a30d", emoji: "🗑️" },
-  { slug: "drainase", nama: "Drainase & Banjir", warna: "#0284c7", emoji: "🌊" },
-  { slug: "lampu", nama: "Lampu Jalan Mati", warna: "#f59e0b", emoji: "💡" },
-  { slug: "jalan", nama: "Jalan Rusak", warna: "#78716c", emoji: "🛣️" },
-  { slug: "ruang-hijau", nama: "Ruang Hijau", warna: "#059669", emoji: "🌳" },
-  { slug: "lainnya", nama: "Lainnya", warna: "#64748b", emoji: "📌" },
+  { slug: "sampah", nama: "Sampah Menumpuk", warna: "#65a30d" },
+  { slug: "drainase", nama: "Drainase & Banjir", warna: "#0284c7" },
+  { slug: "lampu", nama: "Lampu Jalan Mati", warna: "#f59e0b" },
+  { slug: "jalan", nama: "Jalan Rusak", warna: "#78716c" },
+  { slug: "ruang-hijau", nama: "Ruang Hijau", warna: "#059669" },
+  { slug: "lainnya", nama: "Lainnya", warna: "#64748b" },
 ];
 
 export function kategoriBySlug(slug: string): KategoriDef {
@@ -71,7 +70,7 @@ export type BadgeDef = {
   key: string;
   nama: string;
   deskripsi: string;
-  emoji: string;
+  ikon: string;
 };
 
 export const BADGES: BadgeDef[] = [
@@ -79,37 +78,37 @@ export const BADGES: BadgeDef[] = [
     key: "langkah_pertama",
     nama: "Langkah Pertama",
     deskripsi: "Melaporkan masalah pertamamu",
-    emoji: "🌱",
+    ikon: "semai",
   },
   {
     key: "kontributor",
     nama: "Kontributor",
     deskripsi: "5 laporan terkirim",
-    emoji: "🤝",
+    ikon: "kontributor",
   },
   {
     key: "juru_bersih",
     nama: "Juru Bersih",
     deskripsi: "10 laporan terkirim",
-    emoji: "🧹",
+    ikon: "juru_bersih",
   },
   {
     key: "pendengar",
     nama: "Pendengar",
     deskripsi: "Mendukung 10 laporan warga lain",
-    emoji: "👂",
+    ikon: "pendengar",
   },
   {
     key: "suara_rakyat",
     nama: "Suara Rakyat",
     deskripsi: "Mendukung 25 laporan",
-    emoji: "📣",
+    ikon: "suara_rakyat",
   },
   {
     key: "pemberi_semangat",
     nama: "Pemberi Semangat",
     deskripsi: "Menulis 10 komentar",
-    emoji: "🔥",
+    ikon: "pemberi_semangat",
   },
 ];
 
@@ -117,14 +116,14 @@ export type LevelDef = {
   key: string;
   nama: string;
   min: number;
-  emoji: string;
+  ikon: string;
 };
 
 export const LEVELS: LevelDef[] = [
-  { key: "semai", nama: "Semai", min: 0, emoji: "🌱" },
-  { key: "tunas", nama: "Tunas", min: 50, emoji: "🌿" },
-  { key: "pohon", nama: "Pohon", min: 150, emoji: "🌳" },
-  { key: "rimbawan", nama: "Rimbawan", min: 400, emoji: "🦉" },
+  { key: "semai", nama: "Semai", min: 0, ikon: "semai" },
+  { key: "tunas", nama: "Tunas", min: 50, ikon: "tunas" },
+  { key: "pohon", nama: "Pohon", min: 150, ikon: "pohon" },
+  { key: "rimbawan", nama: "Rimbawan", min: 400, ikon: "rimbawan" },
 ];
 
 export function levelDari(poin: number) {

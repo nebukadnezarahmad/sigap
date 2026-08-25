@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Download,
   Flame,
+  ThumbsUp,
   Users,
 } from "lucide-react";
 import {
@@ -26,6 +27,7 @@ import { motion } from "motion/react";
 import { STATUS, SLA_HARI, umurHari, type StatusKey } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
+import { IkonKategori } from "@/lib/ikon-vektor";
 import { Button, Card, Select, StatusChip } from "@/components/ui";
 import { waktuRelatif } from "@/lib/utils";
 
@@ -167,7 +169,7 @@ export function DewanClient({
           lat: r.lat ?? 0,
           lng: r.lng ?? 0,
           warna: r.categories?.warna ?? "#64748b",
-          emoji: r.categories?.emoji ?? "📌",
+          slug: r.categories?.slug ?? "lainnya",
           judul: `${r.judul} · ${STATUS[r.status].label}`,
         })),
     [daftar, filterStatus]
@@ -347,14 +349,17 @@ export function DewanClient({
                 <div key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
                   <div className="min-w-0 flex-1 basis-56">
                     <p className="truncate text-sm font-semibold">{r.judul}</p>
-                    <p className="truncate text-xs text-muted">
-                      {r.categories?.emoji} {r.categories?.nama ?? "Lainnya"} ·{" "}
-                      {waktuRelatif(r.created_at)} · 👍 {r.vote_count}
+                    <p className="flex items-center gap-1 truncate text-xs text-muted">
+                      <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={12} />
+                      {r.categories?.nama ?? "Lainnya"} · {waktuRelatif(r.created_at)} ·
+                      <ThumbsUp size={11} className="shrink-0" />
+                      <span className="angka-tabular">{r.vote_count}</span>
                     </p>
                   </div>
                   {telat && (
                     <span className="rounded-full bg-danger/10 px-2 py-1 text-[11px] font-bold text-danger">
-                      ⏰ {umurHari(r.created_at)} hr — lewat SLA
+                      <AlarmClock size={11} className="inline align-[-1px]" />{" "}
+                      {umurHari(r.created_at)} hr — lewat SLA
                     </span>
                   )}
                   <StatusChip status={r.status} />

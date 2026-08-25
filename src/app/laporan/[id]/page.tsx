@@ -6,6 +6,8 @@ import { STATUS, kategoriBySlug, type StatusKey } from "@/lib/constants";
 import type { FotoLaporan } from "@/types/database";
 import { formatTanggal, waktuRelatif } from "@/lib/utils";
 import { Avatar, Card, StatusChip } from "@/components/ui";
+import { IkonKategori } from "@/lib/ikon-vektor";
+import { CheckCircle2, MapPin, Wrench } from "lucide-react";
 import { LeafletMap } from "@/components/map/leaflet-map";
 import { VoteButton } from "./vote-button";
 import { KomentarSection as Komentar } from "./komentar";
@@ -28,7 +30,7 @@ export default async function HalamanLaporan({
   const { data: r } = await supabase
     .from("reports")
     .select(
-      `*, lat, lng, categories(slug,nama,warna,emoji),
+      `*, lat, lng, categories(slug,nama,warna),
        profiles!reports_user_id_fkey(id,username,nama_lengkap,avatar_url),
        votes(count), comments(count), confirmations(count),
        report_events(id,status,catatan,created_at),
@@ -93,11 +95,12 @@ export default async function HalamanLaporan({
                   color: kat?.warna,
                 }}
               >
-                {kat?.emoji} {kat?.nama ?? "Lainnya"}
+                <IkonKategori slug={kat?.slug ?? "lainnya"} ukuran={13} />{" "}
+                {kat?.nama ?? "Lainnya"}
               </span>
               {r.petugas && (
-                <span className="rounded-full bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300">
-                  🛠️ {r.petugas}
+                <span className="flex items-center gap-1 rounded-full bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300">
+                  <Wrench size={12} /> {r.petugas}
                 </span>
               )}
               <span className="text-xs text-muted" suppressHydrationWarning>
@@ -152,8 +155,8 @@ export default async function HalamanLaporan({
           <Card className="p-5">
             <p className="whitespace-pre-line leading-relaxed">{r.deskripsi}</p>
             {r.alamat_teks && (
-              <p className="mt-3 border-t garis-halus pt-3 text-sm text-muted">
-                📍 {r.alamat_teks}
+              <p className="mt-3 flex items-center gap-1.5 border-t garis-halus pt-3 text-sm text-muted">
+                <MapPin size={13} /> {r.alamat_teks}
               </p>
             )}
           </Card>
@@ -171,8 +174,8 @@ export default async function HalamanLaporan({
 
           {fotoSesudah.length > 0 && (
             <Card className="border-daun-500/40 p-5">
-              <h2 className="mb-3 font-display font-bold text-daun-700 dark:text-daun-300">
-                ✅ Bukti penyelesaian
+              <h2 className="mb-3 flex items-center gap-2 font-display font-bold text-daun-700 dark:text-daun-300">
+                <CheckCircle2 size={17} /> Bukti penyelesaian
               </h2>
               <div className="grid grid-cols-2 gap-2">
                 {fotoSesudah.map((f) => (
@@ -211,7 +214,7 @@ export default async function HalamanLaporan({
                     lat: koordinat[1],
                     lng: koordinat[0],
                     warna: kat?.warna ?? "#64748b",
-                    emoji: kat?.emoji ?? "📌",
+                    slug: kat?.slug ?? "lainnya",
                     judul: r.judul,
                   },
                 ]}
