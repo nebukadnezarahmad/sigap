@@ -174,6 +174,8 @@ export default function HalamanDemo() {
               "Transparansi publik + insight otomatis + open data",
               "Keamanan: RLS, guard role/status, cooldown lapor",
               "Komunitas: polling, aksi bersama, edukasi & quiz berpoin",
+              "Pasar ReUse: pasang & klaim barang bekas antar-warga",
+              "Direktori layanan penting + UMKM warga",
               "Direktori fasilitas hijau di peta + ikuti area",
               "PWA, mode gelap, command palette ⌘K, widget embed",
             ].map((f) => (

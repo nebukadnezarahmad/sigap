@@ -16,6 +16,9 @@ import {
   Users,
   GraduationCap,
   BarChart3,
+  Recycle,
+  Phone,
+  Store,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -99,7 +102,10 @@ export function SiteHeader() {
                 "flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-medium transition",
                 pathname.startsWith("/polling") ||
                   pathname.startsWith("/aksi") ||
-                  pathname.startsWith("/edukasi")
+                  pathname.startsWith("/edukasi") ||
+                  pathname.startsWith("/pasar") ||
+                  pathname.startsWith("/layanan") ||
+                  pathname.startsWith("/umkm")
                   ? "bg-daun-600/10 text-daun-700 dark:text-daun-300"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
               )}
@@ -115,6 +121,9 @@ export function SiteHeader() {
                 { href: "/polling", label: "Polling warga", ikon: BarChart3 },
                 { href: "/aksi", label: "Aksi bersama", ikon: Users },
                 { href: "/edukasi", label: "Edukasi & quiz", ikon: GraduationCap },
+                { href: "/pasar", label: "Pasar ReUse", ikon: Recycle },
+                { href: "/layanan", label: "Direktori layanan", ikon: Phone },
+                { href: "/umkm", label: "UMKM warga", ikon: Store },
               ].map((k) => (
                 <Link
                   key={k.href}

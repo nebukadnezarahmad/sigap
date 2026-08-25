@@ -17,6 +17,9 @@ import {
   BookOpen,
   FileText,
   GraduationCap,
+  Phone,
+  Recycle,
+  Store,
   Trophy,
   Users,
 } from "lucide-react";
@@ -91,6 +94,27 @@ export function CommandPalette() {
         hint: "Komunitas",
         ikon: <GraduationCap size={16} />,
         jalankan: () => router.push("/edukasi"),
+      },
+      {
+        id: "pasar",
+        label: "Pasar ReUse — barang bekas warga",
+        hint: "Komunitas",
+        ikon: <Recycle size={16} />,
+        jalankan: () => router.push("/pasar"),
+      },
+      {
+        id: "layanan",
+        label: "Direktori layanan penting",
+        hint: "Komunitas",
+        ikon: <Phone size={16} />,
+        jalankan: () => router.push("/layanan"),
+      },
+      {
+        id: "umkm",
+        label: "UMKM warga",
+        hint: "Komunitas",
+        ikon: <Store size={16} />,
+        jalankan: () => router.push("/umkm"),
       },
       {
         id: "laporan-saya",

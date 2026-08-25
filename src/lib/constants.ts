@@ -150,6 +150,12 @@ export const BADGES: BadgeDef[] = [
     deskripsi: "Menambahkan 2 fasilitas hijau ke peta",
     ikon: "paket",
   },
+  {
+    key: "pahlawan_reuse",
+    nama: "Pahlawan ReUse",
+    deskripsi: "Memasang 2 barang bekas di Pasar ReUse",
+    ikon: "recycle",
+  },
 ];
 
 export type LevelDef = {

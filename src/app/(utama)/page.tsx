@@ -8,6 +8,7 @@ import {
   MapPin,
   Megaphone,
   Recycle,
+  Store,
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -267,8 +268,22 @@ export default async function Beranda() {
               href: "/edukasi",
               cta: "Mulai belajar",
             },
+            {
+              ikon: Recycle,
+              judul: "Pasar ReUse",
+              isi: "Barang bekas layak pakai berpindah gratis antar-warga — sampah berkurang, tetangga terhubung.",
+              href: "/pasar",
+              cta: "Cari barang",
+            },
+            {
+              ikon: Store,
+              judul: "UMKM warga",
+              isi: "Belanja di tetangga sendiri: kuliner, kerajinan, jasa — ekonomi lingkungan berputar lokal.",
+              href: "/umkm",
+              cta: "Jelajahi usaha",
+            },
           ].map((k, i) => (
-            <Terungkap key={k.judul} tunda={i * 0.08}>
+            <Terungkap key={k.judul} tunda={(i % 3) * 0.08}>
               <Card className="flex h-full flex-col p-6">
                 <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
                   <k.ikon size={18} strokeWidth={1.8} />
