@@ -64,11 +64,8 @@ function FormulirDaftar() {
     }
 
     if (data.user && !data.session) {
-      setPesan(null);
-      alert(
-        "Pendaftaran berhasil! Cek emailmu untuk verifikasi, lalu masuk."
-      );
-      router.push("/masuk");
+      setPesan("ok:Pendaftaran berhasil. Cek emailmu untuk verifikasi, lalu masuk.");
+      setProses(false);
       return;
     }
 
@@ -106,8 +103,15 @@ function FormulirDaftar() {
           <Input id="sandi" type="password" required minLength={8} autoComplete="new-password" value={sandi} onChange={(e) => setSandi(e.target.value)} placeholder="Minimal 8 karakter" />
         </div>
         {pesan && (
-          <p role="alert" className="rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
-            {pesan}
+          <p
+            role="status"
+            className={`rounded-xl px-3 py-2 text-sm ${
+              pesan.startsWith("ok:")
+                ? "bg-daun-500/10 text-daun-700 dark:text-daun-300"
+                : "bg-danger/10 text-danger"
+            }`}
+          >
+            {pesan.startsWith("ok:") ? pesan.slice(3) : pesan}
           </p>
         )}
         <Button type="submit" disabled={proses} className="w-full" size="lg">

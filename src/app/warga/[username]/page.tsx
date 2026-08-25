@@ -121,7 +121,7 @@ export default async function HalamanWarga({
               </div>
               <div className="h-2.5 overflow-hidden rounded-full bg-line">
                 <div
-                  className="h-full rounded-full bg-daun-500 transition-all"
+                  className="h-full rounded-full bg-daun-500 transition-[width,background-color]"
                   style={{ width: `${lv.progres}%` }}
                 />
               </div>

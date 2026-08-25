@@ -56,7 +56,7 @@ export function TurPeta() {
             {LANGKAH.map((_, i) => (
               <span
                 key={i}
-                className={`h-1.5 rounded-full transition-all ${
+                className={`h-1.5 rounded-full transition-[width,background-color] ${
                   i === langkah ? "w-6 bg-daun-600" : "w-1.5 bg-line"
                 }`}
               />
@@ -82,7 +82,7 @@ export function TurPeta() {
                 langkah >= LANGKAH.length - 1 ? selesai() : setLangkah(langkah + 1)
               }
             >
-              {langkah >= LANGKAH.length - 1 ? "Mengerti!" : "Lanjut"}
+              {langkah >= LANGKAH.length - 1 ? "Mengerti" : "Lanjut"}
             </Button>
           </div>
         </motion.div>

@@ -13,12 +13,12 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
+        "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
         size === "sm" && "px-3.5 py-1.5 text-sm",
         size === "md" && "px-5 py-2.5 text-sm",
         size === "lg" && "px-7 py-3 text-base",
         variant === "utama" &&
-          "bg-daun-600 text-white shadow-sm hover:bg-daun-700 hover:shadow-md",
+          "bg-daun-600 text-white shadow-[0_1px_2px_rgb(23_67_42/0.2),0_6px_16px_-6px_rgb(23_67_42/0.35)] hover:bg-daun-700 hover:shadow-[0_2px_4px_rgb(23_67_42/0.2),0_10px_24px_-6px_rgb(23_67_42/0.4)]",
         variant === "sekunder" &&
           "border garis-halus bg-panel text-ink hover:border-daun-400 hover:text-daun-700 dark:hover:text-daun-300",
         variant === "hantu" && "text-muted hover:bg-panel-2 hover:text-ink",
@@ -38,7 +38,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-2xl border garis-halus bg-panel shadow-sm",
+        "rounded-xl border garis-halus bg-panel shadow-[0_1px_2px_rgb(23_67_42/0.05),0_6px_20px_-10px_rgb(23_67_42/0.1)]",
         className
       )}
       {...props}

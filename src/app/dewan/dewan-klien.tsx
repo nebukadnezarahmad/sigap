@@ -230,7 +230,7 @@ export function DewanClient({
                 {k.ikon}
               </span>
               <div>
-                <p className="font-display text-2xl font-extrabold leading-none">{k.nilai}</p>
+                <p className="angka-tabular font-display text-2xl font-extrabold leading-none">{k.nilai}</p>
                 <p className="mt-1 text-xs text-muted">{k.label}</p>
               </div>
             </Card>
@@ -403,7 +403,7 @@ export function DewanClient({
               }`}
             >
               <span
-                className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-all ${
+                className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-[background-color,border-color,box-shadow,color] ${
                   heatAktif ? "left-[22px]" : "left-0.5"
                 }`}
               />

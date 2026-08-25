@@ -21,7 +21,7 @@ function ToggleTema() {
     <button
       onClick={ubah}
       aria-label={gelap ? "Mode terang" : "Mode gelap"}
-      className="rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink"
+      className="flex size-10 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink"
     >
       <span className="hidden dark:block">
         <Sun size={18} />

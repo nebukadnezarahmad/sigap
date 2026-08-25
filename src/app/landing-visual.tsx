@@ -24,7 +24,29 @@ export function AngkaHidup({ nilai }: { nilai: number }) {
     return () => cancelAnimationFrame(raf);
   }, [nilai]);
 
-  return <span>{tampil.toLocaleString("id-ID")}</span>;
+  return <span className="angka-tabular">{tampil.toLocaleString("id-ID")}</span>;
+}
+
+export function Terungkap({
+  children,
+  tunda = 0,
+  className,
+}: {
+  children: React.ReactNode;
+  tunda?: number;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: 24, filter: "blur(4px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.7, delay: tunda, ease: [0.32, 0.72, 0, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
 }
 
 const PIN_HERO = [
@@ -101,73 +123,65 @@ function ChipMelayang({
 
 export function PetaHeroVisual() {
   return (
-    <Card className="relative h-[420px] overflow-hidden p-0 shadow-xl">
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-panel-2"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, var(--line) 0 1px, transparent 1px 56px), repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 56px)",
-          opacity: 0.55,
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute left-[-10%] top-[38%] h-10 w-[130%] rotate-[-14deg]"
-        style={{ backgroundColor: "var(--line)", opacity: 0.7 }}
-      />
-      <div
-        aria-hidden
-        className="absolute right-[6%] top-[12%] size-40 rounded-[2rem] bg-daun-500/15"
-      />
-      {[["20%", "18%"], ["44%", "44%"], ["70%", "70%"], ["82%", "24%"]].map(
-        ([x, y]) => (
-          <div
-            key={x + y}
-            aria-hidden
-            className="absolute size-10 rounded-lg bg-line/60"
-            style={{ left: x, top: y }}
-          />
-        )
-      )}
+    <div
+      aria-hidden
+      className="rounded-[2rem] bg-ink/[0.04] p-1.5 ring-1 ring-black/5 dark:bg-white/[0.04] dark:ring-white/10"
+    >
+      <Card className="relative h-[420px] overflow-hidden rounded-[1.625rem] p-0 bayi-daun">
+        <div
+          className="absolute inset-0 bg-panel-2"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(0deg, var(--line) 0 1px, transparent 1px 56px), repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 56px)",
+            opacity: 0.55,
+          }}
+        />
+        <div
+          className="absolute left-[-10%] top-[38%] h-10 w-[130%] rotate-[-14deg]"
+          style={{ backgroundColor: "var(--line)", opacity: 0.7 }}
+        />
+        <div className="absolute right-[6%] top-[12%] size-40 rounded-[2rem] bg-daun-500/15" />
+        {[["20%", "18%"], ["44%", "44%"], ["70%", "70%"], ["82%", "24%"]].map(
+          ([x, y]) => (
+            <div
+              key={x + y}
+              className="absolute size-10 rounded-lg bg-line/60"
+              style={{ left: x, top: y }}
+            />
+          )
+        )}
 
-      {PIN_HERO.map((p) => (
-        <Pin key={p.emoji} {...p} />
-      ))}
+        {PIN_HERO.map((p) => (
+          <Pin key={p.emoji} {...p} />
+        ))}
 
-      <ChipMelayang
-        isi={<>✅ Selesai ditangani</>}
-        kelas="border garis-halus bg-panel text-ink right-4 top-12"
-        durasi={4}
-        delay={0}
-      />
-      <ChipMelayang
-        isi={<>⏳ Status: Dikerjakan</>}
-        kelas="border garis-halus bg-panel text-ink bottom-16 left-4"
-        durasi={5}
-        delay={0.6}
-      />
-      <ChipMelayang
-        isi={
-          <>
-            +10 poin 🎉
-          </>
-        }
-        kelas="bottom-6 right-6 border-transparent bg-daun-600 text-white"
-        durasi={6}
-        delay={1.1}
-      />
+        <ChipMelayang
+          isi={<>✅ Selesai ditangani</>}
+          kelas="border garis-halus bg-panel text-ink right-4 top-12"
+          durasi={4}
+          delay={0}
+        />
+        <ChipMelayang
+          isi={<>⏳ Status: Dikerjakan</>}
+          kelas="border garis-halus bg-panel text-ink bottom-16 left-4"
+          durasi={5}
+          delay={0.6}
+        />
+        <ChipMelayang
+          isi={<>+10 poin 🎉</>}
+          kelas="bottom-6 right-6 border-transparent bg-daun-600 text-white"
+          durasi={6}
+          delay={1.1}
+        />
 
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 flex items-center justify-between border-b garis-halus bg-panel/70 px-4 py-2.5 text-[11px] font-semibold text-muted backdrop-blur-sm"
-      >
-        <span>PETA LANGSUNG · KOTA HARAPAN</span>
-        <span className="flex items-center gap-1.5">
-          <span className="size-1.5 animate-pulse rounded-full bg-daun-500" />
-          realtime
-        </span>
-      </div>
-    </Card>
+        <div className="absolute inset-x-0 top-0 flex items-center justify-between border-b garis-halus bg-panel/70 px-4 py-2.5 text-[11px] font-semibold text-muted backdrop-blur-sm">
+          <span>PETA LANGSUNG · KOTA HARAPAN</span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-1.5 animate-pulse rounded-full bg-daun-500" />
+            realtime
+          </span>
+        </div>
+      </Card>
+    </div>
   );
 }
