@@ -240,110 +240,139 @@ export function Jelajah({
         </div>
       )}
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <label className="relative">
-          <Search
-            size={15}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-          />
-          <input
-            value={kueri}
-            onChange={(e) => setKueri(e.target.value)}
-            placeholder="Cari judul atau isi laporan…"
-            className="w-64 rounded-full border garis-halus bg-panel py-2 pl-9 pr-3 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15"
-          />
-        </label>
+      <div className="mb-4 rounded-2xl border garis-halus bg-panel p-2.5">
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="relative">
+            <Search
+              size={15}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+            />
+            <input
+              value={kueri}
+              onChange={(e) => setKueri(e.target.value)}
+              placeholder="Cari judul atau isi laporan…"
+              className="w-56 rounded-full border garis-halus bg-panel-2 py-2 pl-9 pr-3 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15"
+            />
+          </label>
 
-        <button
-          onClick={aktifkanSekitarSaya}
-          aria-pressed={!!pusatSaya}
-          className={`flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold transition ${
-            pusatSaya
-              ? "border-transparent bg-daun-600 text-white"
-              : "garis-halus bg-panel text-muted hover:text-ink"
-          }`}
-        >
-          <Crosshair size={14} />
-          {cariLokasi
-            ? "Mencari lokasi…"
-            : pusatSaya
-              ? "≤ 2 km dari saya ✕"
-              : "Di sekitar saya"}
-        </button>
-
-        {KATEGORI.map((k) => (
           <button
-            key={k.slug}
-            onClick={() =>
-              setFKategori((s) =>
-                s.includes(k.slug)
-                  ? s.filter((x) => x !== k.slug)
-                  : [...s, k.slug]
-              )
-            }
-            aria-pressed={fKategori.includes(k.slug)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-              fKategori.includes(k.slug)
-                ? "border-transparent text-white"
-                : "garis-halus bg-panel text-muted hover:text-ink"
+            onClick={aktifkanSekitarSaya}
+            aria-pressed={!!pusatSaya}
+            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              pusatSaya
+                ? "border-transparent bg-daun-600 text-white"
+                : "garis-halus text-muted hover:text-ink"
+            }`}
+          >
+            <Crosshair size={14} />
+            {cariLokasi
+              ? "Mencari…"
+              : pusatSaya
+                ? "≤ 2 km dari saya"
+                : "Di sekitar saya"}
+          </button>
+
+          <span aria-hidden className="mx-1 hidden h-5 w-px bg-line sm:block" />
+
+          {KATEGORI.map((k) => (
+            <button
+              key={k.slug}
+              onClick={() =>
+                setFKategori((arr) =>
+                  arr.includes(k.slug)
+                    ? arr.filter((x) => x !== k.slug)
+                    : [...arr, k.slug]
+                )
+              }
+              aria-pressed={fKategori.includes(k.slug)}
+              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                fKategori.includes(k.slug)
+                  ? "border-transparent text-white"
+                  : "text-muted hover:text-ink"
+              }`}
+              style={
+                fKategori.includes(k.slug)
+                  ? { backgroundColor: k.warna, borderColor: k.warna }
+                  : { borderColor: "var(--line)" }
+              }
+            >
+              <IkonKategori slug={k.slug} ukuran={14} />
+              {k.nama}
+            </button>
+          ))}
+
+          <span aria-hidden className="mx-1 hidden h-5 w-px bg-line sm:block" />
+
+          {(Object.keys(STATUS) as StatusKey[]).map((s) => (
+            <button
+              key={s}
+              onClick={() =>
+                setFStatus((arr) =>
+                  arr.includes(s) ? arr.filter((x) => x !== s) : [...arr, s]
+                )
+              }
+              aria-pressed={fStatus.includes(s)}
+              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                fStatus.includes(s)
+                  ? STATUS[s].chip + " border-current/30"
+                  : "text-muted hover:text-ink"
+              }`}
+              style={
+                fStatus.includes(s)
+                  ? undefined
+                  : { borderColor: "var(--line)" }
+              }
+            >
+              <span
+                className="size-1.5 rounded-full"
+                style={{
+                  backgroundColor: fStatus.includes(s)
+                    ? undefined
+                    : STATUS[s].warna,
+                }}
+              />
+              {STATUS[s].label}
+            </button>
+          ))}
+
+          <span aria-hidden className="mx-1 hidden h-5 w-px bg-line sm:block" />
+
+          <button
+            onClick={() => {
+              if (periodeIdx === null) setPeriodeIdx(BULAN.length - 1);
+              else {
+                setPeriodeIdx(null);
+                setMainkan(false);
+              }
+            }}
+            aria-pressed={periodeIdx !== null}
+            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              periodeIdx !== null
+                ? "border-transparent bg-daun-600 text-white"
+                : "text-muted hover:text-ink"
             }`}
             style={
-              fKategori.includes(k.slug)
-                ? { backgroundColor: k.warna }
-                : undefined
+              periodeIdx !== null
+                ? undefined
+                : { borderColor: "var(--line)" }
             }
           >
-            <IkonKategori slug={k.slug} ukuran={14} />
-            {k.nama}
+            <History size={14} /> Garis waktu
           </button>
-        ))}
+        </div>
 
-        {(Object.keys(STATUS) as StatusKey[]).map((s) => (
-          <button
-            key={s}
-            onClick={() =>
-              setFStatus((arr) =>
-                arr.includes(s) ? arr.filter((x) => x !== s) : [...arr, s]
-              )
-            }
-            aria-pressed={fStatus.includes(s)}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              fStatus.includes(s)
-                ? STATUS[s].chip + " ring-2 ring-current"
-                : "garis-halus bg-panel text-muted hover:text-ink"
-            }`}
-          >
-            ● {STATUS[s].label}
-          </button>
-        ))}
-      </div>
-
-      <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border garis-halus bg-panel px-4 py-3">
-        <button
-          onClick={() => {
-            if (periodeIdx === null) setPeriodeIdx(BULAN.length - 1);
-            else {
-              setPeriodeIdx(null);
-              setMainkan(false);
-            }
-          }}
-          aria-pressed={periodeIdx !== null}
-          className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-            periodeIdx !== null
-              ? "bg-daun-600 text-white"
-              : "garis-halus bg-panel-2 text-muted hover:text-ink"
-          }`}
-        >
-          <History size={14} className="inline" /> Garis waktu
-        </button>
         {periodeIdx !== null && (
-          <>
+          <div className="mt-2.5 flex flex-wrap items-center gap-3 border-t garis-halus px-1 pt-2.5">
             <button
               onClick={() => setMainkan((v) => !v)}
               aria-label={mainkan ? "Jeda" : "Putar"}
-              className="flex size-7 items-center justify-center rounded-full bg-daun-600 text-white transition hover:bg-daun-700"
+              className="flex size-8 items-center justify-center rounded-full bg-daun-600 text-white transition hover:bg-daun-700"
             >
-              {mainkan ? <span className="text-[10px]">■</span> : <Play size={13} />}
+              {mainkan ? (
+                <span className="text-[10px] leading-none">■</span>
+              ) : (
+                <Play size={14} />
+              )}
             </button>
             <input
               type="range"
@@ -351,7 +380,7 @@ export function Jelajah({
               max={BULAN.length - 1}
               value={periodeIdx}
               onChange={(e) => setPeriodeIdx(Number(e.target.value))}
-              className="w-48 accent-daun-600"
+              className="w-52 accent-daun-600"
               aria-label="Pilih periode waktu"
             />
             <span className="text-xs font-semibold text-muted">
@@ -359,7 +388,7 @@ export function Jelajah({
               <span className="angka-tabular">{tersaring.length}</span> laporan
               kumulatif
             </span>
-          </>
+          </div>
         )}
       </div>
 
