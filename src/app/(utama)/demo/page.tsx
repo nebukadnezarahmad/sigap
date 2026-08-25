@@ -173,6 +173,8 @@ export default function HalamanDemo() {
               "Dashboard dewan: SLA, penugasan, bulk, heatmap",
               "Transparansi publik + insight otomatis + open data",
               "Keamanan: RLS, guard role/status, cooldown lapor",
+              "Komunitas: polling, aksi bersama, edukasi & quiz berpoin",
+              "Direktori fasilitas hijau di peta + ikuti area",
               "PWA, mode gelap, command palette ⌘K, widget embed",
             ].map((f) => (
               <li key={f} className="flex items-start gap-2">

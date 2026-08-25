@@ -13,9 +13,12 @@ import {
   Scale,
   ShieldCheck,
   Sun,
+  BarChart3,
   BookOpen,
   FileText,
+  GraduationCap,
   Trophy,
+  Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
@@ -67,6 +70,27 @@ export function CommandPalette() {
         hint: "Aksi",
         ikon: <MapPin size={16} />,
         jalankan: () => router.push("/peta?lapor=1"),
+      },
+      {
+        id: "polling",
+        label: "Polling warga",
+        hint: "Komunitas",
+        ikon: <BarChart3 size={16} />,
+        jalankan: () => router.push("/polling"),
+      },
+      {
+        id: "aksi",
+        label: "Aksi bersama",
+        hint: "Komunitas",
+        ikon: <Users size={16} />,
+        jalankan: () => router.push("/aksi"),
+      },
+      {
+        id: "edukasi",
+        label: "Edukasi & quiz lingkungan",
+        hint: "Komunitas",
+        ikon: <GraduationCap size={16} />,
+        jalankan: () => router.push("/edukasi"),
       },
       {
         id: "laporan-saya",

@@ -1,5 +1,15 @@
 import Link from "next/link";
-import { ArrowRight, Building2, CheckCircle2, MapPin, Megaphone } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  Building2,
+  CheckCircle2,
+  GraduationCap,
+  MapPin,
+  Megaphone,
+  Recycle,
+  Users,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
@@ -219,6 +229,67 @@ export default async function Beranda() {
               ))}
             </div>
           </Terungkap>
+        </div>
+      </section>
+
+      <section
+        className="mx-auto max-w-6xl px-4 py-24"
+        aria-label="Lebih dari sekadar lapor"
+      >
+        <Terungkap>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-kunyit-600">
+            Ekosistem
+          </p>
+          <h2 className="mt-3 max-w-2xl font-serif text-4xl font-semibold tracking-tight">
+            Lebih dari sekadar kanal lapor.
+          </h2>
+        </Terungkap>
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {[
+            {
+              ikon: BarChart3,
+              judul: "Polling partisipatif",
+              isi: "Suaramu menentukan prioritas kebijakan lingkungan — hasil realtime, terbuka.",
+              href: "/polling",
+              cta: "Ikut polling",
+            },
+            {
+              ikon: Users,
+              judul: "Aksi bersama",
+              isi: "Sabtu bersih, lokakarya komposting — temukan atau prakarsai gerakan warga.",
+              href: "/aksi",
+              cta: "Lihat aksi",
+            },
+            {
+              ikon: GraduationCap,
+              judul: "Edukasi & quiz",
+              isi: "Materi ringkas, quiz badge, dan kalkulator jejak sampah pribadimu.",
+              href: "/edukasi",
+              cta: "Mulai belajar",
+            },
+          ].map((k, i) => (
+            <Terungkap key={k.judul} tunda={i * 0.08}>
+              <Card className="flex h-full flex-col p-6">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+                  <k.ikon size={18} strokeWidth={1.8} />
+                </span>
+                <h3 className="mt-3 font-display text-lg font-bold">{k.judul}</h3>
+                <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted teks-pretty">
+                  {k.isi}
+                </p>
+                <Link
+                  href={k.href}
+                  className="group mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-daun-700 dark:text-daun-300"
+                >
+                  {k.cta}
+                  <ArrowRight
+                    size={14}
+                    className="transition-transform group-hover:translate-x-0.5"
+                  />
+                </Link>
+              </Card>
+            </Terungkap>
+          ))}
         </div>
       </section>
 

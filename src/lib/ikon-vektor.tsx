@@ -45,7 +45,7 @@ const NODE_KATEGORI: PetaIkon = {
   ]
 } as const;
 
-const NODE_LAIN: PetaIkon = {
+export const NODE_LAIN: PetaIkon = {
   "semai": [
     ["path", { d: "M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3" }],
     ["path", { d: "M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4" }],
@@ -93,6 +93,41 @@ const NODE_LAIN: PetaIkon = {
   ]
 } as const;
 
+
+export const NODE_FASILITAS: PetaIkon = {
+  "recycle": [
+  ["path", { d: "M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5" }],
+      ["path", { d: "M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12" }],
+      ["path", { d: "m14 16-3 3 3 3" }],
+      ["path", { d: "M8.293 13.596 7.196 9.5 3.1 10.598" }],
+      ["path", { d: "m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843" }],
+      ["path", { d: "m13.378 9.633 4.096 1.098 1.097-4.096" }]
+  ],
+  "gudang": [
+  ["path", { d: "M18 21V10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v11" }],
+      ["path", { d: "M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 1.132-1.803l7.95-3.974a2 2 0 0 1 1.837 0l7.948 3.974A2 2 0 0 1 22 8z" }],
+      ["path", { d: "M6 13h12" }],
+      ["path", { d: "M6 17h12" }]
+  ],
+  "paket": [
+  ["path", { d: "M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" }],
+      ["path", { d: "M12 22V12" }],
+      ["polyline", { points: "3.29 7 12 12 20.71 7" }],
+      ["path", { d: "m7.5 4.27 9 5.15" }]
+  ]
+} as const;
+
+export const NODE_TAMBAHAN: PetaIkon = {
+  "cerdas_lingkungan": [
+  ["path", { d: "M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" }],
+      ["path", { d: "M22 10v6" }],
+      ["path", { d: "M6 12.5V16a6 3 0 0 0 12 0v-3.5" }]
+  ],
+  "relawan": [
+  ["path", { d: "M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762" }]
+  ]
+} as const;
+
 function nodeKeSvg(
   node: NodeIkon,
   warna: string,
@@ -111,6 +146,9 @@ function nodeKeSvg(
 }
 
 export function svgUriKategori(slug: string, warna: string, ukuran = 15) {
+  if (slug.startsWith("fasilitas:")) {
+    return svgUriDariNode(nodeFasilitas(slug.slice(10)), warna, ukuran);
+  }
   return svgUriDariNode(NODE_KATEGORI[slug] ?? NODE_KATEGORI.lainnya, warna, ukuran);
 }
 
@@ -182,7 +220,36 @@ export function IkonKategori({
 }
 
 export function nodeBadge(b: Pick<BadgeDef, "ikon">): NodeIkon {
-  return NODE_LAIN[b.ikon] ?? NODE_LAIN.terkunci;
+  return (
+    NODE_LAIN[b.ikon] ??
+    NODE_TAMBAHAN[b.ikon] ??
+    NODE_LAIN.terkunci
+  );
+}
+
+export function nodeFasilitas(jenis: string): NodeIkon {
+  return NODE_FASILITAS[jenis] ?? NODE_FASILITAS.recycle;
+}
+
+export function IkonFasilitas({
+  jenis,
+  ukuran = 16,
+  tebal = 2,
+  className,
+}: {
+  jenis: string;
+  ukuran?: number;
+  tebal?: number;
+  className?: string;
+}) {
+  return (
+    <IkonVektor
+      node={nodeFasilitas(jenis)}
+      ukuran={ukuran}
+      tebal={tebal}
+      className={className}
+    />
+  );
 }
 
 export function nodeLevel(l: Pick<LevelDef, "ikon">): NodeIkon {

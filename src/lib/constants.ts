@@ -64,7 +64,29 @@ export const POIN = {
   lapor: 10,
   komentar: 3,
   vote: 1,
+  quiz: 15,
+  kalkulator: 5,
+  aksi: 5,
+  fasilitas: 8,
 } as const;
+
+export type JenisFasilitas = "bank-sampah" | "tps3r" | "dropbox";
+
+export const JENIS_FASILITAS: {
+  jenis: JenisFasilitas;
+  nama: string;
+  warna: string;
+}[] = [
+  { jenis: "bank-sampah", nama: "Bank Sampah", warna: "#0d9488" },
+  { jenis: "tps3r", nama: "TPS3R", warna: "#7c3aed" },
+  { jenis: "dropbox", nama: "Dropbox Daur Ulang", warna: "#e11d48" },
+];
+
+export function fasilitasByJenis(jenis: string) {
+  return (
+    JENIS_FASILITAS.find((f) => f.jenis === jenis) ?? JENIS_FASILITAS[0]
+  );
+}
 
 export type BadgeDef = {
   key: string;
@@ -109,6 +131,24 @@ export const BADGES: BadgeDef[] = [
     nama: "Pemberi Semangat",
     deskripsi: "Menulis 10 komentar",
     ikon: "pemberi_semangat",
+  },
+  {
+    key: "cerdas_lingkungan",
+    nama: "Cerdas Lingkungan",
+    deskripsi: "Lulus quiz edukasi dengan skor minimal 4/5",
+    ikon: "cerdas_lingkungan",
+  },
+  {
+    key: "relawan",
+    nama: "Relawan",
+    deskripsi: "Ikut 2 aksi bersama komunitas",
+    ikon: "relawan",
+  },
+  {
+    key: "penyedia_solusi",
+    nama: "Penyedia Solusi",
+    deskripsi: "Menambahkan 2 fasilitas hijau ke peta",
+    ikon: "paket",
   },
 ];
 

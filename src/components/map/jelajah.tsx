@@ -14,6 +14,10 @@ import {
   WifiOff,
 } from "lucide-react";
 import type { LaporanDenganRelasi } from "@/types/database";
+import type { FasilitasRingkas } from "@/app/(utama)/peta/page";
+import { IkonFasilitas } from "@/lib/ikon-vektor";
+import { fasilitasByJenis } from "@/lib/constants";
+import { Recycle } from "lucide-react";
 import { KATEGORI, STATUS, kategoriBySlug, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import {
@@ -30,6 +34,8 @@ import { StatusChip, Button, Card } from "@/components/ui";
 import { Modal } from "@/components/modal";
 import { createClient } from "@/lib/supabase/client";
 import { BuatLaporanFormulir } from "./buat-laporan";
+import { FormFasilitas } from "./form-fasilitas";
+import { TombolIkutiArea } from "./tombol-ikuti-area";
 import { TurPeta } from "./tur-peta";
 
 const LeafletMap = dynamic(
@@ -74,9 +80,11 @@ function jarakMeter(
 export function Jelajah({
   laporanAwal,
   dbAktif,
+  fasilitasAwal,
 }: {
   laporanAwal: LaporanDenganRelasi[];
   dbAktif: boolean;
+  fasilitasAwal: FasilitasRingkas[];
 }) {
   const params = useSearchParams();
   const [laporan, setLaporan] = useState(laporanAwal);
@@ -95,6 +103,9 @@ export function Jelajah({
   );
   const [cariLokasi, setCariLokasi] = useState(false);
   const [pop, setPop] = useState<"kategori" | "status" | null>(null);
+  const [layerFasilitas, setLayerFasilitas] = useState(false);
+  const [fasTerpilih, setFasTerpilih] = useState<FasilitasRingkas | null>(null);
+  const [modalFasilitas, setModalFasilitas] = useState(false);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -199,6 +210,28 @@ export function Jelajah({
           judul: r.judul,
         })),
     [tersaring]
+  );
+
+  const titikFasilitas = useMemo(
+    () =>
+      layerFasilitas
+        ? fasilitasAwal
+            .filter((f) => f.lat != null && f.lng != null)
+            .map((f) => ({
+              id: `fas:${f.id}`,
+              lat: f.lat,
+              lng: f.lng,
+              warna: fasilitasByJenis(f.jenis).warna,
+              slug: `fasilitas:${f.jenis}`,
+              judul: `${f.nama} · ${fasilitasByJenis(f.jenis).nama}`,
+            }))
+        : [],
+    [layerFasilitas, fasilitasAwal]
+  );
+
+  const semuaTitik = useMemo(
+    () => [...titikPeta, ...titikFasilitas],
+    [titikPeta, titikFasilitas]
   );
 
   const terpilih = laporan.find((r) => r.id === terpilihId) ?? null;
@@ -444,6 +477,34 @@ export function Jelajah({
           </button>
 
           <button
+            onClick={() => setLayerFasilitas((v) => !v)}
+            aria-pressed={layerFasilitas}
+            className={`flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+              layerFasilitas
+                ? "border-transparent bg-teal-600 text-white"
+                : "text-muted hover:text-ink"
+            }`}
+            style={
+              layerFasilitas ? undefined : { borderColor: "var(--line)" }
+            }
+          >
+            <Recycle size={15} />
+            Fasilitas
+          </button>
+
+          {layerFasilitas && (
+            <button
+              onClick={() => setModalFasilitas(true)}
+              className="flex h-10 items-center gap-1.5 rounded-full border border-dashed px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-teal-500 hover:text-ink"
+              style={{ borderColor: "var(--line)" }}
+            >
+              + Tambah fasilitas
+            </button>
+          )}
+
+          <TombolIkutiArea pusatSaya={pusatSaya} />
+
+          <button
             onClick={() => {
               if (periodeIdx === null) setPeriodeIdx(BULAN.length - 1);
               else {
@@ -508,13 +569,21 @@ export function Jelajah({
       <div className="grid h-[64dvh] min-h-[460px] grid-rows-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_360px]">
         <Card className="relative min-h-0 overflow-hidden p-0">
           <LeafletMap
-            titik={titikPeta}
-            terpilih={terpilihId}
             pusat={
               pusatSaya ? [pusatSaya.lat, pusatSaya.lng] : undefined
             }
             zoom={pusatSaya ? 15 : undefined}
-            onKlikTitik={(id) => setTerpilihId(id)}
+            titik={semuaTitik}
+            terpilih={terpilihId}
+            onKlikTitik={(id) => {
+              if (id.startsWith("fas:")) {
+                setFasTerpilih(
+                  fasilitasAwal.find((f) => `fas:${f.id}` === id) ?? null
+                );
+              } else {
+                setTerpilihId(id);
+              }
+            }}
           />
           {periodeIdx !== null && (
             <div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-xl bg-panel/90 px-3 py-1.5 font-display text-sm font-bold shadow backdrop-blur">
@@ -642,6 +711,51 @@ export function Jelajah({
         <BuatLaporanFormulir
           selesai={() => {
             setModalBuka(false);
+          }}
+        />
+      </Modal>
+
+      <Modal
+        terbuka={!!fasTerpilih}
+        tutup={() => setFasTerpilih(null)}
+        judul={fasTerpilih?.nama ?? ""}
+        lebar="max-w-md"
+      >
+        {fasTerpilih && (
+          <div className="space-y-3">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
+              style={{
+                backgroundColor: `${fasilitasByJenis(fasTerpilih.jenis).warna}22`,
+                color: fasilitasByJenis(fasTerpilih.jenis).warna,
+              }}
+            >
+              <IkonFasilitas jenis={fasTerpilih.jenis} ukuran={13} />
+              {fasilitasByJenis(fasTerpilih.jenis).nama}
+            </span>
+            {fasTerpilih.alamat && (
+              <p className="text-sm text-muted">📍 {fasTerpilih.alamat}</p>
+            )}
+            {fasTerpilih.jam_buka && (
+              <p className="text-sm text-muted">🕒 {fasTerpilih.jam_buka}</p>
+            )}
+            <p className="text-xs text-muted">
+              Lokasi titik perkiraan — konfirmasi ke pengelola sebelum berkunjung.
+            </p>
+          </div>
+        )}
+      </Modal>
+
+      <Modal
+        terbuka={modalFasilitas}
+        tutup={() => setModalFasilitas(false)}
+        judul="Tambah fasilitas hijau"
+        lebar="max-w-2xl"
+      >
+        <FormFasilitas
+          selesai={() => {
+            setModalFasilitas(false);
+            setLayerFasilitas(true);
           }}
         />
       </Modal>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen,
+  ChevronDown,
   FileText,
   LogOut,
   MapPin,
@@ -12,6 +13,9 @@ import {
   Sun,
   Trophy,
   UserRound,
+  Users,
+  GraduationCap,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -88,6 +92,46 @@ export function SiteHeader() {
               {t.label}
             </Link>
           ))}
+          <div className="group relative">
+            <button
+              aria-haspopup="true"
+              className={cn(
+                "flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-medium transition",
+                pathname.startsWith("/polling") ||
+                  pathname.startsWith("/aksi") ||
+                  pathname.startsWith("/edukasi")
+                  ? "bg-daun-600/10 text-daun-700 dark:text-daun-300"
+                  : "text-muted hover:bg-panel-2 hover:text-ink"
+              )}
+            >
+              Komunitas
+              <ChevronDown
+                size={13}
+                className="transition-transform group-hover:rotate-180"
+              />
+            </button>
+            <div className="invisible absolute left-1/2 top-full z-20 w-48 -translate-x-1/2 translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              {[
+                { href: "/polling", label: "Polling warga", ikon: BarChart3 },
+                { href: "/aksi", label: "Aksi bersama", ikon: Users },
+                { href: "/edukasi", label: "Edukasi & quiz", ikon: GraduationCap },
+              ].map((k) => (
+                <Link
+                  key={k.href}
+                  href={k.href}
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition",
+                    pathname.startsWith(k.href)
+                      ? "bg-daun-600/10 text-daun-700 dark:text-daun-300"
+                      : "text-muted hover:bg-panel-2 hover:text-ink"
+                  )}
+                >
+                  <k.ikon size={15} />
+                  {k.label}
+                </Link>
+              ))}
+            </div>
+          </div>
           {profil?.role === "admin" && (
             <Link
               href="/dewan"

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { Card, StatusChip } from "@/components/ui";
 import { AksiLaporanSaya } from "./aksi";
+import { HapusAreaKlien } from "./hapus-area";
 
 export const metadata: Metadata = { title: "Laporan Saya" };
 export const dynamic = "force-dynamic";
@@ -29,6 +30,13 @@ export default async function HalamanLaporanSaya() {
     .limit(100);
 
   const daftar = (milik ?? []) as unknown as LaporanDenganRelasi[];
+
+  const { data: areaRaw } = await supabase
+    .from("area_follows")
+    .select("id, label, radius_m, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+  const area = areaRaw ?? [];
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -94,6 +102,32 @@ export default async function HalamanLaporanSaya() {
           ))}
         </div>
       )}
+
+      {area.length > 0 && (
+        <section aria-label="Area yang diikuti" className="mt-10">
+          <h2 className="mb-3 font-display text-xl font-bold">
+            Area yang kamu ikuti
+          </h2>
+          <p className="mb-3 text-sm text-muted">
+            Kamu mendapat notifikasi setiap ada laporan baru dalam radius ini.
+          </p>
+          <div className="space-y-2">
+            {area.map((a) => (
+              <Card key={a.id} className="flex items-center justify-between gap-3 p-4">
+                <div>
+                  <p className="text-sm font-semibold">{a.label}</p>
+                  <p className="angka-tabular text-xs text-muted">
+                    radius {a.radius_m} m
+                  </p>
+                </div>
+                <HapusAreaKlien id={a.id} />
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
+
+
