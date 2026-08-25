@@ -359,8 +359,8 @@ export function Jelajah({
         )}
       </div>
 
-      <div className="grid h-[64dvh] min-h-[460px] gap-4 lg:grid-cols-[1fr_360px]">
-        <Card className="relative overflow-hidden p-0">
+      <div className="grid h-[64dvh] min-h-[460px] grid-rows-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_360px]">
+        <Card className="relative min-h-0 overflow-hidden p-0">
           <LeafletMap
             titik={titikPeta}
             terpilih={terpilihId}
@@ -378,7 +378,7 @@ export function Jelajah({
         </Card>
 
         <aside
-          className="hidden flex-col gap-3 overflow-y-auto pr-1 lg:flex"
+          className="hidden min-h-0 flex-col gap-3 overflow-y-auto pr-1 lg:flex"
           aria-label="Daftar laporan"
         >
           <AnimatePresence initial={false}>

@@ -49,6 +49,7 @@ export function LeafletMap({
   const refL = useRef<typeof LeafletNS | null>(null);
   const refLayer = useRef<LeafletNS.Layer | null>(null);
   const refTile = useRef<LeafletNS.TileLayer | null>(null);
+  const refPengamat = useRef<ResizeObserver | null>(null);
   const refPanas = useRef<LeafletNS.Layer | null>(null);
   const refSudahFit = useRef(false);
   const gelap = useTheme();
@@ -92,6 +93,12 @@ export function LeafletMap({
       refPeta.current = peta;
       refL.current = L;
       renderTitik();
+
+      const pengamat = new ResizeObserver(() => {
+        peta.invalidateSize({ animate: false });
+      });
+      pengamat.observe(refDiv.current);
+      refPengamat.current = pengamat;
     }
 
     function renderTitik() {
@@ -170,6 +177,8 @@ export function LeafletMap({
 
   useEffect(() => {
     return () => {
+      refPengamat.current?.disconnect();
+      refPengamat.current = null;
       refPeta.current?.remove();
       refPeta.current = null;
       refTile.current = null;
