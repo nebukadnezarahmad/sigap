@@ -1,39 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Check, Link2, MessageCircle, Share2 } from "lucide-react";
 
 export function ShareButtons({ judul }: { judul: string }) {
   const [tersalin, setTersalin] = useState(false);
-  const [url, setUrl] = useState("");
-
-  useEffect(() => setUrl(location.href), []);
-
   const teks = `Lihat laporan ini di SIGAP: ${judul}`;
+
+  function buka(tautan: string) {
+    window.open(tautan, "_blank", "noopener,noreferrer");
+  }
 
   return (
     <div className="flex items-center gap-1.5">
-      <a
-        href={`https://wa.me/?text=${encodeURIComponent(`${teks}\n${url}`)}`}
-        target="_blank"
-        rel="noopener noreferrer"
+      <button
+        onClick={() =>
+          buka(`https://wa.me/?text=${encodeURIComponent(`${teks}\n${location.href}`)}`)
+        }
         aria-label="Bagikan ke WhatsApp"
         className="rounded-full p-2 text-muted transition hover:bg-daun-500/10 hover:text-daun-700 dark:hover:text-daun-300"
       >
         <MessageCircle size={17} />
-      </a>
-      <a
-        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(teks)}&url=${encodeURIComponent(url)}`}
-        target="_blank"
-        rel="noopener noreferrer"
+      </button>
+      <button
+        onClick={() =>
+          buka(
+            `https://twitter.com/intent/tweet?text=${encodeURIComponent(teks)}&url=${encodeURIComponent(location.href)}`
+          )
+        }
         aria-label="Bagikan ke X"
         className="rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink"
       >
         <Share2 size={17} />
-      </a>
+      </button>
       <button
         onClick={async () => {
-          await navigator.clipboard.writeText(url);
+          await navigator.clipboard.writeText(location.href);
           setTersalin(true);
           setTimeout(() => setTersalin(false), 1600);
         }}
