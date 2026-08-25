@@ -22,6 +22,15 @@ export default function LayoutUtama({
             </span>
           </p>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-5">
+            <Link href="/pasar" className="transition hover:text-ink">
+              Pasar ReUse
+            </Link>
+            <Link href="/layanan" className="transition hover:text-ink">
+              Direktori layanan
+            </Link>
+            <Link href="/umkm" className="transition hover:text-ink">
+              UMKM warga
+            </Link>
             <Link href="/demo" className="transition hover:text-ink">
               Panduan demo
             </Link>
