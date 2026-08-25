@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
-import { Button, Card, Input, Label, Select } from "@/components/ui";
+import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
 
 export function AdminPanel({
   reportId,
@@ -21,6 +21,7 @@ export function AdminPanel({
   const { user } = useUser();
   const [status, setStatus] = useState<StatusKey>(statusAwal);
   const [petugas, setPetugas] = useState(petugasAwal);
+  const [catatan, setCatatan] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [proses, setProses] = useState(false);
   const [pesan, setPesan] = useState<string | null>(null);
@@ -62,7 +63,24 @@ export function AdminPanel({
         .eq("id", reportId);
       if (error) throw new Error(error.message);
 
-      setPesan("Tersimpan ✓");
+      if (catatan.trim()) {
+        const { data: ev } = await supabase
+          .from("report_events")
+          .select("id")
+          .eq("report_id", reportId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+        if (ev) {
+          await supabase
+            .from("report_events")
+            .update({ catatan: catatan.trim() })
+            .eq("id", ev.id);
+        }
+      }
+
+      setPesan("Tersimpan");
+      setCatatan("");
       router.refresh();
     } catch (e) {
       setPesan(e instanceof Error ? e.message : "Gagal menyimpan.");
@@ -107,6 +125,19 @@ export function AdminPanel({
             <option value="PLN Area" />
           </datalist>
         </div>
+      </div>
+      <div>
+        <Label htmlFor="catatan-admin">
+          Catatan untuk linimasa (opsional, melengkapi status terbaru)
+        </Label>
+        <Textarea
+          id="catatan-admin"
+          rows={2}
+          maxLength={300}
+          value={catatan}
+          onChange={(e) => setCatatan(e.target.value)}
+          placeholder="cth. Petugas DLH dikirim hari ini, target selesai 3 hari"
+        />
       </div>
       {status === "selesai" && (
         <label

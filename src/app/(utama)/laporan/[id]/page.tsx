@@ -14,6 +14,7 @@ import { KomentarSection as Komentar } from "./komentar";
 import { KonfirmasiButton } from "./konfirmasi-button";
 import { ShareButtons } from "./share-buttons";
 import { AdminPanel } from "./admin-panel";
+import { SebelumSesudah } from "./sebelum-sesudah";
 import { MomenSelesai } from "./momen-selesai";
 
 export const dynamic = "force-dynamic";
@@ -177,17 +178,37 @@ export default async function HalamanLaporan({
               <h2 className="mb-3 flex items-center gap-2 font-display font-bold text-daun-700 dark:text-daun-300">
                 <CheckCircle2 size={17} /> Bukti penyelesaian
               </h2>
-              <div className="grid grid-cols-2 gap-2">
-                {fotoSesudah.map((f) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={f.id}
-                    src={f.url}
-                    alt="Kondisi setelah ditangani"
-                    className="h-44 w-full rounded-xl object-cover"
-                  />
-                ))}
-              </div>
+              {galeri.length > 0 ? (
+                <SebelumSesudah
+                  sebelum={galeri[0].url}
+                  sesudah={fotoSesudah[0].url}
+                />
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {fotoSesudah.map((f) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={f.id}
+                      src={f.url}
+                      alt="Kondisi setelah ditangani"
+                      className="h-44 w-full rounded-xl object-cover"
+                    />
+                  ))}
+                </div>
+              )}
+              {galeri.length > 0 && fotoSesudah.length > 1 && (
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {fotoSesudah.slice(1).map((f) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={f.id}
+                      src={f.url}
+                      alt="Kondisi setelah ditangani"
+                      className="h-36 w-full rounded-xl object-cover"
+                    />
+                  ))}
+                </div>
+              )}
             </Card>
           )}
 

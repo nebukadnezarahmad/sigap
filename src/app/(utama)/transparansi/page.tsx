@@ -5,6 +5,8 @@ import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { Card, StatusChip } from "@/components/ui";
 import { GrafikBulanan, GrafikKategori } from "./grafik";
+import { TombolCetak } from "./tombol-cetak";
+import { Braces } from "lucide-react";
 
 export const metadata: Metadata = { title: "Transparansi" };
 export const dynamic = "force-dynamic";
@@ -148,15 +150,41 @@ export default async function HalamanTransparansi() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
-      <header className="mb-8">
-        <h1 className="font-display text-3xl font-bold">
-          Transparansi Kinerja Dewan
-        </h1>
-        <p className="mt-2 max-w-2xl text-muted">
-          Data publik dari laporan warga — tanpa disunting. Keterbukaan adalah
-          fondasi kota yang berkelanjutan.
-        </p>
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-bold">
+            Transparansi Kinerja Dewan
+          </h1>
+          <p className="mt-2 max-w-2xl text-muted">
+            Data publik dari laporan warga — tanpa disunting. Keterbukaan adalah
+            fondasi kota yang berkelanjutan.
+          </p>
+        </div>
+        <TombolCetak />
       </header>
+
+      <Card className="mb-6 flex flex-wrap items-center justify-between gap-4 border-daun-500/30 p-5">
+        <div className="flex items-start gap-3">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+            <Braces size={18} />
+          </span>
+          <div>
+            <h2 className="font-display font-bold">Data terbuka (open data)</h2>
+            <p className="mt-1 max-w-xl text-sm text-muted">
+              Seluruh data laporan tersedia gratis dalam format JSON untuk
+              peneliti, jurnalis, dan pengembang — lisensi CC BY 4.0.
+            </p>
+          </div>
+        </div>
+        <a
+          href="/api/open-data"
+          target="_blank"
+          rel="noopener"
+          className="rounded-full border border-daun-500/50 bg-daun-500/5 px-4 py-2 text-sm font-semibold text-daun-700 transition hover:bg-daun-500/10 dark:text-daun-300"
+        >
+          /api/open-data
+        </a>
+      </Card>
 
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[

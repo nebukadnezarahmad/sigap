@@ -54,6 +54,9 @@ export function DewanClient({
   const [daftar, setDaftar] = useState(awal);
   const [heatAktif, setHeatAktif] = useState(true);
   const [filterStatus, setFilterStatus] = useState<"semua" | StatusKey>("semua");
+  const [dipilih, setDipilih] = useState<Set<string>>(new Set());
+  const [bulkStatus, setBulkStatus] = useState<StatusKey>("diverifikasi");
+  const [bulkProses, setBulkProses] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -113,6 +116,32 @@ export function DewanClient({
         assigned_at: petugas ? new Date().toISOString() : null,
       })
       .eq("id", id);
+  }
+
+  function togglePilih(id: string) {
+    setDipilih((s) => {
+      const n = new Set(s);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  }
+
+  async function terapkanBulk() {
+    if (dipilih.size === 0) return;
+    setBulkProses(true);
+    const supabase = createClient();
+    await supabase
+      .from("reports")
+      .update({ status: bulkStatus })
+      .in("id", [...dipilih]);
+    setDaftar((arr) =>
+      arr.map((r) =>
+        dipilih.has(r.id) ? { ...r, status: bulkStatus } : r
+      )
+    );
+    setDipilih(new Set());
+    setBulkProses(false);
   }
 
   function eksporCsv() {
@@ -310,6 +339,35 @@ export function DewanClient({
 
       <div className="grid gap-4 xl:grid-cols-[1fr_420px]">
         <Card className="overflow-hidden p-0">
+          {dipilih.size > 0 && (
+            <div className="flex flex-wrap items-center gap-3 border-b garis-halus bg-daun-500/5 px-5 py-3">
+              <span className="angka-tabular text-sm font-bold text-daun-700 dark:text-daun-300">
+                {dipilih.size} dipilih
+              </span>
+              <Select
+                aria-label="Status massal"
+                className="w-44"
+                value={bulkStatus}
+                onChange={(e) => setBulkStatus(e.target.value as StatusKey)}
+              >
+                {(Object.keys(STATUS) as StatusKey[]).map((st) => (
+                  <option key={st} value={st}>
+                    {STATUS[st].label}
+                  </option>
+                ))}
+              </Select>
+              <Button size="sm" onClick={terapkanBulk} disabled={bulkProses}>
+                {bulkProses ? "Menerapkan…" : "Terapkan ke semua"}
+              </Button>
+              <Button
+                variant="hantu"
+                size="sm"
+                onClick={() => setDipilih(new Set())}
+              >
+                Bersihkan pilihan
+              </Button>
+            </div>
+          )}
           <div className="flex flex-wrap items-center justify-between gap-2 border-b garis-halus px-5 py-3.5">
             <h2 className="font-display font-bold">Kelola laporan</h2>
             <div className="flex items-center gap-2">
@@ -347,6 +405,13 @@ export function DewanClient({
                   !["selesai", "ditolak"].includes(r.status);
                 return (
                 <div key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
+                  <input
+                    type="checkbox"
+                    checked={dipilih.has(r.id)}
+                    onChange={() => togglePilih(r.id)}
+                    aria-label={`Pilih ${r.judul}`}
+                    className="size-4 accent-daun-600"
+                  />
                   <div className="min-w-0 flex-1 basis-56">
                     <p className="truncate text-sm font-semibold">{r.judul}</p>
                     <p className="flex items-center gap-1 truncate text-xs text-muted">

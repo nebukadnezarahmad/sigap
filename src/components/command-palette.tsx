@@ -13,6 +13,8 @@ import {
   Scale,
   ShieldCheck,
   Sun,
+  BookOpen,
+  FileText,
   Trophy,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -65,6 +67,20 @@ export function CommandPalette() {
         hint: "Aksi",
         ikon: <MapPin size={16} />,
         jalankan: () => router.push("/peta?lapor=1"),
+      },
+      {
+        id: "laporan-saya",
+        label: "Laporan saya",
+        hint: "Navigasi",
+        ikon: <FileText size={16} />,
+        jalankan: () => router.push("/laporan-saya"),
+      },
+      {
+        id: "demo",
+        label: "Panduan demo untuk juri",
+        hint: "Bantuan",
+        ikon: <BookOpen size={16} />,
+        jalankan: () => router.push("/demo"),
       },
       {
         id: "tema",

@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, MapPin, Moon, ShieldCheck, Sun, Trophy, UserRound } from "lucide-react";
+import {
+  BookOpen,
+  FileText,
+  LogOut,
+  MapPin,
+  Moon,
+  ShieldCheck,
+  Sun,
+  Trophy,
+  UserRound,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
@@ -52,7 +62,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-[900] border-b garis-halus bg-paper/85 backdrop-blur-md">
+    <header className="sticky top-0 z-[900] border-b garis-halus bg-paper/85 backdrop-blur-md print:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
         <Link href="/" className="flex items-center gap-2">
           <span className="flex size-8 items-center justify-center rounded-xl bg-daun-600 text-white">
@@ -118,10 +128,22 @@ export function SiteHeader() {
                   <UserRound size={15} /> Profil saya
                 </Link>
                 <Link
+                  href="/laporan-saya"
+                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
+                >
+                  <FileText size={15} /> Laporan saya
+                </Link>
+                <Link
                   href="/papan-skor"
                   className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
                 >
                   <Trophy size={15} /> Papan skor
+                </Link>
+                <Link
+                  href="/demo"
+                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
+                >
+                  <BookOpen size={15} /> Panduan demo
                 </Link>
                 <button
                   onClick={keluar}
