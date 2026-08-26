@@ -16,16 +16,36 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Barang } from "./page";
-import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import {
+  Button,
+  Card,
+  Input,
+  KosongState,
+  Label,
+  Select,
+  Textarea,
+} from "@/components/ui";
 import { Modal } from "@/components/modal";
 
+/**
+ * Tiap kategori punya warna sendiri dengan HUE yang berbeda — bukan gradasi
+ * satu hue, karena gradasi diam-diam menciptakan urutan/ranking yang tidak
+ * dimaksud. Sebelumnya kelima kategori punya lima ikon berbeda lalu semuanya
+ * diberi latar hijau yang sama: warna murni dekoratif.
+ *
+ * Warna dipilih agar >= 3:1 terhadap putih supaya aman dipakai sebagai isian.
+ */
 const KATEGORI = [
-  { id: "elektronik", label: "Elektronik", Ikon: Laptop },
-  { id: "pakaian", label: "Pakaian", Ikon: Shirt },
-  { id: "mebel", label: "Mebel", Ikon: Armchair },
-  { id: "buku", label: "Buku & mainan", Ikon: BookOpen },
-  { id: "lainnya", label: "Lainnya", Ikon: PackageOpen },
+  { id: "elektronik", label: "Elektronik", Ikon: Laptop, warna: "#0369a1" },
+  { id: "pakaian", label: "Pakaian", Ikon: Shirt, warna: "#a21caf" },
+  { id: "mebel", label: "Mebel", Ikon: Armchair, warna: "#b45309" },
+  { id: "buku", label: "Buku & mainan", Ikon: BookOpen, warna: "#4d7c0f" },
+  { id: "lainnya", label: "Lainnya", Ikon: PackageOpen, warna: "#64748b" },
 ] as const;
+
+function kategoriPasar(kategori: string) {
+  return KATEGORI.find((k) => k.id === kategori) ?? KATEGORI[4];
+}
 
 const KONDISI_LABEL: Record<string, string> = {
   "seperti-baru": "Seperti baru",
@@ -34,10 +54,13 @@ const KONDISI_LABEL: Record<string, string> = {
 };
 
 function IkonKategori({ kategori }: { kategori: string }) {
-  const found = KATEGORI.find((k) => k.id === kategori) ?? KATEGORI[4];
+  const found = kategoriPasar(kategori);
   return (
-    <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-daun-500/10 text-daun-700 dark:text-daun-300">
-      <found.Ikon size={20} />
+    <span
+      className="flex size-11 shrink-0 items-center justify-center rounded-item"
+      style={{ backgroundColor: `${found.warna}1f`, color: found.warna }}
+    >
+      <found.Ikon size={20} aria-hidden />
     </span>
   );
 }
@@ -284,9 +307,13 @@ export function PasarKlien({
   const [filter, setFilter] = useState<string>("semua");
   const [formBuka, setFormBuka] = useState(false);
 
-  useEffect(() => {
+  /* Menyesuaikan state saat prop berubah — pola resmi React, bukan setState
+     sinkron di dalam effect (yang memicu render bertingkat). */
+  const [awalSebelumnya, setAwalSebelumnya] = useState(awal);
+  if (awal !== awalSebelumnya) {
+    setAwalSebelumnya(awal);
     setBarang(awal);
-  }, [awal]);
+  }
 
   useEffect(() => {
     if (!masuk) return;
@@ -344,9 +371,12 @@ export function PasarKlien({
 
       <AnimatePresence initial={false}>
         <motion.div layout className="grid gap-4 sm:grid-cols-2">
+          {/* Key sebelumnya `${b.id}-${b.status}`, sehingga barang yang diklaim
+              UNMOUNT lalu MOUNT lagi — kartunya hilang lalu muncul kembali
+              alih-alih bertransisi. */}
           {tampil.map((b) => (
             <motion.div
-              key={`${b.id}-${b.status}`}
+              key={b.id}
               layout
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -358,8 +388,34 @@ export function PasarKlien({
         </motion.div>
       </AnimatePresence>
       {tampil.length === 0 && (
-        <Card className="p-10 text-center text-sm text-muted">
-          Belum ada barang pada kategori ini.
+        <Card>
+          <KosongState
+            ikon={<PackageOpen size={24} strokeWidth={1.6} />}
+            judul={
+              filter === "semua"
+                ? "Belum ada barang di Pasar ReUse"
+                : `Belum ada barang ${kategoriPasar(filter).label.toLowerCase()}`
+            }
+            isi={
+              filter === "semua"
+                ? "Barang bekas layak pakai yang dipasang warga akan muncul di sini — gratis untuk diklaim tetangga."
+                : "Coba lihat kategori lain, atau jadilah yang pertama memasang di kategori ini."
+            }
+            aksi={
+              <>
+                {filter !== "semua" && (
+                  <Button variant="sekunder" size="sm" onClick={() => setFilter("semua")}>
+                    Lihat semua kategori
+                  </Button>
+                )}
+                {masuk && (
+                  <Button size="sm" onClick={() => setFormBuka(true)}>
+                    <Plus size={14} aria-hidden /> Pasang barang
+                  </Button>
+                )}
+              </>
+            }
+          />
         </Card>
       )}
 

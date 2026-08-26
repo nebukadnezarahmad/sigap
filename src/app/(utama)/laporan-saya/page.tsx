@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
-import { Card, StatusChip } from "@/components/ui";
+import { Card, KosongState, StatusChip } from "@/components/ui";
 import { AksiLaporanSaya } from "./aksi";
 import { HapusAreaKlien } from "./hapus-area";
 
@@ -50,14 +51,22 @@ export default async function HalamanLaporanSaya() {
       </header>
 
       {daftar.length === 0 ? (
-        <Card className="p-10 text-center">
-          <p className="text-muted">
-            Kamu belum membuat laporan.{" "}
-            <Link href="/peta?lapor=1" className="font-semibold text-daun-700 hover:underline dark:text-daun-300">
-              Buat laporan pertamamu
-            </Link>
-            .
-          </p>
+        <Card>
+          {/* Jalan keluarnya dulu berupa tautan teks di tengah paragraf —
+              sekarang tombol sungguhan. */}
+          <KosongState
+            ikon={<FileText size={24} strokeWidth={1.6} />}
+            judul="Kamu belum membuat laporan"
+            isi="Klik satu titik di peta, tempel foto, pilih kategori. Butuh sekitar 30 detik."
+            aksi={
+              <Link
+                href="/peta?lapor=1"
+                className="rounded-kontrol bg-daun-600 px-5 py-2.5 text-sm font-semibold text-white transition-[transform,background-color] duration-300 ease-sigap hover:bg-daun-700 active:scale-[0.97]"
+              >
+                Buat laporan pertamamu
+              </Link>
+            }
+          />
         </Card>
       ) : (
         <div className="space-y-3">

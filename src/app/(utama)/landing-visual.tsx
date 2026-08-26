@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { CheckCircle2, Clock, Zap } from "lucide-react";
 import { Card } from "@/components/ui";
+import { kategoriBySlug } from "@/lib/constants";
 import { svgUriKategori } from "@/lib/ikon-vektor";
 
 export function AngkaHidup({ nilai }: { nilai: number }) {
+  const kurangiGerak = useReducedMotion();
   const [tampil, setTampil] = useState(0);
 
   useEffect(() => {
-    if (nilai <= 0) return;
+    if (nilai <= 0 || kurangiGerak) return;
     const mulai = performance.now();
     const durasi = 1000;
     let raf = 0;
@@ -24,9 +26,16 @@ export function AngkaHidup({ nilai }: { nilai: number }) {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [nilai]);
+  }, [nilai, kurangiGerak]);
 
-  return <span className="angka-tabular">{tampil.toLocaleString("id-ID")}</span>;
+  // Angka yang berhitung naik adalah gerak dekoratif murni — informasinya utuh
+  // tanpa itu. Saat pengguna minta gerak dikurangi, nilai akhirnya diturunkan
+  // saat render, bukan lewat setState di dalam effect.
+  const ditampilkan = kurangiGerak ? nilai : tampil;
+
+  return (
+    <span className="angka-tabular">{ditampilkan.toLocaleString("id-ID")}</span>
+  );
 }
 
 export function Terungkap({
@@ -41,8 +50,10 @@ export function Terungkap({
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 24, filter: "blur(4px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      // Tanpa filter blur: blur() bukan properti yang ramah compositor, dan
+      // menganimasikannya saat scroll membebani setiap frame.
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.7, delay: tunda, ease: [0.32, 0.72, 0, 1] }}
     >
@@ -51,14 +62,19 @@ export function Terungkap({
   );
 }
 
+/**
+ * Warna diambil dari KATEGORI, bukan disalin. Sebelumnya nilainya di-hardcode
+ * dan sudah basi terhadap sumbernya — dua di antaranya adalah warna lama yang
+ * gagal kontras terhadap ikon putih.
+ */
 const PIN_HERO = [
-  { slug: "sampah", warna: "#65a30d", x: "18%", y: "26%", delay: 0.15 },
-  { slug: "drainase", warna: "#0284c7", x: "58%", y: "22%", delay: 0.3 },
-  { slug: "lampu", warna: "#f59e0b", x: "74%", y: "54%", delay: 0.45 },
-  { slug: "jalan", warna: "#78716c", x: "34%", y: "64%", delay: 0.6 },
-  { slug: "ruang-hijau", warna: "#059669", x: "64%", y: "78%", delay: 0.75 },
-  { slug: "lainnya", warna: "#64748b", x: "12%", y: "76%", delay: 0.9 },
-];
+  { slug: "sampah", x: "18%", y: "26%", delay: 0.15 },
+  { slug: "drainase", x: "58%", y: "22%", delay: 0.3 },
+  { slug: "lampu", x: "74%", y: "54%", delay: 0.45 },
+  { slug: "jalan", x: "34%", y: "64%", delay: 0.6 },
+  { slug: "ruang-hijau", x: "64%", y: "78%", delay: 0.75 },
+  { slug: "lainnya", x: "12%", y: "76%", delay: 0.9 },
+].map((p) => ({ ...p, warna: kategoriBySlug(p.slug).warna }));
 
 function Pin({
   slug,
@@ -73,6 +89,7 @@ function Pin({
   y: string;
   delay: number;
 }) {
+  const kurangiGerak = useReducedMotion();
   const ikon = svgUriKategori(slug, "#ffffff", 16);
   return (
     <motion.div
@@ -84,14 +101,18 @@ function Pin({
       transition={{ delay, type: "spring", stiffness: 260, damping: 16 }}
     >
       <span className="relative flex size-[38px] items-center justify-center">
-        <motion.span
-          className="absolute inset-0 rounded-full opacity-30"
-          style={{ backgroundColor: warna }}
-          animate={{ scale: [1, 1.8], opacity: [0.35, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
-        />
+        {/* Riak yang berdenyut tanpa henti — dimatikan sepenuhnya saat
+            pengguna minta gerak dikurangi (WCAG 2.2.2). */}
+        {!kurangiGerak && (
+          <motion.span
+            className="absolute inset-0 rounded-full opacity-30"
+            style={{ backgroundColor: warna }}
+            animate={{ scale: [1, 1.8], opacity: [0.35, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
+          />
+        )}
         <span
-          className="relative flex size-[38px] items-center justify-center rounded-full border-[3px] border-white shadow-lg"
+          className="relative flex size-[38px] items-center justify-center rounded-full border-[3px] border-white shadow-melayang"
           style={{ backgroundColor: warna }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}

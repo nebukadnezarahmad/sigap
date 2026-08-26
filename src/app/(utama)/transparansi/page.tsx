@@ -1,14 +1,32 @@
 import type { Metadata } from "next";
-import { TrendingDown, TrendingUp, Timer, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import {
+  CheckCircle2,
+  ClipboardList,
+  Database,
+  Timer,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
+import { KATEGORI, SLA_HARI, STATUS, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { Card, StatusChip } from "@/components/ui";
+import { Card, KartuKpi, KosongState, StatusChip } from "@/components/ui";
 import { GrafikBulanan, GrafikKategori } from "./grafik";
 import { TombolCetak } from "./tombol-cetak";
 
 export const metadata: Metadata = { title: "Transparansi" };
 export const dynamic = "force-dynamic";
+
+/**
+ * Ambang tingkat penyelesaian. Warna pada KPI hanya boleh muncul kalau
+ * angkanya bermakna — palet sky/violet/kunyit disimpan khusus untuk STATUS.
+ */
+const AMBANG_SELESAI_BAIK = 70;
+const AMBANG_SELESAI_WASPADA = 40;
+
+const GAYA_TAUTAN_TOMBOL =
+  "inline-flex items-center justify-center gap-2 rounded-kontrol border garis-halus bg-panel px-5 py-2.5 text-sm font-semibold text-ink transition-[border-color,color] duration-300 ease-sigap hover:border-daun-400 hover:text-daun-700 dark:hover:text-daun-300";
 
 function median(arr: number[]) {
   if (arr.length === 0) return 0;
@@ -44,10 +62,24 @@ export default async function HalamanTransparansi() {
   const supabase = await createClient();
   if (!supabase) {
     return (
-      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-bold">
-          Database belum tersambung
-        </h1>
+      <main className="mx-auto max-w-3xl px-4 py-16">
+        <Card variant="garis" className="py-6">
+          <KosongState
+            ikon={<Database size={24} />}
+            judul="Database belum tersambung"
+            isi="Halaman ini membaca langsung dari laporan warga, jadi tidak ada angka yang bisa ditampilkan sampai Supabase aktif. Coba muat ulang beberapa saat lagi."
+            aksi={
+              <>
+                <a href="/transparansi" className={GAYA_TAUTAN_TOMBOL}>
+                  Muat ulang halaman
+                </a>
+                <Link href="/" className={GAYA_TAUTAN_TOMBOL}>
+                  Kembali ke beranda
+                </Link>
+              </>
+            }
+          />
+        </Card>
       </main>
     );
   }
@@ -147,14 +179,23 @@ export default async function HalamanTransparansi() {
     statusCount[r.status as StatusKey] =
       (statusCount[r.status as StatusKey] ?? 0) + 1;
 
+  /* Nada KPI ditentukan oleh makna angkanya, bukan variasi dekoratif. */
+  const nadaSelesai =
+    persenSelesai >= AMBANG_SELESAI_BAIK
+      ? "baik"
+      : persenSelesai < AMBANG_SELESAI_WASPADA
+        ? "waspada"
+        : "netral";
+  const nadaMedian =
+    medianHari === 0 ? "netral" : medianHari > SLA_HARI ? "bahaya" : "baik";
+  const selisihMinggu = mingguIni.length - mingguLalu.length;
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold">
-            Transparansi Kinerja Dewan
-          </h1>
-          <p className="mt-2 max-w-2xl text-muted">
+          <h1 className="font-bold tampil-wonk">Transparansi Kinerja Dewan</h1>
+          <p className="mt-3 max-w-2xl text-badan text-muted teks-pretty">
             Data publik dari laporan warga — tanpa disunting. Keterbukaan adalah
             fondasi kota yang berkelanjutan.
           </p>
@@ -162,111 +203,155 @@ export default async function HalamanTransparansi() {
         <TombolCetak />
       </header>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {[
-          {
-            label: "Total laporan",
-            nilai: total,
-            ikon: <CheckCircle2 size={20} />,
-            warna: "text-sky-600 dark:text-sky-400 bg-sky-500/10",
-          },
-          {
-            label: "Selesai ditangani",
-            nilai: `${persenSelesai}%`,
-            ikon: <CheckCircle2 size={20} />,
-            warna: "text-daun-700 dark:text-daun-300 bg-daun-500/10",
-          },
-          {
-            label: "Median waktu penyelesaian",
-            nilai: medianHari ? `${medianHari} hari` : "—",
-            ikon: <Timer size={20} />,
-            warna: "text-kunyit-600 dark:text-kunyit-400 bg-kunyit-500/10",
-          },
-          {
-            label: "Laporan minggu ini",
-            nilai: mingguIni.length,
-            ikon: <TrendingUp size={20} />,
-            warna: "text-violet-600 dark:text-violet-400 bg-violet-500/10",
-          },
-        ].map((k) => (
-          <Card key={k.label} className="flex items-center gap-3.5 p-4">
+      <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <KartuKpi
+          label="Total laporan"
+          nilai={total}
+          ikon={<ClipboardList size={20} />}
+        />
+        <KartuKpi
+          label="Selesai ditangani"
+          nilai={`${persenSelesai}%`}
+          ikon={<CheckCircle2 size={20} />}
+          nada={nadaSelesai}
+          catatan={`${selesaiList.length} dari ${total} laporan`}
+        />
+        <KartuKpi
+          label="Median waktu penyelesaian"
+          nilai={medianHari > 0 ? medianHari : "—"}
+          satuan={medianHari > 0 ? "hari" : undefined}
+          ikon={<Timer size={20} />}
+          nada={nadaMedian}
+          catatan={
+            medianHari > SLA_HARI
+              ? `Melewati SLA ${SLA_HARI} hari`
+              : `Target SLA ${SLA_HARI} hari`
+          }
+        />
+        <KartuKpi
+          label="Laporan minggu ini"
+          nilai={mingguIni.length}
+          ikon={<TrendingUp size={20} />}
+          catatan={
+            selisihMinggu === 0
+              ? "Sama dengan minggu lalu"
+              : `${selisihMinggu > 0 ? "+" : "−"}${Math.abs(
+                  selisihMinggu
+                )} dari minggu lalu`
+          }
+        />
+      </div>
+
+      {teratas && (
+        <Card
+          variant="garis"
+          className="mb-4 border-kunyit-500 bg-kunyit-500/8 p-5 sm:p-6"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <span
-              className={`flex size-11 items-center justify-center rounded-xl ${k.warna}`}
+              aria-hidden
+              className="flex size-11 shrink-0 items-center justify-center rounded-item bg-kunyit-500/20 text-kunyit-800 dark:text-kunyit-400"
             >
-              {k.ikon}
+              <TrendingUp size={22} />
             </span>
-            <div>
-              <p className="font-display text-2xl font-extrabold leading-none">
-                {k.nilai}
+            <div className="min-w-0">
+              <p className="text-mikro font-semibold uppercase text-kunyit-800 dark:text-kunyit-400">
+                Insight otomatis · perlu perhatian dewan
               </p>
-              <p className="mt-1 text-xs text-muted">{k.label}</p>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      <div className="mb-6 grid gap-3 md:grid-cols-2">
-        {teratas && (
-          <Card className="flex items-start gap-3 border-kunyit-500/40 p-5">
-            <TrendingUp className="mt-0.5 text-kunyit-500" size={20} />
-            <div>
-              <p className="font-display font-bold">Insight otomatis</p>
-              <p className="mt-1 text-sm text-muted">
+              <h2 className="mt-2 font-bold">
                 Laporan{" "}
-                <b className="inline-flex items-center gap-1 text-ink">
-                  <IkonKategori slug={teratas.slug} ukuran={13} /> {teratas.nama}
-                </b>{" "}
-                naik <b className="text-ink">{teratas.naik} laporan</b> dibanding
-                minggu lalu ({teratas.kini} vs {teratas.lalu}). Perlu perhatian
-                khusus dewan.
+                <span className="inline-flex items-baseline gap-1.5">
+                  <IkonKategori slug={teratas.slug} ukuran={18} />
+                  {teratas.nama}
+                </span>{" "}
+                naik {teratas.naik} laporan
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-2 teks-pretty">
+                <span className="angka-tabular font-semibold text-ink">
+                  {teratas.kini}
+                </span>{" "}
+                laporan minggu ini berbanding{" "}
+                <span className="angka-tabular font-semibold text-ink">
+                  {teratas.lalu}
+                </span>{" "}
+                minggu lalu. Lonjakan tertinggi biasanya menandai masalah yang
+                belum tertangani di sumbernya.
               </p>
             </div>
-          </Card>
-        )}
-        {tercepat && (
-          <Card className="flex items-start gap-3 border-daun-500/40 p-5">
-            <TrendingDown className="mt-0.5 text-daun-600 dark:text-daun-400" size={20} />
-            <div>
-              <p className="font-display font-bold">Yang paling responsif</p>
-              <p className="mt-1 text-sm text-muted">
-                Kategori <b className="text-ink">{tercepat.nama}</b> dituntaskan{" "}
-                <b className="text-ink">{tercepat.persen}%</b> ({tercepat.selesai}/
-                {tercepat.total} laporan). Contoh kerja sama yang baik!
-              </p>
-            </div>
-          </Card>
-        )}
-      </div>
+          </div>
+        </Card>
+      )}
 
-      <div className="mb-6 grid gap-4 lg:grid-cols-2">
-        <Card className="p-5">
-          <h2 className="mb-4 font-display font-bold">
-            Laporan masuk vs selesai (6 bulan)
-          </h2>
+      {tercepat && (
+        <p className="mb-8 flex items-start gap-2.5 border-l-2 border-daun-500 py-1 pl-4 text-sm leading-relaxed text-ink-2 teks-pretty">
+          <TrendingDown
+            size={16}
+            aria-hidden
+            className="mt-1 shrink-0 text-daun-600 dark:text-daun-400"
+          />
+          <span>
+            Kategori paling responsif:{" "}
+            <b className="font-semibold text-ink">{tercepat.nama}</b> —{" "}
+            <span className="angka-tabular font-semibold text-ink">
+              {tercepat.persen}%
+            </span>{" "}
+            tuntas ({tercepat.selesai} dari {tercepat.total} laporan).
+          </span>
+        </p>
+      )}
+
+      <div className="mb-6 grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+        <Card className="p-5 sm:p-6">
+          <h2 className="mb-5 font-bold">Laporan masuk vs selesai (6 bulan)</h2>
           <GrafikBulanan data={bulan} />
         </Card>
 
-        <Card className="p-5">
-          <h2 className="mb-4 font-display font-bold">
-            Tingkat penyelesaian per kategori
-          </h2>
+        <Card className="p-5 sm:p-6">
+          <h2 className="mb-5 font-bold">Tingkat penyelesaian per kategori</h2>
           <GrafikKategori data={perKategori} />
         </Card>
       </div>
 
-      <Card className="p-5">
-        <h2 className="mb-4 font-display font-bold">Distribusi status</h2>
-        <div className="flex flex-wrap gap-3">
-          {(Object.keys(STATUS) as StatusKey[]).map((s) => (
-            <div
-              key={s}
-              className="flex items-center gap-2 rounded-full bg-panel-2 px-4 py-2"
-            >
-              <StatusChip status={s} />
-              <span className="font-display font-bold">{statusCount[s] ?? 0}</span>
-            </div>
-          ))}
+      <Card className="p-5 sm:p-6">
+        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-bold">Distribusi status</h2>
+          <p className="text-xs text-muted">
+            Dari <span className="angka-tabular">{total}</span> laporan
+          </p>
         </div>
+        <dl className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
+          {(Object.keys(STATUS) as StatusKey[]).map((s) => {
+            const jumlah = statusCount[s] ?? 0;
+            const persen = total > 0 ? Math.round((jumlah / total) * 100) : 0;
+            return (
+              <div key={s}>
+                <dt>
+                  <StatusChip status={s} />
+                </dt>
+                <dd className="mt-2.5 flex items-baseline gap-1.5">
+                  <span className="angka-tabular font-display text-3xl font-extrabold leading-none">
+                    {jumlah}
+                  </span>
+                  <span className="angka-tabular text-xs text-muted">
+                    {persen}%
+                  </span>
+                </dd>
+                <div
+                  className="mt-2.5 h-1 rounded-kontrol bg-line/60"
+                  aria-hidden
+                >
+                  <div
+                    className="h-full rounded-kontrol"
+                    style={{
+                      width: `${persen}%`,
+                      backgroundColor: STATUS[s].warna,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </dl>
       </Card>
     </main>
   );

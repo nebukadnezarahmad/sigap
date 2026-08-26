@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import {
   BookOpen,
   ChevronDown,
@@ -24,6 +25,65 @@ import { useTheme, toggleTema } from "@/lib/use-theme";
 import { Avatar, Button } from "@/components/ui";
 import { NotifikasiBel } from "@/components/notifikasi-bel";
 
+/* Gaya berulang diekstrak sekali — sebelumnya string yang sama diulang 8 kali. */
+const NAV_DASAR =
+  "relative rounded-kontrol px-3.5 py-1.5 text-sm font-medium transition";
+const NAV_PASIF = "text-muted hover:bg-panel-2 hover:text-ink";
+const NAV_AKTIF = "bg-daun-600/10 text-daun-700 dark:text-daun-300";
+const ITEM_MENU =
+  "flex w-full items-center gap-2.5 rounded-item px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink";
+const PANEL_MENU =
+  "absolute top-full z-20 mt-1.5 rounded-panel bg-panel p-2 shadow-melayang dark:border dark:garis-halus";
+
+/** Penanda aktif berbentuk, bukan hanya warna. */
+function PenandaAktif() {
+  return (
+    <span
+      aria-hidden
+      className="absolute inset-x-3.5 -bottom-0.5 h-0.5 rounded-full bg-daun-600 dark:bg-daun-300"
+    />
+  );
+}
+
+/**
+ * Disclosure terkontrol: klik membuka, Escape dan klik di luar menutup, fokus
+ * kembali ke pemicu. Versi sebelumnya murni `group-hover` sehingga tidak bisa
+ * dijangkau sama sekali di perangkat sentuh.
+ */
+function useMenuTurun(
+  // Refs dibuat di komponen pemanggil dan dititipkan ke sini, bukan dibuat lalu
+  // dikembalikan dari hook: React Compiler tidak bisa melacak ref yang keluar
+  // sebagai properti objek, dan menandai pembacaannya saat render sebagai
+  // pelanggaran (react-hooks/refs).
+  rujukanWadah: React.RefObject<HTMLDivElement | null>,
+  rujukanTombol: React.RefObject<HTMLButtonElement | null>
+) {
+  const [buka, setBuka] = useState(false);
+
+  useEffect(() => {
+    if (!buka) return;
+
+    function padaTombol(e: KeyboardEvent) {
+      if (e.key !== "Escape") return;
+      setBuka(false);
+      rujukanTombol.current?.focus();
+    }
+    function padaKlikLuar(e: MouseEvent) {
+      if (rujukanWadah.current?.contains(e.target as Node)) return;
+      setBuka(false);
+    }
+
+    document.addEventListener("keydown", padaTombol);
+    document.addEventListener("mousedown", padaKlikLuar);
+    return () => {
+      document.removeEventListener("keydown", padaTombol);
+      document.removeEventListener("mousedown", padaKlikLuar);
+    };
+  }, [buka, rujukanWadah, rujukanTombol]);
+
+  return { buka, setBuka };
+}
+
 function ToggleTema() {
   const gelap = useTheme();
 
@@ -35,7 +95,7 @@ function ToggleTema() {
     <button
       onClick={ubah}
       aria-label={gelap ? "Mode terang" : "Mode gelap"}
-      className="flex size-10 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink"
+      className="flex size-10 items-center justify-center rounded-kontrol text-muted transition hover:bg-panel-2 hover:text-ink"
     >
       <span className="hidden dark:block">
         <Sun size={18} />
@@ -47,10 +107,23 @@ function ToggleTema() {
   );
 }
 
+const KOMUNITAS = [
+  { href: "/polling", label: "Polling warga", ikon: BarChart3 },
+  { href: "/aksi", label: "Aksi bersama", ikon: Users },
+  { href: "/edukasi", label: "Edukasi & quiz", ikon: GraduationCap },
+];
+
 export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, profil } = useUser();
+
+  const wadahKomunitas = useRef<HTMLDivElement>(null);
+  const tombolKomunitas = useRef<HTMLButtonElement>(null);
+  const wadahAkun = useRef<HTMLDivElement>(null);
+  const tombolAkun = useRef<HTMLButtonElement>(null);
+  const komunitas = useMenuTurun(wadahKomunitas, tombolKomunitas);
+  const akun = useMenuTurun(wadahAkun, tombolAkun);
 
   const tautan = [
     { href: "/peta", label: "Peta" },
@@ -60,6 +133,16 @@ export function SiteHeader() {
     { href: "/layanan", label: "Layanan" },
     { href: "/umkm", label: "UMKM" },
   ];
+
+  const komunitasAktif = KOMUNITAS.some((k) => pathname.startsWith(k.href));
+
+  /* Pindah halaman menutup kedua menu. */
+  const tutupKomunitas = komunitas.setBuka;
+  const tutupAkun = akun.setBuka;
+  useEffect(() => {
+    tutupKomunitas(false);
+    tutupAkun(false);
+  }, [pathname, tutupKomunitas, tutupAkun]);
 
   async function keluar() {
     const supabase = createClient();
@@ -72,7 +155,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-[900] border-b garis-halus bg-paper/85 backdrop-blur-md print:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-xl bg-daun-600 text-white">
+          <span className="flex size-8 items-center justify-center rounded-item bg-daun-600 text-white">
             <MapPin size={17} strokeWidth={2.5} />
           </span>
           <span className="font-display text-lg font-bold tracking-tight">
@@ -81,71 +164,93 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-0.5 md:flex" aria-label="Utama">
-          {tautan.map((t) => (
-            <Link
-              key={t.href}
-              href={t.href}
-              className={cn(
-                "rounded-full px-3 py-1.5 text-sm font-medium transition",
-                pathname.startsWith(t.href)
-                  ? "bg-daun-600/10 text-daun-700 dark:text-daun-300"
-                  : "text-muted hover:bg-panel-2 hover:text-ink"
-              )}
-            >
-              {t.label}
-            </Link>
-          ))}
-          <div className="group relative">
+          {tautan.map((t) => {
+            const aktif = pathname.startsWith(t.href);
+            return (
+              <Link
+                key={t.href}
+                href={t.href}
+                aria-current={aktif ? "page" : undefined}
+                className={cn(NAV_DASAR, aktif ? NAV_AKTIF : NAV_PASIF)}
+              >
+                {t.label}
+                {aktif && <PenandaAktif />}
+              </Link>
+            );
+          })}
+
+          <div className="relative" ref={wadahKomunitas}>
             <button
+              ref={tombolKomunitas}
+              type="button"
+              onClick={() => komunitas.setBuka((v) => !v)}
               aria-haspopup="true"
+              aria-expanded={komunitas.buka}
+              aria-controls="menu-komunitas"
               className={cn(
-                "flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-medium transition",
-                pathname.startsWith("/polling") ||
-                  pathname.startsWith("/aksi") ||
-                  pathname.startsWith("/edukasi")
-                  ? "bg-daun-600/10 text-daun-700 dark:text-daun-300"
-                  : "text-muted hover:bg-panel-2 hover:text-ink"
+                NAV_DASAR,
+                "flex items-center gap-1",
+                komunitasAktif ? NAV_AKTIF : NAV_PASIF
               )}
             >
               Komunitas
               <ChevronDown
                 size={13}
-                className="transition-transform group-hover:rotate-180"
+                aria-hidden
+                className={cn(
+                  "transition-transform duration-200 ease-sigap",
+                  komunitas.buka && "rotate-180"
+                )}
               />
+              {komunitasAktif && <PenandaAktif />}
             </button>
-            <div className="invisible absolute left-1/2 top-full z-20 w-48 -translate-x-1/2 translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-              {[
-                { href: "/polling", label: "Polling warga", ikon: BarChart3 },
-                { href: "/aksi", label: "Aksi bersama", ikon: Users },
-                { href: "/edukasi", label: "Edukasi & quiz", ikon: GraduationCap },
-              ].map((k) => (
-                <Link
-                  key={k.href}
-                  href={k.href}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition",
-                    pathname.startsWith(k.href)
-                      ? "bg-daun-600/10 text-daun-700 dark:text-daun-300"
-                      : "text-muted hover:bg-panel-2 hover:text-ink"
-                  )}
-                >
-                  <k.ikon size={15} />
-                  {k.label}
-                </Link>
-              ))}
-            </div>
+            {komunitas.buka && (
+              <div
+                id="menu-komunitas"
+                className={cn(PANEL_MENU, "left-1/2 w-52 -translate-x-1/2")}
+              >
+                {KOMUNITAS.map((k) => {
+                  const aktif = pathname.startsWith(k.href);
+                  return (
+                    <Link
+                      key={k.href}
+                      href={k.href}
+                      aria-current={aktif ? "page" : undefined}
+                      onClick={() => komunitas.setBuka(false)}
+                      className={cn(
+                        ITEM_MENU,
+                        aktif &&
+                          "bg-daun-600/10 text-daun-700 dark:text-daun-300"
+                      )}
+                    >
+                      <k.ikon size={15} aria-hidden />
+                      {k.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
+
           {profil?.role === "admin" && (
             <Link
               href="/dewan"
+              aria-current={pathname.startsWith("/dewan") ? "page" : undefined}
               className={cn(
-                "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition",
+                NAV_DASAR,
+                "flex items-center gap-1.5",
                 pathname.startsWith("/dewan")
-                  ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400"
-                  : "text-muted hover:bg-panel-2 hover:text-ink"
+                  ? "bg-kunyit-500/15 text-kunyit-700 dark:text-kunyit-400"
+                  : NAV_PASIF
               )}
             >
-              <ShieldCheck size={15} /> Dewan
+              <ShieldCheck size={15} aria-hidden /> Dewan
+              {pathname.startsWith("/dewan") && (
+                <span
+                  aria-hidden
+                  className="absolute inset-x-3.5 -bottom-0.5 h-0.5 rounded-full bg-kunyit-600 dark:bg-kunyit-400"
+                />
+              )}
             </Link>
           )}
         </nav>
@@ -154,51 +259,73 @@ export function SiteHeader() {
           <ToggleTema />
           {user && <NotifikasiBel />}
           {user ? (
-            <div className="group relative">
+            <div className="relative" ref={wadahAkun}>
               <button
+                ref={tombolAkun}
+                type="button"
+                onClick={() => akun.setBuka((v) => !v)}
                 aria-label="Menu akun"
-                className="flex items-center rounded-full transition hover:ring-4 hover:ring-daun-500/15"
+                aria-haspopup="true"
+                aria-expanded={akun.buka}
+                aria-controls="menu-akun"
+                className="flex items-center rounded-kontrol transition hover:ring-4 hover:ring-daun-500/15"
               >
-                <Avatar nama={profil?.nama_lengkap ?? "?"} url={profil?.avatar_url} ukuran={34} />
+                <Avatar
+                  nama={profil?.nama_lengkap ?? "?"}
+                  url={profil?.avatar_url}
+                  ukuran={34}
+                />
               </button>
-              <div className="invisible absolute right-0 top-full z-20 w-56 translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                <div className="border-b garis-halus px-3 pb-2 pt-1.5">
-                  <p className="truncate text-sm font-semibold">
-                    {profil?.nama_lengkap ?? user.email}
-                  </p>
-                  <p className="truncate text-xs text-muted">@{profil?.username ?? "warga"}</p>
+              {akun.buka && (
+                <div id="menu-akun" className={cn(PANEL_MENU, "right-0 w-56")}>
+                  <div className="border-b garis-halus px-3 pb-2 pt-1.5">
+                    <p className="truncate text-sm font-semibold">
+                      {profil?.nama_lengkap ?? user.email}
+                    </p>
+                    <p className="truncate text-xs text-muted">
+                      @{profil?.username ?? "warga"}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/warga/${profil?.username ?? ""}`}
+                    onClick={() => akun.setBuka(false)}
+                    className={cn(ITEM_MENU, "mt-1")}
+                  >
+                    <UserRound size={15} aria-hidden /> Profil saya
+                  </Link>
+                  <Link
+                    href="/laporan-saya"
+                    onClick={() => akun.setBuka(false)}
+                    className={ITEM_MENU}
+                  >
+                    <FileText size={15} aria-hidden /> Laporan saya
+                  </Link>
+                  <Link
+                    href="/papan-skor"
+                    onClick={() => akun.setBuka(false)}
+                    className={ITEM_MENU}
+                  >
+                    <Trophy size={15} aria-hidden /> Papan skor
+                  </Link>
+                  <Link
+                    href="/demo"
+                    onClick={() => akun.setBuka(false)}
+                    className={ITEM_MENU}
+                  >
+                    <BookOpen size={15} aria-hidden /> Panduan demo
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={keluar}
+                    className={cn(
+                      ITEM_MENU,
+                      "text-danger-kuat hover:bg-danger/10 hover:text-danger-kuat dark:text-red-300 dark:hover:text-red-300"
+                    )}
+                  >
+                    <LogOut size={15} aria-hidden /> Keluar
+                  </button>
                 </div>
-                <Link
-                  href={`/warga/${profil?.username ?? ""}`}
-                  className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
-                >
-                  <UserRound size={15} /> Profil saya
-                </Link>
-                <Link
-                  href="/laporan-saya"
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
-                >
-                  <FileText size={15} /> Laporan saya
-                </Link>
-                <Link
-                  href="/papan-skor"
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
-                >
-                  <Trophy size={15} /> Papan skor
-                </Link>
-                <Link
-                  href="/demo"
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
-                >
-                  <BookOpen size={15} /> Panduan demo
-                </Link>
-                <button
-                  onClick={keluar}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-danger transition hover:bg-danger/10"
-                >
-                  <LogOut size={15} /> Keluar
-                </button>
-              </div>
+              )}
             </div>
           ) : (
             <Button onClick={() => router.push("/masuk")} size="sm">

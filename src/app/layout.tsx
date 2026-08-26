@@ -1,21 +1,31 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Public_Sans, Space_Grotesk } from "next/font/google";
+import { Fraunces, Public_Sans } from "next/font/google";
+import { GerakProvider } from "@/components/gerak-provider";
 import "./globals.css";
 
-const inter = Public_Sans({
+/**
+ * Dua keluarga font, bukan tiga.
+ * Public Sans — turunan Libre Franklin yang dipakai design system pemerintahan
+ * AS; netral, tinggi x besar, terbaca di layar murah. Untuk seluruh UI & data.
+ * Fraunces — serif variabel dengan sumbu optical size; memikul seluruh peran
+ * display. Space Grotesk dilepas: ia salah satu sidik jari paling khas situs
+ * generasi AI, dan font ketiga tidak membayar ongkosnya.
+ */
+const publicSans = Public_Sans({
   subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-teks",
+  display: "swap",
 });
 
 const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-editorial",
+  variable: "--font-tampil",
   style: ["normal", "italic"],
+  // opsz: bentuk huruf menyesuaikan ukuran optis — judul 60px dan 20px tidak
+  // lagi memakai gambar huruf yang sama. SOFT/WONK memberi karakter
+  // idiosinkratik pada display besar (lihat .tampil-wonk di globals.css).
+  axes: ["SOFT", "WONK", "opsz"],
+  display: "swap",
 });
 
 export const viewport: Viewport = {
@@ -45,8 +55,10 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: temaScript }} />
       </head>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} ${fraunces.variable} grain font-sans antialiased`}>
-        {children}
+      <body
+        className={`${publicSans.variable} ${fraunces.variable} grain font-sans antialiased`}
+      >
+        <GerakProvider>{children}</GerakProvider>
       </body>
     </html>
   );

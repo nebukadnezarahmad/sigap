@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { createClient } from "@/lib/supabase/server";
-import { kategoriBySlug } from "@/lib/constants";
+
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -39,10 +39,6 @@ export default async function Gambar({ params }: { params: { id: string } }) {
   } catch {
     /* fallback teks bawaan */
   }
-
-  const kat = kategoriBySlug(
-    kategori === "Lainnya" ? "lainnya" : kategori.toLowerCase().includes("drainase") ? "drainase" : "lainnya"
-  );
 
   return new ImageResponse(
     (

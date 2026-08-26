@@ -20,7 +20,7 @@ export function TombolIkutiArea({
 
   async function ikuti() {
     if (!user) {
-      window.location.assign("/masuk?next=/peta");
+      router.push("/masuk?next=/peta");
       return;
     }
     setProses(true);
