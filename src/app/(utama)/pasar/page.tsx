@@ -39,20 +39,28 @@ export default async function HalamanPasar() {
     .order("created_at", { ascending: false })
     .limit(60);
 
-  const barang: Barang[] = (raw ?? []).map((b) => ({
-    id: b.id,
-    judul: b.judul,
-    deskripsi: b.deskripsi,
-    kategori: b.kategori,
-    kondisi: b.kondisi,
-    titik_ambil: b.titik_ambil,
-    status: b.status,
-    pemilik_id: b.user_id,
-    pemilik_nama:
-      (b as unknown as { pemilik?: { username: string }[] | null }).pemilik?.[0]
-        ?.username ?? null,
-    milikKu: user ? b.user_id === user.id : false,
-  }));
+  const barang: Barang[] = (raw ?? []).map((b) => {
+    const pemilik = b.pemilik as
+      | { username: string }
+      | { username: string }[]
+      | null
+      | undefined;
+    const pemilik_nama = Array.isArray(pemilik)
+      ? (pemilik[0]?.username ?? null)
+      : (pemilik?.username ?? null);
+    return {
+      id: b.id,
+      judul: b.judul,
+      deskripsi: b.deskripsi,
+      kategori: b.kategori,
+      kondisi: b.kondisi,
+      titik_ambil: b.titik_ambil,
+      status: b.status,
+      pemilik_id: b.user_id,
+      pemilik_nama,
+      milikKu: user ? b.user_id === user.id : false,
+    };
+  });
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
