@@ -14,8 +14,9 @@ export const STATUS: Record<
 > = {
   baru: {
     label: "Baru",
-    warna: "#f59e0b",
-    chip: "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400",
+    warna: "#b45309",
+    // Sebelumnya text-kunyit-600 di atas kunyit-500/15 = 2.84:1 — gagal WCAG AA.
+    chip: "bg-kunyit-500/20 text-kunyit-800 dark:bg-kunyit-500/15 dark:text-kunyit-400",
   },
   diverifikasi: {
     label: "Diverifikasi",
@@ -34,8 +35,9 @@ export const STATUS: Record<
   },
   ditolak: {
     label: "Ditolak",
-    warna: "#dc2626",
-    chip: "bg-danger/10 text-danger",
+    warna: "#b91c1c",
+    // Sebelumnya 4.13:1 (terang) dan 3.38:1 (gelap) — gagal di kedua mode.
+    chip: "bg-danger/15 text-danger-kuat dark:bg-danger/20 dark:text-red-300",
   },
 };
 
@@ -45,10 +47,19 @@ export type KategoriDef = {
   warna: string;
 };
 
+/**
+ * Warna kategori memakai HUE yang berbeda-beda, bukan gradasi satu hue —
+ * gradasi satu hue diam-diam menciptakan urutan/ranking yang tidak dimaksud
+ * (aturan Datawrapper untuk skala kualitatif vs kuantitatif).
+ *
+ * Setiap warna di sini menjadi latar pin peta dengan ikon PUTIH di atasnya
+ * (leaflet-map.tsx), jadi wajib >= 3:1 terhadap putih (WCAG 1.4.11).
+ * "lampu" dulu #f59e0b = 2.15:1 dan "sampah" #65a30d = 3.09:1 (marginal).
+ */
 export const KATEGORI: KategoriDef[] = [
-  { slug: "sampah", nama: "Sampah Menumpuk", warna: "#65a30d" },
+  { slug: "sampah", nama: "Sampah Menumpuk", warna: "#4d7c0f" },
   { slug: "drainase", nama: "Drainase & Banjir", warna: "#0284c7" },
-  { slug: "lampu", nama: "Lampu Jalan Mati", warna: "#f59e0b" },
+  { slug: "lampu", nama: "Lampu Jalan Mati", warna: "#b45309" },
   { slug: "jalan", nama: "Jalan Rusak", warna: "#78716c" },
   { slug: "ruang-hijau", nama: "Ruang Hijau", warna: "#059669" },
   { slug: "lainnya", nama: "Lainnya", warna: "#64748b" },
