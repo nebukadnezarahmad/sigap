@@ -6,11 +6,12 @@ import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowRight,
   LogOut,
-  Map,
+  // Diberi alias: ikon bernama `Map` menutupi konstruktor Map bawaan JS.
+  Map as IkonPeta,
   MapPin,
   Moon,
-  Plus,
   Scale,
+  Search,
   ShieldCheck,
   Sun,
   BarChart3,
@@ -36,6 +37,9 @@ type Aksi = {
   jalankan: () => void;
 };
 
+const ID_DAFTAR = "palet-daftar";
+const idOpsi = (i: number) => `palet-opsi-${i}`;
+
 export function CommandPalette() {
   const router = useRouter();
   const { user, profil } = useUser();
@@ -50,7 +54,7 @@ export function CommandPalette() {
         id: "peta",
         label: "Buka peta interaktif",
         hint: "Navigasi",
-        ikon: <Map size={16} />,
+        ikon: <IkonPeta size={16} />,
         jalankan: () => router.push("/peta"),
       },
       {
@@ -168,14 +172,31 @@ export function CommandPalette() {
     return dasar;
   }, [gelap, user, profil, router]);
 
+  /* Pencarian menyertakan kategori: mengetik "admin" menemukan "Dashboard dewan". */
   const hasil = useMemo(() => {
-    if (!kueri.trim()) return aksi;
-    const q = kueri.toLowerCase();
-    return aksi.filter((a) => a.label.toLowerCase().includes(q));
+    const q = kueri.trim().toLowerCase();
+    if (!q) return aksi;
+    return aksi.filter((a) =>
+      `${a.label} ${a.hint}`.toLowerCase().includes(q)
+    );
   }, [aksi, kueri]);
 
+  /* Kelompokkan per kategori, tapi simpan indeks datar agar kursor tetap satu sumbu. */
+  const kelompok = useMemo(() => {
+    const peta = new Map<string, { aksi: Aksi; indeks: number }[]>();
+    hasil.forEach((a, i) => {
+      const isi = peta.get(a.hint) ?? [];
+      isi.push({ aksi: a, indeks: i });
+      peta.set(a.hint, isi);
+    });
+    return Array.from(peta.entries());
+  }, [hasil]);
+
+  const kursorAman = Math.min(kursor, Math.max(0, hasil.length - 1));
+  const terpilih = hasil[kursorAman];
+
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
+    function padaTombol(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setBuka((v) => !v);
@@ -184,9 +205,22 @@ export function CommandPalette() {
       }
       if (e.key === "Escape") setBuka(false);
     }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", padaTombol);
+    return () => window.removeEventListener("keydown", padaTombol);
   }, []);
+
+  /* Jaga opsi terpilih tetap terlihat saat navigasi panah. */
+  useEffect(() => {
+    if (!buka) return;
+    document
+      .getElementById(idOpsi(kursorAman))
+      ?.scrollIntoView({ block: "nearest" });
+  }, [buka, kursorAman]);
+
+  function jalankan(a: Aksi) {
+    setBuka(false);
+    a.jalankan();
+  }
 
   return (
     <AnimatePresence>
@@ -195,7 +229,7 @@ export function CommandPalette() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[1200] flex items-start justify-center pt-[14vh]"
+          className="fixed inset-0 z-[1200] flex items-start justify-center px-4 pt-[14vh]"
         >
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -205,12 +239,13 @@ export function CommandPalette() {
             initial={{ y: -14, scale: 0.98 }}
             animate={{ y: 0, scale: 1 }}
             exit={{ y: -10, opacity: 0 }}
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl border garis-halus bg-panel shadow-2xl"
+            className="relative w-full max-w-lg overflow-hidden rounded-panel bg-panel shadow-modal"
             role="dialog"
-            aria-label="Command palette"
+            aria-modal="true"
+            aria-label="Palet perintah"
           >
-            <div className="flex items-center gap-2 border-b garis-halus px-4">
-              <Plus size={15} className="text-muted" />
+            <div className="flex items-center gap-2.5 border-b garis-halus px-4">
+              <Search size={16} className="shrink-0 text-muted" aria-hidden />
               <input
                 autoFocus
                 value={kueri}
@@ -221,55 +256,101 @@ export function CommandPalette() {
                 onKeyDown={(e) => {
                   if (e.key === "ArrowDown") {
                     e.preventDefault();
-                    setKursor((k) => Math.min(hasil.length - 1, k + 1));
+                    setKursor(Math.min(hasil.length - 1, kursorAman + 1));
                   }
                   if (e.key === "ArrowUp") {
                     e.preventDefault();
-                    setKursor((k) => Math.max(0, k - 1));
+                    setKursor(Math.max(0, kursorAman - 1));
                   }
-                  if (e.key === "Enter" && hasil[kursor]) {
-                    setBuka(false);
-                    hasil[kursor].jalankan();
+                  if (e.key === "Home") {
+                    e.preventDefault();
+                    setKursor(0);
+                  }
+                  if (e.key === "End") {
+                    e.preventDefault();
+                    setKursor(Math.max(0, hasil.length - 1));
+                  }
+                  if (e.key === "Enter" && terpilih) {
+                    e.preventDefault();
+                    jalankan(terpilih);
                   }
                 }}
                 placeholder="Ketik perintah atau tujuan…"
                 className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:text-muted/70"
-                aria-label="Cari perintah"
+                role="combobox"
+                aria-expanded="true"
+                aria-controls={ID_DAFTAR}
+                aria-activedescendant={
+                  terpilih ? idOpsi(kursorAman) : undefined
+                }
+                aria-autocomplete="list"
+                aria-label="Cari perintah atau tujuan"
               />
-              <kbd className="rounded-md border garis-halus px-1.5 py-0.5 text-[10px] text-muted">
+              <kbd className="shrink-0 rounded-kontrol border garis-halus px-2 py-0.5 text-mikro font-semibold text-muted">
                 ESC
               </kbd>
             </div>
-            <ul className="max-h-72 overflow-y-auto p-2">
+
+            <p aria-live="polite" className="sr-only">
+              {hasil.length === 0
+                ? "Tidak ada perintah cocok."
+                : `${hasil.length} perintah ditemukan.`}
+            </p>
+
+            <ul
+              id={ID_DAFTAR}
+              role="listbox"
+              aria-label="Daftar perintah"
+              className="max-h-72 overflow-y-auto p-2"
+            >
               {hasil.length === 0 && (
                 <li className="px-3 py-6 text-center text-sm text-muted">
-                  Tidak ada perintah cocok.
+                  Tidak ada perintah cocok. Coba kata lain.
                 </li>
               )}
-              {hasil.map((a, i) => (
-                <li key={a.id}>
-                  <button
-                    onClick={() => {
-                      setBuka(false);
-                      a.jalankan();
-                    }}
-                    onMouseEnter={() => setKursor(i)}
-                    className={cn(
-                      "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition",
-                      i === kursor
-                        ? "bg-daun-600/10 text-daun-800 dark:text-daun-200"
-                        : "text-ink"
-                    )}
-                  >
-                    <span className="text-muted">{a.ikon}</span>
-                    <span className="flex-1 font-medium">{a.label}</span>
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">
-                      {a.hint}
-                    </span>
-                  </button>
+              {kelompok.map(([kategori, isi]) => (
+                <li key={kategori} role="presentation">
+                  <p className="sticky top-0 z-10 bg-panel px-3 pb-1.5 pt-2 text-mikro font-semibold uppercase text-muted">
+                    {kategori}
+                  </p>
+                  <ul role="group" aria-label={kategori}>
+                    {isi.map(({ aksi: a, indeks }) => (
+                      <li
+                        key={a.id}
+                        id={idOpsi(indeks)}
+                        role="option"
+                        aria-selected={indeks === kursorAman}
+                        onClick={() => jalankan(a)}
+                        onMouseEnter={() => setKursor(indeks)}
+                        className={cn(
+                          "flex cursor-pointer items-center gap-3 rounded-item px-3 py-2.5 text-left text-sm transition",
+                          indeks === kursorAman
+                            ? "bg-daun-600/10 text-daun-800 dark:text-daun-200"
+                            : "text-ink"
+                        )}
+                      >
+                        <span className="text-muted" aria-hidden>
+                          {a.ikon}
+                        </span>
+                        <span className="flex-1 font-medium">{a.label}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>
+
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t garis-halus px-4 py-2.5 text-mikro font-semibold uppercase text-muted">
+              <span>
+                <span aria-hidden>↑↓</span> pilih
+              </span>
+              <span>
+                <span aria-hidden>⏎</span> buka
+              </span>
+              <span>
+                <span aria-hidden>esc</span> tutup
+              </span>
+            </div>
           </motion.div>
         </motion.div>
       )}

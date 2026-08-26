@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import {
   Activity,
@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Download,
   Flame,
+  Inbox,
   ThumbsUp,
   Users,
 } from "lucide-react";
@@ -28,13 +29,39 @@ import { STATUS, SLA_HARI, umurHari, type StatusKey } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { Button, Card, Select, StatusChip } from "@/components/ui";
+import {
+  Button,
+  Card,
+  Input,
+  KartuKpi,
+  KosongState,
+  Select,
+  StatusChip,
+} from "@/components/ui";
 import { waktuRelatif } from "@/lib/utils";
 
 const LeafletMap = dynamic(
   () => import("@/components/map/leaflet-map").then((m) => m.LeafletMap),
   { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-panel-2" /> }
 );
+
+/** Di atas ambang ini tingkat penyelesaian layak diberi nada "baik". */
+const AMBANG_SELESAI_BAIK = 70;
+
+/**
+ * Kontrol di dalam baris tabel dikecilkan lewat className — tailwind-merge
+ * yang menimpa ukuran bawaan, jadi tidak perlu !important.
+ */
+const GAYA_KONTROL_BARIS = "py-1.5 pl-2.5 pr-8 text-xs";
+
+type KartuKpiDef = {
+  label: string;
+  nilai: number;
+  ikon: ReactNode;
+  nada: "netral" | "baik" | "waspada" | "bahaya";
+  catatan?: string;
+  lebar?: string;
+};
 
 export function DewanClient({
   daftar: awal,
@@ -171,7 +198,7 @@ export function DewanClient({
           r.comment_count ?? 0,
         ].join(";")
       );
-    const csv = "\uFEFF" + [kepala.join(";"), ...baris].join("\n");
+    const csv = "﻿" + [kepala.join(";"), ...baris].join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -188,6 +215,7 @@ export function DewanClient({
       umurHari(r.created_at) > SLA_HARI &&
       !["selesai", "ditolak"].includes(r.status)
   ).length;
+  const persenSelesai = total > 0 ? Math.round((selesai / total) * 100) : 0;
 
   const titikPeta = useMemo(
     () =>
@@ -204,74 +232,84 @@ export function DewanClient({
     [daftar, filterStatus]
   );
 
-  const kartu = [
+  const terfilter = daftar.filter(
+    (r) => filterStatus === "semua" || r.status === filterStatus
+  );
+
+  /**
+   * KPI dewan bersifat operasional: SLA memimpin baris dan mengambil dua kolom.
+   * Warna hanya muncul kalau angkanya berubah makna — sisanya netral supaya
+   * palet status (sky/kunyit/violet) tetap milik StatusChip.
+   */
+  const kartu: KartuKpiDef[] = [
     {
-      label: "Total laporan",
-      nilai: total,
-      ikon: <Activity size={20} />,
-      warna: "text-sky-600 dark:text-sky-400 bg-sky-500/10",
+      label: `Melewati SLA ${SLA_HARI} hari`,
+      nilai: lewatSla,
+      ikon: <AlarmClock size={20} />,
+      nada: lewatSla > 0 ? "bahaya" : "baik",
+      catatan:
+        lewatSla > 0 ? "Perlu tindakan hari ini" : "Semua dalam tenggat",
+      lebar: "col-span-2",
     },
     {
       label: "Sedang ditangani",
       nilai: aktif,
       ikon: <Flame size={20} />,
-      warna: "text-kunyit-600 dark:text-kunyit-400 bg-kunyit-500/10",
+      nada: "netral",
+      catatan: "Baru + dikerjakan",
     },
     {
       label: "Selesai",
       nilai: selesai,
       ikon: <CheckCircle2 size={20} />,
-      warna: "text-daun-700 dark:text-daun-300 bg-daun-500/10",
+      nada: persenSelesai >= AMBANG_SELESAI_BAIK ? "baik" : "netral",
+      catatan: `${persenSelesai}% dari total`,
+    },
+    {
+      label: "Total laporan",
+      nilai: total,
+      ikon: <Activity size={20} />,
+      nada: "netral",
     },
     {
       label: "Warga terdaftar",
       nilai: totalWarga,
       ikon: <Users size={20} />,
-      warna: "text-violet-600 dark:text-violet-400 bg-violet-500/10",
-    },
-    {
-      label: `Melewati SLA ${SLA_HARI} hari`,
-      nilai: lewatSla,
-      ikon: <AlarmClock size={20} />,
-      warna:
-        lewatSla > 0
-          ? "text-danger bg-danger/10"
-          : "text-daun-700 dark:text-daun-300 bg-daun-500/10",
+      nada: "netral",
     },
   ];
 
   return (
     <main className="mx-auto max-w-7xl px-4 pb-12 pt-6">
       <header className="mb-6">
-        <h1 className="font-display text-2xl font-bold">Dashboard Dewan</h1>
-        <p className="text-sm text-muted">
-          Pantau & kelola penanganan laporan permukiman secara realtime.
+        <h1 className="font-bold tampil-tenang">Dashboard Dewan</h1>
+        <p className="mt-2 text-sm text-muted">
+          Pantau &amp; kelola penanganan laporan permukiman secara realtime.
         </p>
       </header>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-6">
         {kartu.map((k) => (
           <motion.div
             key={k.label}
+            className={k.lebar}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="flex items-center gap-3.5 p-4">
-              <span className={`flex size-11 items-center justify-center rounded-xl ${k.warna}`}>
-                {k.ikon}
-              </span>
-              <div>
-                <p className="angka-tabular font-display text-2xl font-extrabold leading-none">{k.nilai}</p>
-                <p className="mt-1 text-xs text-muted">{k.label}</p>
-              </div>
-            </Card>
+            <KartuKpi
+              label={k.label}
+              nilai={k.nilai}
+              ikon={k.ikon}
+              nada={k.nada}
+              catatan={k.catatan}
+            />
           </motion.div>
         ))}
       </div>
 
       <div className="mb-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
         <Card className="p-5">
-          <h2 className="mb-4 font-display font-bold">Tren laporan 14 hari</h2>
+          <h2 className="mb-4 font-bold">Tren laporan 14 hari</h2>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={tren} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
@@ -306,7 +344,7 @@ export function DewanClient({
         </Card>
 
         <Card className="p-5">
-          <h2 className="mb-4 font-display font-bold">Komposisi kategori</h2>
+          <h2 className="mb-4 font-bold">Komposisi kategori</h2>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={kategori} layout="vertical" margin={{ left: 10, right: 10 }}>
@@ -369,14 +407,9 @@ export function DewanClient({
             </div>
           )}
           <div className="flex flex-wrap items-center justify-between gap-2 border-b garis-halus px-5 py-3.5">
-            <h2 className="font-display font-bold">Kelola laporan</h2>
+            <h2 className="font-bold">Kelola laporan</h2>
             <div className="flex items-center gap-2">
-              <Button
-                variant="sekunder"
-                size="sm"
-                onClick={eksporCsv}
-                className="!px-3 !py-1.5 text-xs"
-              >
+              <Button variant="sekunder" size="xs" onClick={eksporCsv}>
                 <Download size={14} /> Ekspor CSV
               </Button>
               <Select
@@ -396,25 +429,30 @@ export function DewanClient({
               </Select>
             </div>
           </div>
-          <div className="max-h-[520px] overflow-y-auto divide-y garis-halus">
-            {daftar
-              .filter((r) => filterStatus === "semua" || r.status === filterStatus)
-              .map((r) => {
-                const telat =
-                  umurHari(r.created_at) > SLA_HARI &&
-                  !["selesai", "ditolak"].includes(r.status);
-                return (
-                <div key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
+          <div className="max-h-[520px] divide-y garis-halus overflow-y-auto">
+            {terfilter.map((r) => {
+              const telat =
+                umurHari(r.created_at) > SLA_HARI &&
+                !["selesai", "ditolak"].includes(r.status);
+              const terpilih = dipilih.has(r.id);
+              return (
+                <div
+                  key={r.id}
+                  data-terpilih={terpilih || undefined}
+                  className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3 transition-colors duration-200 ease-sigap hover:bg-panel-2 data-[terpilih]:bg-daun-500/8 data-[terpilih]:shadow-[inset_3px_0_0_var(--color-daun-600)]"
+                >
                   <input
                     type="checkbox"
-                    checked={dipilih.has(r.id)}
+                    checked={terpilih}
                     onChange={() => togglePilih(r.id)}
                     aria-label={`Pilih ${r.judul}`}
                     className="size-4 accent-daun-600"
                   />
-                  <div className="min-w-0 flex-1 basis-56">
-                    <p className="truncate text-sm font-semibold">{r.judul}</p>
-                    <p className="flex items-center gap-1 truncate text-xs text-muted">
+                  <div className="min-w-0 flex-1 basis-60">
+                    <p className="truncate text-sm font-semibold text-ink">
+                      {r.judul}
+                    </p>
+                    <p className="mt-0.5 flex items-center gap-1 truncate text-mikro text-muted">
                       <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={12} />
                       {r.categories?.nama ?? "Lainnya"} · {waktuRelatif(r.created_at)} ·
                       <ThumbsUp size={11} className="shrink-0" />
@@ -422,13 +460,13 @@ export function DewanClient({
                     </p>
                   </div>
                   {telat && (
-                    <span className="rounded-full bg-danger/10 px-2 py-1 text-[11px] font-bold text-danger">
+                    <span className="angka-tabular rounded-kontrol bg-danger/10 px-2 py-1 text-mikro font-bold text-danger-kuat dark:text-red-300">
                       <AlarmClock size={11} className="inline align-[-1px]" />{" "}
                       {umurHari(r.created_at)} hr — lewat SLA
                     </span>
                   )}
                   <StatusChip status={r.status} />
-                  <input
+                  <Input
                     defaultValue={r.petugas ?? ""}
                     placeholder="Petugas…"
                     aria-label={`Petugas untuk ${r.judul}`}
@@ -436,11 +474,11 @@ export function DewanClient({
                       if (e.target.value !== (r.petugas ?? ""))
                         tugaskan(r.id, e.target.value);
                     }}
-                    className="w-36 rounded-lg border garis-halus bg-panel px-2.5 py-1.5 text-xs outline-none focus:border-daun-500"
+                    className={`w-36 ${GAYA_KONTROL_BARIS}`}
                   />
                   <Select
                     aria-label={`Ubah status ${r.judul}`}
-                    className="w-36"
+                    className={`w-36 ${GAYA_KONTROL_BARIS}`}
                     value={r.status}
                     onChange={(e) => ubahStatus(r.id, e.target.value as StatusKey)}
                   >
@@ -451,29 +489,51 @@ export function DewanClient({
                     ))}
                   </Select>
                 </div>
-                );
-              })}
-            {daftar.length === 0 && (
-              <p className="px-5 py-10 text-center text-sm text-muted">
-                Belum ada laporan masuk.
-              </p>
+              );
+            })}
+            {terfilter.length === 0 && (
+              <KosongState
+                ikon={<Inbox size={24} />}
+                judul={
+                  daftar.length === 0
+                    ? "Belum ada laporan masuk"
+                    : `Tidak ada laporan berstatus ${STATUS[filterStatus as StatusKey].label}`
+                }
+                isi={
+                  daftar.length === 0
+                    ? "Laporan warga yang baru masuk akan muncul di sini secara realtime — tidak perlu memuat ulang halaman."
+                    : "Coba longgarkan filter untuk melihat laporan lain."
+                }
+                aksi={
+                  filterStatus !== "semua" ? (
+                    <Button
+                      variant="sekunder"
+                      size="sm"
+                      onClick={() => setFilterStatus("semua")}
+                    >
+                      Tampilkan semua status
+                    </Button>
+                  ) : undefined
+                }
+              />
             )}
           </div>
         </Card>
 
         <Card className="flex flex-col overflow-hidden p-0">
           <div className="flex items-center justify-between border-b garis-halus px-5 py-3.5">
-            <h2 className="font-display font-bold">Peta kepadatan (heatmap)</h2>
+            <h2 className="font-bold">Peta kepadatan (heatmap)</h2>
             <button
               onClick={() => setHeatAktif((v) => !v)}
               role="switch"
               aria-checked={heatAktif}
-              className={`relative h-6 w-11 rounded-full transition ${
+              aria-label="Tampilkan peta kepadatan"
+              className={`relative h-6 w-11 rounded-kontrol transition-colors duration-300 ease-sigap ${
                 heatAktif ? "bg-daun-600" : "bg-line"
               }`}
             >
               <span
-                className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-[background-color,border-color,box-shadow,color] ${
+                className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-[left] duration-300 ease-sigap ${
                   heatAktif ? "left-[22px]" : "left-0.5"
                 }`}
               />
