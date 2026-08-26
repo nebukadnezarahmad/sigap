@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { BarChart3, Check, Plus, Users, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Poll } from "./page";
-import { Button, Card, Input, Label } from "@/components/ui";
+import { Button, Card, Input, KosongState, Label } from "@/components/ui";
 
 function PersenBar({
   persen,
@@ -20,7 +20,9 @@ function PersenBar({
   jumlah: number;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-xl border garis-halus bg-panel-2 px-4 py-2.5">
+    // Tanpa border: kartu polling induk yang memegang batas. Sebelumnya ada
+    // border di dalam border dengan radius yang sama persis.
+    <div className="relative overflow-hidden rounded-item bg-panel-2 px-4 py-2.5">
       <motion.div
         className="absolute inset-y-0 left-0 bg-daun-500/15"
         initial={{ width: 0 }}
@@ -139,7 +141,7 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
                 key={i}
                 onClick={() => pilih(i)}
                 disabled={proses}
-                className="w-full rounded-xl border garis-halus bg-panel-2 px-4 py-2.5 text-left text-sm font-medium transition hover:border-daun-400 hover:bg-daun-500/5 disabled:opacity-50"
+                className="w-full rounded-item bg-panel-2 px-4 py-2.5 text-left text-sm font-medium transition-[background-color,color] duration-300 ease-sigap hover:bg-daun-500/10 hover:text-daun-800 active:scale-[0.99] disabled:opacity-50 dark:hover:text-daun-200"
               >
                 {o}
               </button>
@@ -266,7 +268,7 @@ export function PollingKlien({
   masuk: boolean;
 }) {
   const router = useRouter();
-  const [polls, setPolls] = useState(awal);
+  const [polls] = useState(awal);
   const [formBuka, setFormBuka] = useState(false);
 
   return (
@@ -309,8 +311,25 @@ export function PollingKlien({
           ))}
         </AnimatePresence>
         {polls.length === 0 && (
-          <Card className="p-10 text-center text-sm text-muted">
-            Belum ada polling aktif.
+          <Card>
+            {/* `isAdmin` sudah diketahui di sini — jadi admin mendapat jalan
+                keluar, bukan sekadar kalimat abu di tengah kartu kosong. */}
+            <KosongState
+              ikon={<BarChart3 size={24} strokeWidth={1.6} />}
+              judul="Belum ada polling aktif"
+              isi={
+                isAdmin
+                  ? "Buat polling pertama untuk menanyakan prioritas lingkungan kepada warga."
+                  : "Dewan belum membuka polling. Hasilnya akan tampil di sini secara realtime begitu ada."
+              }
+              aksi={
+                isAdmin ? (
+                  <Button size="sm" onClick={() => setFormBuka(true)}>
+                    <Plus size={14} aria-hidden /> Buat polling pertama
+                  </Button>
+                ) : undefined
+              }
+            />
           </Card>
         )}
       </div>

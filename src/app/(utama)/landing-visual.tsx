@@ -12,14 +12,7 @@ export function AngkaHidup({ nilai }: { nilai: number }) {
   const [tampil, setTampil] = useState(0);
 
   useEffect(() => {
-    if (nilai <= 0) return;
-    // Angka yang berhitung naik adalah gerak dekoratif murni: informasinya
-    // tetap utuh tanpa itu. Langsung tampilkan kalau pengguna minta gerak
-    // dikurangi.
-    if (kurangiGerak) {
-      setTampil(nilai);
-      return;
-    }
+    if (nilai <= 0 || kurangiGerak) return;
     const mulai = performance.now();
     const durasi = 1000;
     let raf = 0;
@@ -35,7 +28,14 @@ export function AngkaHidup({ nilai }: { nilai: number }) {
     return () => cancelAnimationFrame(raf);
   }, [nilai, kurangiGerak]);
 
-  return <span className="angka-tabular">{tampil.toLocaleString("id-ID")}</span>;
+  // Angka yang berhitung naik adalah gerak dekoratif murni — informasinya utuh
+  // tanpa itu. Saat pengguna minta gerak dikurangi, nilai akhirnya diturunkan
+  // saat render, bukan lewat setState di dalam effect.
+  const ditampilkan = kurangiGerak ? nilai : tampil;
+
+  return (
+    <span className="angka-tabular">{ditampilkan.toLocaleString("id-ID")}</span>
+  );
 }
 
 export function Terungkap({

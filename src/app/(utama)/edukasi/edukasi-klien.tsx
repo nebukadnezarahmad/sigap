@@ -52,6 +52,7 @@ function QuizSection({
   ikonHadiah: NodeIkon;
   selesai: () => void;
 }) {
+  const router = useRouter();
   const [mulai, setMulai] = useState(false);
   const [indeks, setIndeks] = useState(0);
   const [pilih, setPilih] = useState<number | null>(null);
@@ -117,7 +118,7 @@ function QuizSection({
               </p>
               <Button
                 className="mt-4"
-                onClick={() => (location.href = "/masuk?next=/edukasi")}
+                onClick={() => router.push("/masuk?next=/edukasi")}
               >
                 Masuk sekarang
               </Button>

@@ -37,8 +37,6 @@ export function NotifikasiBel() {
   useEffect(() => {
     if (!user) return;
     const supabase = createClient();
-    setMemuat(true);
-    setGalat(null);
 
     supabase
       .from("notifications")

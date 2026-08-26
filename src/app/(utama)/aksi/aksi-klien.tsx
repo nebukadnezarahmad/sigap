@@ -4,10 +4,19 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { CalendarDays, MapPin, Plus, Users } from "lucide-react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { EventAksi } from "./page";
-import { Button, Card, Input, Label, Textarea } from "@/components/ui";
-import { Modal } from "@/components/modal";
+import {
+  Button,
+  Card,
+  Input,
+  KosongState,
+  Label,
+  Textarea,
+} from "@/components/ui";
+// `Modal` sebelumnya diimpor tapi tidak pernah dipakai — formnya dirender
+// inline di dalam Card, bukan di modal.
 import { formatTanggal } from "@/lib/utils";
 
 function apakahLewat(tanggal: string) {
@@ -60,13 +69,26 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
     setProses(false);
   }
 
-  const dekat = apakahLewat(data.tanggal);
+  // Dulu bernama `dekat` padahal isinya "sudah lewat" — nama yang menyesatkan
+  // pembacanya ke arah berlawanan dari maknanya.
+  const sudahLewat = apakahLewat(data.tanggal);
 
   return (
-    <Card className="overflow-hidden p-0">
+    <Card
+      variant={sudahLewat ? "datar" : "kartu"}
+      className={`overflow-hidden p-0 ${sudahLewat ? "opacity-70" : ""}`}
+    >
       <div className="flex items-stretch">
-        <div className="flex w-20 shrink-0 flex-col items-center justify-center bg-daun-600/10 py-4 text-daun-800 dark:text-daun-200">
-          <span className="font-display text-2xl font-extrabold leading-none">
+        {/* Blok tanggal kalender diredam kalau acaranya sudah lewat — dulu
+            acara lampau tampil penuh warna dan hanya tombolnya yang mati. */}
+        <div
+          className={`flex w-20 shrink-0 flex-col items-center justify-center py-4 ${
+            sudahLewat
+              ? "bg-line/50 text-muted dark:bg-line"
+              : "bg-daun-600/10 text-daun-800 dark:text-daun-200"
+          }`}
+        >
+          <span className="angka-tabular font-display text-2xl font-extrabold leading-none">
             {new Date(data.tanggal).getDate()}
           </span>
           <span className="text-xs font-bold uppercase">
@@ -74,7 +96,14 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
           </span>
         </div>
         <div className="min-w-0 flex-1 p-5">
-          <h2 className="font-display font-bold leading-snug">{data.judul}</h2>
+          <h2 className="font-display font-bold leading-snug">
+            {data.judul}
+            {sudahLewat && (
+              <span className="ml-2 align-middle rounded-kontrol bg-panel-2 px-2 py-0.5 text-mikro font-semibold uppercase text-muted">
+                Selesai
+              </span>
+            )}
+          </h2>
           <p className="mt-1 line-clamp-2 text-sm text-muted">{data.deskripsi}</p>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
             <span className="flex items-center gap-1">
@@ -99,12 +128,12 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
               variant={data.akuIkut ? "utama" : "sekunder"}
               size="sm"
               onClick={toggle}
-              disabled={!masuk || proses || dekat}
+              disabled={!masuk || proses || sudahLewat}
             >
-              {dekat
+              {sudahLewat
                 ? "Sudah lewat"
                 : data.akuIkut
-                  ? "Kamu ikut ✓"
+                  ? "Kamu ikut"
                   : "Ikut aksi ini"}
             </Button>
             <span className="flex items-center gap-1.5 text-xs font-semibold text-muted">
@@ -217,8 +246,11 @@ export function AksiKlien({
   masuk: boolean;
 }) {
   const router = useRouter();
-  const [events, setEvents] = useState(awal);
+  const [events] = useState(awal);
   const [formBuka, setFormBuka] = useState(false);
+
+  const mendatang = events.filter((e) => !apakahLewat(e.tanggal));
+  const lewat = events.filter((e) => apakahLewat(e.tanggal));
 
   return (
     <div>
@@ -245,26 +277,69 @@ export function AksiKlien({
         </div>
       )}
 
-      <div className="space-y-4">
-        <AnimatePresence initial={false}>
-          {events.map((e) => (
-            <motion.div
-              key={`${e.id}-${e.totalRsvp}-${e.akuIkut}`}
-              layout
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-            >
-              <KartuAksi event={e} masuk={masuk} />
-            </motion.div>
+      {/* Mendatang dan sudah lewat dipisah: keduanya dulu bercampur dalam satu
+          daftar dan hanya dibedakan oleh tombol yang mati. */}
+      {mendatang.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="font-sans text-mikro font-semibold uppercase text-muted">
+            Mendatang
+          </h2>
+          <AnimatePresence initial={false}>
+            {/* Key sebelumnya menyertakan totalRsvp & akuIkut, sehingga setiap
+                RSVP memicu unmount+mount — kartunya berkedip. */}
+            {mendatang.map((e) => (
+              <motion.div
+                key={e.id}
+                layout
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+              >
+                <KartuAksi event={e} masuk={masuk} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </section>
+      )}
+
+      {lewat.length > 0 && (
+        <section className="mt-10 space-y-4">
+          <h2 className="font-sans text-mikro font-semibold uppercase text-muted">
+            Sudah lewat
+          </h2>
+          {lewat.map((e) => (
+            <KartuAksi key={e.id} event={e} masuk={masuk} />
           ))}
-        </AnimatePresence>
-        {events.length === 0 && (
-          <Card className="p-10 text-center text-sm text-muted">
-            Belum ada aksi mendatang. Jadilah pemrakarsa yang pertama!
-          </Card>
-        )}
-      </div>
+        </section>
+      )}
+
+      {events.length === 0 && (
+        <Card>
+          <KosongState
+            ikon={<CalendarDays size={24} strokeWidth={1.6} />}
+            judul="Belum ada aksi bersama"
+            isi={
+              masuk
+                ? "Sabtu bersih, lokakarya komposting, kerja bakti drainase — prakarsai yang pertama dan ajak tetangga."
+                : "Kegiatan warga akan muncul di sini. Masuk untuk memprakarsai aksi pertamamu."
+            }
+            aksi={
+              masuk ? (
+                <Button size="sm" onClick={() => setFormBuka(true)}>
+                  <Plus size={14} aria-hidden /> Buat aksi bersama
+                </Button>
+              ) : (
+                <Link
+                  href="/masuk?next=/aksi"
+                  className="rounded-kontrol bg-daun-600 px-5 py-2.5 text-sm font-semibold text-white transition-[transform,background-color] duration-300 ease-sigap hover:bg-daun-700 active:scale-[0.97]"
+                >
+                  Masuk
+                </Link>
+              )
+            }
+          />
+        </Card>
+      )}
     </div>
   );
 }

@@ -168,6 +168,10 @@ export function LeafletMap({
     return () => {
       batal = true;
     };
+    // `gelap` sengaja tidak masuk daftar dependensi: memasukkannya akan
+    // menginisialisasi ulang seluruh peta setiap kali tema berganti. Perubahan
+    // tema ditangani effect di bawah yang hanya menukar URL tile.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [titik, terpilih, mode, panas, pusat, zoom]);
 
   useEffect(() => {

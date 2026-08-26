@@ -50,10 +50,15 @@ function PenandaAktif() {
  * kembali ke pemicu. Versi sebelumnya murni `group-hover` sehingga tidak bisa
  * dijangkau sama sekali di perangkat sentuh.
  */
-function useMenuTurun() {
+function useMenuTurun(
+  // Refs dibuat di komponen pemanggil dan dititipkan ke sini, bukan dibuat lalu
+  // dikembalikan dari hook: React Compiler tidak bisa melacak ref yang keluar
+  // sebagai properti objek, dan menandai pembacaannya saat render sebagai
+  // pelanggaran (react-hooks/refs).
+  rujukanWadah: React.RefObject<HTMLDivElement | null>,
+  rujukanTombol: React.RefObject<HTMLButtonElement | null>
+) {
   const [buka, setBuka] = useState(false);
-  const rujukanWadah = useRef<HTMLDivElement>(null);
-  const rujukanTombol = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!buka) return;
@@ -74,9 +79,9 @@ function useMenuTurun() {
       document.removeEventListener("keydown", padaTombol);
       document.removeEventListener("mousedown", padaKlikLuar);
     };
-  }, [buka]);
+  }, [buka, rujukanWadah, rujukanTombol]);
 
-  return { buka, setBuka, rujukanWadah, rujukanTombol };
+  return { buka, setBuka };
 }
 
 function ToggleTema() {
@@ -113,8 +118,12 @@ export function SiteHeader() {
   const router = useRouter();
   const { user, profil } = useUser();
 
-  const komunitas = useMenuTurun();
-  const akun = useMenuTurun();
+  const wadahKomunitas = useRef<HTMLDivElement>(null);
+  const tombolKomunitas = useRef<HTMLButtonElement>(null);
+  const wadahAkun = useRef<HTMLDivElement>(null);
+  const tombolAkun = useRef<HTMLButtonElement>(null);
+  const komunitas = useMenuTurun(wadahKomunitas, tombolKomunitas);
+  const akun = useMenuTurun(wadahAkun, tombolAkun);
 
   const tautan = [
     { href: "/peta", label: "Peta" },
@@ -170,9 +179,9 @@ export function SiteHeader() {
             );
           })}
 
-          <div className="relative" ref={komunitas.rujukanWadah}>
+          <div className="relative" ref={wadahKomunitas}>
             <button
-              ref={komunitas.rujukanTombol}
+              ref={tombolKomunitas}
               type="button"
               onClick={() => komunitas.setBuka((v) => !v)}
               aria-haspopup="true"
@@ -250,9 +259,9 @@ export function SiteHeader() {
           <ToggleTema />
           {user && <NotifikasiBel />}
           {user ? (
-            <div className="relative" ref={akun.rujukanWadah}>
+            <div className="relative" ref={wadahAkun}>
               <button
-                ref={akun.rujukanTombol}
+                ref={tombolAkun}
                 type="button"
                 onClick={() => akun.setBuka((v) => !v)}
                 aria-label="Menu akun"

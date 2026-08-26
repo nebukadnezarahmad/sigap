@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import {
@@ -12,8 +12,17 @@ import {
   ShoppingBag,
   Sparkles,
 } from "lucide-react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import {
+  Button,
+  Card,
+  Input,
+  KosongState,
+  Label,
+  Select,
+  Textarea,
+} from "@/components/ui";
 import { Modal } from "@/components/modal";
 
 type Usaha = {
@@ -28,13 +37,18 @@ type Usaha = {
   milikKu: boolean;
 };
 
+/** Hue berbeda per kategori — bukan satu warna kuning untuk kelimanya. */
 const KATEGORI = [
-  { id: "kuliner", label: "Kuliner", Ikon: CookingPot },
-  { id: "kerajinan", label: "Kerajinan", Ikon: Hammer },
-  { id: "jasa", label: "Jasa", Ikon: ShoppingBag },
-  { id: "pertanian", label: "Pertanian", Ikon: Flower2 },
-  { id: "lainnya", label: "Lainnya", Ikon: ShoppingBag },
+  { id: "kuliner", label: "Kuliner", Ikon: CookingPot, warna: "#c2410c" },
+  { id: "kerajinan", label: "Kerajinan", Ikon: Hammer, warna: "#7c3aed" },
+  { id: "jasa", label: "Jasa", Ikon: ShoppingBag, warna: "#0369a1" },
+  { id: "pertanian", label: "Pertanian", Ikon: Flower2, warna: "#4d7c0f" },
+  { id: "lainnya", label: "Lainnya", Ikon: ShoppingBag, warna: "#64748b" },
 ] as const;
+
+function kategoriUmkm(id: string) {
+  return KATEGORI.find((k) => k.id === id) ?? KATEGORI[4];
+}
 
 function nomorWa(telepon: string) {
   const digit = telepon.replace(/\D/g, "");
@@ -45,12 +59,15 @@ function nomorWa(telepon: string) {
 
 function KartuUsaha({ usaha }: { usaha: Usaha }) {
   const wa = nomorWa(usaha.whatsapp);
-  const meta = KATEGORI.find((k) => k.id === usaha.kategori) ?? KATEGORI[4];
+  const meta = kategoriUmkm(usaha.kategori);
   return (
-    <Card className="flex h-full flex-col p-5">
+    <Card interaktif className="flex h-full flex-col p-5">
       <div className="flex items-start gap-3">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400">
-          <meta.Ikon size={20} />
+        <span
+          className="flex size-11 shrink-0 items-center justify-center rounded-item"
+          style={{ backgroundColor: `${meta.warna}1f`, color: meta.warna }}
+        >
+          <meta.Ikon size={20} aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="font-display font-bold leading-snug">{usaha.nama}</h2>
@@ -209,9 +226,13 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
   const [daftar, setDaftar] = useState(awal);
   const [formBuka, setFormBuka] = useState(false);
 
-  useEffect(() => {
+  /* Menyesuaikan state saat prop berubah — pola resmi React, bukan setState
+     sinkron di dalam effect (yang memicu render bertingkat). */
+  const [awalSebelumnya, setAwalSebelumnya] = useState(awal);
+  if (awal !== awalSebelumnya) {
+    setAwalSebelumnya(awal);
     setDaftar(awal);
-  }, [awal]);
+  }
 
   const tampil = useMemo(() => daftar, [daftar]);
 
@@ -242,8 +263,32 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
         </motion.div>
       </AnimatePresence>
       {tampil.length === 0 && (
-        <Card className="p-10 text-center text-sm text-muted">
-          Belum ada usaha terdaftar. Jadilah yang pertama!
+        <Card>
+          {/* Sebelumnya berbunyi "Jadilah yang pertama!" lalu tidak memberi
+              tombol apa pun untuk melakukannya. */}
+          <KosongState
+            ikon={<ShoppingBag size={24} strokeWidth={1.6} />}
+            judul="Belum ada usaha warga terdaftar"
+            isi={
+              masuk
+                ? "Daftarkan usahamu supaya tetangga bisa menemukannya — kuliner, kerajinan, jasa, atau hasil pertanian."
+                : "Katalog usaha warga akan muncul di sini. Masuk untuk mendaftarkan usahamu sendiri."
+            }
+            aksi={
+              masuk ? (
+                <Button size="sm" onClick={() => setFormBuka(true)}>
+                  <Plus size={14} aria-hidden /> Daftarkan usahamu
+                </Button>
+              ) : (
+                <Link
+                  href="/masuk?next=/umkm"
+                  className="rounded-kontrol bg-daun-600 px-5 py-2.5 text-sm font-semibold text-white transition-[transform,background-color] duration-300 ease-sigap hover:bg-daun-700 active:scale-[0.97]"
+                >
+                  Masuk
+                </Link>
+              )
+            }
+          />
         </Card>
       )}
 

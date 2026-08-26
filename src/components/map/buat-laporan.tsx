@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImagePlus, MapPin, Send } from "lucide-react";
 import { KATEGORI } from "@/lib/constants";
-import { svgUriKategori } from "@/lib/ikon-vektor";
+
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";

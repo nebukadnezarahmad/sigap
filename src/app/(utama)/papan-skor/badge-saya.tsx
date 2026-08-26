@@ -25,10 +25,7 @@ export function BadgeSaya() {
   const [memuat, setMemuat] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      setMemuat(false);
-      return;
-    }
+    if (!user) return;
     let batal = false;
     const supabase = createClient();
     Promise.all([
@@ -47,6 +44,8 @@ export function BadgeSaya() {
 
   const jumlahPunya = dimiliki.length;
   const level = poin !== null ? levelDari(poin) : null;
+  // Diturunkan saat render — tanpa pengguna tak ada yang dimuat sama sekali.
+  const sedangMemuat = !!user && memuat;
 
   return (
     <div>
@@ -56,7 +55,7 @@ export function BadgeSaya() {
             <div>
               <h3 className="font-bold">Progresmu</h3>
               <p className="mt-1 text-sm text-muted">
-                {memuat
+                {sedangMemuat
                   ? "Memuat progres…"
                   : `${jumlahPunya} dari ${BADGES.length} badge terkumpul`}
                 {level && ` · level ${level.sekarang.nama}`}
