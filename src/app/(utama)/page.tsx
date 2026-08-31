@@ -113,10 +113,6 @@ export default async function Beranda() {
         />
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
           <div className="animate-muncul">
-            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-daun-500/30 bg-daun-500/10 px-3.5 py-1.5 text-xs font-semibold text-daun-700 dark:text-daun-300">
-              <Building2 size={13} className="inline align-[-2px]" /> Untuk Kota
-              & Permukiman Berkelanjutan · SDG 11
-            </p>
             <h1 className="font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
               Masalah lingkungan di sekitarmu,{" "}
               <span className="text-daun-600 dark:text-daun-400">
