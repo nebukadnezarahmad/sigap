@@ -46,10 +46,11 @@
   --color-kunyit-600: #d97706;
 
   --color-danger: #dc2626;
+  --color-sdg11: #fd9d24;
 
-  --font-display: var(--font-display), sans-serif;
-  --font-sans: var(--font-sans), sans-serif;
-  --font-serif: var(--font-editorial), serif;
+  --font-display: var(--font-display), Georgia, serif;
+  --font-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-display), Georgia, serif;
 
   --animate-muncul: muncul 0.5s ease-out both;
   --animate-detak: detak 2s ease-in-out infinite;

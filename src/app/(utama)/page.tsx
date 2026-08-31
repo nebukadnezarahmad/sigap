@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   MapPin,
   Megaphone,
-  Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI } from "@/lib/constants";
@@ -186,188 +185,241 @@ export default async function Beranda() {
       </section>
 
       <section
-        className="border-y garis-halus bg-panel-2/60 py-24"
+        className="border-y garis-halus bg-panel-2/60 py-20"
         aria-label="Kategori laporan"
       >
         <div className="mx-auto max-w-6xl px-4">
           <Terungkap className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-                Cakupan
+                Standar Cakupan & SLA Resmi
               </p>
-              <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-                Apa yang bisa dilaporkan?
+              <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
+                6 Kategori Permukiman dengan Target SLA Terikat
               </h2>
             </div>
             <p className="max-w-sm text-sm text-muted teks-pretty">
-              Enam kategori menampung hampir semua masalah permukiman sehari-hari
-              — jumlahnya tumbuh seiring partisipasi warga.
+              Setiap kategori memiliki target waktu penanganan (*Service Level Agreement*) resmi yang dipantau publik secara transparan.
             </p>
           </Terungkap>
           <Terungkap tunda={0.1}>
-            <div className="mt-10 flex flex-wrap gap-2.5">
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {KATEGORI.map((k) => (
-                <span
+                <div
                   key={k.slug}
-                  className="flex items-center gap-2 rounded-full border garis-halus bg-panel py-2.5 pl-4 pr-3 text-sm font-semibold shadow-[0_1px_2px_rgb(23_67_42/0.04)]"
+                  className="flex flex-col justify-between rounded-2xl border garis-halus bg-panel p-4 shadow-sm"
                 >
-                  <span
-                    className="flex size-7 items-center justify-center rounded-full"
-                    style={{ backgroundColor: `${k.warna}22`, color: k.warna }}
-                    role="img"
-                    aria-label={k.nama}
-                  >
-                    <IkonKategori slug={k.slug} ukuran={14} />
-                  </span>
-                  {k.nama}
-                  <span className="angka-tabular rounded-full bg-panel-2 px-2 py-0.5 text-xs text-muted">
-                    {hitungKategori.get(k.slug) ?? 0}
-                  </span>
-                </span>
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="flex size-8 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: `${k.warna}20`, color: k.warna }}
+                      role="img"
+                      aria-label={k.nama}
+                    >
+                      <IkonKategori slug={k.slug} ukuran={15} />
+                    </span>
+                    <span className="angka-tabular rounded-full bg-panel-2 px-2 py-0.5 text-xs font-bold text-muted">
+                      {hitungKategori.get(k.slug) ?? 0}
+                    </span>
+                  </div>
+                  <div className="mt-4">
+                    <p className="font-display font-bold text-sm text-ink truncate">
+                      {k.nama}
+                    </p>
+                    <p className="mt-1 text-[11px] font-semibold text-daun-700 dark:text-daun-300">
+                      SLA: {k.slug === "sampah" ? "3 Hari" : k.slug === "jalan" ? "14 Hari" : k.slug === "ruang-hijau" ? "21 Hari" : "7 Hari"}
+                    </p>
+                  </div>
+                </div>
               ))}
             </div>
           </Terungkap>
         </div>
       </section>
 
+      {/* Arsitektur Solusi — Asymmetric Editorial Layout */}
       <section
         className="mx-auto max-w-6xl px-4 py-24"
         aria-label="Pilar solusi SIGAP"
       >
         <Terungkap>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-kunyit-600">
-            Arsitektur Solusi
-          </p>
-          <h2 className="mt-3 max-w-2xl font-serif text-4xl font-semibold tracking-tight">
-            Empat pilar transparansi & aksi terpadu
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-kunyit-600">
+            <Building2 size={15} /> Arsitektur Solusi Infinitera 2.0
+          </div>
+          <h2 className="mt-2 max-w-2xl font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
+            Ekosistem Civic-Tech Tertutup & Akuntabel
           </h2>
+          <p className="mt-3 max-w-2xl text-muted text-base">
+            Bukan sekadar form pengaduan biasa. SIGAP dirancang dengan siklus data lengkap dari mitigasi duplikasi spasial hingga verifikasi silang oleh warga.
+          </p>
         </Terungkap>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            {
-              ikon: MapPin,
-              judul: "Peta & Lapor Cepat",
-              isi: "Pin-drop koordinat presisi, foto bukti, marker cluster, dan klasifikasi 6 kategori permukiman.",
-              href: "/peta",
-              cta: "Buka peta",
-            },
-            {
-              ikon: Building2,
-              judul: "Dashboard Dewan",
-              isi: "Pemantauan SLA penanganan, verifikasi status berkala, penugasan petugas, dan sebaran heatmap.",
-              href: "/dewan",
-              cta: "Pelajari dashboard",
-            },
-            {
-              ikon: BarChart3,
-              judul: "Transparansi Publik",
-              isi: "Data tuntas realtime, median durasi penyelesaian masalah, serta akses ekspor Open Data publik.",
-              href: "/transparansi",
-              cta: "Lihat data",
-            },
-            {
-              ikon: Users,
-              judul: "Gamifikasi Warga",
-              isi: "Insentif partisipasi berupa poin lapor & vote, 10 badge pencapaian, dan level status komunitas.",
-              href: "/papan-skor",
-              cta: "Papan skor",
-            },
-          ].map((k, i) => (
-            <Terungkap key={k.judul} tunda={i * 0.08}>
-              <Card className="flex h-full flex-col p-6">
-                <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
-                  <k.ikon size={18} strokeWidth={1.8} />
+
+        <div className="mt-12 grid gap-6 lg:grid-cols-12">
+          {/* Spotlight Kiri: Peta Spasial & Deduplikasi */}
+          <Terungkap className="lg:col-span-6 flex">
+            <Card className="flex flex-col justify-between p-8 border-daun-600/30 bg-gradient-to-b from-daun-600/5 to-transparent w-full">
+              <div>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-daun-600/15 px-3 py-1 text-xs font-bold text-daun-700 dark:text-daun-300">
+                  <MapPin size={13} /> Pilar 01 · Masukan Data Bersih
                 </span>
-                <h3 className="mt-3 font-display text-lg font-bold">{k.judul}</h3>
-                <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted teks-pretty">
-                  {k.isi}
+                <h3 className="mt-4 font-serif text-2xl font-semibold">
+                  Peta Spasial & Deduplikasi Geospasial 100m
+                </h3>
+                <p className="mt-3 leading-relaxed text-muted text-sm teks-pretty">
+                  Mencegah penumpukan laporan kembar di titik yang sama. Ketika warga meletakkan pin, algoritma PostGIS memindai masalah serupa dalam radius 100 meter dan mengajak warga ikut mendukung alih-alih membuat entri duplikat.
                 </p>
-                <Link
-                  href={k.href}
-                  className="group mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-daun-700 dark:text-daun-300"
-                >
-                  {k.cta}
-                  <ArrowRight
-                    size={14}
-                    className="transition-transform group-hover:translate-x-0.5"
-                  />
-                </Link>
+                <div className="mt-6 rounded-2xl border garis-halus bg-panel p-4 text-xs space-y-2">
+                  <div className="flex items-center justify-between text-muted">
+                    <span>Indeks Spasial</span>
+                    <span className="font-mono text-ink font-semibold">PostGIS GiST 4326</span>
+                  </div>
+                  <div className="flex items-center justify-between text-muted">
+                    <span>Radius Filter</span>
+                    <span className="font-semibold text-daun-700 dark:text-daun-300">≤ 100 Meter</span>
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                href="/peta"
+                className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300"
+              >
+                Buka Peta & Coba Lapor <ArrowRight size={15} />
+              </Link>
+            </Card>
+          </Terungkap>
+
+          {/* 3 Blok Kanan: Dashboard, Verifikasi Warga, Transparansi */}
+          <div className="lg:col-span-6 space-y-4 flex flex-col justify-between">
+            <Terungkap tunda={0.1}>
+              <Card className="p-6 transition hover:border-daun-400">
+                <div className="flex items-start gap-4">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                    <Building2 size={20} />
+                  </span>
+                  <div>
+                    <h3 className="font-display font-bold text-lg">
+                      Dashboard Dewan dengan Target SLA
+                    </h3>
+                    <p className="mt-1 text-xs text-muted leading-relaxed">
+                      Pemantauan target hari penanganan yang mengikat (3–21 hari), penugasan petugas teknis (DLH/PU), serta pemantauan sebaran kepadatan masalah via Heatmap.
+                    </p>
+                  </div>
+                </div>
               </Card>
             </Terungkap>
-          ))}
-        </div>
-      </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-24" aria-label="Mengapa penting">
-        <div className="grid items-start gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-          <Terungkap>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-kunyit-600">
-              Mengapa ini penting
-            </p>
-            <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-              Ini bukan sekadar aplikasi.
-            </h2>
-            <p className="mt-5 max-w-lg leading-relaxed text-muted teks-pretty">
-              Data SIPSN Kementerian Lingkungan Hidup mencatat timbulan sampah
-              nasional mencapai{" "}
-              <b className="text-ink">±33,79 juta ton pada 2024</b>, dan hanya
-              sekitar sepertiga yang dikelola dengan baik. Mayoritas sisanya
-              menumpuk persis di permukiman kita — di got, di tikungan, di tanah
-              kosong.
-            </p>
-            <p className="mt-4 max-w-lg leading-relaxed text-muted teks-pretty">
-              Perubahan dimulai dari lingkungan terkecil: RT kita. SIGAP membuat
-              setiap warga punya alat untuk memulainya hari ini.
-            </p>
-            <p className="mt-5 text-xs text-muted">
-              Sumber: SIPSN KLHK 2024–2025 · BRIN (2025)
-            </p>
-          </Terungkap>
-          <div className="grid gap-3 sm:grid-cols-3 lg:mt-14">
-            {[
-              ["33,79 jt", "ton sampah nasional 2024"],
-              ["~32%", "yang dikelola dengan baik"],
-              ["56,7%", "berasal dari rumah tangga"],
-            ].map(([angka, label], i) => (
-              <Terungkap key={label} tunda={i * 0.08}>
-                <Card
-                  className={`flex h-full flex-col justify-between p-5 bayi-daun ${
-                    i === 1 ? "sm:-translate-y-3" : i === 2 ? "sm:translate-y-2" : ""
-                  }`}
-                >
-                  <p className="font-serif text-3xl font-semibold text-kunyit-500">
-                    {angka}
-                  </p>
-                  <p className="mt-3 text-sm text-muted teks-pretty">{label}</p>
-                </Card>
-              </Terungkap>
-            ))}
+            <Terungkap tunda={0.2}>
+              <Card className="p-6 border-orange-500/30 bg-orange-500/5 transition hover:border-orange-500/50">
+                <div className="flex items-start gap-4">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 text-orange-600 dark:text-orange-400">
+                    <CheckCircle2 size={20} />
+                  </span>
+                  <div>
+                    <h3 className="font-display font-bold text-lg text-ink">
+                      Verifikasi 2 Warga & Bukti Foto Wajib
+                    </h3>
+                    <p className="mt-1 text-xs text-muted leading-relaxed">
+                      Menghapus praktik penutupan laporan sepihak. Dewan wajib melampirkan foto bukti fisik sesudah, dan status membutuhkan minimal 2 konfirmasi warga lapangan.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </Terungkap>
+
+            <Terungkap tunda={0.3}>
+              <Card className="p-6 transition hover:border-daun-400">
+                <div className="flex items-start gap-4">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+                    <BarChart3 size={20} />
+                  </span>
+                  <div>
+                    <h3 className="font-display font-bold text-lg">
+                      Papan Keterlambatan Publik & Open Data
+                    </h3>
+                    <p className="mt-1 text-xs text-muted leading-relaxed">
+                      Daftar laporan yang melewati SLA dipublikasikan terbuka (*Overdue Watchlist*), siap dicetak PDF untuk rapat RT/RW, dan tersedia via API lisensi CC-BY.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </Terungkap>
           </div>
         </div>
       </section>
 
+      {/* Section Mengapa Ini Penting — Factsheet Dossier */}
+      <section className="mx-auto max-w-6xl px-4 py-20" aria-label="Mengapa penting">
+        <div className="rounded-[2.5rem] border garis-halus bg-panel p-8 sm:p-12 shadow-sm">
+          <div className="grid items-center gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-7">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-kunyit-600">
+                Lembar Fakta Permukiman
+              </p>
+              <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
+                Mengapa SIGAP Mendesak untuk Kota Kita?
+              </h2>
+              <p className="mt-4 leading-relaxed text-muted text-sm sm:text-base teks-pretty">
+                Data SIPSN Kementerian Lingkungan Hidup mencatat timbulan sampah nasional mencapai <b className="text-ink font-semibold">±33,79 juta ton pada 2024</b>, dan hanya sekitar sepertiga yang berhasil dikelola dengan baik. Mayoritas sisanya menumpuk persis di lingkungan permukiman: drainase tersumbat, TPS liar di tikungan jalan, dan fasilitas publik terbengkalai.
+              </p>
+              <p className="mt-3 leading-relaxed text-muted text-sm sm:text-base teks-pretty">
+                Perubahan nyata dimulai dari lingkup terkecil: koordinasi RT/RW yang transparan dan terdata secara digital.
+              </p>
+              <p className="mt-6 text-xs text-muted/80">
+                Sumber Resmi: SIPSN KLHK 2024–2025 · Publikasi Riset BRIN (2025)
+              </p>
+            </div>
+
+            <div className="lg:col-span-5 grid gap-3">
+              {[
+                { angka: "33,79 Jt", unit: "Ton", label: "Timbulan sampah nasional tahun 2024" },
+                { angka: "~32%", unit: "Terkelola", label: "Sampah yang tertangani dengan baik" },
+                { angka: "56,7%", unit: "Rumah Tangga", label: "Berasal dari aktivitas permukiman warga" },
+              ].map((f) => (
+                <div
+                  key={f.label}
+                  className="rounded-2xl border garis-halus bg-panel-2 p-4 text-left"
+                >
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="font-serif text-3xl font-bold text-ink">
+                      {f.angka}
+                    </span>
+                    <span className="text-xs font-bold text-daun-700 dark:text-daun-300 uppercase">
+                      {f.unit}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-muted">{f.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Banner Call to Action */}
       <section className="mx-auto max-w-6xl px-4 pb-28">
         <Terungkap>
-          <div className="relative overflow-hidden rounded-[2rem] border-none bg-daun-700 p-10 text-center text-white sm:p-16">
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-daun-700 p-10 text-center text-white sm:p-16 shadow-2xl">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_50%_120%,rgba(255,255,255,0.16),transparent)]"
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_50%_120%,rgba(255,255,255,0.18),transparent)]"
             />
             <h2 className="font-serif text-3xl font-semibold sm:text-4xl">
-              Lingkunganmu menunggu laporan pertamamu.
+              Lingkunganmu Menunggu Tindakan Nyata.
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-white/85 teks-pretty">
-              Butuh 30 detik untuk melapor. Dampaknya bisa bertahun-tahun
-              dirasakan.
+            <p className="mx-auto mt-4 max-w-xl text-white/85 text-base sm:text-lg teks-pretty">
+              Butuh 30 detik untuk menandai masalah di peta. Penanganannya tercatat dan dipantau bersama seluruh warga.
             </p>
-            <Link href="/peta" className="group mt-8 inline-flex">
-              <span className="inline-flex items-center gap-3 rounded-full bg-white py-2.5 pl-7 pr-2.5 text-base font-semibold text-daun-800 transition-[transform] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-daun-50 active:scale-[0.98]">
-                Mulai jelajahi peta
-                <span className="flex size-8 items-center justify-center rounded-full bg-daun-600/10 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                  <ArrowRight size={16} strokeWidth={2.2} className="text-daun-700" />
+            <div className="mt-8 flex flex-wrap justify-center items-center gap-3">
+              <Link href="/peta" className="group inline-flex">
+                <span className="inline-flex items-center gap-3 rounded-full bg-white py-3 pl-8 pr-3 text-base font-bold text-daun-800 transition-all hover:bg-daun-50 active:scale-[0.98] shadow-lg">
+                  Buka Peta Interaktif
+                  <span className="flex size-8 items-center justify-center rounded-full bg-daun-600/15 transition-transform group-hover:translate-x-0.5">
+                    <ArrowRight size={16} strokeWidth={2.2} className="text-daun-700" />
+                  </span>
                 </span>
-              </span>
-            </Link>
+              </Link>
+            </div>
           </div>
         </Terungkap>
       </section>

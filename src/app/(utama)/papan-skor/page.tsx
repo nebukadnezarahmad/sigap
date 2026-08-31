@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Crown, Medal } from "lucide-react";
+import { Crown, Medal, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { BADGES } from "@/lib/constants";
 import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
@@ -7,7 +7,7 @@ import { Avatar, Card } from "@/components/ui";
 import { BadgeSaya } from "./badge-saya";
 
 export const metadata: Metadata = {
-  title: "Papan Skor",
+  title: "Daftar Kehormatan Warga",
 };
 
 export const dynamic = "force-dynamic";
@@ -44,11 +44,15 @@ export default async function HalamanPapanSkor() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <header className="mb-8 text-center">
-        <h1 className="font-display text-3xl font-bold">Papan Skor Warga</h1>
-        <p className="mt-2 text-muted">
-          Poin diberikan untuk setiap partisipasi: lapor{" "}
-          <b>+10</b> · komentar <b>+3</b> · dukung laporan <b>+1</b>
+      <header className="mb-10 text-center">
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-daun-600/10 px-3 py-1 text-xs font-bold text-daun-700 dark:text-daun-300 uppercase tracking-wider mb-2">
+          <ShieldCheck size={14} /> Piagam Partisipasi Sipil
+        </div>
+        <h1 className="font-serif text-3xl sm:text-4xl font-semibold">
+          Daftar Kehormatan Warga
+        </h1>
+        <p className="mt-2 text-sm text-muted max-w-lg mx-auto teks-pretty">
+          Apresiasi bagi warga yang aktif menjaga lingkungan: Melaporkan masalah (<b>+10</b>), komentar solusi (<b>+3</b>), dan mendukung laporan warga lain (<b>+1</b>).
         </p>
       </header>
 

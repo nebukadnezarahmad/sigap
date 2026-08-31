@@ -1,21 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Public_Sans, Space_Grotesk } from "next/font/google";
+import { Fraunces, Public_Sans } from "next/font/google";
 import "./globals.css";
 
-const inter = Public_Sans({
+const publicSans = Public_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-display",
+  display: "swap",
 });
 
 const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-editorial",
+  variable: "--font-display",
+  axes: ["opsz", "SOFT", "WONK"],
   style: ["normal", "italic"],
+  display: "swap",
 });
 
 export const viewport: Viewport = {
@@ -45,7 +43,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: temaScript }} />
       </head>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} ${fraunces.variable} grain font-sans antialiased`}>
+      <body className={`${publicSans.variable} ${fraunces.variable} grain font-sans antialiased`}>
         {children}
       </body>
     </html>

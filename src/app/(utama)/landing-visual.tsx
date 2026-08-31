@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { CheckCircle2, Clock, Zap } from "lucide-react";
-import { Card } from "@/components/ui";
 import { svgUriKategori } from "@/lib/ikon-vektor";
 
 export function AngkaHidup({ nilai }: { nilai: number }) {
@@ -52,140 +50,192 @@ export function Terungkap({
 }
 
 const PIN_HERO = [
-  { slug: "sampah", warna: "#65a30d", x: "18%", y: "26%", delay: 0.15 },
-  { slug: "drainase", warna: "#0284c7", x: "58%", y: "22%", delay: 0.3 },
-  { slug: "lampu", warna: "#f59e0b", x: "74%", y: "54%", delay: 0.45 },
-  { slug: "jalan", warna: "#78716c", x: "34%", y: "64%", delay: 0.6 },
-  { slug: "ruang-hijau", warna: "#059669", x: "64%", y: "78%", delay: 0.75 },
-  { slug: "lainnya", warna: "#64748b", x: "12%", y: "76%", delay: 0.9 },
+  {
+    slug: "sampah",
+    nama: "Sampah Liar Pasar",
+    warna: "#65a30d",
+    x: "24%",
+    y: "28%",
+    status: "Menunggu Verifikasi",
+    sla: "Target 3 Hari",
+    delay: 0.1,
+  },
+  {
+    slug: "drainase",
+    nama: "Got Tersumbat RT 02",
+    warna: "#0284c7",
+    x: "62%",
+    y: "24%",
+    status: "Dikerjakan",
+    sla: "SLA: Sisa 2 Hari",
+    delay: 0.25,
+  },
+  {
+    slug: "lampu",
+    nama: "PJU Padam Tikungan",
+    warna: "#f59e0b",
+    x: "78%",
+    y: "60%",
+    status: "Selesai",
+    sla: "Tuntas Tepat Waktu",
+    delay: 0.4,
+  },
+  {
+    slug: "jalan",
+    nama: "Lubang Ambles 80cm",
+    warna: "#78716c",
+    x: "36%",
+    y: "68%",
+    status: "Diverifikasi",
+    sla: "Target 14 Hari",
+    delay: 0.55,
+  },
 ];
 
-function Pin({
-  slug,
-  warna,
-  x,
-  y,
-  delay,
-}: {
-  slug: string;
-  warna: string;
-  x: string;
-  y: string;
-  delay: number;
-}) {
-  const ikon = svgUriKategori(slug, "#ffffff", 16);
-  return (
-    <motion.div
-      aria-hidden
-      className="absolute"
-      style={{ left: x, top: y }}
-      initial={{ scale: 0, y: -14 }}
-      animate={{ scale: 1, y: 0 }}
-      transition={{ delay, type: "spring", stiffness: 260, damping: 16 }}
-    >
-      <span className="relative flex size-[38px] items-center justify-center">
-        <motion.span
-          className="absolute inset-0 rounded-full opacity-30"
-          style={{ backgroundColor: warna }}
-          animate={{ scale: [1, 1.8], opacity: [0.35, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
-        />
-        <span
-          className="relative flex size-[38px] items-center justify-center rounded-full border-[3px] border-white shadow-lg"
-          style={{ backgroundColor: warna }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={ikon} width={16} height={16} alt="" />
-        </span>
-      </span>
-    </motion.div>
-  );
-}
-
-function ChipMelayang({
-  isi,
-  kelas,
-  durasi,
-  delay,
-}: {
-  isi: React.ReactNode;
-  kelas: string;
-  durasi: number;
-  delay: number;
-}) {
-  return (
-    <motion.div
-      aria-hidden
-      className={`absolute z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-md ${kelas}`}
-      animate={{ y: [0, -8, 0] }}
-      transition={{ duration: durasi, repeat: Infinity, ease: "easeInOut", delay }}
-    >
-      {isi}
-    </motion.div>
-  );
-}
-
 export function PetaHeroVisual() {
+  const [pinAktif, setPinAktif] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPinAktif((prev) => (prev + 1) % PIN_HERO.length);
+    }, 3800);
+    return () => clearInterval(timer);
+  }, []);
+
+  const terpilih = PIN_HERO[pinAktif];
+
   return (
-    <div
-      aria-hidden
-      className="rounded-[2rem] bg-ink/[0.04] p-1.5 ring-1 ring-black/5 dark:bg-white/[0.04] dark:ring-white/10"
-    >
-      <Card className="relative h-[420px] overflow-hidden rounded-[1.625rem] p-0 bayi-daun">
-        <div
-          className="absolute inset-0 bg-panel-2"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, var(--line) 0 1px, transparent 1px 56px), repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 56px)",
-            opacity: 0.55,
-          }}
-        />
-        <div
-          className="absolute left-[-10%] top-[38%] h-10 w-[130%] rotate-[-14deg]"
-          style={{ backgroundColor: "var(--line)", opacity: 0.7 }}
-        />
-        <div className="absolute right-[6%] top-[12%] size-40 rounded-[2rem] bg-daun-500/15" />
-        {[["20%", "18%"], ["44%", "44%"], ["70%", "70%"], ["82%", "24%"]].map(
-          ([x, y]) => (
-            <div
-              key={x + y}
-              className="absolute size-10 rounded-lg bg-line/60"
-              style={{ left: x, top: y }}
-            />
-          )
-        )}
-
-        {PIN_HERO.map((p) => (
-          <Pin key={p.slug} {...p} />
-        ))}
-
-        <ChipMelayang
-          isi={<><CheckCircle2 size={13} className="text-daun-600" /> Selesai ditangani</>}
-          kelas="border garis-halus bg-panel text-ink right-4 top-12"
-          durasi={4}
-          delay={0}
-        />
-        <ChipMelayang
-          isi={<><Clock size={13} className="text-kunyit-600" /> Status: Dikerjakan</>}
-          kelas="border garis-halus bg-panel text-ink bottom-16 left-4"
-          durasi={5}
-          delay={0.6}
-        />
-        <ChipMelayang
-          isi={<><Zap size={13} /> +10 poin</>}
-          kelas="bottom-6 right-6 border-transparent bg-daun-600 text-white"
-          durasi={6}
-          delay={1.1}
-        />
-
-        <div className="absolute inset-x-0 top-0 flex items-center justify-between border-b garis-halus bg-panel/70 px-4 py-2.5 text-[11px] font-semibold text-muted backdrop-blur-sm">
-          <span>PETA LANGSUNG · KOTA HARAPAN</span>
-          <span className="flex items-center gap-1.5">
-            <span className="size-1.5 animate-pulse rounded-full bg-daun-500" />
-            realtime
+    <div className="relative rounded-[2rem] border garis-halus bg-panel p-2 shadow-2xl">
+      {/* Header Dossier */}
+      <div className="flex items-center justify-between border-b garis-halus bg-panel-2/80 px-4 py-2.5 rounded-t-[1.6rem] text-xs">
+        <div className="flex items-center gap-2">
+          <span className="size-2 rounded-full bg-daun-500 animate-ping" />
+          <span className="font-display font-bold tracking-wider text-ink uppercase text-[11px]">
+            Peta Geospasial Wilayah RT 03/RW 05
           </span>
         </div>
-      </Card>
+        <span className="rounded-full bg-daun-500/10 px-2 py-0.5 text-[10px] font-bold text-daun-700 dark:text-daun-300">
+          Sistem Aktif Realtime
+        </span>
+      </div>
+
+      {/* Area Peta */}
+      <div className="relative h-[380px] w-full overflow-hidden bg-[#f3f0e8] dark:bg-[#121b16]">
+        {/* Grid Spasial & Jalan */}
+        <div
+          className="absolute inset-0 opacity-40 dark:opacity-20"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(0deg, var(--line) 0 1px, transparent 1px 48px), repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 48px)",
+          }}
+        />
+
+        {/* Poligon Blok Lingkungan & Jalan Utama */}
+        <svg className="absolute inset-0 size-full stroke-line/80" fill="none" aria-hidden>
+          <path
+            d="M-20,160 L450,80"
+            stroke="currentColor"
+            strokeWidth="24"
+            className="text-white dark:text-panel-2"
+          />
+          <path
+            d="M180,-20 L260,420"
+            stroke="currentColor"
+            strokeWidth="18"
+            className="text-white dark:text-panel-2"
+          />
+          <path
+            d="M320,100 L440,360"
+            stroke="currentColor"
+            strokeWidth="14"
+            className="text-white dark:text-panel-2"
+          />
+        </svg>
+
+        {/* Label Jalan Hiperlokal */}
+        <span className="absolute left-6 top-[130px] -rotate-10 font-sans text-[10px] font-semibold tracking-wider text-muted uppercase">
+          Jl. Pemuda Raya
+        </span>
+        <span className="absolute left-[200px] top-[40px] rotate-80 font-sans text-[10px] font-semibold tracking-wider text-muted uppercase">
+          Gg. Melati RT 03
+        </span>
+
+        {/* Pins Geospasial */}
+        {PIN_HERO.map((p, idx) => {
+          const isSelected = idx === pinAktif;
+          const ikon = svgUriKategori(p.slug, "#ffffff", 14);
+          return (
+            <div
+              key={p.slug}
+              onClick={() => setPinAktif(idx)}
+              className="absolute cursor-pointer transition-transform duration-300"
+              style={{ left: p.x, top: p.y }}
+            >
+              <div className="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
+                {isSelected && (
+                  <motion.span
+                    className="absolute inset-0 size-10 rounded-full"
+                    style={{ backgroundColor: p.warna }}
+                    initial={{ scale: 0.8, opacity: 0.8 }}
+                    animate={{ scale: 2.2, opacity: 0 }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
+                  />
+                )}
+                <span
+                  className={`flex size-8 items-center justify-center rounded-full border-2 border-white shadow-lg transition-transform ${
+                    isSelected ? "scale-125 ring-2 ring-offset-2 ring-daun-500" : "scale-100 opacity-90"
+                  }`}
+                  style={{ backgroundColor: p.warna }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={ikon} width={14} height={14} alt="" />
+                </span>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Kartu Live Dossier Mini */}
+        <motion.div
+          key={terpilih.nama}
+          initial={{ opacity: 0, y: 12, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-72 rounded-2xl border garis-halus bg-panel/95 p-3.5 shadow-xl backdrop-blur-md"
+        >
+          <div className="flex items-center justify-between gap-2 border-b garis-halus pb-2">
+            <span
+              className="flex size-5 items-center justify-center rounded-md"
+              style={{ backgroundColor: `${terpilih.warna}25`, color: terpilih.warna }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={svgUriKategori(terpilih.slug, terpilih.warna, 11)} width={11} height={11} alt="" />
+            </span>
+            <span className="text-[11px] font-bold text-ink truncate flex-1">
+              {terpilih.nama}
+            </span>
+            <span className="rounded bg-panel-2 px-1.5 py-0.5 text-[9px] font-bold text-muted">
+              {terpilih.sla}
+            </span>
+          </div>
+
+          <div className="mt-2 flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1 text-[11px] text-muted">
+              <span className="size-1.5 rounded-full" style={{ backgroundColor: terpilih.warna }} />
+              {terpilih.status}
+            </span>
+            <span className="font-semibold text-daun-700 dark:text-daun-300 text-[11px]">
+              {pinAktif === 0 ? "✓ 2 Warga Verifikasi" : "Lihat Detail →"}
+            </span>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Footer Status Bar */}
+      <div className="flex items-center justify-between border-t garis-halus bg-panel-2/60 px-4 py-2 text-[11px] text-muted rounded-b-[1.6rem]">
+        <span>PostGIS Geospasial 100m Radius</span>
+        <span className="font-medium">SDG 11 · Kota Berkelanjutan</span>
+      </div>
     </div>
   );
 }
