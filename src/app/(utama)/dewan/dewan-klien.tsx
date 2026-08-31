@@ -24,7 +24,7 @@ import {
   YAxis,
 } from "recharts";
 import { motion } from "motion/react";
-import { STATUS, SLA_HARI, umurHari, type StatusKey } from "@/lib/constants";
+import { STATUS, hitungSla, type StatusKey } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { IkonKategori } from "@/lib/ikon-vektor";
@@ -182,10 +182,14 @@ export function DewanClient({
 
   const selesai = hitungStatus.selesai ?? 0;
   const total = daftar.length;
-  const aktif = (hitungStatus.baru ?? 0) + (hitungStatus.dikerjakan ?? 0);
+  const aktif =
+    (hitungStatus.baru ?? 0) +
+    (hitungStatus.diverifikasi ?? 0) +
+    (hitungStatus.dikerjakan ?? 0) +
+    (hitungStatus.menunggu_verifikasi ?? 0);
   const lewatSla = daftar.filter(
     (r) =>
-      umurHari(r.created_at) > SLA_HARI &&
+      hitungSla(r.categories?.slug, r.created_at).lewatSla &&
       !["selesai", "ditolak"].includes(r.status)
   ).length;
 
@@ -212,7 +216,7 @@ export function DewanClient({
       warna: "text-sky-600 dark:text-sky-400 bg-sky-500/10",
     },
     {
-      label: "Sedang ditangani",
+      label: "Sedang diproses",
       nilai: aktif,
       ikon: <Flame size={20} />,
       warna: "text-kunyit-600 dark:text-kunyit-400 bg-kunyit-500/10",
@@ -230,7 +234,7 @@ export function DewanClient({
       warna: "text-violet-600 dark:text-violet-400 bg-violet-500/10",
     },
     {
-      label: `Melewati SLA ${SLA_HARI} hari`,
+      label: "Melewati Target SLA",
       nilai: lewatSla,
       ikon: <AlarmClock size={20} />,
       warna:
@@ -400,9 +404,9 @@ export function DewanClient({
             {daftar
               .filter((r) => filterStatus === "semua" || r.status === filterStatus)
               .map((r) => {
+                const sla = hitungSla(r.categories?.slug, r.created_at);
                 const telat =
-                  umurHari(r.created_at) > SLA_HARI &&
-                  !["selesai", "ditolak"].includes(r.status);
+                  sla.lewatSla && !["selesai", "ditolak"].includes(r.status);
                 return (
                 <div key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
                   <input
@@ -424,7 +428,7 @@ export function DewanClient({
                   {telat && (
                     <span className="rounded-full bg-danger/10 px-2 py-1 text-[11px] font-bold text-danger">
                       <AlarmClock size={11} className="inline align-[-1px]" />{" "}
-                      {umurHari(r.created_at)} hr — lewat SLA
+                      +{sla.hariTerlambat} hr lewat SLA ({sla.targetHari} hr)
                     </span>
                   )}
                   <StatusChip status={r.status} />

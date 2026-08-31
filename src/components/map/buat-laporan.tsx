@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, MapPin, Send } from "lucide-react";
-import { KATEGORI } from "@/lib/constants";
+import { AlertTriangle, ImagePlus, MapPin, Send, ThumbsUp } from "lucide-react";
+import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";
@@ -17,6 +17,29 @@ const LeafletMap = dynamic(
 
 const PUSAT_KOTA: [number, number] = [-6.2, 106.816666];
 
+function hitungJarakMeter(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number }
+) {
+  const R = 6371000;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((a.lat * Math.PI) / 180) *
+      Math.cos((b.lat * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+type LaporanMirip = {
+  id: string;
+  judul: string;
+  jarak_m: number;
+  vote_count: number;
+  status: string;
+};
+
 export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   const router = useRouter();
   const { user } = useUser();
@@ -28,6 +51,98 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   const [files, setFiles] = useState<File[]>([]);
   const [proses, setProses] = useState(false);
   const [pesan, setPesan] = useState<string | null>(null);
+  const [laporanMirip, setLaporanMirip] = useState<LaporanMirip[]>([]);
+  const [abaikanDuplikat, setAbaikanDuplikat] = useState(false);
+
+  // Cek duplikasi saat posisi atau kategori berubah
+  useEffect(() => {
+    if (!posisi) return;
+    let aktif = true;
+    const supabase = createClient();
+
+    async function cek() {
+      if (!posisi) return;
+      try {
+        const { data: kat } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("slug", slugKategori)
+          .single();
+
+        // 1. Coba RPC database jika tersedia
+        const { data: rpcData, error: rpcErr } = await supabase.rpc(
+          "laporan_mirip",
+          {
+            p_lat: posisi.lat,
+            p_lng: posisi.lng,
+            p_category_id: kat?.id ?? null,
+            p_radius_m: 100,
+          }
+        );
+
+        if (!rpcErr && rpcData && rpcData.length > 0) {
+          if (aktif) {
+            setLaporanMirip(rpcData);
+            setAbaikanDuplikat(false);
+          }
+          return;
+        }
+
+        // 2. Fallback query ke reports aktif terdekat
+        const { data: semua } = await supabase
+          .from("reports")
+          .select("id, judul, lat, lng, status, category_id, votes(count)")
+          .in("status", ["baru", "diverifikasi", "dikerjakan", "menunggu_verifikasi"])
+          .not("lat", "is", null)
+          .not("lng", "is", null);
+
+        if (semua && aktif) {
+          const cocok: LaporanMirip[] = [];
+          for (const r of semua) {
+            if (r.lat == null || r.lng == null) continue;
+            const jarak = hitungJarakMeter(posisi, { lat: r.lat, lng: r.lng });
+            if (jarak <= 100) {
+              const count = r.votes?.[0]?.count ?? 0;
+              cocok.push({
+                id: r.id,
+                judul: r.judul,
+                jarak_m: jarak,
+                vote_count: count,
+                status: r.status,
+              });
+            }
+          }
+          cocok.sort((a, b) => a.jarak_m - b.jarak_m);
+          setLaporanMirip(cocok);
+          setAbaikanDuplikat(false);
+        }
+      } catch {
+        /* abaikan error cek */
+      }
+    }
+
+    void cek();
+    return () => {
+      aktif = false;
+    };
+  }, [posisi, slugKategori]);
+
+  async function handleDukungLaporanMirip(id: string) {
+    if (!user) return;
+    setProses(true);
+    try {
+      const supabase = createClient();
+      await supabase.from("votes").upsert(
+        { report_id: id, user_id: user.id },
+        { onConflict: "report_id,user_id" }
+      );
+      selesai();
+      router.push(`/laporan/${id}`);
+    } catch {
+      selesai();
+      router.push(`/laporan/${id}`);
+    }
+  }
 
   if (!user) {
     return (
@@ -277,6 +392,44 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             ? `Titik terpilih: ${posisi.lat.toFixed(5)}, ${posisi.lng.toFixed(5)}`
             : "Belum ada titik dipilih"}
         </p>
+
+        {/* Kartu Peringatan Deduplikasi Cerdas */}
+        {laporanMirip.length > 0 && !abaikanDuplikat && (
+          <div className="mt-3 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-left">
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle size={17} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                  Laporan Serupa Ditemukan ({Math.round(laporanMirip[0].jarak_m)} m dari titikmu)
+                </p>
+                <p className="mt-1 text-sm font-semibold truncate text-ink">
+                  {laporanMirip[0].judul}
+                </p>
+                <p className="mt-0.5 text-xs text-muted">
+                  {laporanMirip[0].vote_count} dukungan warga · Status: {STATUS[laporanMirip[0].status as StatusKey]?.label ?? laporanMirip[0].status}
+                </p>
+                <div className="mt-2.5 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    type="button"
+                    onClick={() => handleDukungLaporanMirip(laporanMirip[0].id)}
+                    className="bg-daun-600 hover:bg-daun-700 text-white"
+                  >
+                    <ThumbsUp size={12} /> Ikut Dukung (+1 Poin)
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="sekunder"
+                    type="button"
+                    onClick={() => setAbaikanDuplikat(true)}
+                  >
+                    Ini Masalah Berbeda
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {pesan && (
           <p role="alert" className="mt-2 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">

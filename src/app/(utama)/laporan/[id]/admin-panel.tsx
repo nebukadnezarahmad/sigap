@@ -33,14 +33,28 @@ export function AdminPanel({
     try {
       const supabase = createClient();
 
-      if (status === "selesai" && file) {
+      if ((status === "selesai" || status === "menunggu_verifikasi") && !file) {
+        // Cek apakah sudah ada foto sesudah sebelumnya
+        const { data: adaFoto } = await supabase
+          .from("report_photos")
+          .select("id")
+          .eq("report_id", reportId)
+          .eq("fase", "sesudah")
+          .limit(1);
+
+        if (!adaFoto || adaFoto.length === 0) {
+          throw new Error("Foto bukti fisik sesudah penanganan wajib diunggah.");
+        }
+      }
+
+      if (file) {
         if (file.size > 5 * 1024 * 1024)
-          throw new Error("Foto maksimal 5 MB.");
-        const path = `${user.id}/selesai-${Date.now()}-${file.name.replace(/[^\w.-]/g, "_")}`;
+          throw new Error("Ukuran foto maksimal 5 MB.");
+        const path = `${user.id}/sesudah-${Date.now()}-${file.name.replace(/[^\w.-]/g, "_")}`;
         const { error: upErr } = await supabase.storage
           .from("foto-laporan")
           .upload(path, file, { contentType: file.type });
-        if (upErr) throw new Error(upErr.message);
+        if (upErr) throw new Error(`Gagal unggah foto: ${upErr.message}`);
         const { data: pub } = supabase.storage
           .from("foto-laporan")
           .getPublicUrl(path);
@@ -79,8 +93,9 @@ export function AdminPanel({
         }
       }
 
-      setPesan("Tersimpan");
+      setPesan("Tersimpan!");
       setCatatan("");
+      setFile(null);
       router.refresh();
     } catch (e) {
       setPesan(e instanceof Error ? e.message : "Gagal menyimpan.");
@@ -92,7 +107,7 @@ export function AdminPanel({
   return (
     <Card className="border-kunyit-500/40 bg-kunyit-100/30 p-5 dark:bg-kunyit-500/5">
       <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
-        <Wrench size={16} /> Panel dewan
+        <Wrench size={16} /> Panel Dewan & Petugas
       </h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
@@ -139,27 +154,34 @@ export function AdminPanel({
           placeholder="cth. Petugas DLH dikirim hari ini, target selesai 3 hari"
         />
       </div>
-      {status === "selesai" && (
-        <label
-          htmlFor="foto-sesudah"
-          className="mt-3 flex cursor-pointer items-center gap-2 rounded-xl border border-dashed garis-halus px-3.5 py-3 text-sm text-muted transition hover:border-daun-400 hover:text-ink"
-        >
-          <ImagePlus size={17} />
-          {file ? file.name : "Unggah foto bukti sesudah (opsional)"}
-          <input
-            id="foto-sesudah"
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          />
-        </label>
+      {(status === "selesai" || status === "menunggu_verifikasi") && (
+        <div className="mt-3 space-y-2">
+          <label
+            htmlFor="foto-sesudah"
+            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-daun-500/50 bg-daun-500/5 px-3.5 py-3 text-sm text-ink transition hover:border-daun-500 hover:bg-daun-500/10"
+          >
+            <ImagePlus size={17} className="text-daun-600 dark:text-daun-400" />
+            <span className="font-semibold">
+              {file ? file.name : "Unggah foto bukti fisik sesudah (Wajib)*"}
+            </span>
+            <input
+              id="foto-sesudah"
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
+          <p className="text-xs text-muted">
+            Foto bukti fisik mutlak diperlukan demi akuntabilitas sebelum laporan dapat diverifikasi warga.
+          </p>
+        </div>
       )}
       <div className="mt-4 flex items-center gap-3">
         <Button onClick={simpan} disabled={proses}>
           <Save size={16} /> {proses ? "Menyimpan…" : "Simpan perubahan"}
         </Button>
-        {pesan && <span className="text-sm text-muted">{pesan}</span>}
+        {pesan && <span className="text-sm font-semibold text-daun-700 dark:text-daun-300">{pesan}</span>}
       </div>
     </Card>
   );

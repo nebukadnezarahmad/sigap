@@ -1,13 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertTriangle, CheckCircle2, MapPin, Timer, Wrench } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { STATUS, kategoriBySlug, type StatusKey } from "@/lib/constants";
+import { STATUS, kategoriBySlug, hitungSla, type StatusKey } from "@/lib/constants";
 import type { FotoLaporan } from "@/types/database";
 import { formatTanggal, waktuRelatif } from "@/lib/utils";
 import { Avatar, Card, StatusChip } from "@/components/ui";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { CheckCircle2, MapPin, Wrench } from "lucide-react";
 import { LeafletMap } from "@/components/map/leaflet-map";
 import { VoteButton } from "./vote-button";
 import { KomentarSection as Komentar } from "./komentar";
@@ -45,6 +44,7 @@ export default async function HalamanLaporan({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   let isAdmin = false;
   let sudahKonfirmasi = false;
   if (user) {
@@ -62,6 +62,7 @@ export default async function HalamanLaporan({
   }
 
   const kat = r.categories;
+  const sla = hitungSla(kat?.slug, r.created_at);
   const koordinat: [number, number] = [r.lng ?? 106.816666, r.lat ?? -6.2];
   const semuaFoto = (r.report_photos ?? []) as unknown as FotoLaporan[];
   const fotoSebelum = semuaFoto.filter((f) => f.fase === "sebelum");
@@ -104,6 +105,31 @@ export default async function HalamanLaporan({
                   <Wrench size={12} /> {r.petugas}
                 </span>
               )}
+
+              {/* Badge Target SLA */}
+              {r.status !== "selesai" && (
+                <span
+                  className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                    sla.lewatSla
+                      ? "bg-danger/15 text-danger font-bold"
+                      : "bg-panel-2 text-muted border garis-halus"
+                  }`}
+                  title={`Target SLA Kategori: ${sla.targetHari} hari (Jatuh tempo: ${formatTanggal(sla.jatuhTempo.toISOString())})`}
+                >
+                  {sla.lewatSla ? (
+                    <>
+                      <AlertTriangle size={12} className="text-danger shrink-0" />
+                      <span>Lewat SLA {sla.hariTerlambat} hr</span>
+                    </>
+                  ) : (
+                    <>
+                      <Timer size={12} className="text-muted shrink-0" />
+                      <span>SLA: sisa {sla.sisaHari} hr (target {sla.targetHari} hr)</span>
+                    </>
+                  )}
+                </span>
+              )}
+
               <span className="text-xs text-muted" suppressHydrationWarning>
                 {waktuRelatif(r.created_at)}
               </span>
@@ -169,6 +195,7 @@ export default async function HalamanLaporan({
               jumlahAwal={r.confirmations?.[0]?.count ?? 0}
               sudahAwal={sudahKonfirmasi}
               masuk={!!user}
+              status={r.status as StatusKey}
             />
             <ShareButtons judul={r.judul} />
           </div>

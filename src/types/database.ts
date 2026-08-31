@@ -19,6 +19,7 @@ export type StatusLaporan =
   | "baru"
   | "diverifikasi"
   | "dikerjakan"
+  | "menunggu_verifikasi"
   | "selesai"
   | "ditolak";
 

@@ -5,6 +5,7 @@ export type StatusKey =
   | "baru"
   | "diverifikasi"
   | "dikerjakan"
+  | "menunggu_verifikasi"
   | "selesai"
   | "ditolak";
 
@@ -26,6 +27,11 @@ export const STATUS: Record<
     label: "Dikerjakan",
     warna: "#7c3aed",
     chip: "bg-violet-500/15 text-violet-700 dark:text-violet-400",
+  },
+  menunggu_verifikasi: {
+    label: "Menunggu Verifikasi",
+    warna: "#ea580c",
+    chip: "bg-orange-500/15 text-orange-700 dark:text-orange-400",
   },
   selesai: {
     label: "Selesai",
@@ -186,8 +192,40 @@ export function levelDari(poin: number) {
   return { sekarang, berikut, progres };
 }
 
+export const SLA_KATEGORI: Record<string, number> = {
+  sampah: 3,
+  drainase: 7,
+  lampu: 7,
+  jalan: 14,
+  "ruang-hijau": 21,
+  lainnya: 14,
+};
+
 export const SLA_HARI = 7;
 
 export function umurHari(iso: string) {
   return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+}
+
+export function hitungSla(kategoriSlug?: string | null, created_at?: string) {
+  const slug = kategoriSlug ?? "lainnya";
+  const targetHari = SLA_KATEGORI[slug] ?? 7;
+  if (!created_at) {
+    return { targetHari, jatuhTempo: new Date(), lewatSla: false, sisaHari: targetHari, hariTerlambat: 0 };
+  }
+  const tglBuat = new Date(created_at).getTime();
+  const durasiMs = targetHari * 86400000;
+  const jatuhTempo = new Date(tglBuat + durasiMs);
+  const selisihHari = Math.floor((Date.now() - tglBuat) / 86400000);
+  const lewatSla = selisihHari > targetHari;
+  const sisaHari = Math.max(0, targetHari - selisihHari);
+  const hariTerlambat = Math.max(0, selisihHari - targetHari);
+
+  return {
+    targetHari,
+    jatuhTempo,
+    lewatSla,
+    sisaHari,
+    hariTerlambat,
+  };
 }
