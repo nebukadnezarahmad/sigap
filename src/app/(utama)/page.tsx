@@ -43,10 +43,20 @@ const LANGKAH = [
 export default async function Beranda() {
   let statistik = { total: 0, selesai: 0, warga: 0 };
   let hitungKategori = new Map<string, number>();
+  let titikAwal: {
+    id: string;
+    lat: number;
+    lng: number;
+    warna: string;
+    slug: string;
+    judul: string;
+    status?: string;
+  }[] = [];
+
   try {
     const supabase = await createClient();
     if (supabase) {
-      const [laporan, selesai, warga, perKategori] = await Promise.all([
+      const [laporan, selesai, warga, perKategori, laporanPeta] = await Promise.all([
         supabase.from("reports").select("id", { count: "exact", head: true }),
         supabase
           .from("reports")
@@ -54,6 +64,13 @@ export default async function Beranda() {
           .eq("status", "selesai"),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("reports").select("categories(slug)"),
+        supabase
+          .from("reports")
+          .select("id, judul, lat, lng, status, categories(slug, nama, warna)")
+          .not("lat", "is", null)
+          .not("lng", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(30),
       ]);
       statistik = {
         total: laporan.count ?? 0,
@@ -64,6 +81,24 @@ export default async function Beranda() {
       for (const r of (perKategori.data ?? []) as unknown as LaporanDenganRelasi[]) {
         const slug = r.categories?.slug ?? "lainnya";
         hitungKategori.set(slug, (hitungKategori.get(slug) ?? 0) + 1);
+      }
+      if (laporanPeta.data && laporanPeta.data.length > 0) {
+        titikAwal = (laporanPeta.data as unknown as {
+          id: string;
+          judul: string;
+          lat: number | string;
+          lng: number | string;
+          status: string;
+          categories: { slug: string; nama: string; warna: string } | null;
+        }[]).map((r) => ({
+          id: r.id,
+          lat: Number(r.lat),
+          lng: Number(r.lng),
+          warna: r.categories?.warna ?? "#2e9e57",
+          slug: r.categories?.slug ?? "sampah",
+          judul: r.judul,
+          status: r.status,
+        }));
       }
     }
   } catch {
@@ -132,7 +167,7 @@ export default async function Beranda() {
           </div>
 
           <Terungkap tunda={0.15}>
-            <PetaHeroVisual />
+            <PetaHeroVisual awalTitik={titikAwal} />
           </Terungkap>
         </div>
       </section>

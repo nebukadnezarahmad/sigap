@@ -1,8 +1,13 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
-import { svgUriKategori } from "@/lib/ikon-vektor";
+import { motion, AnimatePresence } from "motion/react";
+import { createClient } from "@/lib/supabase/client";
+import { STATUS, type StatusKey } from "@/lib/constants";
+import { IkonKategori } from "@/lib/ikon-vektor";
+import { ArrowRight, ExternalLink, MapPin, X } from "lucide-react";
 
 export function AngkaHidup({ nilai }: { nilai: number }) {
   const [tampil, setTampil] = useState(nilai);
@@ -49,192 +54,255 @@ export function Terungkap({
   );
 }
 
-const PIN_HERO = [
+export type TitikHero = {
+  id: string;
+  lat: number;
+  lng: number;
+  warna: string;
+  slug: string;
+  judul: string;
+  status?: string;
+};
+
+const LeafletMap = dynamic(
+  () => import("@/components/map/leaflet-map").then((m) => m.LeafletMap),
   {
-    slug: "sampah",
-    nama: "Sampah Liar Pasar",
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full w-full items-center justify-center bg-panel-2 text-xs text-muted">
+        <span className="flex items-center gap-2 font-medium">
+          <span className="size-2 animate-ping rounded-full bg-daun-500" />
+          Memuat Peta Spasial Realtime...
+        </span>
+      </div>
+    ),
+  }
+);
+
+const FALLBACK_TITIK: TitikHero[] = [
+  {
+    id: "demo-1",
+    lat: -6.2088,
+    lng: 106.8456,
     warna: "#65a30d",
-    x: "24%",
-    y: "28%",
-    status: "Menunggu Verifikasi",
-    sla: "Target 3 Hari",
-    delay: 0.1,
+    slug: "sampah",
+    judul: "Sampah Liar Depan Pasar RT 03",
+    status: "menunggu_verifikasi",
   },
   {
-    slug: "drainase",
-    nama: "Got Tersumbat RT 02",
+    id: "demo-2",
+    lat: -6.212,
+    lng: 106.849,
     warna: "#0284c7",
-    x: "62%",
-    y: "24%",
-    status: "Dikerjakan",
-    sla: "SLA: Sisa 2 Hari",
-    delay: 0.25,
+    slug: "drainase",
+    judul: "Got Tersumbat Sedimen Tebal",
+    status: "dikerjakan",
   },
   {
-    slug: "lampu",
-    nama: "PJU Padam Tikungan",
+    id: "demo-3",
+    lat: -6.205,
+    lng: 106.842,
     warna: "#f59e0b",
-    x: "78%",
-    y: "60%",
-    status: "Selesai",
-    sla: "Tuntas Tepat Waktu",
-    delay: 0.4,
+    slug: "lampu",
+    judul: "PJU Padam Tikungan Utama",
+    status: "selesai",
   },
   {
-    slug: "jalan",
-    nama: "Lubang Ambles 80cm",
+    id: "demo-4",
+    lat: -6.215,
+    lng: 106.841,
     warna: "#78716c",
-    x: "36%",
-    y: "68%",
-    status: "Diverifikasi",
-    sla: "Target 14 Hari",
-    delay: 0.55,
+    slug: "jalan",
+    judul: "Lubang Ambles 80cm",
+    status: "diverifikasi",
   },
 ];
 
-export function PetaHeroVisual() {
-  const [pinAktif, setPinAktif] = useState(0);
+export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
+  const [titik, setTitik] = useState<TitikHero[]>(
+    awalTitik && awalTitik.length > 0 ? awalTitik : FALLBACK_TITIK
+  );
+  const [terpilihId, setTerpilihId] = useState<string | null>(null);
 
+  // Sinkronisasi realtime dari Supabase
   useEffect(() => {
-    const timer = setInterval(() => {
-      setPinAktif((prev) => (prev + 1) % PIN_HERO.length);
-    }, 3800);
-    return () => clearInterval(timer);
+    const supabase = createClient();
+    if (!supabase) return;
+
+    const channel = supabase
+      .channel("hero-reports-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "reports" },
+        async () => {
+          try {
+            const { data } = await supabase
+              .from("reports")
+              .select("id, judul, lat, lng, status, categories(slug, nama, warna)")
+              .not("lat", "is", null)
+              .not("lng", "is", null)
+              .order("created_at", { ascending: false })
+              .limit(30);
+
+            if (data && data.length > 0) {
+              const hasil: TitikHero[] = (data as unknown as {
+                id: string;
+                lat: number | string;
+                lng: number | string;
+                judul: string;
+                status: string;
+                categories: { slug: string; nama: string; warna: string } | null;
+              }[]).map((r) => ({
+                id: r.id,
+                lat: Number(r.lat),
+                lng: Number(r.lng),
+                warna: r.categories?.warna ?? "#2e9e57",
+                slug: r.categories?.slug ?? "sampah",
+                judul: r.judul,
+                status: r.status,
+              }));
+              setTitik(hasil);
+            }
+          } catch {
+            /* pertahankan data lokal */
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  const terpilih = PIN_HERO[pinAktif];
+  const laporanTerpilih =
+    titik.find((t) => t.id === terpilihId) ?? (terpilihId === null ? titik[0] : null);
+
+  const statusInfo = laporanTerpilih?.status
+    ? STATUS[laporanTerpilih.status as StatusKey]
+    : null;
 
   return (
-    <div className="relative rounded-[2rem] border garis-halus bg-panel p-2 shadow-2xl">
-      {/* Header Dossier */}
-      <div className="flex items-center justify-between border-b garis-halus bg-panel-2/80 px-4 py-2.5 rounded-t-[1.6rem] text-xs">
+    <div className="relative overflow-hidden rounded-[2rem] border garis-halus bg-panel p-2 shadow-2xl">
+      {/* Top Bar Status */}
+      <div className="flex items-center justify-between border-b garis-halus bg-panel-2/90 px-4 py-2.5 rounded-t-[1.6rem] text-xs">
         <div className="flex items-center gap-2">
-          <span className="size-2 rounded-full bg-daun-500 animate-ping" />
-          <span className="font-display font-bold tracking-wider text-ink uppercase text-[11px]">
-            Peta Geospasial Wilayah RT 03/RW 05
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-daun-400 opacity-75" />
+            <span className="relative inline-flex size-2 rounded-full bg-daun-500" />
+          </span>
+          <span className="font-semibold text-ink tracking-tight">
+            Peta Geospasial Wilayah
           </span>
         </div>
-        <span className="rounded-full bg-daun-500/10 px-2 py-0.5 text-[10px] font-bold text-daun-700 dark:text-daun-300">
-          Sistem Aktif Realtime
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-daun-500/10 px-2.5 py-0.5 text-[11px] font-bold text-daun-700 dark:text-daun-300">
+            {titik.length} Laporan Aktif
+          </span>
+          <span className="hidden sm:inline text-[11px] text-muted">· Realtime</span>
+        </div>
       </div>
 
-      {/* Area Peta */}
-      <div className="relative h-[380px] w-full overflow-hidden bg-[#f3f0e8] dark:bg-[#121b16]">
-        {/* Grid Spasial & Jalan */}
-        <div
-          className="absolute inset-0 opacity-40 dark:opacity-20"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, var(--line) 0 1px, transparent 1px 48px), repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 48px)",
-          }}
+      {/* Area Peta Nyata Leaflet */}
+      <div className="relative h-[380px] w-full overflow-hidden rounded-xl bg-panel-2">
+        <LeafletMap
+          titik={titik}
+          terpilih={terpilihId}
+          onKlikTitik={(id) => setTerpilihId(id)}
+          zoom={14}
+          pusat={
+            titik.length > 0
+              ? [titik[0].lat, titik[0].lng]
+              : [-6.2088, 106.8456]
+          }
+          className="h-full w-full"
         />
 
-        {/* Poligon Blok Lingkungan & Jalan Utama */}
-        <svg className="absolute inset-0 size-full stroke-line/80" fill="none" aria-hidden>
-          <path
-            d="M-20,160 L450,80"
-            stroke="currentColor"
-            strokeWidth="24"
-            className="text-white dark:text-panel-2"
-          />
-          <path
-            d="M180,-20 L260,420"
-            stroke="currentColor"
-            strokeWidth="18"
-            className="text-white dark:text-panel-2"
-          />
-          <path
-            d="M320,100 L440,360"
-            stroke="currentColor"
-            strokeWidth="14"
-            className="text-white dark:text-panel-2"
-          />
-        </svg>
-
-        {/* Label Jalan Hiperlokal */}
-        <span className="absolute left-6 top-[130px] -rotate-10 font-sans text-[10px] font-semibold tracking-wider text-muted uppercase">
-          Jl. Pemuda Raya
-        </span>
-        <span className="absolute left-[200px] top-[40px] rotate-80 font-sans text-[10px] font-semibold tracking-wider text-muted uppercase">
-          Gg. Melati RT 03
-        </span>
-
-        {/* Pins Geospasial */}
-        {PIN_HERO.map((p, idx) => {
-          const isSelected = idx === pinAktif;
-          const ikon = svgUriKategori(p.slug, "#ffffff", 14);
-          return (
-            <div
-              key={p.slug}
-              onClick={() => setPinAktif(idx)}
-              className="absolute cursor-pointer transition-transform duration-300"
-              style={{ left: p.x, top: p.y }}
+        {/* Floating Dossier Card saat pin diklik / dipilih */}
+        <AnimatePresence>
+          {laporanTerpilih && (
+            <motion.div
+              key={laporanTerpilih.id}
+              initial={{ opacity: 0, y: 14, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.96 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="absolute bottom-3 left-3 right-3 sm:left-auto sm:right-3 sm:w-80 z-[1000] rounded-2xl border garis-halus bg-panel/95 p-3.5 shadow-2xl backdrop-blur-md"
             >
-              <div className="relative flex items-center justify-center -translate-x-1/2 -translate-y-1/2">
-                {isSelected && (
-                  <motion.span
-                    className="absolute inset-0 size-10 rounded-full"
-                    style={{ backgroundColor: p.warna }}
-                    initial={{ scale: 0.8, opacity: 0.8 }}
-                    animate={{ scale: 2.2, opacity: 0 }}
-                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
-                  />
+              <div className="flex items-start justify-between gap-2 border-b garis-halus pb-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span
+                    className="flex size-7 shrink-0 items-center justify-center rounded-lg"
+                    style={{
+                      backgroundColor: `${laporanTerpilih.warna}20`,
+                      color: laporanTerpilih.warna,
+                    }}
+                  >
+                    <IkonKategori slug={laporanTerpilih.slug} ukuran={14} />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-ink truncate">
+                      {laporanTerpilih.judul}
+                    </p>
+                    <p className="text-[10px] text-muted capitalize">
+                      Kategori: {laporanTerpilih.slug.replace("-", " ")}
+                    </p>
+                  </div>
+                </div>
+                {terpilihId && (
+                  <button
+                    onClick={() => setTerpilihId(null)}
+                    className="rounded-full p-1 text-muted hover:bg-panel-2 hover:text-ink transition"
+                    aria-label="Tutup"
+                  >
+                    <X size={13} />
+                  </button>
                 )}
-                <span
-                  className={`flex size-8 items-center justify-center rounded-full border-2 border-white shadow-lg transition-transform ${
-                    isSelected ? "scale-125 ring-2 ring-offset-2 ring-daun-500" : "scale-100 opacity-90"
-                  }`}
-                  style={{ backgroundColor: p.warna }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ikon} width={14} height={14} alt="" />
-                </span>
               </div>
-            </div>
-          );
-        })}
 
-        {/* Kartu Live Dossier Mini */}
-        <motion.div
-          key={terpilih.nama}
-          initial={{ opacity: 0, y: 12, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.3 }}
-          className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-72 rounded-2xl border garis-halus bg-panel/95 p-3.5 shadow-xl backdrop-blur-md"
-        >
-          <div className="flex items-center justify-between gap-2 border-b garis-halus pb-2">
-            <span
-              className="flex size-5 items-center justify-center rounded-md"
-              style={{ backgroundColor: `${terpilih.warna}25`, color: terpilih.warna }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={svgUriKategori(terpilih.slug, terpilih.warna, 11)} width={11} height={11} alt="" />
-            </span>
-            <span className="text-[11px] font-bold text-ink truncate flex-1">
-              {terpilih.nama}
-            </span>
-            <span className="rounded bg-panel-2 px-1.5 py-0.5 text-[9px] font-bold text-muted">
-              {terpilih.sla}
-            </span>
-          </div>
+              <div className="mt-2.5 flex items-center justify-between">
+                {statusInfo ? (
+                  <span
+                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold"
+                    style={{
+                      backgroundColor: `${statusInfo.warna}18`,
+                      color: statusInfo.warna,
+                    }}
+                  >
+                    <span
+                      className="size-1.5 rounded-full"
+                      style={{ backgroundColor: statusInfo.warna }}
+                    />
+                    {statusInfo.label}
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-muted">Terpantau</span>
+                )}
 
-          <div className="mt-2 flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1 text-[11px] text-muted">
-              <span className="size-1.5 rounded-full" style={{ backgroundColor: terpilih.warna }} />
-              {terpilih.status}
-            </span>
-            <span className="font-semibold text-daun-700 dark:text-daun-300 text-[11px]">
-              {pinAktif === 0 ? "✓ 2 Warga Verifikasi" : "Lihat Detail →"}
-            </span>
-          </div>
-        </motion.div>
+                <Link
+                  href={`/laporan/${laporanTerpilih.id}`}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300 dark:hover:text-daun-200 transition"
+                >
+                  Buka Detail <ArrowRight size={12} />
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Footer Status Bar */}
-      <div className="flex items-center justify-between border-t garis-halus bg-panel-2/60 px-4 py-2 text-[11px] text-muted rounded-b-[1.6rem]">
-        <span>PostGIS Geospasial 100m Radius</span>
-        <span className="font-medium">SDG 11 · Kota Berkelanjutan</span>
+      {/* Bottom Bar Controls & Navigation */}
+      <div className="flex items-center justify-between border-t garis-halus bg-panel-2/80 px-4 py-2.5 rounded-b-[1.6rem] text-xs">
+        <span className="text-muted text-[11px] flex items-center gap-1.5">
+          <MapPin size={13} className="text-daun-600 dark:text-daun-400" />
+          Klik sembarang pin untuk melihat status
+        </span>
+        <Link
+          href="/peta"
+          className="inline-flex items-center gap-1 font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300 dark:hover:text-daun-200 text-[11px] transition"
+        >
+          Jelajahi Peta Penuh <ExternalLink size={12} />
+        </Link>
       </div>
     </div>
   );
