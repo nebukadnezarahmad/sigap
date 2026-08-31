@@ -9,9 +9,9 @@ import { useTheme } from "@/lib/use-theme";
 import { svgUriKategori } from "@/lib/ikon-vektor";
 
 const TILE_TERANG =
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png";
 const TILE_GELAP =
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png";
 
 export type TitikPeta = {
   id: string;
@@ -81,7 +81,7 @@ export function LeafletMap({
 
       refTile.current = L.tileLayer(gelap ? TILE_GELAP : TILE_TERANG, {
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> kontributor',
+          '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> · <a href="https://www.hotosm.org/" target="_blank" rel="noopener noreferrer">HOT</a>',
         maxZoom: 19,
       }).addTo(peta);
 
