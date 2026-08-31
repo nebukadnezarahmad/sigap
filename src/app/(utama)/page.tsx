@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -6,6 +7,7 @@ import {
   CheckCircle2,
   MapPin,
   Megaphone,
+  Sparkles,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI } from "@/lib/constants";
@@ -21,22 +23,19 @@ const LANGKAH = [
     nomor: "01",
     ikon: MapPin,
     judul: "Lapor dalam 30 detik",
-    isi: "Klik titik di peta, tempel foto, pilih kategori. Selesai. Setiap laporan langsung terlihat oleh dewan.",
-    lebar: "md:ml-0 md:max-w-xl",
+    isi: "Klik titik di peta, tempel foto bukti, pilih kategori. Setiap laporan langsung terlihat oleh dewan.",
   },
   {
     nomor: "02",
     ikon: Megaphone,
     judul: "Warga serentak mendukung",
-    isi: "Dukungan dan komentar warga lain menaikkan prioritas laporan — dan membuatnya sulit diabaikan.",
-    lebar: "md:ml-auto md:max-w-xl md:text-right",
+    isi: "Dukungan warga lain menaikkan prioritas penanganan dan mempercepat tindak lanjut di lapangan.",
   },
   {
     nomor: "03",
     ikon: CheckCircle2,
-    judul: "Ditindaklanjuti transparan",
-    isi: "Semua orang melihat perubahan status: baru, diverifikasi, dikerjakan, selesai — lengkap dengan bukti foto.",
-    lebar: "md:ml-0 md:max-w-xl",
+    judul: "Verifikasi tuntas transparan",
+    isi: "Petugas wajib upload foto sesudah, dan laporan disahkan selesai setelah diverifikasi minimal 2 warga.",
   },
 ];
 
@@ -107,10 +106,10 @@ export default async function Beranda() {
 
   return (
     <main>
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden bg-pola-grid border-b garis-halus">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_70%_10%,rgba(46,158,87,0.1),transparent)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_70%_10%,rgba(46,158,87,0.12),transparent)]"
         />
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
           <div className="animate-muncul">
@@ -143,11 +142,12 @@ export default async function Beranda() {
               </Link>
               <Link
                 href="/daftar"
-                className="rounded-full border garis-halus bg-panel px-6 py-3 text-base font-semibold text-ink transition-[border-color,color] duration-300 hover:border-daun-400 hover:text-daun-700 dark:hover:text-daun-300"
+                className="rounded-full border garis-halus bg-panel px-6 py-3 text-base font-semibold text-ink transition-[border-color,color] duration-300 hover:border-daun-400 hover:text-daun-700 dark:hover:text-daun-300 shadow-sm"
               >
                 Gabung jadi warga SIGAP
               </Link>
             </div>
+
             <dl className="mt-10 flex gap-10">
               {[
                 ["Laporan masuk", statistik.total],
@@ -164,6 +164,26 @@ export default async function Beranda() {
                 </div>
               ))}
             </dl>
+
+            {/* Cuplikan Foto Lingkungan Nyata */}
+            <div className="mt-8 flex items-center gap-3.5 rounded-2xl border garis-halus bg-panel/80 p-2.5 backdrop-blur-sm max-w-lg shadow-sm">
+              <div className="relative size-12 shrink-0 overflow-hidden rounded-xl">
+                <Image
+                  src="/images/lingkungan-permukiman.jpg"
+                  alt="Kawasan permukiman kota hijau"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-ink truncate">
+                  Kawasan Permukiman Berkelanjutan
+                </p>
+                <p className="text-[11px] text-muted truncate">
+                  Kota Harapan · Terintegrasi Pos Ronda, DLH & Warga RT/RW
+                </p>
+              </div>
+            </div>
           </div>
 
           <Terungkap tunda={0.15}>
@@ -172,50 +192,79 @@ export default async function Beranda() {
         </div>
       </section>
 
+      {/* Section Cara Kerja & Gotong Royong Warga */}
       <section
-        className="mx-auto max-w-6xl px-4 py-24"
+        className="mx-auto max-w-6xl px-4 py-24 bg-pola-topografi"
         aria-label="Cara kerja"
       >
-        <Terungkap>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-            Cara kerja
-          </p>
-          <h2 className="mt-3 max-w-xl font-serif text-4xl font-semibold tracking-tight">
-            Tiga langkah, satu lingkungan lebih baik
-          </h2>
-        </Terungkap>
-        <div className="mt-14 space-y-14">
-          {LANGKAH.map((l, i) => (
-            <Terungkap key={l.nomor} tunda={i * 0.08}>
-              <div
-                className={`relative flex items-start gap-6 border-l-2 border-daun-600/20 pl-8 ${l.lebar}`}
-              >
-                <span
-                  aria-hidden
-                  className="absolute -left-[13px] top-1 flex size-6 items-center justify-center rounded-full bg-daun-600 font-display text-[10px] font-bold text-white"
-                >
-                  {i + 1}
-                </span>
-                <span
-                  aria-hidden
-                  className="hidden font-display text-6xl font-extrabold leading-none text-daun-600/10 sm:block dark:text-daun-300/10"
-                >
-                  {l.nomor}
-                </span>
-                <div className={l.lebar.includes("text-right") ? "sm:ml-auto" : ""}>
-                  <h3 className="flex items-center gap-2.5 font-serif text-2xl font-semibold tracking-tight">
-                    <span className="flex size-9 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
-                      <l.ikon size={18} strokeWidth={1.8} />
+        <div className="grid gap-12 lg:grid-cols-12 items-center">
+          <div className="lg:col-span-7">
+            <Terungkap>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
+                Cara kerja
+              </p>
+              <h2 className="mt-2 max-w-xl font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
+                Tiga Langkah Mudah Menjaga Lingkungan Bersama
+              </h2>
+            </Terungkap>
+            <div className="mt-10 space-y-8">
+              {LANGKAH.map((l, i) => (
+                <Terungkap key={l.nomor} tunda={i * 0.08}>
+                  <div className="relative flex items-start gap-4 border-l-2 border-daun-600/30 pl-6">
+                    <span
+                      aria-hidden
+                      className="absolute -left-[13px] top-1 flex size-6 items-center justify-center rounded-full bg-daun-600 font-display text-[10px] font-bold text-white shadow-sm"
+                    >
+                      {i + 1}
                     </span>
-                    {l.judul}
-                  </h3>
-                  <p className="mt-2 leading-relaxed text-muted teks-pretty">
-                    {l.isi}
-                  </p>
+                    <div>
+                      <h3 className="flex items-center gap-2 font-display text-lg font-bold">
+                        <span className="flex size-7 items-center justify-center rounded-lg bg-daun-600/10 text-daun-700 dark:text-daun-300">
+                          <l.ikon size={15} />
+                        </span>
+                        {l.judul}
+                      </h3>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted teks-pretty">
+                        {l.isi}
+                      </p>
+                    </div>
+                  </div>
+                </Terungkap>
+              ))}
+            </div>
+          </div>
+
+          {/* Kartu Foto Gotong Royong Warga Lapangan */}
+          <div className="lg:col-span-5">
+            <Terungkap tunda={0.2}>
+              <div className="relative overflow-hidden rounded-3xl border garis-halus bg-panel p-2.5 shadow-xl">
+                <div className="relative h-80 w-full overflow-hidden rounded-2xl">
+                  <Image
+                    src="/images/gotong-royong.jpg"
+                    alt="Warga RT gotong royong dan verifikasi lingkungan"
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                  <div className="absolute bottom-3 left-3 right-3 text-white">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-md">
+                      <Sparkles size={11} /> Aksi Lapangan Warga
+                    </span>
+                    <p className="mt-1.5 text-sm font-bold">
+                      Gotong Royong & Verifikasi Warga
+                    </p>
+                    <p className="text-[11px] text-white/80 leading-relaxed">
+                      RT 05 / RW 03 · Masalah selesai divalidasi langsung oleh 2 warga sekitar.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 text-xs">
+                  <span className="text-muted">Partisipasi Aktif RT/RW</span>
+                  <span className="font-bold text-daun-700 dark:text-daun-300">✓ Terverifikasi Lapangan</span>
                 </div>
               </div>
             </Terungkap>
-          ))}
+          </div>
         </div>
       </section>
 
@@ -405,7 +454,20 @@ export default async function Beranda() {
               </p>
             </div>
 
-            <div className="lg:col-span-5 grid gap-3">
+            <div className="lg:col-span-5 flex flex-col gap-3">
+              <div className="relative h-48 w-full overflow-hidden rounded-2xl border garis-halus shadow-sm">
+                <Image
+                  src="/images/kota-sdg11.jpg"
+                  alt="Koridor transportasi dan ruang hijau perkotaan berkelanjutan SDG 11"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                <p className="absolute bottom-2.5 left-3.5 right-3.5 text-xs font-bold text-white">
+                  Target SDG 11: Kota & Permukiman Berkelanjutan
+                </p>
+              </div>
+
               {[
                 { angka: "33,79 Jt", unit: "Ton", label: "Timbulan sampah nasional tahun 2024" },
                 { angka: "~32%", unit: "Terkelola", label: "Sampah yang tertangani dengan baik" },
@@ -413,17 +475,17 @@ export default async function Beranda() {
               ].map((f) => (
                 <div
                   key={f.label}
-                  className="rounded-2xl border garis-halus bg-panel-2 p-4 text-left"
+                  className="rounded-2xl border garis-halus bg-panel-2 p-3.5 text-left"
                 >
                   <div className="flex items-baseline gap-1.5">
-                    <span className="font-serif text-3xl font-bold text-ink">
+                    <span className="font-serif text-2xl font-bold text-ink">
                       {f.angka}
                     </span>
                     <span className="text-xs font-bold text-daun-700 dark:text-daun-300 uppercase">
                       {f.unit}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-muted">{f.label}</p>
+                  <p className="mt-0.5 text-xs text-muted">{f.label}</p>
                 </div>
               ))}
             </div>
