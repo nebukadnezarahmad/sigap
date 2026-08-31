@@ -8,10 +8,14 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/lib/use-theme";
 import { svgUriKategori } from "@/lib/ikon-vektor";
 
+const CARTO_KEY = process.env.NEXT_PUBLIC_CARTO_API_KEY
+  ? `?api_key=${process.env.NEXT_PUBLIC_CARTO_API_KEY}`
+  : "";
+
 const TILE_TERANG =
-  "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png";
+  `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${CARTO_KEY}`;
 const TILE_GELAP =
-  "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png";
+  `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${CARTO_KEY}`;
 
 export type TitikPeta = {
   id: string;
@@ -81,7 +85,7 @@ export function LeafletMap({
 
       refTile.current = L.tileLayer(gelap ? TILE_GELAP : TILE_TERANG, {
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> · <a href="https://www.hotosm.org/" target="_blank" rel="noopener noreferrer">HOT</a>',
+          '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
         maxZoom: 19,
       }).addTo(peta);
 
