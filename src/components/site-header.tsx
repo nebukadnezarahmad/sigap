@@ -2,20 +2,18 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   BookOpen,
-  ChevronDown,
   FileText,
   LogOut,
   MapPin,
   Moon,
   ShieldCheck,
+  Sparkles,
   Sun,
   Trophy,
   UserRound,
-  Users,
-  GraduationCap,
-  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -23,6 +21,7 @@ import { useUser } from "@/lib/use-user";
 import { useTheme, toggleTema } from "@/lib/use-theme";
 import { Avatar, Button } from "@/components/ui";
 import { NotifikasiBel } from "@/components/notifikasi-bel";
+import { DemoAuthModal } from "@/components/tombol-demo-login";
 
 function ToggleTema() {
   const gelap = useTheme();
@@ -51,14 +50,14 @@ export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, profil } = useUser();
+  const [modalDemoBuka, setModalDemoBuka] = useState(false);
 
   const tautan = [
     { href: "/peta", label: "Peta" },
+    { href: "/laporan-saya", label: "Laporan Saya" },
     { href: "/papan-skor", label: "Papan Skor" },
     { href: "/transparansi", label: "Transparansi" },
-    { href: "/pasar", label: "Pasar" },
-    { href: "/layanan", label: "Layanan" },
-    { href: "/umkm", label: "UMKM" },
+    { href: "/demo", label: "Panduan Demo" },
   ];
 
   async function keluar() {
@@ -86,62 +85,22 @@ export function SiteHeader() {
               key={t.href}
               href={t.href}
               className={cn(
-                "rounded-full px-3 py-1.5 text-sm font-medium transition",
+                "rounded-full px-3.5 py-1.5 text-sm font-medium transition",
                 pathname.startsWith(t.href)
-                  ? "bg-daun-600/10 text-daun-700 dark:text-daun-300"
+                  ? "bg-daun-600/10 text-daun-700 dark:text-daun-300 font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
               )}
             >
               {t.label}
             </Link>
           ))}
-          <div className="group relative">
-            <button
-              aria-haspopup="true"
-              className={cn(
-                "flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-medium transition",
-                pathname.startsWith("/polling") ||
-                  pathname.startsWith("/aksi") ||
-                  pathname.startsWith("/edukasi")
-                  ? "bg-daun-600/10 text-daun-700 dark:text-daun-300"
-                  : "text-muted hover:bg-panel-2 hover:text-ink"
-              )}
-            >
-              Komunitas
-              <ChevronDown
-                size={13}
-                className="transition-transform group-hover:rotate-180"
-              />
-            </button>
-            <div className="invisible absolute left-1/2 top-full z-20 w-48 -translate-x-1/2 translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-              {[
-                { href: "/polling", label: "Polling warga", ikon: BarChart3 },
-                { href: "/aksi", label: "Aksi bersama", ikon: Users },
-                { href: "/edukasi", label: "Edukasi & quiz", ikon: GraduationCap },
-              ].map((k) => (
-                <Link
-                  key={k.href}
-                  href={k.href}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition",
-                    pathname.startsWith(k.href)
-                      ? "bg-daun-600/10 text-daun-700 dark:text-daun-300"
-                      : "text-muted hover:bg-panel-2 hover:text-ink"
-                  )}
-                >
-                  <k.ikon size={15} />
-                  {k.label}
-                </Link>
-              ))}
-            </div>
-          </div>
           {profil?.role === "admin" && (
             <Link
               href="/dewan"
               className={cn(
                 "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition",
                 pathname.startsWith("/dewan")
-                  ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400"
+                  ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
               )}
             >
@@ -150,7 +109,7 @@ export function SiteHeader() {
           )}
         </nav>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <ToggleTema />
           {user && <NotifikasiBel />}
           {user ? (
@@ -166,7 +125,14 @@ export function SiteHeader() {
                   <p className="truncate text-sm font-semibold">
                     {profil?.nama_lengkap ?? user.email}
                   </p>
-                  <p className="truncate text-xs text-muted">@{profil?.username ?? "warga"}</p>
+                  <p className="truncate text-xs text-muted">
+                    @{profil?.username ?? "warga"}{" "}
+                    {profil?.role === "admin" && (
+                      <span className="rounded bg-kunyit-500/15 px-1.5 py-0.5 text-[10px] font-bold text-kunyit-600">
+                        Admin
+                      </span>
+                    )}
+                  </p>
                 </div>
                 <Link
                   href={`/warga/${profil?.username ?? ""}`}
@@ -186,6 +152,14 @@ export function SiteHeader() {
                 >
                   <Trophy size={15} /> Papan skor
                 </Link>
+                {profil?.role === "admin" && (
+                  <Link
+                    href="/dewan"
+                    className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-kunyit-600 transition hover:bg-kunyit-500/10 dark:text-kunyit-400"
+                  >
+                    <ShieldCheck size={15} /> Dashboard dewan
+                  </Link>
+                )}
                 <Link
                   href="/demo"
                   className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
@@ -201,12 +175,30 @@ export function SiteHeader() {
               </div>
             </div>
           ) : (
-            <Button onClick={() => router.push("/masuk")} size="sm">
-              Masuk
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="sekunder"
+                size="sm"
+                onClick={() => setModalDemoBuka(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 border-daun-500/30 text-daun-700 hover:bg-daun-500/10 dark:text-daun-300"
+              >
+                <Sparkles size={14} className="text-daun-600 dark:text-daun-400" />
+                Akun Demo
+              </Button>
+              <Button onClick={() => router.push("/masuk")} size="sm">
+                Masuk
+              </Button>
+            </div>
           )}
         </div>
       </div>
+
+      <DemoAuthModal
+        terbuka={modalDemoBuka}
+        tutup={() => setModalDemoBuka(false)}
+        judul="Masuk Cepat Mode Demo"
+        deskripsi="Pilih peran akun di bawah untuk menguji fitur SIGAP secara langsung dengan 1-klik."
+      />
     </header>
   );
 }

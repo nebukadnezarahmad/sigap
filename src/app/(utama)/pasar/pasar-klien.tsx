@@ -285,10 +285,6 @@ export function PasarKlien({
   const [formBuka, setFormBuka] = useState(false);
 
   useEffect(() => {
-    setBarang(awal);
-  }, [awal]);
-
-  useEffect(() => {
     if (!masuk) return;
     const supabase = createClient();
     const ch = supabase

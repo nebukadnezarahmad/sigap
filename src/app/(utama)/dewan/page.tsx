@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import type { StatusKey } from "@/lib/constants";
 import { DewanClient } from "./dewan-klien";
+import { GerbangDewan } from "./gerbang-dewan";
 
 export const metadata: Metadata = {
   title: "Dashboard Dewan",
@@ -27,13 +27,19 @@ export default async function HalamanDewan() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/masuk?next=/dewan");
+  if (!user) {
+    return <GerbangDewan alasan="belum_login" />;
+  }
+
   const { data: profil } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
-  if (profil?.role !== "admin") redirect("/peta");
+
+  if (profil?.role !== "admin") {
+    return <GerbangDewan alasan="bukan_admin" />;
+  }
 
   const { data: semua } = await supabase
     .from("reports")

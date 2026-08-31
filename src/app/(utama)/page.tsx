@@ -4,11 +4,8 @@ import {
   BarChart3,
   Building2,
   CheckCircle2,
-  GraduationCap,
   MapPin,
   Megaphone,
-  Recycle,
-  Store,
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -235,55 +232,48 @@ export default async function Beranda() {
 
       <section
         className="mx-auto max-w-6xl px-4 py-24"
-        aria-label="Lebih dari sekadar lapor"
+        aria-label="Pilar solusi SIGAP"
       >
         <Terungkap>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-kunyit-600">
-            Ekosistem
+            Arsitektur Solusi
           </p>
           <h2 className="mt-3 max-w-2xl font-serif text-4xl font-semibold tracking-tight">
-            Lebih dari sekadar kanal lapor.
+            Empat pilar transparansi & aksi terpadu
           </h2>
         </Terungkap>
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
+              ikon: MapPin,
+              judul: "Peta & Lapor Cepat",
+              isi: "Pin-drop koordinat presisi, foto bukti, marker cluster, dan klasifikasi 6 kategori permukiman.",
+              href: "/peta",
+              cta: "Buka peta",
+            },
+            {
+              ikon: Building2,
+              judul: "Dashboard Dewan",
+              isi: "Pemantauan SLA penanganan, verifikasi status berkala, penugasan petugas, dan sebaran heatmap.",
+              href: "/dewan",
+              cta: "Pelajari dashboard",
+            },
+            {
               ikon: BarChart3,
-              judul: "Polling partisipatif",
-              isi: "Suaramu menentukan prioritas kebijakan lingkungan — hasil realtime, terbuka.",
-              href: "/polling",
-              cta: "Ikut polling",
+              judul: "Transparansi Publik",
+              isi: "Data tuntas realtime, median durasi penyelesaian masalah, serta akses ekspor Open Data publik.",
+              href: "/transparansi",
+              cta: "Lihat data",
             },
             {
               ikon: Users,
-              judul: "Aksi bersama",
-              isi: "Sabtu bersih, lokakarya komposting — temukan atau prakarsai gerakan warga.",
-              href: "/aksi",
-              cta: "Lihat aksi",
-            },
-            {
-              ikon: GraduationCap,
-              judul: "Edukasi & quiz",
-              isi: "Materi ringkas, quiz badge, dan kalkulator jejak sampah pribadimu.",
-              href: "/edukasi",
-              cta: "Mulai belajar",
-            },
-            {
-              ikon: Recycle,
-              judul: "Pasar ReUse",
-              isi: "Barang bekas layak pakai berpindah gratis antar-warga — sampah berkurang, tetangga terhubung.",
-              href: "/pasar",
-              cta: "Cari barang",
-            },
-            {
-              ikon: Store,
-              judul: "UMKM warga",
-              isi: "Belanja di tetangga sendiri: kuliner, kerajinan, jasa — ekonomi lingkungan berputar lokal.",
-              href: "/umkm",
-              cta: "Jelajahi usaha",
+              judul: "Gamifikasi Warga",
+              isi: "Insentif partisipasi berupa poin lapor & vote, 10 badge pencapaian, dan level status komunitas.",
+              href: "/papan-skor",
+              cta: "Papan skor",
             },
           ].map((k, i) => (
-            <Terungkap key={k.judul} tunda={(i % 3) * 0.08}>
+            <Terungkap key={k.judul} tunda={i * 0.08}>
               <Card className="flex h-full flex-col p-6">
                 <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
                   <k.ikon size={18} strokeWidth={1.8} />

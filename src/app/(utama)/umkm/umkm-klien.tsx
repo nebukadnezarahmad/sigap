@@ -209,10 +209,6 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
   const [daftar, setDaftar] = useState(awal);
   const [formBuka, setFormBuka] = useState(false);
 
-  useEffect(() => {
-    setDaftar(awal);
-  }, [awal]);
-
   const tampil = useMemo(() => daftar, [daftar]);
 
   return (

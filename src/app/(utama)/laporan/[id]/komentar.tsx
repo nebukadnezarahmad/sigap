@@ -8,6 +8,7 @@ import { useUser } from "@/lib/use-user";
 import type { Komentar } from "@/types/database";
 import { waktuRelatif } from "@/lib/utils";
 import { Avatar, Button, Card, Textarea } from "@/components/ui";
+import { DemoAuthModal } from "@/components/tombol-demo-login";
 
 export function KomentarSection({
   reportId,
@@ -21,6 +22,7 @@ export function KomentarSection({
   const [teks, setTeks] = useState("");
   const [kirim, setKirim] = useState(false);
   const [terisi, setTerisi] = useState(false);
+  const [modalAuth, setModalAuth] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -146,8 +148,33 @@ export function KomentarSection({
           </Button>
         </form>
       ) : (
-        <p className="mt-5 text-sm text-muted">Masuk untuk ikut berdiskusi.</p>
+        <div className="mt-5 rounded-2xl border border-daun-500/25 bg-daun-500/5 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold">Ingin ikut berdiskusi?</p>
+              <p className="text-xs text-muted">
+                Masuk untuk menulis komentar atau klarifikasi pada laporan warga ini.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="sekunder"
+              onClick={() => setModalAuth(true)}
+              className="border-daun-500/30 text-daun-700 hover:bg-daun-500/10 dark:text-daun-300"
+            >
+              Masuk 1-Klik Demo
+            </Button>
+          </div>
+        </div>
       )}
+
+      <DemoAuthModal
+        terbuka={modalAuth}
+        tutup={() => setModalAuth(false)}
+        judul="Diskusi Laporan Warga"
+        deskripsi="Masuk dengan akun demo untuk mengirim tanggapan atau informasi tambahan."
+        tujuan={`/laporan/${reportId}`}
+      />
     </Card>
   );
 }

@@ -6,6 +6,7 @@ import { ThumbsUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import { Button } from "@/components/ui";
+import { DemoAuthModal } from "@/components/tombol-demo-login";
 
 export function VoteButton({
   reportId,
@@ -18,6 +19,7 @@ export function VoteButton({
   const [jumlah, setJumlah] = useState(jumlahAwal);
   const [sudahVote, setSudahVote] = useState(false);
   const [proses, setProses] = useState(false);
+  const [modalAuth, setModalAuth] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -32,7 +34,11 @@ export function VoteButton({
   }, [user, reportId]);
 
   async function toggle() {
-    if (!user || proses) return;
+    if (!user) {
+      setModalAuth(true);
+      return;
+    }
+    if (proses) return;
     setProses(true);
 
     const supabase = createClient();
@@ -55,21 +61,36 @@ export function VoteButton({
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <Button
-        variant={sudahVote ? "utama" : "sekunder"}
-        onClick={toggle}
-        disabled={!user || proses}
-        title={user ? "" : "Masuk untuk mendukung laporan ini"}
-        className={!sudahVote && !user ? "opacity-70" : ""}
-      >
-        <ThumbsUp size={16} className={sudahVote ? "fill-current" : ""} />
-        <motion.span key={jumlah}>{jumlah}</motion.span>
-        <span>{sudahVote ? "Didukung" : "Dukung laporan ini"}</span>
-      </Button>
-      {!user && (
-        <span className="text-xs text-muted">masuk untuk memberi dukungan</span>
-      )}
-    </div>
+    <>
+      <div className="flex items-center gap-3">
+        <Button
+          variant={sudahVote ? "utama" : "sekunder"}
+          onClick={toggle}
+          disabled={proses}
+          title={user ? "" : "Masuk untuk mendukung laporan ini"}
+        >
+          <ThumbsUp size={16} className={sudahVote ? "fill-current" : ""} />
+          <motion.span key={jumlah}>{jumlah}</motion.span>
+          <span>{sudahVote ? "Didukung" : "Dukung laporan ini"}</span>
+        </Button>
+        {!user && (
+          <button
+            type="button"
+            onClick={() => setModalAuth(true)}
+            className="text-xs text-muted hover:text-ink hover:underline transition"
+          >
+            masuk untuk memberi dukungan
+          </button>
+        )}
+      </div>
+
+      <DemoAuthModal
+        terbuka={modalAuth}
+        tutup={() => setModalAuth(false)}
+        judul="Dukung Laporan Ini"
+        deskripsi="Masuk dengan salah satu akun demo untuk memberikan dukungan (vote) pada laporan warga ini."
+        tujuan={`/laporan/${reportId}`}
+      />
+    </>
   );
 }

@@ -5,10 +5,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImagePlus, MapPin, Send } from "lucide-react";
 import { KATEGORI } from "@/lib/constants";
-import { svgUriKategori } from "@/lib/ikon-vektor";
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";
+import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
 const LeafletMap = dynamic(
   () => import("./leaflet-map").then((m) => m.LeafletMap),
@@ -31,16 +31,33 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
 
   if (!user) {
     return (
-      <div className="space-y-4 text-center">
-        <p className="text-sm text-muted">
-          Kamu harus masuk dulu untuk melaporkan masalah — supaya setiap laporan
-          bisa dipertanggungjawabkan.
-        </p>
-        <div className="flex justify-center gap-2">
-          <Button onClick={() => router.push("/masuk?next=/peta")}>Masuk</Button>
-          <Button variant="sekunder" onClick={() => router.push("/daftar?next=/peta")}>
-            Daftar
-          </Button>
+      <div className="space-y-4 py-2">
+        <div className="text-center">
+          <p className="font-display font-bold text-base">
+            Masuk untuk Melaporkan Masalah
+          </p>
+          <p className="mt-1 text-sm text-muted">
+            Setiap laporan diikat dengan akun warga agar validitas dan poin partisipasi dapat tercatat.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-daun-500/30 bg-daun-500/5 p-4">
+          <p className="mb-2.5 text-xs font-bold uppercase tracking-wider text-daun-700 dark:text-daun-300">
+            Masuk Cepat Mode Demo (1-Klik untuk Juri)
+          </p>
+          <PilihanAkunDemo ringkas />
+        </div>
+
+        <div className="flex items-center justify-between border-t garis-halus pt-3 text-xs text-muted">
+          <span>Punya akun sendiri?</span>
+          <div className="flex gap-2">
+            <Button size="sm" variant="sekunder" onClick={() => router.push("/masuk?next=/peta?lapor=1")}>
+              Masuk Manual
+            </Button>
+            <Button size="sm" onClick={() => router.push("/daftar?next=/peta?lapor=1")}>
+              Daftar Akun
+            </Button>
+          </div>
         </div>
       </div>
     );

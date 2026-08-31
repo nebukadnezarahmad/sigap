@@ -6,6 +6,7 @@ import type { LaporanDenganRelasi } from "@/types/database";
 import { Card, StatusChip } from "@/components/ui";
 import { AksiLaporanSaya } from "./aksi";
 import { HapusAreaKlien } from "./hapus-area";
+import { GerbangLaporanSaya } from "./gerbang-laporan-saya";
 
 export const metadata: Metadata = { title: "Laporan Saya" };
 export const dynamic = "force-dynamic";
@@ -17,7 +18,7 @@ export default async function HalamanLaporanSaya() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/masuk?next=/laporan-saya");
+  if (!user) return <GerbangLaporanSaya />;
 
   const { data: milik } = await supabase
     .from("reports")

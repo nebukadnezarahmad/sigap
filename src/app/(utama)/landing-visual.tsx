@@ -7,12 +7,12 @@ import { Card } from "@/components/ui";
 import { svgUriKategori } from "@/lib/ikon-vektor";
 
 export function AngkaHidup({ nilai }: { nilai: number }) {
-  const [tampil, setTampil] = useState(0);
+  const [tampil, setTampil] = useState(nilai);
 
   useEffect(() => {
     if (nilai <= 0) return;
     const mulai = performance.now();
-    const durasi = 1000;
+    const durasi = 800;
     let raf = 0;
 
     function tick(sekarang: number) {
