@@ -1,18 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Public_Sans } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 
-const publicSans = Public_Sans({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-display",
-  axes: ["opsz", "SOFT", "WONK"],
-  style: ["normal", "italic"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
   display: "swap",
 });
 
@@ -43,7 +36,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: temaScript }} />
       </head>
-      <body className={`${publicSans.variable} ${fraunces.variable} grain font-sans antialiased`}>
+      <body className={`${poppins.variable} grain font-sans antialiased`}>
         {children}
       </body>
     </html>
