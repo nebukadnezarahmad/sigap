@@ -88,6 +88,11 @@ export function Jelajah({
 }) {
   const params = useSearchParams();
   const [laporan, setLaporan] = useState(laporanAwal);
+  const [prevLaporanAwal, setPrevLaporanAwal] = useState(laporanAwal);
+  if (laporanAwal !== prevLaporanAwal) {
+    setPrevLaporanAwal(laporanAwal);
+    setLaporan(laporanAwal);
+  }
   const [terpilihId, setTerpilihId] = useState<string | null>(null);
   const [kueri, setKueri] = useState("");
   const [fKategori, setFKategori] = useState<string[]>([]);
@@ -95,6 +100,12 @@ export function Jelajah({
   const [modalBuka, setModalBuka] = useState(
     () => params.get("lapor") === "1"
   );
+  const laporParam = params.get("lapor");
+  const [prevLapor, setPrevLapor] = useState(laporParam);
+  if (laporParam !== prevLapor) {
+    setPrevLapor(laporParam);
+    if (laporParam === "1") setModalBuka(true);
+  }
   const [realtimeAktif, setRealtimeAktif] = useState(false);
   const [periodeIdx, setPeriodeIdx] = useState<number | null>(null);
   const [mainkan, setMainkan] = useState(false);
@@ -643,6 +654,12 @@ export function Jelajah({
               </motion.div>
             ))}
           </AnimatePresence>
+          {tersaring.length > 0 && (
+            <p className="py-1 text-center text-xs text-muted">
+              menampilkan {Math.min(40, tersaring.length)} dari{" "}
+              {tersaring.length} laporan
+            </p>
+          )}
           {tersaring.length === 0 && (
             <Card className="flex flex-col items-center gap-2 p-8 text-center text-muted">
               <MapPinOff size={28} />

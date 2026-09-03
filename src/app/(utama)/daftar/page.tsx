@@ -5,12 +5,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { MapPin } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { isTujuanAman } from "@/lib/utils";
 import { Button, Card, Input, Label } from "@/components/ui";
 
 function FormulirDaftar() {
   const router = useRouter();
   const params = useSearchParams();
-  const tujuan = params.get("next") ?? "/peta";
+  const tujuanMentah = params.get("next") ?? "/peta";
+  const tujuan = isTujuanAman(tujuanMentah) ? tujuanMentah : "/peta";
   const [nama, setNama] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -54,11 +56,19 @@ function FormulirDaftar() {
     });
 
     if (error) {
-      setPesan(
-        error.message === "User already registered"
-          ? "Email sudah terdaftar. Coba masuk."
-          : `Gagal mendaftar: ${error.message}`
-      );
+      const pesanDb = error.message ?? "";
+      const kodeDb =
+        typeof (error as { code?: unknown }).code === "string"
+          ? (error as { code: string }).code
+          : null;
+      if (
+        kodeDb === "23505" ||
+        /already registered|already exists|duplicate|unique/i.test(pesanDb)
+      ) {
+        setPesan("Username/email sudah dipakai");
+      } else {
+        setPesan("Gagal mendaftar. Coba lagi.");
+      }
       setProses(false);
       return;
     }

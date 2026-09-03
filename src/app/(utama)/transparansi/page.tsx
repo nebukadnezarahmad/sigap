@@ -87,13 +87,10 @@ export default async function HalamanTransparansi() {
     );
     if (evSelesai) {
       durasiHari.push(
-        Math.max(
-          1,
-          Math.round(
-            (new Date(evSelesai.created_at).getTime() -
-              new Date(r.created_at).getTime()) /
-              86400000
-          )
+        Math.round(
+          (new Date(evSelesai.created_at).getTime() -
+            new Date(r.created_at).getTime()) /
+            86400000
         )
       );
     }
@@ -213,7 +210,7 @@ export default async function HalamanTransparansi() {
           },
           {
             label: "Median waktu beres",
-            nilai: medianHari ? `${medianHari} hari` : "—",
+            nilai: medianHari ? `${medianHari} hari` : "<1 hari",
             ikon: <Timer size={20} />,
             warna: "text-kunyit-600 dark:text-kunyit-400 bg-kunyit-500/10",
           },

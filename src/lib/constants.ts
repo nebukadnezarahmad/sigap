@@ -16,7 +16,7 @@ export const STATUS: Record<
   baru: {
     label: "Baru",
     warna: "#f59e0b",
-    chip: "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400",
+    chip: "bg-kunyit-500/15 text-kunyit-700 dark:text-kunyit-300",
   },
   diverifikasi: {
     label: "Diverifikasi",
@@ -41,7 +41,7 @@ export const STATUS: Record<
   ditolak: {
     label: "Ditolak",
     warna: "#dc2626",
-    chip: "bg-danger/10 text-danger",
+    chip: "bg-danger/10 text-danger dark:text-red-400",
   },
 };
 
@@ -54,7 +54,7 @@ export type KategoriDef = {
 export const KATEGORI: KategoriDef[] = [
   { slug: "sampah", nama: "Sampah Menumpuk", warna: "#65a30d" },
   { slug: "drainase", nama: "Drainase & Banjir", warna: "#0284c7" },
-  { slug: "lampu", nama: "Lampu Jalan Mati", warna: "#f59e0b" },
+  { slug: "lampu", nama: "Lampu Jalan Mati", warna: "#b45309" },
   { slug: "jalan", nama: "Jalan Rusak", warna: "#78716c" },
   { slug: "ruang-hijau", nama: "Ruang Hijau", warna: "#059669" },
   { slug: "lainnya", nama: "Lainnya", warna: "#64748b" },

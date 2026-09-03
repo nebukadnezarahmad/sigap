@@ -5,13 +5,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { MapPin, ShieldAlert, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { isTujuanAman } from "@/lib/utils";
 import { Button, Card, Input, Label } from "@/components/ui";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
 function FormulirMasuk() {
   const router = useRouter();
   const params = useSearchParams();
-  const tujuan = params.get("next") ?? "/peta";
+  const tujuanMentah = params.get("next") ?? "/peta";
+  const tujuan = isTujuanAman(tujuanMentah) ? tujuanMentah : "/peta";
   const butuhAdmin = tujuan.startsWith("/dewan");
   const [email, setEmail] = useState("");
   const [sandi, setSandi] = useState("");
@@ -40,7 +42,7 @@ function FormulirMasuk() {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${location.origin}/auth/callback?next=${tujuan}` },
+      options: { redirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(tujuan)}` },
     });
   }
 

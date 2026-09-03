@@ -11,9 +11,23 @@ import { ArrowRight, ExternalLink, MapPin, X } from "lucide-react";
 
 export function AngkaHidup({ nilai }: { nilai: number }) {
   const [tampil, setTampil] = useState(nilai);
+  const [prevNilai, setPrevNilai] = useState(nilai);
+  if (nilai !== prevNilai) {
+    setPrevNilai(nilai);
+    setTampil(nilai);
+  }
 
   useEffect(() => {
-    if (nilai <= 0) return;
+    if (nilai <= 0) {
+      return;
+    }
+    if (
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
     const mulai = performance.now();
     const durasi = 800;
     let raf = 0;
@@ -29,7 +43,14 @@ export function AngkaHidup({ nilai }: { nilai: number }) {
     return () => cancelAnimationFrame(raf);
   }, [nilai]);
 
-  return <span className="angka-tabular">{tampil.toLocaleString("id-ID")}</span>;
+  return (
+    <span
+      className="angka-tabular inline-block tabular-nums"
+      style={{ minWidth: `${String(nilai).length}ch` }}
+    >
+      {tampil.toLocaleString("id-ID")}
+    </span>
+  );
 }
 
 export function Terungkap({

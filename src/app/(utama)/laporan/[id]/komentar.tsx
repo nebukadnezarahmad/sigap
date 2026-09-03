@@ -32,6 +32,7 @@ export function KomentarSection({
       .select("*, profiles(id,username,nama_lengkap,avatar_url)")
       .eq("report_id", reportId)
       .order("created_at", { ascending: true })
+      .limit(100)
       .then(({ data }) => {
         setDaftar(data ?? []);
         setTerisi(true);
@@ -60,6 +61,39 @@ export function KomentarSection({
               ? s
               : [...s, { ...baru, profiles: data }]
           );
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "comments",
+          filter: `report_id=eq.${reportId}`,
+        },
+        async (payload) => {
+          const upd = payload.new as Komentar;
+          const { data } = await supabase
+            .from("profiles")
+            .select("id,username,nama_lengkap,avatar_url")
+            .eq("id", upd.user_id)
+            .single();
+          setDaftar((s) =>
+            s.map((k) => (k.id === upd.id ? { ...upd, profiles: data } : k))
+          );
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "comments",
+          filter: `report_id=eq.${reportId}`,
+        },
+        (payload) => {
+          const lama = payload.old as { id: string };
+          setDaftar((s) => s.filter((k) => k.id !== lama.id));
         }
       )
       .subscribe();

@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { CalendarDays, MapPin, Plus, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/lib/use-user";
 import type { EventAksi } from "./page";
 import { Button, Card, Input, Label, Textarea } from "@/components/ui";
-import { Modal } from "@/components/modal";
 import { formatTanggal } from "@/lib/utils";
 
 function apakahLewat(tanggal: string) {
@@ -16,45 +16,87 @@ function apakahLewat(tanggal: string) {
 
 function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
   const router = useRouter();
+  const { user: pengguna } = useUser();
   const [data, setData] = useState(event);
+  const [prevEvent, setPrevEvent] = useState(event);
+  if (event !== prevEvent) {
+    setPrevEvent(event);
+    setData(event);
+  }
   const [proses, setProses] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
     const ch = supabase
-      .channel(`rsvp-${data.id}`)
+      .channel(`rsvp-${event.id}`)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "event_rsvp",
-          filter: `event_id=eq.${data.id}`,
+          filter: `event_id=eq.${event.id}`,
         },
-        () => {
-          setData((d) =>
-            d.totalRsvp === event.totalRsvp
-              ? { ...d, totalRsvp: d.totalRsvp + 1 }
-              : d
-          );
+        (payload) => {
+          // RSVP sendiri sudah dihitung optimistis di toggle()
+          const baru = payload.new as { user_id: string };
+          if (baru.user_id && baru.user_id === pengguna?.id) return;
+          setData((d) => ({ ...d, totalRsvp: d.totalRsvp + 1 }));
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "event_rsvp",
+          filter: `event_id=eq.${event.id}`,
+        },
+        (payload) => {
+          const lama = payload.old as { user_id: string };
+          if (lama.user_id && lama.user_id === pengguna?.id) return;
+          setData((d) => ({
+            ...d,
+            totalRsvp: Math.max(0, d.totalRsvp - 1),
+          }));
         }
       )
       .subscribe();
     return () => {
       void supabase.removeChannel(ch);
     };
-  }, [data.id, event.totalRsvp]);
+  }, [event.id, pengguna?.id]);
 
   async function toggle() {
     if (!masuk || proses) return;
     setProses(true);
     const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setProses(false);
+      return;
+    }
     if (data.akuIkut) {
-      await supabase.from("event_rsvp").delete().match({ event_id: data.id });
-      setData((d) => ({ ...d, akuIkut: false, totalRsvp: d.totalRsvp - 1 }));
+      const { error } = await supabase
+        .from("event_rsvp")
+        .delete()
+        .match({ event_id: data.id, user_id: user.id });
+      if (!error) {
+        setData((d) => ({
+          ...d,
+          akuIkut: false,
+          totalRsvp: Math.max(0, d.totalRsvp - 1),
+        }));
+      }
     } else {
-      await supabase.from("event_rsvp").insert({ event_id: data.id });
-      setData((d) => ({ ...d, akuIkut: true, totalRsvp: d.totalRsvp + 1 }));
+      const { error } = await supabase
+        .from("event_rsvp")
+        .insert({ event_id: data.id, user_id: user.id });
+      if (!error) {
+        setData((d) => ({ ...d, akuIkut: true, totalRsvp: d.totalRsvp + 1 }));
+      }
       router.refresh();
     }
     setProses(false);
@@ -118,7 +160,7 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
   );
 }
 
-function FormAksi({ tutup, selesai }: { tutup: () => void; selesai: () => void }) {
+function FormAksi({ tutup, selesai }: { tutup: () => void; selesai: (baru?: EventAksi) => void }) {
   const [judul, setJudul] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [alamat, setAlamat] = useState("");
@@ -131,18 +173,36 @@ function FormAksi({ tutup, selesai }: { tutup: () => void; selesai: () => void }
     setProses(true);
     setPesan(null);
     const supabase = createClient();
-    const { error } = await supabase.from("events").insert({
-      judul,
-      deskripsi,
-      alamat: alamat.trim() || null,
-      tanggal: new Date(tanggal).toISOString(),
-    });
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { data, error } = await supabase
+      .from("events")
+      .insert({
+        judul,
+        deskripsi,
+        alamat: alamat.trim() || null,
+        tanggal: new Date(tanggal).toISOString(),
+        user_id: user?.id ?? null,
+      })
+      .select("id, judul, deskripsi, alamat, tanggal, user_id")
+      .single();
     setProses(false);
     if (error) {
       setPesan(error.message);
       return;
     }
-    selesai();
+    selesai({
+      id: data.id,
+      judul: data.judul,
+      deskripsi: data.deskripsi,
+      alamat: data.alamat,
+      tanggal: data.tanggal,
+      totalRsvp: 0,
+      akuIkut: false,
+      pembuatKu: true,
+      namaPembuat: "Kamu",
+    });
   }
 
   return (
@@ -218,6 +278,11 @@ export function AksiKlien({
 }) {
   const router = useRouter();
   const [events, setEvents] = useState(awal);
+  const [prevAwal, setPrevAwal] = useState(awal);
+  if (awal !== prevAwal) {
+    setPrevAwal(awal);
+    setEvents(awal);
+  }
   const [formBuka, setFormBuka] = useState(false);
 
   return (
@@ -231,7 +296,8 @@ export function AksiKlien({
               </h2>
               <FormAksi
                 tutup={() => setFormBuka(false)}
-                selesai={() => {
+                selesai={(baru) => {
+                  if (baru) setEvents((s) => [baru, ...s]);
                   setFormBuka(false);
                   router.refresh();
                 }}
@@ -249,7 +315,7 @@ export function AksiKlien({
         <AnimatePresence initial={false}>
           {events.map((e) => (
             <motion.div
-              key={`${e.id}-${e.totalRsvp}-${e.akuIkut}`}
+              key={e.id}
               layout
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

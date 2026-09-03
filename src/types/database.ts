@@ -54,7 +54,7 @@ export type FotoLaporan = {
 export type Notifikasi = {
   id: string;
   user_id: string;
-  jenis: "status" | "konfirmasi" | "poin" | "tugas";
+  jenis: "status" | "konfirmasi" | "poin" | "tugas" | "area";
   judul: string;
   isi: string | null;
   report_id: string | null;

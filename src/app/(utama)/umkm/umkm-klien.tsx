@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import {
@@ -90,7 +90,7 @@ function FormAjukanUsaha({
   selesai,
 }: {
   tutup: () => void;
-  selesai: () => void;
+  selesai: (baru?: Usaha) => void;
 }) {
   const [nama, setNama] = useState("");
   const [kategori, setKategori] = useState("kuliner");
@@ -109,21 +109,35 @@ function FormAjukanUsaha({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    const { error } = await supabase.from("umkm").insert({
-      nama,
-      kategori,
-      produk,
-      whatsapp,
-      alamat: alamat.trim() || null,
-      jam_buka: jam.trim() || null,
-      owner_id: user?.id ?? null,
-    });
+    const { data, error } = await supabase
+      .from("umkm")
+      .insert({
+        nama,
+        kategori,
+        produk,
+        whatsapp,
+        alamat: alamat.trim() || null,
+        jam_buka: jam.trim() || null,
+        owner_id: user?.id ?? null,
+      })
+      .select("id, nama, kategori, produk, whatsapp, alamat, jam_buka, verified")
+      .single();
     setProses(false);
     if (error) {
       setPesan(error.message);
       return;
     }
-    selesai();
+    selesai({
+      id: data.id,
+      nama: data.nama,
+      kategori: data.kategori,
+      produk: data.produk,
+      whatsapp: data.whatsapp,
+      alamat: data.alamat,
+      jamBuka: data.jam_buka,
+      verified: data.verified ?? false,
+      milikKu: true,
+    });
   }
 
   return (
@@ -207,9 +221,14 @@ function FormAjukanUsaha({
 export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
   const router = useRouter();
   const [daftar, setDaftar] = useState(awal);
+  const [prevAwal, setPrevAwal] = useState(awal);
+  if (awal !== prevAwal) {
+    setPrevAwal(awal);
+    setDaftar(awal);
+  }
   const [formBuka, setFormBuka] = useState(false);
 
-  const tampil = useMemo(() => daftar, [daftar]);
+  const tampil = daftar;
 
   return (
     <div>
@@ -246,7 +265,8 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
       <Modal terbuka={formBuka} tutup={() => setFormBuka(false)} judul="Daftarkan usaha">
         <FormAjukanUsaha
           tutup={() => setFormBuka(false)}
-          selesai={() => {
+          selesai={(baru) => {
+            if (baru) setDaftar((s) => [baru, ...s]);
             setFormBuka(false);
             router.refresh();
           }}

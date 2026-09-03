@@ -162,7 +162,11 @@ export function CommandPalette() {
         label: "Keluar dari akun",
         hint: "Akun",
         ikon: <LogOut size={16} />,
-        jalankan: () => createClient().auth.signOut(),
+        jalankan: async () => {
+          await createClient().auth.signOut();
+          router.push("/");
+          router.refresh();
+        },
       });
     }
     return dasar;

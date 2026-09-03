@@ -25,7 +25,16 @@ export default async function HalamanLaporan({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  if (!supabase) notFound();
+  if (!supabase) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <h1 className="font-display text-2xl font-bold">Database belum tersambung</h1>
+        <p className="mt-2 text-sm text-muted">
+          Atur env Supabase lalu jalankan schema.sql (lihat README).
+        </p>
+      </main>
+    );
+  }
 
   const { data: r } = await supabase
     .from("reports")
@@ -62,6 +71,9 @@ export default async function HalamanLaporan({
   }
 
   const kat = r.categories;
+  const profilPelapor = Array.isArray(r.profiles)
+    ? (r.profiles[0] ?? null)
+    : r.profiles;
   const sla = hitungSla(kat?.slug, r.created_at);
   const koordinat: [number, number] = [r.lng ?? 106.816666, r.lat ?? -6.2];
   const semuaFoto = (r.report_photos ?? []) as unknown as FotoLaporan[];
@@ -139,20 +151,20 @@ export default async function HalamanLaporan({
             </h1>
             <div className="mt-3 flex items-center gap-2.5">
               <Link
-                href={`/warga/${r.profiles?.username ?? ""}`}
+                href={`/warga/${profilPelapor?.username ?? ""}`}
                 className="flex items-center gap-2.5 transition hover:opacity-80"
               >
                 <Avatar
-                  nama={r.profiles?.nama_lengkap ?? "Warga"}
-                  url={r.profiles?.avatar_url}
+                  nama={profilPelapor?.nama_lengkap ?? "Warga"}
+                  url={profilPelapor?.avatar_url}
                   ukuran={32}
                 />
                 <div className="text-sm">
                   <p className="font-semibold">
-                    {r.profiles?.nama_lengkap ?? "Warga"}
+                    {profilPelapor?.nama_lengkap ?? "Warga"}
                   </p>
                   <p className="text-xs text-muted">
-                    @{r.profiles?.username}
+                    @{profilPelapor?.username}
                   </p>
                 </div>
               </Link>

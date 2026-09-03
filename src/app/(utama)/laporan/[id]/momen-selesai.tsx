@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import confetti from "canvas-confetti";
 import { motion } from "motion/react";
 import { PartyPopper } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -31,12 +30,15 @@ export function MomenSelesai({
           if (upd.id === reportId && upd.status === "selesai") {
             refSelesai.current = true;
             setBaru(true);
-            confetti({
-              particleCount: 160,
-              spread: 75,
-              origin: { y: 0.25 },
-              colors: ["#2e9e57", "#f59e0b", "#55bc77", "#fbbf24"],
-            });
+            void (async () => {
+              const { default: confetti } = await import("canvas-confetti");
+              confetti({
+                particleCount: 160,
+                spread: 75,
+                origin: { y: 0.25 },
+                colors: ["#2e9e57", "#f59e0b", "#55bc77", "#fbbf24"],
+              });
+            })();
           }
         }
       )

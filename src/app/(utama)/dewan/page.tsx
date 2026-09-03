@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
-import type { StatusKey } from "@/lib/constants";
 import { DewanClient } from "./dewan-klien";
 import { GerbangDewan } from "./gerbang-dewan";
 
@@ -61,13 +60,11 @@ export default async function HalamanDewan() {
     .from("profiles")
     .select("id", { count: "exact", head: true });
 
-  const hitungStatus: Record<string, number> = {};
   const hitungKategori = new Map<
     string,
     { nama: string; warna: string; jumlah: number }
   >();
   const trenMap = new Map<string, number>();
-  const panas: [number, number][] = [];
 
   for (let i = 13; i >= 0; i--) {
     const d = new Date();
@@ -76,7 +73,6 @@ export default async function HalamanDewan() {
   }
 
   for (const r of daftar) {
-    hitungStatus[r.status] = (hitungStatus[r.status] ?? 0) + 1;
     const slug = r.categories?.slug ?? "lainnya";
     const entri = hitungKategori.get(slug) ?? {
       nama: r.categories?.nama ?? "Lainnya",
@@ -88,17 +84,13 @@ export default async function HalamanDewan() {
 
     const tgl = r.created_at.slice(5, 10);
     if (trenMap.has(tgl)) trenMap.set(tgl, (trenMap.get(tgl) ?? 0) + 1);
-
-    if (r.lat != null && r.lng != null) panas.push([r.lat, r.lng]);
   }
 
   return (
     <DewanClient
       daftar={daftar}
-      hitungStatus={hitungStatus as Partial<Record<StatusKey, number>>}
       kategori={[...hitungKategori.values()]}
       tren={[...trenMap.entries()].map(([tanggal, jumlah]) => ({ tanggal, jumlah }))}
-      panas={panas}
       totalWarga={totalWarga ?? 0}
     />
   );

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { BarChart3, Check, Plus, Users, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/lib/use-user";
 import type { Poll } from "./page";
 import { Button, Card, Input, Label } from "@/components/ui";
 
@@ -50,7 +51,13 @@ function PersenBar({
 
 function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
   const router = useRouter();
+  const { user: pengguna } = useUser();
   const [data, setData] = useState(poll);
+  const [prevPoll, setPrevPoll] = useState(poll);
+  if (poll !== prevPoll) {
+    setPrevPoll(poll);
+    setData(poll);
+  }
   const [proses, setProses] = useState(false);
 
   useEffect(() => {
@@ -60,44 +67,79 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
       .on(
         "postgres_changes",
         {
-          event: "*",
+          event: "INSERT",
           schema: "public",
           table: "poll_votes",
           filter: `poll_id=eq.${poll.id}`,
         },
         (payload) => {
-          if (payload.eventType === "INSERT") {
-            const baru = payload.new as { opsi_idx: number };
-            setData((d) => {
-              if (d.totalSuara === poll.totalSuara) {
-                const perOpsi = [...d.perOpsi];
-                perOpsi[baru.opsi_idx] = (perOpsi[baru.opsi_idx] ?? 0) + 1;
-                return { ...d, perOpsi, totalSuara: d.totalSuara + 1 };
-              }
-              return d;
-            });
-          }
+          const baru = payload.new as { opsi_idx: number; user_id: string };
+          // Suara sendiri sudah dihitung optimistis di pilih()
+          if (baru.user_id && baru.user_id === pengguna?.id) return;
+          setData((d) => {
+            const perOpsi = [...d.perOpsi];
+            perOpsi[baru.opsi_idx] = (perOpsi[baru.opsi_idx] ?? 0) + 1;
+            return { ...d, perOpsi, totalSuara: d.totalSuara + 1 };
+          });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "poll_votes",
+          filter: `poll_id=eq.${poll.id}`,
+        },
+        (payload) => {
+          const lama = payload.old as { opsi_idx: number };
+          setData((d) => {
+            const perOpsi = [...d.perOpsi];
+            perOpsi[lama.opsi_idx] = Math.max(
+              0,
+              (perOpsi[lama.opsi_idx] ?? 0) - 1
+            );
+            return { ...d, perOpsi, totalSuara: Math.max(0, d.totalSuara - 1) };
+          });
         }
       )
       .subscribe();
     return () => {
       void supabase.removeChannel(ch);
     };
-  }, [poll]);
+  }, [poll.id, pengguna?.id]);
 
   async function pilih(idx: number) {
     if (!masuk || proses || data.pilihanKu !== null) return;
     setProses(true);
     const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setProses(false);
+      return;
+    }
+    setData((d) => {
+      const perOpsi = [...d.perOpsi];
+      perOpsi[idx] = (perOpsi[idx] ?? 0) + 1;
+      return { ...d, perOpsi, totalSuara: d.totalSuara + 1, pilihanKu: idx };
+    });
     const { error } = await supabase
       .from("poll_votes")
-      .insert({ poll_id: data.id, opsi_idx: idx });
-    if (!error) {
+      .insert({ poll_id: data.id, user_id: user.id, opsi_idx: idx });
+    if (error) {
       setData((d) => {
         const perOpsi = [...d.perOpsi];
-        perOpsi[idx] = (perOpsi[idx] ?? 0) + 1;
-        return { ...d, perOpsi, totalSuara: d.totalSuara + 1, pilihanKu: idx };
+        perOpsi[idx] = Math.max(0, (perOpsi[idx] ?? 0) - 1);
+        return {
+          ...d,
+          perOpsi,
+          totalSuara: Math.max(0, d.totalSuara - 1),
+          pilihanKu: null,
+        };
       });
+    } else {
       router.refresh();
     }
     setProses(false);
@@ -162,7 +204,7 @@ function FormBuatPolling({
   selesai,
 }: {
   tutup: () => void;
-  selesai: () => void;
+  selesai: (baru?: Poll) => void;
 }) {
   const [pertanyaan, setPertanyaan] = useState("");
   const [opsi, setOpsi] = useState(["", ""]);
@@ -178,16 +220,33 @@ function FormBuatPolling({
     }
     setProses(true);
     const supabase = createClient();
-    const { error } = await supabase.from("polls").insert({
-      pertanyaan,
-      opsi: bersih,
-    });
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { data, error } = await supabase
+      .from("polls")
+      .insert({
+        pertanyaan,
+        opsi: bersih,
+        created_by: user?.id ?? null,
+      })
+      .select("id, pertanyaan, opsi")
+      .single();
     setProses(false);
     if (error) {
       setPesan(error.message);
       return;
     }
-    selesai();
+    const baru: Poll = {
+      id: data.id,
+      pertanyaan: data.pertanyaan,
+      opsi: data.opsi as string[],
+      totalSuara: 0,
+      perOpsi: (data.opsi as string[]).map(() => 0),
+      pilihanKu: null,
+      buatanKu: true,
+    };
+    selesai(baru);
   }
 
   return (
@@ -267,6 +326,11 @@ export function PollingKlien({
 }) {
   const router = useRouter();
   const [polls, setPolls] = useState(awal);
+  const [prevAwal, setPrevAwal] = useState(awal);
+  if (awal !== prevAwal) {
+    setPrevAwal(awal);
+    setPolls(awal);
+  }
   const [formBuka, setFormBuka] = useState(false);
 
   return (
@@ -280,7 +344,8 @@ export function PollingKlien({
               </h2>
               <FormBuatPolling
                 tutup={() => setFormBuka(false)}
-                selesai={() => {
+                selesai={(baru) => {
+                  if (baru) setPolls((s) => [baru, ...s]);
                   setFormBuka(false);
                   router.refresh();
                 }}
@@ -298,7 +363,7 @@ export function PollingKlien({
         <AnimatePresence initial={false}>
           {polls.map((p) => (
             <motion.div
-              key={`${p.id}-${p.totalSuara}-${p.pilihanKu}`}
+              key={p.id}
               layout
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
