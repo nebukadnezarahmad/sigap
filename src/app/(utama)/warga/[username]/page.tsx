@@ -20,11 +20,16 @@ type LaporanRingkas = {
 
 function hitungStreak(tanggal: string[]) {
   const unik = new Set(tanggal.map((iso) => iso.slice(0, 10)));
-  const sekarang = Date.now();
-  return [...unik].filter((d) => {
-    const selisih = (sekarang - new Date(d + "T00:00:00").getTime()) / 86400000;
-    return selisih <= 7;
-  }).length;
+  let streak = 0;
+  const d = new Date();
+  // Mundur dari hari ini selama ada aktivitas tiap harinya
+  while (true) {
+    const kunci = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    if (!unik.has(kunci)) break;
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
 }
 
 export default async function HalamanWarga({

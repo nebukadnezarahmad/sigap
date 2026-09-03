@@ -8,12 +8,14 @@ import {
   FileText,
   LogOut,
   MapPin,
+  Menu,
   Moon,
   ShieldCheck,
   Sparkles,
   Sun,
   Trophy,
   UserRound,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -34,7 +36,7 @@ function ToggleTema() {
     <button
       onClick={ubah}
       aria-label={gelap ? "Mode terang" : "Mode gelap"}
-      className="flex size-10 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink"
+      className="flex size-10 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
     >
       <span className="hidden dark:block">
         <Sun size={18} />
@@ -51,6 +53,7 @@ export function SiteHeader() {
   const router = useRouter();
   const { user, profil } = useUser();
   const [modalDemoBuka, setModalDemoBuka] = useState(false);
+  const [menuBuka, setMenuBuka] = useState(false);
 
   const tautan = [
     { href: "/peta", label: "Peta" },
@@ -70,7 +73,10 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-[900] border-b garis-halus bg-paper/85 backdrop-blur-md print:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href="/" className="flex items-center gap-2">
+        <Link
+          href="/"
+          className="flex items-center gap-2 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+        >
           <span className="flex size-8 items-center justify-center rounded-xl bg-daun-600 text-white">
             <MapPin size={17} strokeWidth={2.5} />
           </span>
@@ -85,7 +91,7 @@ export function SiteHeader() {
               key={t.href}
               href={t.href}
               className={cn(
-                "rounded-full px-3.5 py-1.5 text-sm font-medium transition",
+                "rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
                 pathname.startsWith(t.href)
                   ? "bg-daun-600/10 text-daun-700 dark:text-daun-300 font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
@@ -98,7 +104,7 @@ export function SiteHeader() {
             <Link
               href="/dewan"
               className={cn(
-                "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition",
+                "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
                 pathname.startsWith("/dewan")
                   ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
@@ -111,12 +117,20 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <ToggleTema />
+          <button
+            onClick={() => setMenuBuka((v) => !v)}
+            aria-expanded={menuBuka}
+            aria-label={menuBuka ? "Tutup menu navigasi" : "Buka menu navigasi"}
+            className="flex size-10 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 md:hidden"
+          >
+            {menuBuka ? <X size={20} /> : <Menu size={20} />}
+          </button>
           {user && <NotifikasiBel />}
           {user ? (
             <div className="group relative">
               <button
                 aria-label="Menu akun"
-                className="flex items-center rounded-full transition hover:ring-4 hover:ring-daun-500/15"
+                className="flex items-center rounded-full transition hover:ring-4 hover:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
               >
                 <Avatar nama={profil?.nama_lengkap ?? "?"} url={profil?.avatar_url} ukuran={34} />
               </button>
@@ -192,6 +206,48 @@ export function SiteHeader() {
           )}
         </div>
       </div>
+
+      {menuBuka && (
+        <nav
+          className="border-t garis-halus px-4 py-3 md:hidden"
+          aria-label="Navigasi seluler"
+        >
+          <ul className="flex flex-col gap-1">
+            {tautan.map((t) => (
+              <li key={t.href}>
+                <Link
+                  href={t.href}
+                  onClick={() => setMenuBuka(false)}
+                  className={cn(
+                    "flex min-h-[44px] items-center rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                    pathname.startsWith(t.href)
+                      ? "bg-daun-600/10 text-daun-700 dark:text-daun-300 font-semibold"
+                      : "text-muted hover:bg-panel-2 hover:text-ink"
+                  )}
+                >
+                  {t.label}
+                </Link>
+              </li>
+            ))}
+            {profil?.role === "admin" && (
+              <li>
+                <Link
+                  href="/dewan"
+                  onClick={() => setMenuBuka(false)}
+                  className={cn(
+                    "flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                    pathname.startsWith("/dewan")
+                      ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
+                      : "text-muted hover:bg-panel-2 hover:text-ink"
+                  )}
+                >
+                  <ShieldCheck size={15} /> Dewan
+                </Link>
+              </li>
+            )}
+          </ul>
+        </nav>
+      )}
 
       <DemoAuthModal
         terbuka={modalDemoBuka}

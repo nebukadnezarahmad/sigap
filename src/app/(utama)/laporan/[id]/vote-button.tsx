@@ -43,19 +43,30 @@ export function VoteButton({
 
     const supabase = createClient();
     if (sudahVote) {
-      await supabase
+      setSudahVote(false);
+      setJumlah((n) => Math.max(0, n - 1));
+      const { error } = await supabase
         .from("votes")
         .delete()
         .eq("report_id", reportId)
         .eq("user_id", user.id);
-      setSudahVote(false);
-      setJumlah((n) => Math.max(0, n - 1));
+      if (error) {
+        setSudahVote(true);
+        setJumlah((n) => n + 1);
+      }
     } else {
-      await supabase
-        .from("votes")
-        .insert({ report_id: reportId, user_id: user.id });
       setSudahVote(true);
       setJumlah((n) => n + 1);
+      const { error } = await supabase
+        .from("votes")
+        .upsert(
+          { report_id: reportId, user_id: user.id },
+          { onConflict: "report_id,user_id" }
+        );
+      if (error) {
+        setSudahVote(false);
+        setJumlah((n) => Math.max(0, n - 1));
+      }
     }
     setProses(false);
   }

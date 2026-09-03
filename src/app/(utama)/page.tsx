@@ -118,7 +118,7 @@ export default async function Beranda() {
               <span className="text-daun-600 dark:text-daun-400">
                 terpetakan.
               </span>{" "}
-              <em className="font-light italic text-kunyit-500">
+              <em className="font-light italic text-kunyit-700 dark:text-kunyit-300">
                 Diselesaikan.
               </em>
             </h1>
@@ -168,6 +168,8 @@ export default async function Beranda() {
                   src="/images/lingkungan-permukiman.jpg"
                   alt="Kawasan permukiman kota hijau"
                   fill
+                  sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
+                  priority
                   className="object-cover"
                 />
               </div>
@@ -239,6 +241,7 @@ export default async function Beranda() {
                     src="/images/gotong-royong.jpg"
                     alt="Warga RT gotong royong dan verifikasi lingkungan"
                     fill
+                    sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
@@ -323,7 +326,7 @@ export default async function Beranda() {
         aria-label="Pilar solusi SIGAP"
       >
         <Terungkap>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-kunyit-600">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-kunyit-700 dark:text-kunyit-300">
             <Building2 size={15} /> Arsitektur Solusi Infinitera 2.0
           </div>
           <h2 className="mt-2 max-w-2xl font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
@@ -433,7 +436,7 @@ export default async function Beranda() {
         <div className="rounded-[2.5rem] border garis-halus bg-panel p-8 sm:p-12 shadow-sm">
           <div className="grid items-center gap-10 lg:grid-cols-12">
             <div className="lg:col-span-7">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-kunyit-600">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-kunyit-700 dark:text-kunyit-300">
                 Lembar Fakta Permukiman
               </p>
               <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
@@ -456,6 +459,7 @@ export default async function Beranda() {
                   src="/images/kota-sdg11.jpg"
                   alt="Koridor transportasi dan ruang hijau perkotaan berkelanjutan SDG 11"
                   fill
+                  sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />

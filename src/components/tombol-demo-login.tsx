@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Crown, UserRound, Loader2, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { isTujuanAman } from "@/lib/utils";
 import { Modal } from "@/components/modal";
 
 export const AKUN_DEMO = [
@@ -47,6 +48,7 @@ export function PilihanAkunDemo({
   const router = useRouter();
   const [loadingEmail, setLoadingEmail] = useState<string | null>(null);
   const [pesanGalat, setPesanGalat] = useState<string | null>(null);
+  const demoAktif = process.env.NEXT_PUBLIC_DEMO_ENABLED !== "false";
 
   async function handleLogin(email: string) {
     setLoadingEmail(email);
@@ -59,20 +61,28 @@ export function PilihanAkunDemo({
       });
 
       if (error) {
-        setPesanGalat(error.message || "Gagal masuk dengan akun demo.");
+        setPesanGalat("Gagal masuk dengan akun demo. Coba lagi.");
         setLoadingEmail(null);
         return;
       }
 
       onSelesai?.();
       if (tujuan) {
-        router.push(tujuan);
+        router.push(isTujuanAman(tujuan) ? tujuan : "/peta");
       }
       router.refresh();
     } catch {
       setPesanGalat("Terjadi kesalahan saat memproses login.");
       setLoadingEmail(null);
     }
+  }
+
+  if (!demoAktif) {
+    return (
+      <p className="rounded-xl bg-panel-2/60 px-3 py-2 text-sm text-muted">
+        Mode demo nonaktif
+      </p>
+    );
   }
 
   const akunTampil = hanyaAdmin
@@ -203,6 +213,7 @@ export function DemoAuthModal({
   tujuan?: string;
 }) {
   const router = useRouter();
+  const tujuanAman = isTujuanAman(tujuan) ? tujuan : undefined;
 
   return (
     <Modal terbuka={terbuka} tutup={tutup} judul={judul} lebar="max-w-lg">
@@ -216,7 +227,7 @@ export function DemoAuthModal({
               type="button"
               onClick={() => {
                 tutup();
-                router.push(`/masuk${tujuan ? `?next=${encodeURIComponent(tujuan)}` : ""}`);
+                router.push(`/masuk${tujuanAman ? `?next=${encodeURIComponent(tujuanAman)}` : ""}`);
               }}
               className="font-semibold text-daun-700 hover:underline dark:text-daun-300"
             >

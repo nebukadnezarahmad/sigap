@@ -77,19 +77,32 @@ export function AdminPanel({
         .eq("id", reportId);
       if (error) throw new Error(error.message);
 
-      if (catatan.trim()) {
-        const { data: ev } = await supabase
-          .from("report_events")
-          .select("id")
-          .eq("report_id", reportId)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .single();
-        if (ev) {
-          await supabase
+      try {
+        if (status !== statusAwal || catatan.trim()) {
+          const { error: evErr } = await supabase
             .from("report_events")
-            .update({ catatan: catatan.trim() })
-            .eq("id", ev.id);
+            .insert({
+              report_id: reportId,
+              status,
+              catatan: catatan.trim() || null,
+            });
+          if (evErr) throw evErr;
+        }
+      } catch {
+        if (catatan.trim()) {
+          const { data: ev } = await supabase
+            .from("report_events")
+            .select("id")
+            .eq("report_id", reportId)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
+          if (ev) {
+            await supabase
+              .from("report_events")
+              .update({ catatan: catatan.trim() })
+              .eq("id", ev.id);
+          }
         }
       }
 

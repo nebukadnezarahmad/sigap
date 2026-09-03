@@ -34,9 +34,19 @@ export function useUser() {
     ambil();
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (batal) return;
       setUser(session?.user ?? null);
-      if (!session?.user) setProfil(null);
+      if (!session?.user) {
+        setProfil(null);
+      } else {
+        const { data: p } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        if (!batal) setProfil(p);
+      }
     });
 
     return () => {

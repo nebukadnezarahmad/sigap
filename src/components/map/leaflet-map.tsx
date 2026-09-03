@@ -2,6 +2,7 @@
 
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { useEffect, useRef } from "react";
 import type * as LeafletNS from "leaflet";
 import { cn } from "@/lib/utils";
@@ -89,6 +90,10 @@ export function LeafletMap({
         maxZoom: 19,
       }).addTo(peta);
 
+      peta.createPane("panas");
+      const panePanas = peta.getPane("panas");
+      if (panePanas) panePanas.style.zIndex = "350";
+
       if (mode === "pilih") {
         peta.on("click", (e: LeafletNS.LeafletMouseEvent) => {
           cbRef.current.onPilih?.(e.latlng.lat, e.latlng.lng);
@@ -128,8 +133,11 @@ export function LeafletMap({
             radius: 34,
             blur: 24,
             maxZoom: 16,
+            pane: "panas",
             gradient: { 0.2: "#fbbf24", 0.55: "#f97316", 0.9: "#dc2626" },
           }).addTo(peta);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (refPanas.current as any).bringToBack?.();
         }
       }
 
@@ -145,7 +153,10 @@ export function LeafletMap({
         titik.forEach((t) => {
           const m = L.marker([t.lat, t.lng], {
             icon: buatIkon(L, t.warna, t.slug, t.id === terpilih),
-          }).bindTooltip(t.judul, { direction: "top", offset: [0, -22] });
+          }).bindTooltip(escapeHtml(t.judul), {
+            direction: "top",
+            offset: [0, -22],
+          });
           m.on("click", () => cbRef.current.onKlikTitik?.(t.id));
           cluster.addLayer(m);
         });
@@ -180,6 +191,20 @@ export function LeafletMap({
     }
   }, [gelap]);
 
+  const pusatLat = pusat?.[0];
+  const pusatLng = pusat?.[1];
+
+  // Geser tampilan saat `pusat` berubah tanpa mengulang fitBounds.
+  useEffect(() => {
+    if (
+      refPeta.current &&
+      pusatLat !== undefined &&
+      pusatLng !== undefined
+    ) {
+      refPeta.current.setView([pusatLat, pusatLng], refPeta.current.getZoom());
+    }
+  }, [pusatLat, pusatLng]);
+
   useEffect(() => {
     return () => {
       refPengamat.current?.disconnect();
@@ -194,17 +219,37 @@ export function LeafletMap({
   }, []);
 
   return (
-    <div
-      ref={refDiv}
-      className={cn(
-        "z-0 h-full w-full",
-        mode === "pilih" && "cursor-crosshair",
-        className
-      )}
-      role="application"
-      aria-label="Peta interaktif"
-    />
+    <>
+      <div
+        ref={refDiv}
+        className={cn(
+          "z-0 h-full w-full",
+          mode === "pilih" && "cursor-crosshair",
+          className
+        )}
+        role="region"
+        aria-label="Peta interaktif"
+      />
+      <ul className="sr-only">
+        {titik.slice(0, 30).map((t) => (
+          <li key={t.id}>{t.judul}</li>
+        ))}
+      </ul>
+    </>
   );
+}
+
+function escapeHtml(teks: string) {
+  return teks
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function warnaAman(warna: string) {
+  return /^#[0-9a-fA-F]{6}$/.test(warna) ? warna : "#2e9e57";
 }
 
 function buatIkon(
@@ -213,10 +258,11 @@ function buatIkon(
   slug: string,
   aktif?: boolean
 ) {
+  const aman = warnaAman(warna);
   const ikon = svgUriKategori(slug, "#ffffff", 15);
   return L.divIcon({
     className: "",
-    html: `<span class="pin-sigap${aktif ? " pin-aktif" : ""}" style="--pin:${warna}"><img src="${ikon}" width="15" height="15" alt="" class="pin-ikon" /></span>`,
+    html: `<span class="pin-sigap${aktif ? " pin-aktif" : ""}" style="--pin:${aman}"><img src="${ikon}" width="15" height="15" alt="" class="pin-ikon" /></span>`,
     iconSize: [34, 34],
     iconAnchor: [17, 34],
     tooltipAnchor: [0, -26],

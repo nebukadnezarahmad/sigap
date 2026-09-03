@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    id: "/",
     name: "SIGAP — Lapor. Serentak. Selesai.",
     short_name: "SIGAP",
     description:

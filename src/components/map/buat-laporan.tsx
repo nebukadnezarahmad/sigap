@@ -94,11 +94,13 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           .select("id, judul, lat, lng, status, category_id, votes(count)")
           .in("status", ["baru", "diverifikasi", "dikerjakan", "menunggu_verifikasi"])
           .not("lat", "is", null)
-          .not("lng", "is", null);
+          .not("lng", "is", null)
+          .limit(50);
 
         if (semua && aktif) {
           const cocok: LaporanMirip[] = [];
           for (const r of semua) {
+            if (kat?.id && r.category_id !== kat.id) continue;
             if (r.lat == null || r.lng == null) continue;
             const jarak = hitungJarakMeter(posisi, { lat: r.lat, lng: r.lng });
             if (jarak <= 100) {
@@ -189,27 +191,39 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       return;
     }
 
+    if (
+      posisi.lat < -90 ||
+      posisi.lat > 90 ||
+      posisi.lng < -180 ||
+      posisi.lng > 180
+    ) {
+      setPesan("Koordinat di luar jangkauan (lat -90..90, lng -180..180).");
+      return;
+    }
+
     setProses(true);
     try {
       const supabase = createClient();
-      let foto_url: string | null = null;
 
       for (const f of files) {
         if (f.size > 5 * 1024 * 1024) throw new Error("Setiap foto maksimal 5 MB.");
       }
 
-      if (files.length > 0) {
-        const pertama = files[0];
-        const path0 = `${pelapor.id}/${Date.now()}-${pertama.name.replace(/[^\w.-]/g, "_")}`;
+      // Unggah sekali per file langsung ke report_photos;
+      // foto pertama juga dipakai sebagai foto_url (satu upload, dua referensi).
+      const urls: string[] = [];
+      for (const [i, f] of files.entries()) {
+        const path = `${pelapor.id}/${Date.now()}-${i}-${f.name.replace(/[^\w.-]/g, "_")}`;
         const { error: upErr } = await supabase.storage
           .from("foto-laporan")
-          .upload(path0, pertama, { contentType: pertama.type });
+          .upload(path, f, { contentType: f.type });
         if (upErr) throw new Error(`Gagal unggah foto: ${upErr.message}`);
         const { data: pub } = supabase.storage
           .from("foto-laporan")
-          .getPublicUrl(path0);
-        foto_url = pub.publicUrl;
+          .getPublicUrl(path);
+        urls.push(pub.publicUrl);
       }
+      const foto_url: string | null = urls[0] ?? null;
 
       const { data: kat } = await supabase
         .from("categories")
@@ -217,51 +231,29 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         .eq("slug", slugKategori)
         .single();
 
-      const { error } = await supabase.from("reports").insert({
-        user_id: pelapor.id,
-        category_id: kat?.id ?? null,
-        judul,
-        deskripsi,
-        alamat_teks: alamat || null,
-        foto_url,
-        status: "baru",
-        lokasi: `SRID=4326;POINT(${posisi.lng} ${posisi.lat})`,
-      });
+      const { data: inserted, error } = await supabase
+        .from("reports")
+        .insert({
+          user_id: pelapor.id,
+          category_id: kat?.id ?? null,
+          judul,
+          deskripsi,
+          alamat_teks: alamat || null,
+          foto_url,
+          status: "baru",
+          lokasi: `SRID=4326;POINT(${posisi.lng} ${posisi.lat})`,
+        })
+        .select("id")
+        .single();
       if (error) throw new Error(error.message);
 
-      if (files.length > 0) {
-        const { data: laporanBaru } = await supabase
-          .from("reports")
-          .select("id")
-          .eq("user_id", pelapor.id)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .single();
-        if (laporanBaru) {
-          const baris = await Promise.all(
-            files.map(async (f, i) => {
-              const path = `${pelapor.id}/${Date.now()}-${i}-${f.name.replace(/[^\w.-]/g, "_")}`;
-              const { error: upErr } = await supabase.storage
-                .from("foto-laporan")
-                .upload(path, f, { contentType: f.type });
-              if (upErr) return null;
-              const { data: pub } = supabase.storage
-                .from("foto-laporan")
-                .getPublicUrl(path);
-              return {
-                report_id: laporanBaru.id,
-                url: pub.publicUrl,
-                fase: "sebelum",
-              };
-            })
-          );
-          const valid = baris.filter(
-            (b): b is { report_id: string; url: string; fase: string } => !!b
-          );
-          if (valid.length > 0) {
-            await supabase.from("report_photos").insert(valid);
-          }
-        }
+      if (urls.length > 0 && inserted) {
+        const baris = urls.map((url) => ({
+          report_id: inserted.id,
+          url,
+          fase: "sebelum",
+        }));
+        await supabase.from("report_photos").insert(baris);
       }
 
       selesai();

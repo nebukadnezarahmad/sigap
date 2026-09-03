@@ -34,3 +34,8 @@ export function inisial(nama: string) {
     .join("")
     .toUpperCase();
 }
+
+export function isTujuanAman(t: string | null | undefined): boolean {
+  if (!t) return false;
+  return t.startsWith("/") && !t.startsWith("//") && !t.includes("://");
+}

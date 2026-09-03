@@ -43,27 +43,48 @@ export function KonfirmasiButton({
 
     try {
       if (sudah) {
-        await supabase
+        const { error } = await supabase
           .from("confirmations")
           .delete()
           .eq("report_id", reportId)
           .eq("user_id", user.id);
+        if (error) throw error;
         setSudah(false);
         setJumlah((n) => Math.max(0, n - 1));
       } else {
-        await supabase
+        // Jalur utama: RPC atomik (fallback ke cara lama jika RPC belum ada)
+        try {
+          const { data, error } = await supabase.rpc("konfirmasi_laporan", {
+            p_report_id: reportId,
+          });
+          if (error) throw error;
+          const hasil = data as { jumlah?: number; selesai?: boolean } | null;
+          setSudah(true);
+          setJumlah(hasil?.jumlah ?? jumlah + 1);
+          if (hasil?.selesai) {
+            setPesan("✓ Laporan telah diverifikasi oleh 2 warga dan resmi berstatus Selesai!");
+          }
+          router.refresh();
+          return;
+        } catch {
+          /* RPC belum tersedia — lanjut ke cara lama */
+        }
+
+        const { error: insErr } = await supabase
           .from("confirmations")
           .insert({ report_id: reportId, user_id: user.id });
+        if (insErr) throw insErr;
         const baruJml = jumlah + 1;
         setSudah(true);
         setJumlah(baruJml);
 
         // Jika status menunggu_verifikasi dan konfirmasi mencapai 2, selesaikan resmi
         if (status === "menunggu_verifikasi" && baruJml >= 2) {
-          await supabase
+          const { error: updErr } = await supabase
             .from("reports")
             .update({ status: "selesai" })
             .eq("id", reportId);
+          if (updErr) throw updErr;
           setPesan("✓ Laporan telah diverifikasi oleh 2 warga dan resmi berstatus Selesai!");
           router.refresh();
         }
@@ -84,16 +105,18 @@ export function KonfirmasiButton({
     setProses(true);
     try {
       const supabase = createClient();
-      await supabase
+      const { error: updErr } = await supabase
         .from("reports")
         .update({ status: "dikerjakan" })
         .eq("id", reportId);
+      if (updErr) throw updErr;
 
-      await supabase.from("comments").insert({
+      const { error: comErr } = await supabase.from("comments").insert({
         report_id: reportId,
         user_id: user.id,
         isi: "⚠️ Verifikasi penutupan ditolak warga: Masalah belum sepenuhnya terselesaikan di lapangan.",
       });
+      if (comErr) throw comErr;
 
       setPesan("Laporan dikembalikan ke status 'Dikerjakan' untuk ditindaklanjuti ulang.");
       router.refresh();

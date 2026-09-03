@@ -30,7 +30,11 @@ export default async function HalamanLaporanSaya() {
     .order("created_at", { ascending: false })
     .limit(100);
 
-  const daftar = (milik ?? []) as unknown as LaporanDenganRelasi[];
+  const daftar = (milik ?? []).map((r) => ({
+    ...r,
+    vote_count: r.votes?.[0]?.count ?? 0,
+    comment_count: r.comments?.[0]?.count ?? 0,
+  })) as unknown as LaporanDenganRelasi[];
 
   const { data: areaRaw } = await supabase
     .from("area_follows")

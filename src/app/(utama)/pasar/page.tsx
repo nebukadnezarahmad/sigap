@@ -78,7 +78,7 @@ export default async function HalamanPasar() {
         </p>
       </header>
 
-      <PasarKlien awal={barang} masuk={!!user} userId={user?.id ?? null} />
+      <PasarKlien awal={barang} masuk={!!user} />
     </main>
   );
 }

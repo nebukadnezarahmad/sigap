@@ -27,6 +27,7 @@ select r.user_id,
        now() - interval '3 hours'
 from public.reports r
 where r.status <> 'baru'
+order by r.created_at desc
 limit 4;
 
 insert into public.notifications (user_id, jenis, judul, isi, report_id, dibaca, created_at)

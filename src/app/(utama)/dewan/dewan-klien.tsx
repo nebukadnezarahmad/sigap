@@ -11,18 +11,41 @@ import {
   ThumbsUp,
   Users,
 } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+const Area = dynamic(
+  () => import("recharts").then((m) => m.Area),
+  { ssr: false }
+);
+const AreaChart = dynamic(
+  () => import("recharts").then((m) => m.AreaChart),
+  { ssr: false }
+);
+const Bar = dynamic(() => import("recharts").then((m) => m.Bar), {
+  ssr: false,
+});
+const BarChart = dynamic(
+  () => import("recharts").then((m) => m.BarChart),
+  { ssr: false }
+);
+const CartesianGrid = dynamic(
+  () => import("recharts").then((m) => m.CartesianGrid),
+  { ssr: false }
+);
+const Cell = dynamic(() => import("recharts").then((m) => m.Cell), {
+  ssr: false,
+});
+const ResponsiveContainer = dynamic(
+  () => import("recharts").then((m) => m.ResponsiveContainer),
+  { ssr: false }
+);
+const Tooltip = dynamic(() => import("recharts").then((m) => m.Tooltip), {
+  ssr: false,
+});
+const XAxis = dynamic(() => import("recharts").then((m) => m.XAxis), {
+  ssr: false,
+});
+const YAxis = dynamic(() => import("recharts").then((m) => m.YAxis), {
+  ssr: false,
+});
 import { motion } from "motion/react";
 import { STATUS, hitungSla, type StatusKey } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
@@ -38,17 +61,13 @@ const LeafletMap = dynamic(
 
 export function DewanClient({
   daftar: awal,
-  hitungStatus,
   kategori,
   tren,
-  panas,
   totalWarga,
 }: {
   daftar: LaporanDenganRelasi[];
-  hitungStatus: Partial<Record<StatusKey, number>>;
   kategori: { nama: string; warna: string; jumlah: number }[];
   tren: { tanggal: string; jumlah: number }[];
-  panas: [number, number][];
   totalWarga: number;
 }) {
   const [daftar, setDaftar] = useState(awal);
@@ -128,20 +147,42 @@ export function DewanClient({
   }
 
   async function terapkanBulk() {
-    if (dipilih.size === 0) return;
+    if (dipilih.size === 0 || bulkProses) return;
+    const ids = [...dipilih];
+    if (
+      !window.confirm(
+        `Ubah status ${ids.length} laporan menjadi "${STATUS[bulkStatus].label}"?`
+      )
+    )
+      return;
     setBulkProses(true);
     const supabase = createClient();
-    await supabase
-      .from("reports")
-      .update({ status: bulkStatus })
-      .in("id", [...dipilih]);
-    setDaftar((arr) =>
-      arr.map((r) =>
-        dipilih.has(r.id) ? { ...r, status: bulkStatus } : r
-      )
-    );
-    setDipilih(new Set());
-    setBulkProses(false);
+    try {
+      const setId = new Set(ids);
+      for (let i = 0; i < ids.length; i += 50) {
+        const chunk = ids.slice(i, i + 50);
+        const { error } = await supabase
+          .from("reports")
+          .update({ status: bulkStatus })
+          .in("id", chunk);
+        if (error) throw error;
+        try {
+          await supabase.from("report_events").insert(
+            chunk.map((id) => ({ report_id: id, status: bulkStatus }))
+          );
+        } catch {
+          /* trigger DB sudah mencatat perubahan status; abaikan */
+        }
+      }
+      setDaftar((arr) =>
+        arr.map((r) => (setId.has(r.id) ? { ...r, status: bulkStatus } : r ))
+      );
+      setDipilih(new Set());
+    } catch {
+      /* biarkan daftar apa adanya; pengguna bisa coba lagi */
+    } finally {
+      setBulkProses(false);
+    }
   }
 
   function eksporCsv() {
@@ -180,13 +221,19 @@ export function DewanClient({
     URL.revokeObjectURL(a.href);
   }
 
-  const selesai = hitungStatus.selesai ?? 0;
+  const hitungLive = useMemo(() => {
+    const h: Partial<Record<StatusKey, number>> = {};
+    for (const r of daftar) h[r.status as StatusKey] = (h[r.status as StatusKey] ?? 0) + 1;
+    return h;
+  }, [daftar]);
+
+  const selesai = hitungLive.selesai ?? 0;
   const total = daftar.length;
   const aktif =
-    (hitungStatus.baru ?? 0) +
-    (hitungStatus.diverifikasi ?? 0) +
-    (hitungStatus.dikerjakan ?? 0) +
-    (hitungStatus.menunggu_verifikasi ?? 0);
+    (hitungLive.baru ?? 0) +
+    (hitungLive.diverifikasi ?? 0) +
+    (hitungLive.dikerjakan ?? 0) +
+    (hitungLive.menunggu_verifikasi ?? 0);
   const lewatSla = daftar.filter(
     (r) =>
       hitungSla(r.categories?.slug, r.created_at).lewatSla &&
@@ -197,14 +244,24 @@ export function DewanClient({
     () =>
       daftar
         .filter((r) => filterStatus === "semua" || r.status === filterStatus)
+        .filter((r) => r.lat != null && r.lng != null)
         .map((r) => ({
           id: r.id,
-          lat: r.lat ?? 0,
-          lng: r.lng ?? 0,
+          lat: r.lat as number,
+          lng: r.lng as number,
           warna: r.categories?.warna ?? "#64748b",
           slug: r.categories?.slug ?? "lainnya",
-          judul: `${r.judul} · ${STATUS[r.status].label}`,
+          judul: `${r.judul} · ${STATUS[r.status as StatusKey].label}`,
         })),
+    [daftar, filterStatus]
+  );
+
+  const panasLive = useMemo(
+    () =>
+      daftar
+        .filter((r) => filterStatus === "semua" || r.status === filterStatus)
+        .filter((r) => r.lat != null && r.lng != null)
+        .map((r) => [r.lat as number, r.lng as number] as [number, number]),
     [daftar, filterStatus]
   );
 
@@ -486,7 +543,7 @@ export function DewanClient({
           <div className="h-[480px] flex-1">
             <LeafletMap
               titik={titikPeta}
-              panas={heatAktif ? panas : undefined}
+              panas={heatAktif ? panasLive : undefined}
             />
           </div>
         </Card>

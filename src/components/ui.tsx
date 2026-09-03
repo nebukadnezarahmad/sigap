@@ -32,13 +32,18 @@ export function Button({
 }
 
 export function Card({
+  variant = "datar",
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.HTMLAttributes<HTMLDivElement> & {
+  variant?: "datar" | "melayang";
+}) {
   return (
     <div
       className={cn(
-        "rounded-xl border garis-halus bg-panel shadow-[0_1px_2px_rgb(23_67_42/0.05),0_6px_20px_-10px_rgb(23_67_42/0.1)]",
+        "rounded-xl border garis-halus bg-panel",
+        variant === "melayang" &&
+          "shadow-[0_1px_2px_rgb(23_67_42/0.05),0_6px_20px_-10px_rgb(23_67_42/0.1)]",
         className
       )}
       {...props}
@@ -53,7 +58,7 @@ export function Input({
   return (
     <input
       className={cn(
-        "w-full rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15",
+        "w-full rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
         className
       )}
       {...props}
@@ -68,7 +73,7 @@ export function Textarea({
   return (
     <textarea
       className={cn(
-        "w-full rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15",
+        "w-full rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
         className
       )}
       {...props}
@@ -84,7 +89,7 @@ export function Select({
   return (
     <select
       className={cn(
-        "w-full appearance-none rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15",
+        "w-full appearance-none rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
         className
       )}
       {...props}

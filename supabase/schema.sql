@@ -14,6 +14,8 @@ create extension if not exists pgcrypto;
 create type public.report_status as enum
   ('baru', 'diverifikasi', 'dikerjakan', 'selesai', 'ditolak');
 
+alter type public.report_status add value if not exists 'menunggu_verifikasi';
+
 -- ------------------------------------------------------------
 -- 2. Profiles
 -- ------------------------------------------------------------
@@ -333,12 +335,15 @@ as $$
 $$;
 
 -- ---------- profiles ----------
+drop policy if exists "profiles_select_public" on public.profiles;
 create policy "profiles_select_public" on public.profiles
   for select using (true);
 
+drop policy if exists "profiles_insert_self" on public.profiles;
 create policy "profiles_insert_self" on public.profiles
   for insert with check (auth.uid() = id);
 
+drop policy if exists "profiles_update_self" on public.profiles;
 create policy "profiles_update_self" on public.profiles
   for update using (auth.uid() = id) with check (auth.uid() = id);
 
@@ -366,20 +371,25 @@ create trigger trg_guard_role_change
   for each row execute function public.guard_role_change();
 
 -- ---------- categories ----------
+drop policy if exists "categories_select_public" on public.categories;
 create policy "categories_select_public" on public.categories
   for select using (true);
 -- tanpa policy tulis: kategori hanya dikelola service role
 
 -- ---------- reports ----------
+drop policy if exists "reports_select_public" on public.reports;
 create policy "reports_select_public" on public.reports
   for select using (true);
 
+drop policy if exists "reports_insert_own" on public.reports;
 create policy "reports_insert_own" on public.reports
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "reports_delete_own_new" on public.reports;
 create policy "reports_delete_own_new" on public.reports
   for delete using (auth.uid() = user_id and status = 'baru');
 
+drop policy if exists "reports_update_admin_or_owner_new" on public.reports;
 create policy "reports_update_admin_or_owner_new" on public.reports
   for update using (
     public.is_admin()
@@ -420,31 +430,39 @@ create trigger trg_guard_report_owner_edit
   for each row execute function public.guard_report_owner_edit();
 
 -- ---------- comments ----------
+drop policy if exists "comments_select_public" on public.comments;
 create policy "comments_select_public" on public.comments
   for select using (true);
 
+drop policy if exists "comments_insert_own" on public.comments;
 create policy "comments_insert_own" on public.comments
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "comments_delete_own" on public.comments;
 create policy "comments_delete_own" on public.comments
   for delete using (auth.uid() = user_id);
 
 -- ---------- votes ----------
+drop policy if exists "votes_select_public" on public.votes;
 create policy "votes_select_public" on public.votes
   for select using (true);
 
+drop policy if exists "votes_insert_own" on public.votes;
 create policy "votes_insert_own" on public.votes
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "votes_delete_own" on public.votes;
 create policy "votes_delete_own" on public.votes
   for delete using (auth.uid() = user_id);
 
 -- ---------- user_badges ----------
+drop policy if exists "user_badges_select_public" on public.user_badges;
 create policy "user_badges_select_public" on public.user_badges
   for select using (true);
 -- tulis hanya lewat trigger server-side (SECURITY DEFINER)
 
 -- ---------- report_events ----------
+drop policy if exists "report_events_select_public" on public.report_events;
 create policy "report_events_select_public" on public.report_events
   for select using (true);
 -- tulis hanya lewat trigger server-side (SECURITY DEFINER)
@@ -456,9 +474,11 @@ insert into storage.buckets (id, name, public)
 values ('foto-laporan', 'foto-laporan', true)
 on conflict (id) do nothing;
 
+drop policy if exists "foto_laporan_select_public" on storage.objects;
 create policy "foto_laporan_select_public" on storage.objects
   for select using (bucket_id = 'foto-laporan');
 
+drop policy if exists "foto_laporan_insert_authenticated" on storage.objects;
 create policy "foto_laporan_insert_authenticated" on storage.objects
   for insert to authenticated with check (
     bucket_id = 'foto-laporan'
@@ -466,6 +486,7 @@ create policy "foto_laporan_insert_authenticated" on storage.objects
     and lower((storage.extension(name))) in ('png','jpg','jpeg','webp','gif')
   );
 
+drop policy if exists "foto_laporan_update_owner" on storage.objects;
 create policy "foto_laporan_update_owner" on storage.objects
   for update to authenticated
   using (
@@ -479,6 +500,7 @@ create policy "foto_laporan_update_owner" on storage.objects
     and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "foto_laporan_delete_owner" on storage.objects;
 create policy "foto_laporan_delete_owner" on storage.objects
   for delete to authenticated
   using (
@@ -516,7 +538,7 @@ end $$;
 -- (disalin dari migrasi-v2.sql; lihat berkas itu)
 -- ============================================================
 
-  add column if not exists assigned_at timestamptz;
+alter table public.reports add column if not exists assigned_at timestamptz;
 
 create table if not exists public.report_photos (
   id         uuid primary key default gen_random_uuid(),
@@ -551,9 +573,11 @@ alter table public.report_photos ENABLE ROW LEVEL SECURITY;
 alter table public.confirmations  ENABLE ROW LEVEL SECURITY;
 alter table public.notifications  ENABLE ROW LEVEL SECURITY;
 
+drop policy if exists "photos_select_public" on public.report_photos;
 create policy "photos_select_public" on public.report_photos
   for select using (true);
 
+drop policy if exists "photos_insert_owner_or_admin" on public.report_photos;
 create policy "photos_insert_owner_or_admin" on public.report_photos
   for insert with check (
     public.is_admin()
@@ -563,6 +587,7 @@ create policy "photos_insert_owner_or_admin" on public.report_photos
     )
   );
 
+drop policy if exists "photos_delete_owner_or_admin" on public.report_photos;
 create policy "photos_delete_owner_or_admin" on public.report_photos
   for delete using (
     public.is_admin()
@@ -572,21 +597,26 @@ create policy "photos_delete_owner_or_admin" on public.report_photos
     )
   );
 
+drop policy if exists "confirm_select_public" on public.confirmations;
 create policy "confirm_select_public" on public.confirmations
   for select using (true);
 
+drop policy if exists "confirm_insert_own" on public.confirmations;
 create policy "confirm_insert_own" on public.confirmations
   for insert with check (
     auth.uid() = user_id
     and user_id <> (select user_id from public.reports where id = report_id)
   );
 
+drop policy if exists "confirm_delete_own" on public.confirmations;
 create policy "confirm_delete_own" on public.confirmations
   for delete using (auth.uid() = user_id);
 
+drop policy if exists "notif_select_own" on public.notifications;
 create policy "notif_select_own" on public.notifications
   for select using (auth.uid() = user_id);
 
+drop policy if exists "notif_update_own" on public.notifications;
 create policy "notif_update_own" on public.notifications
   for update using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
@@ -765,6 +795,7 @@ create trigger trg_batas_lapor
   execute function public.batas_lapor();
 
 -- 3. Admin boleh melengkapi catatan pada event terbaru
+drop policy if exists "events_update_admin" on public.report_events;
 create policy "events_update_admin" on public.report_events
   for update using (public.is_admin())
   with check (public.is_admin());
@@ -794,13 +825,18 @@ create table if not exists public.poll_votes (
 alter table public.polls ENABLE ROW LEVEL SECURITY;
 alter table public.poll_votes ENABLE ROW LEVEL SECURITY;
 
+drop policy if exists "polls_select_public" on public.polls;
 create policy "polls_select_public" on public.polls for select using (true);
+drop policy if exists "polls_insert_admin" on public.polls;
 create policy "polls_insert_admin" on public.polls for insert
   with check (public.is_admin());
+drop policy if exists "polls_update_admin" on public.polls;
 create policy "polls_update_admin" on public.polls for update
   using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "poll_votes_select_public" on public.poll_votes;
 create policy "poll_votes_select_public" on public.poll_votes for select using (true);
+drop policy if exists "poll_votes_insert_own" on public.poll_votes;
 create policy "poll_votes_insert_own" on public.poll_votes for insert
   with check (
     auth.uid() = user_id
@@ -826,9 +862,12 @@ create index if not exists facilities_lokasi_idx on public.facilities using gist
 
 alter table public.facilities ENABLE ROW LEVEL SECURITY;
 
+drop policy if exists "facilities_select_public" on public.facilities;
 create policy "facilities_select_public" on public.facilities for select using (true);
+drop policy if exists "facilities_insert_auth" on public.facilities;
 create policy "facilities_insert_auth" on public.facilities for insert
   with check (auth.uid() = user_id);
+drop policy if exists "facilities_delete_owner" on public.facilities;
 create policy "facilities_delete_owner" on public.facilities for delete
   using (auth.uid() = user_id or public.is_admin());
 
@@ -853,15 +892,21 @@ create table if not exists public.event_rsvp (
 alter table public.events ENABLE ROW LEVEL SECURITY;
 alter table public.event_rsvp ENABLE ROW LEVEL SECURITY;
 
+drop policy if exists "events_select_public" on public.events;
 create policy "events_select_public" on public.events for select using (true);
+drop policy if exists "events_insert_auth" on public.events;
 create policy "events_insert_auth" on public.events for insert
   with check (auth.uid() = user_id);
+drop policy if exists "events_delete_owner" on public.events;
 create policy "events_delete_owner" on public.events for delete
   using (auth.uid() = user_id or public.is_admin());
 
+drop policy if exists "rsvp_select_public" on public.event_rsvp;
 create policy "rsvp_select_public" on public.event_rsvp for select using (true);
+drop policy if exists "rsvp_insert_own" on public.event_rsvp;
 create policy "rsvp_insert_own" on public.event_rsvp for insert
   with check (auth.uid() = user_id);
+drop policy if exists "rsvp_delete_own" on public.event_rsvp;
 create policy "rsvp_delete_own" on public.event_rsvp for delete
   using (auth.uid() = user_id);
 
@@ -876,8 +921,10 @@ create table if not exists public.quiz_results (
 
 alter table public.quiz_results ENABLE ROW LEVEL SECURITY;
 
+drop policy if exists "quiz_select_own" on public.quiz_results;
 create policy "quiz_select_own" on public.quiz_results
   for select using (auth.uid() = user_id or public.is_admin());
+drop policy if exists "quiz_insert_own" on public.quiz_results;
 create policy "quiz_insert_own" on public.quiz_results
   for insert with check (auth.uid() = user_id and total > 0 and benar >= 0 and benar <= total);
 
@@ -891,10 +938,13 @@ create table if not exists public.kalkulator_hasil (
 
 alter table public.kalkulator_hasil ENABLE ROW LEVEL SECURITY;
 
+drop policy if exists "kalkulator_select_own" on public.kalkulator_hasil;
 create policy "kalkulator_select_own" on public.kalkulator_hasil
   for select using (auth.uid() = user_id);
+drop policy if exists "kalkulator_write_own" on public.kalkulator_hasil;
 create policy "kalkulator_write_own" on public.kalkulator_hasil
   for insert with check (auth.uid() = user_id);
+drop policy if exists "kalkulator_update_own" on public.kalkulator_hasil;
 create policy "kalkulator_update_own" on public.kalkulator_hasil
   for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
@@ -910,10 +960,13 @@ create table if not exists public.area_follows (
 
 alter table public.area_follows ENABLE ROW LEVEL SECURITY;
 
+drop policy if exists "area_select_own" on public.area_follows;
 create policy "area_select_own" on public.area_follows
   for select using (auth.uid() = user_id);
+drop policy if exists "area_insert_own" on public.area_follows;
 create policy "area_insert_own" on public.area_follows
   for insert with check (auth.uid() = user_id);
+drop policy if exists "area_delete_own" on public.area_follows;
 create policy "area_delete_own" on public.area_follows
   for delete using (auth.uid() = user_id);
 

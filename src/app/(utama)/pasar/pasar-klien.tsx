@@ -45,14 +45,17 @@ function IkonKategori({ kategori }: { kategori: string }) {
 function KartuBarang({
   barang,
   masuk,
-  userId,
 }: {
   barang: Barang;
   masuk: boolean;
-  userId: string | null;
 }) {
   const router = useRouter();
   const [data, setData] = useState(barang);
+  const [prevBarang, setPrevBarang] = useState(barang);
+  if (barang !== prevBarang) {
+    setPrevBarang(barang);
+    setData(barang);
+  }
   const [proses, setProses] = useState(false);
   const [pesan, setPesan] = useState<string | null>(null);
 
@@ -60,11 +63,11 @@ function KartuBarang({
     const supabase = createClient();
     const ch = supabase
       .channel(`pasar-${barang.id}`)
-      .on(
+          .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "pasar_barang", filter: `id=eq.${barang.id}` },
         (payload) => {
-          const baru = payload.new as { status: string; claimed_by: string | null };
+          const baru = payload.new as { status: string };
           setData((d) => ({ ...d, status: baru.status }));
         }
       )
@@ -79,14 +82,29 @@ function KartuBarang({
     setProses(true);
     setPesan(null);
     const supabase = createClient();
-    const { error } = await supabase
-      .from("pasar_barang")
-      .update({ status: "terklaim", claimed_by: userId })
-      .eq("id", data.id);
-    if (error) {
-      setPesan(error.message);
-      setProses(false);
-      return;
+    try {
+      const { error } = await supabase.rpc("klaim_barang", { p_id: data.id });
+      if (error) throw error;
+    } catch {
+      // Fallback bila RPC belum tersedia: update kondisional tanpa claimed_by
+      const { data: baris, error } = await supabase
+        .from("pasar_barang")
+        .update({ status: "terklaim" })
+        .eq("id", data.id)
+        .eq("status", "tersedia")
+        .select("id");
+      if (error) {
+        setPesan(error.message);
+        setProses(false);
+        return;
+      }
+      if (!baris || baris.length === 0) {
+        setPesan("Barang sudah diklaim orang lain.");
+        setData((d) => ({ ...d, status: "terklaim" }));
+        setProses(false);
+        router.refresh();
+        return;
+      }
     }
     setData((d) => ({ ...d, status: "terklaim" }));
     setProses(false);
@@ -162,7 +180,7 @@ function FormPasangBarang({
   selesai,
 }: {
   tutup: () => void;
-  selesai: () => void;
+  selesai: (baru?: Barang) => void;
 }) {
   const [judul, setJudul] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
@@ -180,20 +198,35 @@ function FormPasangBarang({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    const { error } = await supabase.from("pasar_barang").insert({
-      user_id: user!.id,
-      judul,
-      deskripsi: deskripsi.trim() || null,
-      kategori,
-      kondisi,
-      titik_ambil: titik,
-    });
+    const { data, error } = await supabase
+      .from("pasar_barang")
+      .insert({
+        user_id: user!.id,
+        judul,
+        deskripsi: deskripsi.trim() || null,
+        kategori,
+        kondisi,
+        titik_ambil: titik,
+      })
+      .select("id, judul, deskripsi, kategori, kondisi, titik_ambil, status, user_id")
+      .single();
     setProses(false);
     if (error) {
       setPesan(error.message);
       return;
     }
-    selesai();
+    selesai({
+      id: data.id,
+      judul: data.judul,
+      deskripsi: data.deskripsi,
+      kategori: data.kategori,
+      kondisi: data.kondisi,
+      titik_ambil: data.titik_ambil,
+      status: data.status,
+      pemilik_id: data.user_id,
+      pemilik_nama: null,
+      milikKu: true,
+    });
   }
 
   return (
@@ -273,14 +306,17 @@ function FormPasangBarang({
 export function PasarKlien({
   awal,
   masuk,
-  userId,
 }: {
   awal: Barang[];
   masuk: boolean;
-  userId: string | null;
 }) {
   const router = useRouter();
   const [barang, setBarang] = useState(awal);
+  const [prevAwal, setPrevAwal] = useState(awal);
+  if (awal !== prevAwal) {
+    setPrevAwal(awal);
+    setBarang(awal);
+  }
   const [filter, setFilter] = useState<string>("semua");
   const [formBuka, setFormBuka] = useState(false);
 
@@ -342,13 +378,13 @@ export function PasarKlien({
         <motion.div layout className="grid gap-4 sm:grid-cols-2">
           {tampil.map((b) => (
             <motion.div
-              key={`${b.id}-${b.status}`}
+              key={b.id}
               layout
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
-              <KartuBarang barang={b} masuk={masuk} userId={userId} />
+              <KartuBarang barang={b} masuk={masuk} />
             </motion.div>
           ))}
         </motion.div>
@@ -362,7 +398,8 @@ export function PasarKlien({
       <Modal terbuka={formBuka} tutup={() => setFormBuka(false)} judul="Pasang barang bekas">
         <FormPasangBarang
           tutup={() => setFormBuka(false)}
-          selesai={() => {
+          selesai={(baru) => {
+            if (baru) setBarang((s) => [baru, ...s]);
             setFormBuka(false);
             router.refresh();
           }}
