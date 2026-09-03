@@ -354,6 +354,12 @@ create index if not exists events_user_idx on public.events (user_id);
 create index if not exists event_rsvp_user_idx on public.event_rsvp (user_id);
 create index if not exists reports_user_created_idx on public.reports (user_id, created_at desc);
 create index if not exists area_follows_lokasi_idx on public.area_follows using gist (lokasi);
+-- deduplikasi baris ganda warisan seed sebelum pasang unique (simpan 1 per grup).
+delete from public.area_follows a
+using public.area_follows b
+where a.ctid > b.ctid
+  and a.user_id = b.user_id
+  and a.label = b.label;
 create unique index if not exists area_follows_user_label_uniq on public.area_follows (user_id, label);
 
 -- ------------------------------------------------------------
