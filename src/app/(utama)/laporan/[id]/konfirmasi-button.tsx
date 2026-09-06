@@ -105,23 +105,17 @@ export function KonfirmasiButton({
     setProses(true);
     try {
       const supabase = createClient();
-      const { error: updErr } = await supabase
-        .from("reports")
-        .update({ status: "dikerjakan" })
-        .eq("id", reportId);
-      if (updErr) throw updErr;
-
-      const { error: comErr } = await supabase.from("comments").insert({
-        report_id: reportId,
-        user_id: user.id,
-        isi: "⚠️ Verifikasi penutupan ditolak warga: Masalah belum sepenuhnya terselesaikan di lapangan.",
+      // Jalur resmi: RPC sistem (guard owner menolak update langsung
+      // saat status bukan "baru", bahkan oleh pemilik laporan).
+      const { error: rpcErr } = await supabase.rpc("tolak_verifikasi", {
+        p_report_id: reportId,
       });
-      if (comErr) throw comErr;
+      if (rpcErr) throw rpcErr;
 
       setPesan("Laporan dikembalikan ke status 'Dikerjakan' untuk ditindaklanjuti ulang.");
       router.refresh();
-    } catch {
-      /* abaikan */
+    } catch (e) {
+      setPesan(e instanceof Error ? e.message : "Penolakan gagal, coba lagi.");
     } finally {
       setProses(false);
     }

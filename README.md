@@ -85,8 +85,8 @@ sigap/
 
 ## Checklist Lomba Infinitera 2.0
 
-- [ ] Sudah deployed (Vercel)
-- [ ] Repo publik di GitHub
+- [x] Sudah deployed (Vercel)
+- [x] Repo publik di GitHub
 - [ ] Video demo 5–7 menit
 - [ ] Proposal PDF
 - [ ] Akun demo juri aktif

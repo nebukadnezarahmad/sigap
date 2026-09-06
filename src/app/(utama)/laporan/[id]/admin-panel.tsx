@@ -8,6 +8,20 @@ import { STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
 
+/**
+ * Status lanjutan yang sah dari tiap status sekarang. "selesai" sengaja
+ * tidak ada di pilihan manual mana pun — status itu hanya tercapai otomatis
+ * lewat RPC konfirmasi_laporan() setelah 2 warga konfirmasi.
+ */
+const STATUS_LANJUTAN: Record<StatusKey, StatusKey[]> = {
+  baru: ["diverifikasi", "ditolak"],
+  diverifikasi: ["dikerjakan", "ditolak"],
+  dikerjakan: ["menunggu_verifikasi", "ditolak"],
+  menunggu_verifikasi: ["dikerjakan"],
+  selesai: [],
+  ditolak: [],
+};
+
 export function AdminPanel({
   reportId,
   statusAwal,
@@ -130,7 +144,7 @@ export function AdminPanel({
             value={status}
             onChange={(e) => setStatus(e.target.value as StatusKey)}
           >
-            {(Object.keys(STATUS) as StatusKey[]).map((s) => (
+            {( [statusAwal, ...STATUS_LANJUTAN[statusAwal]] as StatusKey[] ).map((s) => (
               <option key={s} value={s}>
                 {STATUS[s].label}
               </option>

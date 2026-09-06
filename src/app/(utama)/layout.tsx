@@ -4,9 +4,6 @@ import { CommandPalette } from "@/components/command-palette";
 import { Gerak } from "@/components/gerak";
 
 const TAUTAN_KAKI = [
-  { href: "/pasar", label: "Pasar ReUse" },
-  { href: "/layanan", label: "Direktori layanan" },
-  { href: "/umkm", label: "UMKM warga" },
   { href: "/demo", label: "Panduan demo" },
   { href: "/privasi", label: "Privasi" },
   { href: "/ketentuan", label: "Ketentuan" },
