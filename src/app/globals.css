@@ -79,6 +79,20 @@
   }
 }
 
+/* Eksperimen visual-fusion: token Apple berprefix ap- (ADDITIVE, token lama tidak diubah) */
+@theme {
+  --color-ap-blue: #0066cc;
+  --color-ap-blue-focus: #0071e3;
+  --color-ap-sky: #2997ff;
+  --color-ap-ink: #1d1d1f;
+  --color-ap-parchment: #f5f5f7;
+  --color-ap-pearl: #fafafc;
+  --color-ap-tile1: #272729;
+  --color-ap-tile2: #2a2a2c;
+  --color-ap-hairline: #e0e0e0;
+  --shadow-ap-shadow: rgba(0, 0, 0, 0.22) 3px 5px 30px;
+}
+
 body {
   background: var(--paper);
   color: var(--ink);

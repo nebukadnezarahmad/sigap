@@ -15,6 +15,7 @@ import type { LaporanDenganRelasi } from "@/types/database";
 import { Card } from "@/components/ui";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { AngkaHidup, PetaHeroVisual, Terungkap } from "./landing-visual";
+import { HeroPembungkus } from "@/components/eksperimen/hero-pembungkus";
 
 export const dynamic = "force-dynamic";
 
@@ -106,6 +107,7 @@ export default async function Beranda() {
 
   return (
     <main>
+      <HeroPembungkus />
       <section className="relative overflow-hidden bg-pola-grid border-b garis-halus">
         <div
           aria-hidden

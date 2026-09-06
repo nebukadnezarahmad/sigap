@@ -22,6 +22,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import { useTheme, toggleTema } from "@/lib/use-theme";
 import { Avatar, Button } from "@/components/ui";
+import { KacaBar } from "@/components/eksperimen/kaca";
 import { NotifikasiBel } from "@/components/notifikasi-bel";
 import { DemoAuthModal } from "@/components/tombol-demo-login";
 
@@ -71,7 +72,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-[900] border-b garis-halus bg-paper/85 backdrop-blur-md print:hidden">
+    <KacaBar as="header" className="print:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
         <Link
           href="/"
@@ -255,6 +256,6 @@ export function SiteHeader() {
         judul="Masuk Cepat Mode Demo"
         deskripsi="Pilih peran akun di bawah untuk menguji fitur SIGAP secara langsung dengan 1-klik."
       />
-    </header>
+    </KacaBar>
   );
 }
