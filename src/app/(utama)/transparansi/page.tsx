@@ -13,7 +13,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI, STATUS, SLA_KATEGORI, hitungSla, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { Card, StatusChip, Button } from "@/components/ui";
+import { StatusChip, Button } from "@/components/ui";
 import { formatTanggal } from "@/lib/utils";
 import { GrafikBulanan, GrafikKategori } from "./grafik";
 import { TombolCetak } from "./tombol-cetak";
@@ -176,7 +176,7 @@ export default async function HalamanTransparansi() {
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-daun-700 dark:text-daun-400">
             <ShieldCheck size={16} /> Rapor Akuntabilitas Publik
           </div>
-          <h1 className="mt-1 font-display text-3xl font-bold">
+          <h1 className="mt-1 font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px]">
             Transparansi & Kepatuhan SLA Dewan
           </h1>
           <p className="mt-2 max-w-2xl text-muted">
@@ -185,7 +185,7 @@ export default async function HalamanTransparansi() {
         </div>
         <div className="flex items-center gap-2">
           <Link href="/api/open-data" target="_blank">
-            <Button variant="sekunder" size="sm" className="hidden sm:inline-flex gap-1.5">
+            <Button variant="sekunder" size="sm" className="hidden min-h-[44px] sm:inline-flex gap-1.5">
               <FileSpreadsheet size={15} /> Open Data (JSON)
             </Button>
           </Link>
@@ -224,52 +224,55 @@ export default async function HalamanTransparansi() {
                 : "text-daun-700 dark:text-daun-300 bg-daun-500/10",
           },
         ].map((k) => (
-          <Card key={k.label} className="flex items-center gap-3.5 p-4">
+          <div
+            key={k.label}
+            className="flex items-center gap-3.5 rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink"
+          >
             <span
               className={`flex size-11 items-center justify-center rounded-xl ${k.warna}`}
             >
               {k.ikon}
             </span>
             <div>
-              <p className="font-display text-2xl font-extrabold leading-none">
+              <p className="angka-tabular font-display text-2xl font-extrabold leading-none">
                 {k.nilai}
               </p>
               <p className="mt-1 text-xs text-muted">{k.label}</p>
             </div>
-          </Card>
+          </div>
         ))}
       </div>
 
       {/* Standar SLA Kategori */}
-      <Card className="mb-6 border-panel-2 bg-panel-2/50 p-5">
-        <h2 className="font-display text-base font-bold">
+      <section className="mb-6 rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+        <h2 className="font-display text-base font-bold tracking-[-0.224px]">
           Standar Target Waktu Penanganan (SLA Resmi per Kategori)
         </h2>
         <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
           {KATEGORI.filter((k) => k.slug !== "lainnya").map((k) => (
             <div
               key={k.slug}
-              className="rounded-2xl border garis-halus bg-panel p-3 text-left"
+              className="rounded-lg border border-ap-hairline bg-ap-pearl p-3 text-left dark:border-line dark:bg-panel-2"
             >
               <div className="flex items-center gap-1.5 text-xs font-semibold text-muted">
                 <IkonKategori slug={k.slug} ukuran={13} />
                 <span className="truncate">{k.nama}</span>
               </div>
-              <p className="mt-1 font-display text-xl font-black text-ink">
+              <p className="angka-tabular mt-1 font-display text-xl font-black text-ap-ink dark:text-ink">
                 {SLA_KATEGORI[k.slug] ?? 7} Hari
               </p>
               <p className="text-[11px] text-muted">Target respon & beres</p>
             </div>
           ))}
         </div>
-      </Card>
+      </section>
 
       {/* Papan Keterlambatan Publik (Overdue Watchlist) */}
-      <Card className="mb-6 border-danger/30 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b garis-halus pb-3">
+      <section className="mb-6 rounded-[18px] border border-danger/30 bg-white p-6 shadow-none dark:bg-panel">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ap-hairline pb-3 dark:border-line">
           <div className="flex items-center gap-2">
             <AlertTriangle className="text-danger" size={18} />
-            <h2 className="font-display font-bold text-lg">
+            <h2 className="font-display font-bold text-lg tracking-[-0.224px]">
               Papan Keterlambatan Publik (*Overdue Watchlist*)
             </h2>
           </div>
@@ -286,7 +289,7 @@ export default async function HalamanTransparansi() {
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b garis-halus text-xs text-muted">
+                <tr className="border-b border-ap-hairline text-xs text-muted dark:border-line">
                   <th className="pb-2 font-semibold">Judul Masalah</th>
                   <th className="pb-2 font-semibold">Kategori</th>
                   <th className="pb-2 font-semibold">Tgl Lapor</th>
@@ -296,7 +299,7 @@ export default async function HalamanTransparansi() {
                   <th className="pb-2 font-semibold text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-garis-halus">
+              <tbody className="divide-y divide-ap-hairline dark:divide-line">
                 {laporanLewatSla.slice(0, 10).map((r) => (
                   <tr key={r.id} className="hover:bg-panel-2/40 transition">
                     <td className="py-3 font-semibold text-ink max-w-xs truncate">
@@ -308,10 +311,10 @@ export default async function HalamanTransparansi() {
                     <td className="py-3 text-xs text-muted">
                       {formatTanggal(r.created_at)}
                     </td>
-                    <td className="py-3 text-xs font-medium">
+                    <td className="angka-tabular py-3 text-xs font-medium">
                       {r.sla.targetHari} hari
                     </td>
-                    <td className="py-3 text-xs font-bold text-danger">
+                    <td className="angka-tabular py-3 text-xs font-bold text-danger">
                       +{r.sla.hariTerlambat} hari
                     </td>
                     <td className="py-3">
@@ -320,7 +323,7 @@ export default async function HalamanTransparansi() {
                     <td className="py-3 text-right">
                       <Link
                         href={`/laporan/${r.id}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-daun-700 hover:underline dark:text-daun-300"
+                        className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-ap-blue hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky dark:hover:bg-ap-sky/10"
                       >
                         Detail <ExternalLink size={12} />
                       </Link>
@@ -331,62 +334,62 @@ export default async function HalamanTransparansi() {
             </table>
           </div>
         )}
-      </Card>
+      </section>
 
       {/* Insight Otomatis */}
       <div className="mb-6 grid gap-3 md:grid-cols-2">
         {teratas && (
-          <Card className="flex items-start gap-3 border-kunyit-500/40 p-5">
+          <div className="flex items-start gap-3 rounded-[18px] border border-kunyit-500/40 bg-white p-6 shadow-none dark:bg-panel">
             <TrendingUp className="mt-0.5 text-kunyit-500" size={20} />
             <div>
-              <p className="font-display font-bold">Tren Kenaikan Laporan</p>
+              <p className="font-display font-bold tracking-[-0.224px]">Tren Kenaikan Laporan</p>
               <p className="mt-1 text-sm text-muted">
                 Laporan{" "}
                 <b className="inline-flex items-center gap-1 text-ink">
                   <IkonKategori slug={teratas.slug} ukuran={13} /> {teratas.nama}
                 </b>{" "}
-                naik <b className="text-ink">{teratas.naik} laporan</b> dibanding
+                naik <b className="angka-tabular text-ink">{teratas.naik} laporan</b> dibanding
                 minggu lalu ({teratas.kini} vs {teratas.lalu}). Memerlukan alokasi petugas tambahan.
               </p>
             </div>
-          </Card>
+          </div>
         )}
         {tercepat && (
-          <Card className="flex items-start gap-3 border-daun-500/40 p-5">
+          <div className="flex items-start gap-3 rounded-[18px] border border-daun-500/40 bg-white p-6 shadow-none dark:bg-panel">
             <TrendingDown className="mt-0.5 text-daun-600 dark:text-daun-400" size={20} />
             <div>
-              <p className="font-display font-bold">Kinerja Tertinggi</p>
+              <p className="font-display font-bold tracking-[-0.224px]">Kinerja Tertinggi</p>
               <p className="mt-1 text-sm text-muted">
-                Kategori <b className="text-ink">{tercepat.nama}</b> memiliki tingkat ketuntasan tertinggi yaitu{" "}
-                <b className="text-ink">{tercepat.persen}%</b> ({tercepat.selesai}/
+                Kategori <b className="angka-tabular text-ink">{tercepat.nama}</b> memiliki tingkat ketuntasan tertinggi yaitu{" "}
+                <b className="angka-tabular text-ink">{tercepat.persen}%</b> ({tercepat.selesai}/
                 {tercepat.total} laporan diselesaikan).
               </p>
             </div>
-          </Card>
+          </div>
         )}
       </div>
 
       {/* Grafik Laporan & Kategori */}
       <div className="mb-6 grid gap-4 lg:grid-cols-2">
-        <Card className="p-5">
-          <h2 className="mb-4 font-display font-bold">
+        <section className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+          <h2 className="mb-4 font-display font-bold tracking-[-0.224px]">
             Tren Laporan Masuk vs Selesai (6 Bulan)
           </h2>
           <GrafikBulanan data={bulan} />
-        </Card>
+        </section>
 
-        <Card className="p-5">
-          <h2 className="mb-4 font-display font-bold">
+        <section className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+          <h2 className="mb-4 font-display font-bold tracking-[-0.224px]">
             Tingkat Ketuntasan per Kategori
           </h2>
           <GrafikKategori data={perKategori} />
-        </Card>
+        </section>
       </div>
 
       {/* Distribusi Status & Open Data API Info */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="p-5 sm:col-span-2">
-          <h2 className="mb-4 font-display font-bold">Distribusi Status Penanganan</h2>
+        <section className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink sm:col-span-2">
+          <h2 className="mb-4 font-display font-bold tracking-[-0.224px]">Distribusi Status Penanganan</h2>
           <div className="flex flex-wrap gap-3">
             {(Object.keys(STATUS) as StatusKey[]).map((s) => (
               <div
@@ -394,25 +397,25 @@ export default async function HalamanTransparansi() {
                 className="flex items-center gap-2 rounded-full bg-panel-2 px-4 py-2"
               >
                 <StatusChip status={s} />
-                <span className="font-display font-bold">{statusCount[s] ?? 0}</span>
+                <span className="angka-tabular font-display font-bold">{statusCount[s] ?? 0}</span>
               </div>
             ))}
           </div>
-        </Card>
+        </section>
 
-        <Card className="p-5 flex flex-col justify-between">
+        <section className="flex flex-col justify-between rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
           <div>
-            <h2 className="font-display font-bold text-base">Open Data API Warga</h2>
+            <h2 className="font-display font-bold text-base tracking-[-0.224px]">Open Data API Warga</h2>
             <p className="mt-2 text-xs text-muted leading-relaxed">
               Seluruh data laporan dapat diakses secara publik dan gratis di bawah lisensi CC-BY untuk kepentingan riset akademis, jurnalisme warga, dan integrasi sistem kota.
             </p>
           </div>
           <Link href="/api/open-data" target="_blank" className="mt-4">
-            <Button variant="sekunder" size="sm" className="w-full gap-1.5 text-xs">
+            <Button variant="sekunder" size="sm" className="w-full min-h-[44px] gap-1.5 text-xs">
               <ExternalLink size={13} /> Akses /api/open-data
             </Button>
           </Link>
-        </Card>
+        </section>
       </div>
     </main>
   );

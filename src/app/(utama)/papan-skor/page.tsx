@@ -3,7 +3,7 @@ import { Crown, Medal, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { BADGES } from "@/lib/constants";
 import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
-import { Avatar, Card } from "@/components/ui";
+import { Avatar } from "@/components/ui";
 import { BadgeSaya } from "./badge-saya";
 
 export const metadata: Metadata = {
@@ -48,7 +48,7 @@ export default async function HalamanPapanSkor() {
         <div className="inline-flex items-center gap-1.5 rounded-full bg-daun-600/10 px-3 py-1 text-xs font-bold text-daun-700 dark:text-daun-300 uppercase tracking-wider mb-2">
           <ShieldCheck size={14} /> Piagam Partisipasi Sipil
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-semibold">
+        <h1 className="font-serif text-3xl sm:text-4xl font-semibold leading-[1.1] tracking-[-0.28px]">
           Daftar Kehormatan Warga
         </h1>
         <p className="mt-2 text-sm text-muted max-w-lg mx-auto teks-pretty">
@@ -57,9 +57,9 @@ export default async function HalamanPapanSkor() {
       </header>
 
       {!dbAktif && (
-        <Card className="mb-6 p-5 text-center text-sm text-muted">
+        <div className="mb-6 rounded-[18px] border border-ap-hairline bg-white p-6 text-center text-sm text-muted shadow-none dark:border-line dark:bg-panel">
           Database belum tersambung — papan skor akan tampil setelah Supabase diatur.
-        </Card>
+        </div>
       )}
 
       {pemimpin.length > 0 && (
@@ -67,9 +67,9 @@ export default async function HalamanPapanSkor() {
           {urutanPodium.map((p) => {
             const juara = podium.indexOf(p) + 1;
             return (
-              <Card
+              <div
                 key={p.id}
-                className={`flex flex-col items-center px-3 py-5 text-center ${
+                className={`flex flex-col items-center rounded-[18px] border border-ap-hairline bg-white px-3 py-6 text-center text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink ${
                   juara === 1 ? "ring-2 ring-kunyit-500" : ""
                 }`}
               >
@@ -88,17 +88,17 @@ export default async function HalamanPapanSkor() {
                 <p className="angka-tabular mt-1.5 rounded-full bg-daun-600/10 px-3 py-0.5 text-sm font-bold text-daun-700 dark:text-daun-300">
                   {p.poin} poin
                 </p>
-              </Card>
+              </div>
             );
           })}
         </div>
       )}
 
       {sisanya.length > 0 && (
-        <Card className="mb-10 divide-y garis-halus overflow-hidden">
+        <div className="mb-10 divide-y divide-ap-hairline overflow-hidden rounded-[18px] border border-ap-hairline bg-white shadow-none dark:divide-line dark:border-line dark:bg-panel">
           {sisanya.map((p, i) => (
             <div key={p.id} className="flex items-center gap-3 px-4 py-3">
-              <span className="w-6 text-center font-display font-bold text-muted">
+              <span className="angka-tabular w-6 text-center font-display font-bold text-muted">
                 {i + 4}
               </span>
               <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={34} />
@@ -109,20 +109,20 @@ export default async function HalamanPapanSkor() {
               <span className="angka-tabular text-sm font-bold">{p.poin}</span>
             </div>
           ))}
-        </Card>
+        </div>
       )}
 
       <section aria-label="Koleksi badge">
-        <h2 className="mb-4 font-display text-xl font-bold">Koleksi Badge</h2>
+        <h2 className="mb-4 font-display text-xl font-bold tracking-[-0.224px]">Koleksi Badge</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {BADGES.map((b) => (
-            <Card key={b.key} className="p-4">
+            <div key={b.key} className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
               <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
                 <IkonVektor node={nodeBadge(b)} ukuran={20} />
               </span>
               <p className="mt-2 font-display text-sm font-bold">{b.nama}</p>
               <p className="mt-0.5 text-xs text-muted">{b.deskripsi}</p>
-            </Card>
+            </div>
           ))}
         </div>
         <BadgeSaya />
