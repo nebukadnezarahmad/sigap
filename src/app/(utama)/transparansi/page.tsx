@@ -176,7 +176,7 @@ export default async function HalamanTransparansi() {
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-daun-700 dark:text-daun-400">
             <ShieldCheck size={16} /> Rapor Akuntabilitas Publik
           </div>
-          <h1 className="mt-1 font-display text-3xl font-bold">
+          <h1 className="mt-1 font-display text-3xl font-bold tracking-tight">
             Transparansi & Kepatuhan SLA Dewan
           </h1>
           <p className="mt-2 max-w-2xl text-muted">
@@ -200,7 +200,7 @@ export default async function HalamanTransparansi() {
             label: "Total laporan warga",
             nilai: total,
             ikon: <CheckCircle2 size={20} />,
-            warna: "text-sky-600 dark:text-sky-400 bg-sky-500/10",
+            warna: "text-muted bg-panel-2",
           },
           {
             label: "Tingkat tuntas",
@@ -231,7 +231,7 @@ export default async function HalamanTransparansi() {
               {k.ikon}
             </span>
             <div>
-              <p className="font-display text-2xl font-extrabold leading-none">
+              <p className="text-2xl font-extrabold leading-none tabular-nums">
                 {k.nilai}
               </p>
               <p className="mt-1 text-xs text-muted">{k.label}</p>
@@ -255,7 +255,7 @@ export default async function HalamanTransparansi() {
                 <IkonKategori slug={k.slug} ukuran={13} />
                 <span className="truncate">{k.nama}</span>
               </div>
-              <p className="mt-1 font-display text-xl font-black text-ink">
+              <p className="mt-1 text-xl font-black tabular-nums text-ink">
                 {SLA_KATEGORI[k.slug] ?? 7} Hari
               </p>
               <p className="text-[11px] text-muted">Target respon & beres</p>
@@ -285,15 +285,18 @@ export default async function HalamanTransparansi() {
         ) : (
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-left text-sm">
+              <caption className="sr-only">
+                Daftar laporan warga yang melewati batas waktu SLA
+              </caption>
               <thead>
                 <tr className="border-b garis-halus text-xs text-muted">
-                  <th className="pb-2 font-semibold">Judul Masalah</th>
-                  <th className="pb-2 font-semibold">Kategori</th>
-                  <th className="pb-2 font-semibold">Tgl Lapor</th>
-                  <th className="pb-2 font-semibold">Target SLA</th>
-                  <th className="pb-2 font-semibold text-danger">Keterlambatan</th>
-                  <th className="pb-2 font-semibold">Status</th>
-                  <th className="pb-2 font-semibold text-right">Aksi</th>
+                  <th scope="col" className="pb-2 font-semibold">Judul Masalah</th>
+                  <th scope="col" className="pb-2 font-semibold">Kategori</th>
+                  <th scope="col" className="pb-2 font-semibold">Tgl Lapor</th>
+                  <th scope="col" className="pb-2 font-semibold">Target SLA</th>
+                  <th scope="col" className="pb-2 font-semibold text-danger">Keterlambatan</th>
+                  <th scope="col" className="pb-2 font-semibold">Status</th>
+                  <th scope="col" className="pb-2 font-semibold text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-garis-halus">
@@ -308,10 +311,10 @@ export default async function HalamanTransparansi() {
                     <td className="py-3 text-xs text-muted">
                       {formatTanggal(r.created_at)}
                     </td>
-                    <td className="py-3 text-xs font-medium">
+                    <td className="py-3 text-xs font-medium tabular-nums">
                       {r.sla.targetHari} hari
                     </td>
-                    <td className="py-3 text-xs font-bold text-danger">
+                    <td className="py-3 text-xs font-bold tabular-nums text-danger">
                       +{r.sla.hariTerlambat} hari
                     </td>
                     <td className="py-3">
@@ -320,6 +323,7 @@ export default async function HalamanTransparansi() {
                     <td className="py-3 text-right">
                       <Link
                         href={`/laporan/${r.id}`}
+                        aria-label={`Detail laporan ${r.judul}`}
                         className="inline-flex items-center gap-1 text-xs font-semibold text-daun-700 hover:underline dark:text-daun-300"
                       >
                         Detail <ExternalLink size={12} />
@@ -394,7 +398,7 @@ export default async function HalamanTransparansi() {
                 className="flex items-center gap-2 rounded-full bg-panel-2 px-4 py-2"
               >
                 <StatusChip status={s} />
-                <span className="font-display font-bold">{statusCount[s] ?? 0}</span>
+                <span className="font-bold tabular-nums">{statusCount[s] ?? 0}</span>
               </div>
             ))}
           </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { PollingKlien } from "./polling-klien";
+import { GalatPolling, PollingKlien } from "./polling-klien";
 
 export const metadata: Metadata = { title: "Polling Warga" };
 export const dynamic = "force-dynamic";
@@ -19,11 +19,7 @@ export default async function HalamanPolling() {
   const supabase = await createClient();
 
   if (!supabase) {
-    return (
-      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-bold">Database belum tersambung</h1>
-      </main>
-    );
+    return <GalatPolling />;
   }
 
   const {

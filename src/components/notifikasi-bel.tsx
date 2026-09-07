@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { Bell, CheckCheck, Eye, Flag, Star, Wrench } from "lucide-react";
@@ -30,6 +30,8 @@ export function NotifikasiBel() {
   const router = useRouter();
   const [buka, setBuka] = useState(false);
   const [daftar, setDaftar] = useState<Notif[]>([]);
+  const refPemicu = useRef<HTMLButtonElement>(null);
+  const refPanel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -66,6 +68,41 @@ export function NotifikasiBel() {
 
   const belum = daftar.filter((n) => !n.dibaca).length;
 
+  useEffect(() => {
+    if (!buka) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setBuka(false);
+        refPemicu.current?.focus();
+        return;
+      }
+      if (e.key === "Tab") {
+        const panel = refPanel.current;
+        if (!panel) return;
+        const daftarFokus = Array.from(
+          panel.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((el) => el.getClientRects().length > 0);
+        if (daftarFokus.length === 0) {
+          e.preventDefault();
+          return;
+        }
+        const pertama = daftarFokus[0];
+        const terakhir = daftarFokus[daftarFokus.length - 1];
+        if (e.shiftKey && document.activeElement === pertama) {
+          e.preventDefault();
+          terakhir.focus();
+        } else if (!e.shiftKey && document.activeElement === terakhir) {
+          e.preventDefault();
+          pertama.focus();
+        }
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [buka]);
+
   async function tandaiSemua() {
     if (!user) return;
     setDaftar((s) => s.map((n) => ({ ...n, dibaca: true })));
@@ -80,9 +117,12 @@ export function NotifikasiBel() {
   return (
     <div className="relative">
       <button
+        ref={refPemicu}
         onClick={() => setBuka((v) => !v)}
         aria-label={`Notifikasi${belum ? `, ${belum} belum dibaca` : ""}`}
-        className="relative rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink"
+        aria-expanded={buka}
+        aria-haspopup="dialog"
+        className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
       >
         <Bell size={18} />
         {belum > 0 && (
@@ -100,8 +140,16 @@ export function NotifikasiBel() {
       <AnimatePresence>
         {buka && (
           <>
-            <div className="fixed inset-0 z-30" onClick={() => setBuka(false)} />
+            <button
+              type="button"
+              aria-label="Tutup notifikasi"
+              onClick={() => setBuka(false)}
+              className="fixed inset-0 z-30 cursor-default bg-transparent"
+            />
             <motion.div
+              ref={refPanel}
+              role="dialog"
+              aria-label="Notifikasi"
               initial={{ opacity: 0, y: 6, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 6, scale: 0.98 }}

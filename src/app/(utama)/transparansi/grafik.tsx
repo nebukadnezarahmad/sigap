@@ -9,7 +9,6 @@ const gayaTooltip = {
   borderRadius: 16,
   padding: "10px 14px",
   fontSize: 12,
-  boxShadow: "0 8px 24px -6px rgba(0,0,0,0.12)",
 } as const;
 
 type DataBulanan = { label: string; masuk: number; tuntas: number };
@@ -54,13 +53,13 @@ const IsiGrafikBulanan = dynamic<{ data: DataBulanan[] }>(
               <Bar
                 dataKey="masuk"
                 name="Masuk"
-                fill="#93a39b"
+                fill="var(--chart-masuk, var(--muted))"
                 radius={[6, 6, 0, 0]}
               />
               <Bar
                 dataKey="tuntas"
                 name="Selesai"
-                fill="#2e9e57"
+                fill="var(--chart-selesai, var(--color-daun-500))"
                 radius={[6, 6, 0, 0]}
               />
             </BarChart>
@@ -122,7 +121,7 @@ const IsiGrafikKategori = dynamic<{ data: DataKategori[] }>(
 
 export function GrafikBulanan({ data }: { data: DataBulanan[] }) {
   return (
-    <div className="h-60">
+    <div className="h-60 [--chart-masuk:var(--muted)] [--chart-selesai:var(--color-daun-500)] dark:[--chart-selesai:var(--color-daun-400)]">
       <IsiGrafikBulanan data={data} />
     </div>
   );

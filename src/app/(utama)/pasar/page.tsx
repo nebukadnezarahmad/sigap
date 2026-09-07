@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { PasarKlien } from "./pasar-klien";
+import { GalatPasar, PasarKlien } from "./pasar-klien";
 
 export const metadata: Metadata = { title: "Pasar ReUse" };
 export const dynamic = "force-dynamic";
@@ -22,11 +22,7 @@ export default async function HalamanPasar() {
   const supabase = await createClient();
 
   if (!supabase) {
-    return (
-      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-bold">Database belum tersambung</h1>
-      </main>
-    );
+    return <GalatPasar />;
   }
 
   const {

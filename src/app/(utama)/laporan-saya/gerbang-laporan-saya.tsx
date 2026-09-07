@@ -18,7 +18,7 @@ export function GerbangLaporanSaya() {
         </h1>
 
         <p className="mt-2 text-sm text-muted leading-relaxed">
-          Halaman ini menampilkan seluruh laporan yang pernah Anda buat dan perkembangan status penanganannya. Silakan masuk untuk melihat daftar laporan Anda.
+          Anda belum masuk. Halaman ini menampilkan seluruh laporan yang pernah Anda buat dan perkembangan status penanganannya. Silakan masuk untuk melihat daftar laporan Anda.
         </p>
 
         <div className="mt-6 rounded-2xl border border-daun-500/30 bg-daun-500/5 p-4 text-left">
@@ -29,6 +29,18 @@ export function GerbangLaporanSaya() {
         </div>
 
         <div className="mt-6 flex flex-col items-center gap-2 text-sm">
+          <Link
+            href="/masuk?next=/laporan-saya"
+            className="font-semibold text-daun-700 hover:underline dark:text-daun-300"
+          >
+            Masuk manual
+          </Link>
+          <Link
+            href="/demo"
+            className="text-muted hover:text-ink transition"
+          >
+            Lihat panduan demo
+          </Link>
           <Link
             href="/peta"
             className="inline-flex items-center gap-1.5 text-muted hover:text-ink transition"

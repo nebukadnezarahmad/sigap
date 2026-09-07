@@ -32,20 +32,17 @@ export function Button({
 }
 
 export function Card({
-  variant = "datar",
+  variant: _varian = "datar",
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
+  // Dipertahankan untuk kompatibilitas API; visual selalu garis saja (tanpa bayangan).
   variant?: "datar" | "melayang";
 }) {
+  void _varian;
   return (
     <div
-      className={cn(
-        "rounded-xl border garis-halus bg-panel",
-        variant === "melayang" &&
-          "shadow-[0_1px_2px_rgb(23_67_42/0.05),0_6px_20px_-10px_rgb(23_67_42/0.1)]",
-        className
-      )}
+      className={cn("rounded-xl border garis-halus bg-panel", className)}
       {...props}
     />
   );

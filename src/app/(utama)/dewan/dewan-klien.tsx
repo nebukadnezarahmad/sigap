@@ -270,25 +270,25 @@ export function DewanClient({
       label: "Total laporan",
       nilai: total,
       ikon: <Activity size={20} />,
-      warna: "text-sky-600 dark:text-sky-400 bg-sky-500/10",
+      warna: "text-muted bg-panel-2",
     },
     {
       label: "Sedang diproses",
       nilai: aktif,
       ikon: <Flame size={20} />,
-      warna: "text-kunyit-600 dark:text-kunyit-400 bg-kunyit-500/10",
+      warna: "text-muted bg-panel-2",
     },
     {
       label: "Selesai",
       nilai: selesai,
       ikon: <CheckCircle2 size={20} />,
-      warna: "text-daun-700 dark:text-daun-300 bg-daun-500/10",
+      warna: "text-muted bg-panel-2",
     },
     {
       label: "Warga terdaftar",
       nilai: totalWarga,
       ikon: <Users size={20} />,
-      warna: "text-violet-600 dark:text-violet-400 bg-violet-500/10",
+      warna: "text-muted bg-panel-2",
     },
     {
       label: "Melewati Target SLA",
@@ -304,8 +304,13 @@ export function DewanClient({
   return (
     <main className="mx-auto max-w-7xl px-4 pb-12 pt-6">
       <header className="mb-6">
-        <h1 className="font-display text-2xl font-bold">Dashboard Dewan</h1>
-        <p className="text-sm text-muted">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
+          Panel dewan
+        </p>
+        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+          Dashboard Dewan
+        </h1>
+        <p className="mt-3 max-w-xl text-muted teks-pretty">
           Pantau & kelola penanganan laporan permukiman secara realtime.
         </p>
       </header>
@@ -322,7 +327,7 @@ export function DewanClient({
                 {k.ikon}
               </span>
               <div>
-                <p className="angka-tabular font-display text-2xl font-extrabold leading-none">{k.nilai}</p>
+                <p className="angka-tabular text-2xl font-extrabold leading-none tabular-nums">{k.nilai}</p>
                 <p className="mt-1 text-xs text-muted">{k.label}</p>
               </div>
             </Card>
@@ -418,7 +423,9 @@ export function DewanClient({
                 ))}
               </Select>
               <Button size="sm" onClick={terapkanBulk} disabled={bulkProses}>
-                {bulkProses ? "Menerapkan…" : "Terapkan ke semua"}
+                {bulkProses
+                  ? "Menerapkan…"
+                  : `Terapkan ke ${dipilih.size} laporan`}
               </Button>
               <Button
                 variant="hantu"

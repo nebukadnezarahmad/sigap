@@ -48,7 +48,7 @@ export default async function HalamanPapanSkor() {
         <div className="inline-flex items-center gap-1.5 rounded-full bg-daun-600/10 px-3 py-1 text-xs font-bold text-daun-700 dark:text-daun-300 uppercase tracking-wider mb-2">
           <ShieldCheck size={14} /> Piagam Partisipasi Sipil
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-semibold">
+        <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight">
           Daftar Kehormatan Warga
         </h1>
         <p className="mt-2 text-sm text-muted max-w-lg mx-auto teks-pretty">
@@ -69,7 +69,7 @@ export default async function HalamanPapanSkor() {
             return (
               <Card
                 key={p.id}
-                className={`flex flex-col items-center px-3 py-5 text-center ${
+                className={`flex flex-col items-center p-5 text-center ${
                   juara === 1 ? "ring-2 ring-kunyit-500" : ""
                 }`}
               >
@@ -98,7 +98,7 @@ export default async function HalamanPapanSkor() {
         <Card className="mb-10 divide-y garis-halus overflow-hidden">
           {sisanya.map((p, i) => (
             <div key={p.id} className="flex items-center gap-3 px-4 py-3">
-              <span className="w-6 text-center font-display font-bold text-muted">
+              <span className="w-6 text-center text-sm font-bold tabular-nums text-muted">
                 {i + 4}
               </span>
               <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={34} />

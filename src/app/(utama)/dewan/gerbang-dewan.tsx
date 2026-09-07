@@ -23,8 +23,8 @@ export function GerbangDewan({
 
         <p className="mt-2 text-sm text-muted leading-relaxed">
           {alasan === "bukan_admin"
-            ? "Akun Anda saat ini memiliki peran Warga. Dashboard ini hanya dapat diakses oleh peran Administrator/Dewan."
-            : "Dashboard Dewan digunakan untuk memverifikasi laporan masuk, menugaskan petugas, dan memantau SLA penanganan masalah."}
+            ? "Anda sudah masuk dengan peran Warga. Dashboard ini hanya untuk peran Administrator/Dewan — gunakan tombol demo di bawah untuk beralih ke akun Dewan."
+            : "Anda belum masuk. Dashboard Dewan digunakan untuk memverifikasi laporan masuk, menugaskan petugas, dan memantau SLA penanganan masalah."}
         </p>
 
         <div className="mt-6 rounded-2xl border border-kunyit-500/30 bg-kunyit-500/5 p-4 text-left">
@@ -35,6 +35,18 @@ export function GerbangDewan({
         </div>
 
         <div className="mt-6 flex flex-col items-center gap-2 text-sm">
+          <Link
+            href="/masuk?next=/dewan"
+            className="font-semibold text-kunyit-700 hover:underline dark:text-kunyit-400"
+          >
+            Masuk manual sebagai admin
+          </Link>
+          <Link
+            href="/demo"
+            className="text-muted hover:text-ink transition"
+          >
+            Lihat panduan demo
+          </Link>
           <Link
             href="/peta"
             className="inline-flex items-center gap-1.5 text-muted hover:text-ink transition"

@@ -62,7 +62,7 @@ export function KonfirmasiButton({
           setSudah(true);
           setJumlah(hasil?.jumlah ?? jumlah + 1);
           if (hasil?.selesai) {
-            setPesan("✓ Laporan telah diverifikasi oleh 2 warga dan resmi berstatus Selesai!");
+            setPesan("Laporan telah diverifikasi oleh 2 warga dan resmi berstatus Selesai!");
           }
           router.refresh();
           return;
@@ -85,12 +85,13 @@ export function KonfirmasiButton({
             .update({ status: "selesai" })
             .eq("id", reportId);
           if (updErr) throw updErr;
-          setPesan("✓ Laporan telah diverifikasi oleh 2 warga dan resmi berstatus Selesai!");
+          setPesan("Laporan telah diverifikasi oleh 2 warga dan resmi berstatus Selesai!");
           router.refresh();
         }
       }
-    } catch {
-      /* abaikan */
+    } catch (e) {
+      const inti = e instanceof Error ? e.message : "Gagal menyimpan konfirmasi.";
+      setPesan(`${inti} Periksa koneksi lalu coba lagi.`);
     } finally {
       setProses(false);
     }
@@ -142,24 +143,32 @@ export function KonfirmasiButton({
               </p>
 
               {pesan && (
-                <p className="mt-2 text-xs font-semibold text-daun-700 dark:text-daun-300">
+                <p
+                  role={pesan.includes("Gagal") ? "alert" : "status"}
+                  className="mt-2 text-xs font-semibold text-daun-700 dark:text-daun-300"
+                >
                   {pesan}
                 </p>
               )}
 
               <div className="mt-4 flex flex-wrap gap-2.5">
                 <Button
+                  type="button"
                   onClick={toggleKonfirmasi}
                   disabled={proses}
+                  aria-pressed={sudah}
+                  aria-busy={proses}
                   className="bg-daun-600 hover:bg-daun-700 text-white"
                 >
                   <CheckCircle2 size={16} />
-                  {sudah ? "Sudah Kamu Verifikasi" : "✓ Ya, Masalah Sudah Selesai"}
+                  {sudah ? "Sudah Kamu Verifikasi" : "Ya, Masalah Sudah Selesai"}
                 </Button>
                 <Button
+                  type="button"
                   variant="sekunder"
                   onClick={tolakVerifikasi}
                   disabled={proses}
+                  aria-busy={proses}
                   className="border-danger/30 text-danger hover:bg-danger/10"
                 >
                   <XCircle size={16} /> Masalah Belum Beres
@@ -182,22 +191,35 @@ export function KonfirmasiButton({
 
   return (
     <>
-      <Button
-        variant={sudah ? "utama" : "sekunder"}
-        onClick={toggleKonfirmasi}
-        disabled={proses}
-        title={masuk ? "" : "Masuk untuk konfirmasi"}
-      >
-        <Eye size={16} className={sudah ? "fill-current" : ""} />
-        <motion.span key={jumlah}>{jumlah}</motion.span>
-        <span>
-          {status === "selesai"
-            ? "Diverifikasi Warga"
-            : sudah
-            ? "Kukonfirmasi Ada"
-            : "Saya juga melihat ini"}
-        </span>
-      </Button>
+      <div className="flex flex-col gap-2">
+        <Button
+          type="button"
+          variant={sudah ? "utama" : "sekunder"}
+          onClick={toggleKonfirmasi}
+          disabled={proses}
+          aria-pressed={sudah}
+          aria-busy={proses}
+          title={masuk ? "" : "Masuk untuk konfirmasi"}
+        >
+          <Eye size={16} className={sudah ? "fill-current" : ""} />
+          <motion.span key={jumlah}>{jumlah}</motion.span>
+          <span>
+            {status === "selesai"
+              ? "Diverifikasi Warga"
+              : sudah
+              ? "Kukonfirmasi Ada"
+              : "Saya juga melihat ini"}
+          </span>
+        </Button>
+        {pesan && (
+          <p
+            role={pesan.includes("Gagal") ? "alert" : "status"}
+            className="text-xs font-semibold text-danger"
+          >
+            {pesan}
+          </p>
+        )}
+      </div>
 
       <DemoAuthModal
         terbuka={modalAuth}

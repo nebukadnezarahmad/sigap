@@ -7,7 +7,7 @@ import {
   CheckCircle2,
   MapPin,
   Megaphone,
-  Sparkles,
+  Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI } from "@/lib/constants";
@@ -22,25 +22,26 @@ const LANGKAH = [
   {
     nomor: "01",
     ikon: MapPin,
-    judul: "Lapor dalam 30 detik",
-    isi: "Klik titik di peta, tempel foto bukti, pilih kategori. Setiap laporan langsung terlihat oleh dewan.",
+    judul: "Tandai masalah dalam 30 detik",
+    isi: "Tandai titik di peta, sertakan foto, pilih kategori. Laporanmu langsung terlihat oleh dewan dan warga sekitar.",
   },
   {
     nomor: "02",
     ikon: Megaphone,
     judul: "Warga serentak mendukung",
-    isi: "Dukungan warga lain menaikkan prioritas penanganan dan mempercepat tindak lanjut di lapangan.",
+    isi: "Dukungan dari warga lain, termasuk kamu, menaikkan prioritas penanganan dan mempercepat tindak lanjut di lapangan.",
   },
   {
     nomor: "03",
     ikon: CheckCircle2,
-    judul: "Verifikasi tuntas transparan",
-    isi: "Petugas wajib upload foto sesudah, dan laporan disahkan selesai setelah diverifikasi minimal 2 warga.",
+    judul: "Penanganan yang bisa kamu cek",
+    isi: "Petugas menyertakan foto sesudah penanganan, dan laporan selesai setelah diverifikasi minimal 2 warga di lapangan.",
   },
 ];
 
 export default async function Beranda() {
   let statistik = { total: 0, selesai: 0, warga: 0 };
+  let statistikGagal = false;
   let hitungKategori = new Map<string, number>();
   let titikAwal: {
     id: string;
@@ -76,6 +77,9 @@ export default async function Beranda() {
         selesai: selesai.count ?? 0,
         warga: warga.count ?? 0,
       };
+      if (laporan.error || selesai.error || warga.error) {
+        statistikGagal = true;
+      }
       hitungKategori = new Map();
       for (const r of (perKategori.data ?? []) as unknown as LaporanDenganRelasi[]) {
         const slug = r.categories?.slug ?? "lainnya";
@@ -99,18 +103,16 @@ export default async function Beranda() {
           status: r.status,
         }));
       }
+    } else {
+      statistikGagal = true;
     }
   } catch {
-    /* fallback nol */
+    statistikGagal = true;
   }
 
   return (
     <main>
       <section className="relative overflow-hidden bg-pola-grid border-b garis-halus">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_70%_10%,rgba(46,158,87,0.12),transparent)]"
-        />
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
           <div className="animate-muncul">
             <h1 className="font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
@@ -151,8 +153,14 @@ export default async function Beranda() {
                 ["Warga aktif", statistik.warga],
               ].map(([label, nilai]) => (
                 <div key={label as string}>
-                  <dd className="font-display text-2xl font-extrabold text-daun-700 dark:text-daun-300 sm:text-3xl">
-                    <AngkaHidup nilai={nilai as number} />
+                  <dd className="text-2xl font-bold tabular-nums angka-tabular text-daun-700 dark:text-daun-300 sm:text-3xl">
+                    {statistikGagal ? (
+                      <span aria-label={`${label as string} tidak tersedia`}>
+                        —
+                      </span>
+                    ) : (
+                      <AngkaHidup nilai={nilai as number} />
+                    )}
                   </dd>
                   <dt className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-muted">
                     {label}
@@ -235,8 +243,8 @@ export default async function Beranda() {
           {/* Kartu Foto Gotong Royong Warga Lapangan */}
           <div className="lg:col-span-5">
             <Terungkap tunda={0.2}>
-              <div className="relative overflow-hidden rounded-3xl border garis-halus bg-panel p-2.5 shadow-xl">
-                <div className="relative h-80 w-full overflow-hidden rounded-2xl">
+              <div className="relative overflow-hidden rounded-2xl border garis-halus bg-panel p-2.5 shadow-xl">
+                <div className="relative h-80 w-full overflow-hidden rounded-xl">
                   <Image
                     src="/images/gotong-royong.jpg"
                     alt="Warga RT gotong royong dan verifikasi lingkungan"
@@ -244,10 +252,11 @@ export default async function Beranda() {
                     sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
                     className="object-cover"
                   />
+                  {/* Overlay dipertahankan: teks putih di atas foto, penjamin kontras */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
                   <div className="absolute bottom-3 left-3 right-3 text-white">
                     <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-md">
-                      <Sparkles size={11} /> Aksi Lapangan Warga
+                      <Users size={11} /> Aksi lapangan warga
                     </span>
                     <p className="mt-1.5 text-sm font-bold">
                       Gotong Royong & Verifikasi Warga
@@ -257,9 +266,9 @@ export default async function Beranda() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center justify-between p-3 text-xs">
-                  <span className="text-muted">Partisipasi Aktif RT/RW</span>
-                  <span className="font-bold text-daun-700 dark:text-daun-300">✓ Terverifikasi Lapangan</span>
+                <div className="flex items-center justify-between gap-2 p-3 text-xs">
+                  <span className="min-w-0 truncate text-muted">Partisipasi aktif RT/RW</span>
+                  <span className="inline-flex shrink-0 items-center gap-1 font-bold text-daun-700 dark:text-daun-300"><CheckCircle2 size={13} /> Terverifikasi lapangan</span>
                 </div>
               </div>
             </Terungkap>
@@ -268,7 +277,7 @@ export default async function Beranda() {
       </section>
 
       <section
-        className="border-y garis-halus bg-panel-2/60 py-20"
+        className="border-y garis-halus bg-panel-2/60 py-24"
         aria-label="Kategori laporan"
       >
         <div className="mx-auto max-w-6xl px-4">
@@ -301,11 +310,11 @@ export default async function Beranda() {
                     >
                       <IkonKategori slug={k.slug} ukuran={15} />
                     </span>
-                    <span className="angka-tabular rounded-full bg-panel-2 px-2 py-0.5 text-xs font-bold text-muted">
-                      {hitungKategori.get(k.slug) ?? 0}
+                    <span className="angka-tabular rounded-full bg-panel-2 px-2 py-0.5 text-xs font-bold tabular-nums text-muted">
+                      {statistikGagal ? "—" : (hitungKategori.get(k.slug) ?? 0)}
                     </span>
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-4 min-w-0">
                     <p className="font-display font-bold text-sm text-ink truncate">
                       {k.nama}
                     </p>
@@ -327,38 +336,38 @@ export default async function Beranda() {
       >
         <Terungkap>
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-kunyit-700 dark:text-kunyit-300">
-            <Building2 size={15} /> Arsitektur Solusi Infinitera 2.0
+            <Building2 size={15} /> Pilar layanan SIGAP
           </div>
           <h2 className="mt-2 max-w-2xl font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
-            Ekosistem Civic-Tech Tertutup & Akuntabel
+            Ekosistem civic-tech yang terhubung dan akuntabel
           </h2>
           <p className="mt-3 max-w-2xl text-muted text-base">
-            Bukan sekadar form pengaduan biasa. SIGAP dirancang dengan siklus data lengkap dari mitigasi duplikasi spasial hingga verifikasi silang oleh warga.
+            Bukan sekadar formulir aduan. SIGAP merawat setiap laporanmu dari pencatatan yang rapi hingga verifikasi bersama warga.
           </p>
         </Terungkap>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-12">
           {/* Spotlight Kiri: Peta Spasial & Deduplikasi */}
           <Terungkap className="lg:col-span-6 flex">
-            <Card className="flex flex-col justify-between p-8 border-daun-600/30 bg-gradient-to-b from-daun-600/5 to-transparent w-full">
+            <Card className="flex w-full flex-col justify-between border-daun-600/30 p-8">
               <div>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-daun-600/15 px-3 py-1 text-xs font-bold text-daun-700 dark:text-daun-300">
-                  <MapPin size={13} /> Pilar 01 · Masukan Data Bersih
+                  <MapPin size={13} /> Pilar 01 · Catatan warga yang rapi
                 </span>
                 <h3 className="mt-4 font-serif text-2xl font-semibold">
-                  Peta Spasial & Deduplikasi Geospasial 100m
+                  Satu titik untuk satu masalah dalam 100 meter
                 </h3>
                 <p className="mt-3 leading-relaxed text-muted text-sm teks-pretty">
-                  Mencegah penumpukan laporan kembar di titik yang sama. Ketika warga meletakkan pin, algoritma PostGIS memindai masalah serupa dalam radius 100 meter dan mengajak warga ikut mendukung alih-alih membuat entri duplikat.
+                  Supaya tidak ada laporan ganda di titik yang sama. Saat kamu menandai pin, sistem memeriksa masalah serupa dalam radius 100 meter dan mengajakmu mendukung laporan yang sudah ada.
                 </p>
-                <div className="mt-6 rounded-2xl border garis-halus bg-panel p-4 text-xs space-y-2">
-                  <div className="flex items-center justify-between text-muted">
-                    <span>Indeks Spasial</span>
+                <div className="mt-6 rounded-xl border garis-halus bg-panel p-4 text-xs space-y-2">
+                  <div className="flex items-center justify-between gap-2 text-muted">
+                    <span className="min-w-0 truncate">Basis data wilayah</span>
                     <span className="font-mono text-ink font-semibold">PostGIS GiST 4326</span>
                   </div>
-                  <div className="flex items-center justify-between text-muted">
-                    <span>Radius Filter</span>
-                    <span className="font-semibold text-daun-700 dark:text-daun-300">≤ 100 Meter</span>
+                  <div className="flex items-center justify-between gap-2 text-muted">
+                    <span className="min-w-0 truncate">Jarak pantau</span>
+                    <span className="font-semibold text-daun-700 dark:text-daun-300">≤ 100 meter</span>
                   </div>
                 </div>
               </div>
@@ -367,7 +376,7 @@ export default async function Beranda() {
                 href="/peta"
                 className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300"
               >
-                Buka Peta & Coba Lapor <ArrowRight size={15} />
+                Lihat peta dan coba melapor <ArrowRight size={15} />
               </Link>
             </Card>
           </Terungkap>
@@ -377,15 +386,15 @@ export default async function Beranda() {
             <Terungkap tunda={0.1}>
               <Card className="p-6 transition hover:border-daun-400">
                 <div className="flex items-start gap-4">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
                     <Building2 size={20} />
                   </span>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-display font-bold text-lg">
-                      Dashboard Dewan dengan Target SLA
+                      Dasbor dewan dengan target SLA
                     </h3>
                     <p className="mt-1 text-xs text-muted leading-relaxed">
-                      Pemantauan target hari penanganan yang mengikat (3–21 hari), penugasan petugas teknis (DLH/PU), serta pemantauan sebaran kepadatan masalah via Heatmap.
+                      Target hari penanganan yang mengikat (3–21 hari), penugasan petugas teknis (DLH/PU), serta peta sebaran masalah yang bisa kamu pantau.
                     </p>
                   </div>
                 </div>
@@ -393,17 +402,17 @@ export default async function Beranda() {
             </Terungkap>
 
             <Terungkap tunda={0.2}>
-              <Card className="p-6 border-orange-500/30 bg-orange-500/5 transition hover:border-orange-500/50">
+              <Card className="p-6 transition hover:border-daun-400">
                 <div className="flex items-start gap-4">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 text-orange-600 dark:text-orange-400">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
                     <CheckCircle2 size={20} />
                   </span>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-display font-bold text-lg text-ink">
-                      Verifikasi 2 Warga & Bukti Foto Wajib
+                      Verifikasi warga dan foto bukti
                     </h3>
                     <p className="mt-1 text-xs text-muted leading-relaxed">
-                      Menghapus praktik penutupan laporan sepihak. Dewan wajib melampirkan foto bukti fisik sesudah, dan status membutuhkan minimal 2 konfirmasi warga lapangan.
+                      Tidak ada penutupan laporan sepihak. Dewan menyertakan foto sesudah penanganan, dan status selesai butuh minimal 2 konfirmasi warga di lapangan.
                     </p>
                   </div>
                 </div>
@@ -416,12 +425,12 @@ export default async function Beranda() {
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
                     <BarChart3 size={20} />
                   </span>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-display font-bold text-lg">
-                      Papan Keterlambatan Publik & Open Data
+                      Papan keterlambatan publik dan data terbuka
                     </h3>
                     <p className="mt-1 text-xs text-muted leading-relaxed">
-                      Daftar laporan yang melewati SLA dipublikasikan terbuka (*Overdue Watchlist*), siap dicetak PDF untuk rapat RT/RW, dan tersedia via API lisensi CC-BY.
+                      Daftar laporan yang melewati target waktu tayang terbuka, siap dicetak untuk rapat RT/RW, dan tersedia sebagai data terbuka.
                     </p>
                   </div>
                 </div>
@@ -432,8 +441,8 @@ export default async function Beranda() {
       </section>
 
       {/* Section Mengapa Ini Penting — Factsheet Dossier */}
-      <section className="mx-auto max-w-6xl px-4 py-20" aria-label="Mengapa penting">
-        <div className="rounded-[2.5rem] border garis-halus bg-panel p-8 sm:p-12 shadow-sm">
+      <section className="mx-auto max-w-6xl px-4 py-24" aria-label="Mengapa penting">
+        <div className="rounded-2xl border garis-halus bg-panel p-8 sm:p-12 shadow-sm">
           <div className="grid items-center gap-10 lg:grid-cols-12">
             <div className="lg:col-span-7">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-kunyit-700 dark:text-kunyit-300">
@@ -454,7 +463,7 @@ export default async function Beranda() {
             </div>
 
             <div className="lg:col-span-5 flex flex-col gap-3">
-              <div className="relative h-48 w-full overflow-hidden rounded-2xl border garis-halus shadow-sm">
+              <div className="relative h-48 w-full overflow-hidden rounded-xl border garis-halus shadow-sm">
                 <Image
                   src="/images/kota-sdg11.jpg"
                   alt="Koridor transportasi dan ruang hijau perkotaan berkelanjutan SDG 11"
@@ -462,6 +471,7 @@ export default async function Beranda() {
                   sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
                   className="object-cover"
                 />
+                {/* Overlay dipertahankan: label putih di atas foto, penjamin kontras */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
                 <p className="absolute bottom-2.5 left-3.5 right-3.5 text-xs font-bold text-white">
                   Target SDG 11: Kota & Permukiman Berkelanjutan
@@ -478,7 +488,7 @@ export default async function Beranda() {
                   className="rounded-2xl border garis-halus bg-panel-2 p-3.5 text-left"
                 >
                   <div className="flex items-baseline gap-1.5">
-                    <span className="font-serif text-2xl font-bold text-ink">
+                    <span className="text-2xl font-bold tabular-nums angka-tabular text-ink">
                       {f.angka}
                     </span>
                     <span className="text-xs font-bold text-daun-700 dark:text-daun-300 uppercase">
@@ -494,13 +504,9 @@ export default async function Beranda() {
       </section>
 
       {/* Banner Call to Action */}
-      <section className="mx-auto max-w-6xl px-4 pb-28">
+      <section className="mx-auto max-w-6xl px-4 pb-24">
         <Terungkap>
-          <div className="relative overflow-hidden rounded-[2.5rem] bg-daun-700 p-10 text-center text-white sm:p-16 shadow-2xl">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_50%_120%,rgba(255,255,255,0.18),transparent)]"
-            />
+          <div className="relative overflow-hidden rounded-2xl bg-daun-700 p-10 text-center text-white sm:p-16 shadow-2xl">
             <h2 className="font-serif text-3xl font-semibold sm:text-4xl">
               Lingkunganmu Menunggu Tindakan Nyata.
             </h2>

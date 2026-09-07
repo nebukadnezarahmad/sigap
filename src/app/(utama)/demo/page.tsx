@@ -47,7 +47,6 @@ const TUR = [
 ];
 
 export default function HalamanDemo() {
-  const demoAktif = process.env.NEXT_PUBLIC_DEMO_ENABLED !== "false";
   return (
     <main className="mx-auto max-w-4xl px-4 py-12">
       <header className="mb-10 text-center">
@@ -64,19 +63,11 @@ export default function HalamanDemo() {
       </header>
 
       <section aria-label="Akun demo instan" className="mb-12">
-        {demoAktif ? (
-          <>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-display text-lg font-bold">Akun Demo Siap Pakai</h2>
-              <span className="text-xs text-muted">Sandi bawaan: sigap123456</span>
-            </div>
-            <PilihanAkunDemo />
-          </>
-        ) : (
-          <p className="rounded-2xl border garis-halus bg-panel px-4 py-3 text-sm text-muted">
-            Mode demo nonaktif
-          </p>
-        )}
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-display text-lg font-bold">Akun Demo Siap Pakai</h2>
+          <span className="text-xs text-muted">Tanpa perlu mendaftar</span>
+        </div>
+        <PilihanAkunDemo />
       </section>
 
       <section aria-label="Tur fitur" className="mb-12">

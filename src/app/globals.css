@@ -3,6 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  color-scheme: light dark;
   --paper: #f6f4ef;
   --panel: #ffffff;
   --panel-2: #fbfaf7;
@@ -88,6 +89,10 @@ html {
   scroll-behavior: smooth;
 }
 
+#isi-utama {
+  scroll-margin-top: 80px;
+}
+
 h1,
 h2,
 h3 {
@@ -97,7 +102,7 @@ h3 {
 h1 {
   font-size: 1.875rem;
   line-height: 1.2;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.025em;
 }
 
@@ -110,7 +115,7 @@ h1 {
 h2 {
   font-size: 1.5rem;
   line-height: 1.25;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.025em;
 }
 

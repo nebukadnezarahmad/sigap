@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { AksiKlien } from "./aksi-klien";
+import { AksiKlien, GalatAksi } from "./aksi-klien";
 
 export const metadata: Metadata = { title: "Aksi Bersama" };
 export const dynamic = "force-dynamic";
@@ -24,11 +24,7 @@ function batasLewat() {
 export default async function HalamanAksi() {
   const supabase = await createClient();
   if (!supabase) {
-    return (
-      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-bold">Database belum tersambung</h1>
-      </main>
-    );
+    return <GalatAksi />;
   }
 
   const {

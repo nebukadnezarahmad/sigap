@@ -112,7 +112,7 @@ export function Modal({
             ref={refDialog}
             tabIndex={-1}
             className={cn(
-              "relative z-10 my-auto w-full max-h-[88vh] overflow-y-auto rounded-3xl border garis-halus bg-panel p-6 shadow-2xl focus:outline-none",
+              "relative z-10 my-auto w-full max-h-[88vh] overflow-y-auto rounded-3xl border garis-halus bg-panel p-6 focus:outline-none",
               lebar
             )}
             initial={{ y: 24, opacity: 0, scale: 0.96 }}
@@ -121,7 +121,7 @@ export function Modal({
             transition={{ type: "spring", damping: 28, stiffness: 340 }}
           >
             <div className="mb-4 flex items-start justify-between gap-4 border-b garis-halus pb-3">
-              <h2 className="font-display text-lg sm:text-xl font-bold">{judul}</h2>
+              <h2 className="font-display text-lg sm:text-xl font-semibold">{judul}</h2>
               <button
                 onClick={tutup}
                 aria-label="Tutup modal"

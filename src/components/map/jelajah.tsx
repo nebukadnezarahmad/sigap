@@ -312,6 +312,7 @@ export function Jelajah({
               value={kueri}
               onChange={(e) => setKueri(e.target.value)}
               placeholder="Cari judul atau isi laporan…"
+              aria-label="Cari laporan"
               className="h-10 w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15"
             />
           </label>
@@ -320,7 +321,7 @@ export function Jelajah({
             <button
               onClick={() => setPop(pop === "kategori" ? null : "kategori")}
               aria-expanded={pop === "kategori"}
-              className={`flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+              className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
                 pop === "kategori" || fKategori.length > 0
                   ? "border-daun-500/50 bg-daun-500/5 text-daun-700 dark:text-daun-300"
                   : "text-muted hover:text-ink"
@@ -358,7 +359,7 @@ export function Jelajah({
                         )
                       }
                       aria-pressed={aktif}
-                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition hover:bg-panel-2"
+                      className="flex min-h-[44px] w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition hover:bg-panel-2"
                     >
                       <span
                         className={`flex size-4 items-center justify-center rounded border transition ${
@@ -379,7 +380,7 @@ export function Jelajah({
                 {fKategori.length > 0 && (
                   <button
                     onClick={() => setFKategori([])}
-                    className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink"
+                    className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink"
                   >
                     <X size={12} /> Reset kategori
                   </button>
@@ -392,7 +393,7 @@ export function Jelajah({
             <button
               onClick={() => setPop(pop === "status" ? null : "status")}
               aria-expanded={pop === "status"}
-              className={`flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+              className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
                 pop === "status" || fStatus.length > 0
                   ? "border-daun-500/50 bg-daun-500/5 text-daun-700 dark:text-daun-300"
                   : "text-muted hover:text-ink"
@@ -434,7 +435,7 @@ export function Jelajah({
                         )
                       }
                       aria-pressed={aktif}
-                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition hover:bg-panel-2"
+                      className="flex min-h-[44px] w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition hover:bg-panel-2"
                     >
                       <span
                         className={`flex size-4 items-center justify-center rounded border transition ${
@@ -456,7 +457,7 @@ export function Jelajah({
                 {fStatus.length > 0 && (
                   <button
                     onClick={() => setFStatus([])}
-                    className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink"
+                    className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink"
                   >
                     <X size={12} /> Reset status
                   </button>
@@ -470,7 +471,7 @@ export function Jelajah({
           <button
             onClick={aktifkanSekitarSaya}
             aria-pressed={!!pusatSaya}
-            className={`flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+            className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
               pusatSaya
                 ? "border-transparent bg-daun-600 text-white"
                 : "text-muted hover:text-ink"
@@ -490,7 +491,7 @@ export function Jelajah({
           <button
             onClick={() => setLayerFasilitas((v) => !v)}
             aria-pressed={layerFasilitas}
-            className={`flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+            className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
               layerFasilitas
                 ? "border-transparent bg-teal-600 text-white"
                 : "text-muted hover:text-ink"
@@ -506,7 +507,7 @@ export function Jelajah({
           {layerFasilitas && (
             <button
               onClick={() => setModalFasilitas(true)}
-              className="flex h-10 items-center gap-1.5 rounded-full border border-dashed px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-teal-500 hover:text-ink"
+              className="flex min-h-[44px] items-center gap-1.5 rounded-full border border-dashed px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-teal-500 hover:text-ink"
               style={{ borderColor: "var(--line)" }}
             >
               + Tambah fasilitas
@@ -524,7 +525,7 @@ export function Jelajah({
               }
             }}
             aria-pressed={periodeIdx !== null}
-            className={`flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+            className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
               periodeIdx !== null
                 ? "border-transparent bg-daun-600 text-white"
                 : "text-muted hover:text-ink"
@@ -543,7 +544,7 @@ export function Jelajah({
             <button
               onClick={() => setMainkan((v) => !v)}
               aria-label={mainkan ? "Jeda" : "Putar"}
-              className="flex size-8 items-center justify-center rounded-full bg-daun-600 text-white transition hover:bg-daun-700"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-daun-600 text-white transition hover:bg-daun-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
             >
               {mainkan ? (
                 <span className="text-[10px] leading-none">■</span>
@@ -570,10 +571,11 @@ export function Jelajah({
       </div>
 
       {pop && (
-        <div
-          className="fixed inset-0 z-20"
+        <button
+          type="button"
+          aria-label="Tutup filter"
           onClick={() => setPop(null)}
-          aria-hidden
+          className="fixed inset-0 z-20 cursor-default bg-transparent"
         />
       )}
 
@@ -619,7 +621,16 @@ export function Jelajah({
               >
                 <Card
                   onClick={() => setTerpilihId(r.id)}
-                  className={`cursor-pointer p-4 transition hover:border-daun-400 ${
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setTerpilihId(r.id);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Buka laporan ${r.judul}`}
+                  className={`cursor-pointer p-4 transition hover:border-daun-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 ${
                     terpilihId === r.id ? "ring-2 ring-daun-500" : ""
                   }`}
                 >
@@ -751,10 +762,10 @@ export function Jelajah({
               {fasilitasByJenis(fasTerpilih.jenis).nama}
             </span>
             {fasTerpilih.alamat && (
-              <p className="text-sm text-muted">📍 {fasTerpilih.alamat}</p>
+              <p className="text-sm text-muted">Alamat: {fasTerpilih.alamat}</p>
             )}
             {fasTerpilih.jam_buka && (
-              <p className="text-sm text-muted">🕒 {fasTerpilih.jam_buka}</p>
+              <p className="text-sm text-muted">Jam: {fasTerpilih.jam_buka}</p>
             )}
             <p className="text-xs text-muted">
               Lokasi titik perkiraan — konfirmasi ke pengelola sebelum berkunjung.

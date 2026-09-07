@@ -93,7 +93,7 @@ const LeafletMap = dynamic(
       <div className="flex h-full w-full items-center justify-center bg-panel-2 text-xs text-muted">
         <span className="flex items-center gap-2 font-medium">
           <span className="size-2 animate-ping rounded-full bg-daun-500" />
-          Memuat Peta Spasial Realtime...
+          Memuat peta wilayah…
         </span>
       </div>
     ),
@@ -204,21 +204,21 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
     : null;
 
   return (
-    <div className="relative overflow-hidden rounded-[2rem] border garis-halus bg-panel p-2 shadow-2xl">
+    <div className="relative overflow-hidden rounded-2xl border garis-halus bg-panel p-2 shadow-2xl">
       {/* Top Bar Status */}
-      <div className="flex items-center justify-between border-b garis-halus bg-panel-2/90 px-4 py-2.5 rounded-t-[1.6rem] text-xs">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 border-b garis-halus bg-panel-2/90 px-4 py-2.5 rounded-t-xl text-xs">
+        <div className="flex min-w-0 items-center gap-2">
           <span className="relative flex size-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-daun-400 opacity-75" />
             <span className="relative inline-flex size-2 rounded-full bg-daun-500" />
           </span>
-          <span className="font-semibold text-ink tracking-tight">
-            Peta Geospasial Wilayah
+          <span className="truncate font-semibold text-ink tracking-tight">
+            Peta wilayah
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="rounded-full bg-daun-500/10 px-2.5 py-0.5 text-[11px] font-bold text-daun-700 dark:text-daun-300">
-            {titik.length} Laporan Aktif
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="rounded-full bg-daun-500/10 px-2.5 py-0.5 text-[11px] font-bold tabular-nums angka-tabular text-daun-700 dark:text-daun-300">
+            {titik.length} laporan aktif
           </span>
           <span className="hidden sm:inline text-[11px] text-muted">· Realtime</span>
         </div>
@@ -302,9 +302,9 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
 
                 <Link
                   href={`/laporan/${laporanTerpilih.id}`}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300 dark:hover:text-daun-200 transition"
+                  className="inline-flex shrink-0 items-center gap-1 text-[11px] font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300 dark:hover:text-daun-200 transition"
                 >
-                  Buka Detail <ArrowRight size={12} />
+                  Lihat detail <ArrowRight size={12} />
                 </Link>
               </div>
             </motion.div>
@@ -313,16 +313,16 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
       </div>
 
       {/* Bottom Bar Controls & Navigation */}
-      <div className="flex items-center justify-between border-t garis-halus bg-panel-2/80 px-4 py-2.5 rounded-b-[1.6rem] text-xs">
-        <span className="text-muted text-[11px] flex items-center gap-1.5">
-          <MapPin size={13} className="text-daun-600 dark:text-daun-400" />
-          Klik sembarang pin untuk melihat status
+      <div className="flex items-center justify-between gap-2 border-t garis-halus bg-panel-2/80 px-4 py-2.5 rounded-b-xl text-xs">
+        <span className="flex min-w-0 items-center gap-1.5 text-[11px] text-muted">
+          <MapPin size={13} className="shrink-0 text-daun-600 dark:text-daun-400" />
+          <span className="truncate">Pilih pin untuk melihat status laporan di sekitarmu</span>
         </span>
         <Link
           href="/peta"
-          className="inline-flex items-center gap-1 font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300 dark:hover:text-daun-200 text-[11px] transition"
+          className="inline-flex shrink-0 items-center gap-1 font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300 dark:hover:text-daun-200 text-[11px] transition"
         >
-          Jelajahi Peta Penuh <ExternalLink size={12} />
+          Lihat peta lengkap <ExternalLink size={12} />
         </Link>
       </div>
     </div>

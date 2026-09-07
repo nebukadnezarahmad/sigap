@@ -10,6 +10,26 @@ import { IkonVektor, type NodeIkon } from "@/lib/ikon-vektor";
 
 type Soal = { tanya: string; opsi: string[]; benar: number };
 
+export function GalatEdukasi() {
+  const router = useRouter();
+  return (
+    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+      <Card className="p-8">
+        <h1 className="font-display text-2xl font-bold">
+          Edukasi belum bisa dimuat
+        </h1>
+        <p className="mt-2 text-sm text-muted">
+          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
+          lagi.
+        </p>
+        <Button className="mt-5" onClick={() => router.refresh()}>
+          Coba lagi
+        </Button>
+      </Card>
+    </main>
+  );
+}
+
 export function EdukasiKlien({
   soal,
   masuk,
@@ -187,7 +207,9 @@ function QuizSection({
                 disabled={!skor}
                 onClick={lanjut}
               >
-                {indeks < soal.length - 1 ? "Lanjut" : "Lihat hasil"}
+                {indeks < soal.length - 1
+                  ? `Lanjut ke soal ${indeks + 2}`
+                  : "Lihat hasil"}
               </Button>
             </div>
           )}
@@ -221,7 +243,7 @@ function QuizSection({
                   : "Masuk untuk menyimpan skor."}
               </p>
               <Button variant="sekunder" className="mt-5" onClick={ulang}>
-                Coba lagi
+                Ulangi quiz
               </Button>
             </motion.div>
           )}

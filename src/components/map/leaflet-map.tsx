@@ -3,20 +3,58 @@
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import type * as LeafletNS from "leaflet";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/lib/use-theme";
 import { svgUriKategori } from "@/lib/ikon-vektor";
 
-const CARTO_KEY = process.env.NEXT_PUBLIC_CARTO_API_KEY
-  ? `?api_key=${process.env.NEXT_PUBLIC_CARTO_API_KEY}`
-  : "";
+const KUNCI_CARTO = process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "";
+const ADA_KUNCI_CARTO = KUNCI_CARTO.length > 0;
 
-const TILE_TERANG =
-  `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${CARTO_KEY}`;
-const TILE_GELAP =
-  `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${CARTO_KEY}`;
+const TILE_TERANG = `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${
+  ADA_KUNCI_CARTO ? `?api_key=${KUNCI_CARTO}` : ""
+}`;
+const TILE_GELAP = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${
+  ADA_KUNCI_CARTO ? `?api_key=${KUNCI_CARTO}` : ""
+}`;
+
+// Fallback ubin OSM standar saat kunci CARTO kosong. Tanpa ini, ubin CARTO
+// tanpa kunci menampilkan watermark "API KEY REQUIRED" dan peta terlihat kotor.
+const TILE_OSM = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const ATRIBUSI_OSM =
+  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors';
+const ATRIBUSI_CARTO =
+  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>';
+
+function urlTile(gelap: boolean) {
+  if (!ADA_KUNCI_CARTO) return TILE_OSM;
+  return gelap ? TILE_GELAP : TILE_TERANG;
+}
+
+function atribusiTile() {
+  return ADA_KUNCI_CARTO ? ATRIBUSI_CARTO : ATRIBUSI_OSM;
+}
+
+// Palet literal khusus Leaflet: gradien kanvas heatmap dan data-URI ikon SVG
+// tidak bisa membaca var() CSS, jadi nilainya diselaraskan manual dengan
+// token @theme di globals.css:
+// - PUTIH_PIN: --color-panel mode terang (#ffffff), untuk ikon di atas pin berwarna.
+// - HIJAU_BAKU: --color-daun-500 (#2e9e57), warna pin cadangan.
+// - PANAS_SEDANG (#f97316): belum ada padanan token, didefinisikan di sini.
+// - PANAS_RENDAH / PANAS_TINGGI dibaca dari --color-kunyit-400 / --color-danger
+//   saat runtime (dengan nilai ganti yang sama bila token tak ditemukan).
+const PUTIH_PIN = "#ffffff";
+const HIJAU_BAKU = "#2e9e57";
+const PANAS_SEDANG = "#f97316";
+
+function nilaiToken(nama: string, ganti: string) {
+  if (typeof window === "undefined") return ganti;
+  return (
+    getComputedStyle(document.documentElement).getPropertyValue(nama).trim() ||
+    ganti
+  );
+}
 
 export type TitikPeta = {
   id: string;
@@ -60,6 +98,8 @@ export function LeafletMap({
   const refSudahFit = useRef(false);
   const gelap = useTheme();
   const cbRef = useRef({ onPilih, onKlikTitik });
+  const [mencariLokasi, setMencariLokasi] = useState(false);
+  const [statusLokasi, setStatusLokasi] = useState<string | null>(null);
 
   useEffect(() => {
     cbRef.current = { onPilih, onKlikTitik };
@@ -84,9 +124,8 @@ export function LeafletMap({
       });
       L.control.zoom({ position: "bottomright" }).addTo(peta);
 
-      refTile.current = L.tileLayer(gelap ? TILE_GELAP : TILE_TERANG, {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
+      refTile.current = L.tileLayer(urlTile(gelap), {
+        attribution: atribusiTile(),
         maxZoom: 19,
       }).addTo(peta);
 
@@ -134,7 +173,11 @@ export function LeafletMap({
             blur: 24,
             maxZoom: 16,
             pane: "panas",
-            gradient: { 0.2: "#fbbf24", 0.55: "#f97316", 0.9: "#dc2626" },
+            gradient: {
+              0.2: nilaiToken("--color-kunyit-400", "#fbbf24"),
+              0.55: PANAS_SEDANG,
+              0.9: nilaiToken("--color-danger", "#dc2626"),
+            },
           }).addTo(peta);
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (refPanas.current as any).bringToBack?.();
@@ -153,11 +196,33 @@ export function LeafletMap({
         titik.forEach((t) => {
           const m = L.marker([t.lat, t.lng], {
             icon: buatIkon(L, t.warna, t.slug, t.id === terpilih),
+            // Marker Leaflet bisa difokus (Tab) dan diklik via Enter secara
+            // bawaan; title/alt memberi nama yang terbaca pembaca layar.
+            keyboard: true,
+            title: t.judul,
+            alt: `Pin laporan: ${t.judul}`,
           }).bindTooltip(escapeHtml(t.judul), {
             direction: "top",
             offset: [0, -22],
           });
-          m.on("click", () => cbRef.current.onKlikTitik?.(t.id));
+          const bukaLaporan = () => cbRef.current.onKlikTitik?.(t.id);
+          m.on("click", bukaLaporan);
+          // Pengaman bila event keydown marker didukung: Space/Enter
+          // membuka laporan yang sama seperti klik.
+          (
+            m as unknown as {
+              on(
+                nama: string,
+                fn: (e: { originalEvent?: KeyboardEvent }) => void
+              ): void;
+            }
+          ).on("keydown", (e) => {
+            const tombol = e.originalEvent;
+            if (tombol && (tombol.key === "Enter" || tombol.key === " ")) {
+              tombol.preventDefault();
+              bukaLaporan();
+            }
+          });
           cluster.addLayer(m);
         });
         peta.addLayer(cluster);
@@ -171,6 +236,9 @@ export function LeafletMap({
         const layer = L.layerGroup().addTo(peta);
         L.marker([t.lat, t.lng], {
           icon: buatIkon(L, t.warna, t.slug, true),
+          keyboard: true,
+          title: t.judul,
+          alt: `Pin laporan: ${t.judul}`,
         }).addTo(layer);
         refLayer.current = layer;
         peta.setView([t.lat, t.lng], Math.max(peta.getZoom(), 15));
@@ -187,7 +255,7 @@ export function LeafletMap({
 
   useEffect(() => {
     if (refTile.current) {
-      refTile.current.setUrl(gelap ? TILE_GELAP : TILE_TERANG);
+      refTile.current.setUrl(urlTile(gelap));
     }
   }, [gelap]);
 
@@ -218,21 +286,115 @@ export function LeafletMap({
     };
   }, []);
 
+  // Fallback keyboard untuk mode "pilih": peta Leaflet hanya bisa diklik
+  // dengan tetikus, jadi sediakan tombol geolokasi + Enter untuk menandai
+  // titik tengah peta (peta bisa digeser dengan tombol panah).
+  function pakaiLokasiSaya() {
+    if (!("geolocation" in navigator)) {
+      setStatusLokasi("Peramban tidak mendukung geolokasi.");
+      return;
+    }
+    setMencariLokasi(true);
+    setStatusLokasi("Mencari lokasimu…");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        setMencariLokasi(false);
+        setStatusLokasi(
+          `Lokasi ditemukan: ${lat.toFixed(5)}, ${lng.toFixed(5)}.`
+        );
+        if (refPeta.current) {
+          refPeta.current.setView(
+            [lat, lng],
+            Math.max(refPeta.current.getZoom(), 15)
+          );
+        }
+        cbRef.current.onPilih?.(lat, lng);
+      },
+      () => {
+        setMencariLokasi(false);
+        setStatusLokasi(
+          "Lokasi tidak ditemukan. Geser peta lalu tekan Enter."
+        );
+      },
+      { timeout: 8000 }
+    );
+  }
+
+  // Enter/Space saat fokus di badan peta menandai titik tengah.
+  // Abaikan bila fokus ada di kontrol zoom, marker, tautan, atau tombol
+  // agar tidak ganda dengan aksi bawaan elemen tersebut.
+  function pilihTengah(e: KeyboardEvent<HTMLDivElement>) {
+    if (mode !== "pilih") return;
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const el = e.target;
+    if (!(el instanceof HTMLElement)) return;
+    if (!el.closest(".leaflet-container")) return;
+    if (el.closest(".leaflet-control, .leaflet-marker-icon, a, button")) {
+      return;
+    }
+    e.preventDefault();
+    const tengah = refPeta.current?.getCenter();
+    if (tengah) cbRef.current.onPilih?.(tengah.lat, tengah.lng);
+  }
+
   return (
     <>
-      <div
-        ref={refDiv}
-        className={cn(
-          "z-0 h-full w-full",
-          mode === "pilih" && "cursor-crosshair",
-          className
+      {/* Perbesar kontrol zoom bawaan Leaflet (30px) ke target 44px,
+          plus cincin fokus yang jelas untuk marker keyboard. */}
+      <style>{`.sigap-peta .leaflet-bar a{width:44px!important;height:44px!important;line-height:44px!important}
+.sigap-peta .leaflet-marker-icon:focus-visible{outline:3px solid var(--color-daun-600);outline-offset:3px;border-radius:12px}`}</style>
+      <div className="relative h-full w-full" onKeyDown={pilihTengah}>
+        <div
+          ref={refDiv}
+          className={cn(
+            "sigap-peta z-0 h-full w-full",
+            mode === "pilih" && "cursor-crosshair",
+            className
+          )}
+          role="region"
+          aria-label="Peta interaktif"
+        />
+        {mode === "pilih" && (
+          <div className="pointer-events-none absolute left-3 top-3 z-[600] flex max-w-[calc(100%-1.5rem)] flex-col items-start gap-1.5">
+            <button
+              type="button"
+              onClick={pakaiLokasiSaya}
+              disabled={mencariLokasi}
+              className="pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full border garis-halus bg-panel/95 px-4 text-sm font-semibold shadow-lg backdrop-blur transition hover:border-daun-400 disabled:opacity-60"
+            >
+              {mencariLokasi ? "Mencari…" : "Pakai lokasi saya"}
+            </button>
+            <p className="rounded-lg bg-panel/90 px-2.5 py-1 text-[11px] leading-snug text-muted shadow backdrop-blur">
+              Keyboard: geser dengan tombol panah, tekan Enter untuk menandai
+              titik tengah.
+            </p>
+            {statusLokasi && (
+              <p
+                role="status"
+                className="rounded-lg bg-panel/90 px-2.5 py-1 text-[11px] leading-snug text-ink shadow backdrop-blur"
+              >
+                {statusLokasi}
+              </p>
+            )}
+          </div>
         )}
-        role="region"
-        aria-label="Peta interaktif"
-      />
-      <ul className="sr-only">
+      </div>
+      {/* Jalan pintas keyboard: setiap tombol membuka laporan yang sama
+          seperti klik marker. Tersembunyi visual hingga difokus (pola
+          skip-link) agar tidak membebani navigasi Tab pengguna awas. */}
+      <ul aria-label="Jalan pintas keyboard daftar laporan">
         {titik.slice(0, 30).map((t) => (
-          <li key={t.id}>{t.judul}</li>
+          <li key={t.id}>
+            <button
+              type="button"
+              onClick={() => cbRef.current.onKlikTitik?.(t.id)}
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[2000] focus:min-h-11 focus:rounded-full focus:bg-daun-700 focus:px-5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-xl"
+            >
+              Buka laporan: {t.judul}
+            </button>
+          </li>
         ))}
       </ul>
     </>
@@ -249,7 +411,7 @@ function escapeHtml(teks: string) {
 }
 
 function warnaAman(warna: string) {
-  return /^#[0-9a-fA-F]{6}$/.test(warna) ? warna : "#2e9e57";
+  return /^#[0-9a-fA-F]{6}$/.test(warna) ? warna : HIJAU_BAKU;
 }
 
 function buatIkon(
@@ -259,7 +421,7 @@ function buatIkon(
   aktif?: boolean
 ) {
   const aman = warnaAman(warna);
-  const ikon = svgUriKategori(slug, "#ffffff", 15);
+  const ikon = svgUriKategori(slug, PUTIH_PIN, 15);
   return L.divIcon({
     className: "",
     html: `<span class="pin-sigap${aktif ? " pin-aktif" : ""}" style="--pin:${aman}"><img src="${ikon}" width="15" height="15" alt="" class="pin-ikon" /></span>`,

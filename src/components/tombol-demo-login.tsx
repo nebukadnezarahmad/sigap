@@ -29,8 +29,8 @@ export const AKUN_DEMO = [
     email: "rafa@sigap.demo",
     deskripsi: "Akun baru untuk mencoba alur pelaporan dari awal",
     admin: false,
-    warna: "border-sky-500/30 bg-sky-500/5 hover:border-sky-500/60",
-    badge: "bg-sky-500/15 text-sky-700 dark:text-sky-400",
+    warna: "border-daun-500/30 bg-daun-500/5 hover:border-daun-500/60",
+    badge: "bg-daun-500/15 text-daun-700 dark:text-daun-300",
   },
 ];
 
@@ -48,7 +48,6 @@ export function PilihanAkunDemo({
   const router = useRouter();
   const [loadingEmail, setLoadingEmail] = useState<string | null>(null);
   const [pesanGalat, setPesanGalat] = useState<string | null>(null);
-  const demoAktif = process.env.NEXT_PUBLIC_DEMO_ENABLED !== "false";
 
   async function handleLogin(email: string) {
     setLoadingEmail(email);
@@ -61,7 +60,9 @@ export function PilihanAkunDemo({
       });
 
       if (error) {
-        setPesanGalat("Gagal masuk dengan akun demo. Coba lagi.");
+        setPesanGalat(
+          "Gagal masuk dengan akun demo. Coba lagi atau masuk manual."
+        );
         setLoadingEmail(null);
         return;
       }
@@ -75,14 +76,6 @@ export function PilihanAkunDemo({
       setPesanGalat("Terjadi kesalahan saat memproses login.");
       setLoadingEmail(null);
     }
-  }
-
-  if (!demoAktif) {
-    return (
-      <p className="rounded-xl bg-panel-2/60 px-3 py-2 text-sm text-muted">
-        Mode demo nonaktif
-      </p>
-    );
   }
 
   const akunTampil = hanyaAdmin
@@ -105,6 +98,7 @@ export function PilihanAkunDemo({
                 key={a.email}
                 type="button"
                 disabled={loadingEmail !== null}
+                aria-busy={loadingEmail !== null}
                 onClick={() => handleLogin(a.email)}
                 className={`flex flex-col items-start rounded-xl border p-3 text-left transition ${a.warna} ${
                   isLoading ? "opacity-75" : ""
@@ -116,7 +110,9 @@ export function PilihanAkunDemo({
                     {a.peran.split(" ")[0]}
                   </span>
                   {isLoading ? (
-                    <Loader2 size={13} className="animate-spin text-muted" />
+                    <span className="flex items-center gap-1 text-[10px] font-semibold text-muted">
+                      <Loader2 size={13} className="animate-spin" /> Masuk…
+                    </span>
                   ) : (
                     <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${a.badge}`}>
                       1-Klik
@@ -149,6 +145,7 @@ export function PilihanAkunDemo({
               key={a.email}
               type="button"
               disabled={loadingEmail !== null}
+              aria-busy={loadingEmail !== null}
               onClick={() => handleLogin(a.email)}
               className={`flex w-full items-center justify-between rounded-2xl border p-4 text-left transition ${a.warna} ${
                 isLoading ? "opacity-75" : ""

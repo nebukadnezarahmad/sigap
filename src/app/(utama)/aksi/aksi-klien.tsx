@@ -14,6 +14,26 @@ function apakahLewat(tanggal: string) {
   return new Date(tanggal).getTime() < Date.now();
 }
 
+export function GalatAksi() {
+  const router = useRouter();
+  return (
+    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+      <Card className="p-8">
+        <h1 className="font-display text-2xl font-bold">
+          Aksi Bersama belum bisa dimuat
+        </h1>
+        <p className="mt-2 text-sm text-muted">
+          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
+          lagi.
+        </p>
+        <Button className="mt-5" onClick={() => router.refresh()}>
+          Coba lagi
+        </Button>
+      </Card>
+    </main>
+  );
+}
+
 function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
   const router = useRouter();
   const { user: pengguna } = useUser();
@@ -108,10 +128,10 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
     <Card className="overflow-hidden p-0">
       <div className="flex items-stretch">
         <div className="flex w-20 shrink-0 flex-col items-center justify-center bg-daun-600/10 py-4 text-daun-800 dark:text-daun-200">
-          <span className="font-display text-2xl font-extrabold leading-none">
+          <span className="angka-tabular font-display text-2xl font-extrabold leading-none">
             {new Date(data.tanggal).getDate()}
           </span>
-          <span className="text-xs font-bold uppercase">
+          <span className="angka-tabular text-xs font-bold uppercase">
             {new Date(data.tanggal).toLocaleDateString("id-ID", { month: "short" })}
           </span>
         </div>

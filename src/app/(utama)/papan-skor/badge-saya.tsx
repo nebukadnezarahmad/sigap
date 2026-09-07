@@ -45,7 +45,7 @@ export function BadgeSaya() {
             key={poin}
             initial={{ scale: 1.25 }}
             animate={{ scale: 1 }}
-            className="angka-tabular font-display text-2xl font-extrabold text-daun-700 dark:text-daun-300"
+            className="angka-tabular text-2xl font-extrabold tabular-nums text-daun-700 dark:text-daun-300"
           >
             {poin} poin
           </motion.p>
