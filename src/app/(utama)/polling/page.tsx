@@ -61,25 +61,33 @@ export default async function HalamanPolling() {
     : { data: null };
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-          Suara warga
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-          Polling Partisipatif
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Pendapatmu menentukan arah kebijakan lingkungan. Satu warga, satu
-          suara per polling — hasilnya terbuka dan berjalan realtime.
-        </p>
-      </header>
+    <main>
+      {/* Tile header terang (canvas putih) */}
+      <section className="bg-white text-ap-ink dark:bg-panel dark:text-ink">
+        <div className="mx-auto max-w-3xl px-4 py-12">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ap-blue dark:text-ap-sky">
+            Suara warga
+          </p>
+          <h1 className="mt-3 font-serif text-[40px] font-semibold leading-[1.1] tracking-[-0.28px]">
+            Polling Partisipatif
+          </h1>
+          <p className="mt-3 max-w-xl text-[17px] leading-[1.47] tracking-[-0.374px] text-muted teks-pretty">
+            Pendapatmu menentukan arah kebijakan lingkungan. Satu warga, satu
+            suara per polling — hasilnya terbuka dan berjalan realtime.
+          </p>
+        </div>
+      </section>
 
-      <PollingKlien
-        awal={polls}
-        isAdmin={profil?.role === "admin"}
-        masuk={!!user}
-      />
+      {/* Konten parchment */}
+      <section className="bg-ap-parchment text-ap-ink dark:bg-paper dark:text-ink">
+        <div className="mx-auto max-w-3xl px-4 py-10">
+          <PollingKlien
+            awal={polls}
+            isAdmin={profil?.role === "admin"}
+            masuk={!!user}
+          />
+        </div>
+      </section>
     </main>
   );
 }

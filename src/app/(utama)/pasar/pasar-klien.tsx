@@ -17,6 +17,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import type { Barang } from "./page";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { Modal } from "@/components/modal";
 
 const KATEGORI = [
@@ -114,11 +115,11 @@ function KartuBarang({
   const tersedia = data.status === "tersedia";
 
   return (
-    <Card className="p-5">
+    <Card className="rounded-[18px] border-ap-hairline bg-white p-5 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
       <div className="flex gap-3">
         <IkonKategori kategori={data.kategori} />
         <div className="min-w-0 flex-1">
-          <h2 className="font-display font-bold leading-snug">{data.judul}</h2>
+          <h2 className="font-display font-bold leading-snug tracking-[-0.224px]">{data.judul}</h2>
           <p className="mt-1 text-xs text-muted">
             dari @{data.pemilik_nama ?? "warga"} ·{" "}
             <span className="uppercase tracking-wide">{data.kategori}</span> ·{" "}
@@ -152,7 +153,7 @@ function KartuBarang({
 
       {tersedia && !data.milikKu && (
         <Button
-          className="mt-4 w-full"
+          className="mt-4 min-h-[44px] w-full focus-visible:outline-ap-blue-focus"
           variant={masuk ? "utama" : "sekunder"}
           disabled={proses || !masuk}
           onClick={klaim}
@@ -307,15 +308,15 @@ export function GalatPasar() {
   const router = useRouter();
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
-        <h1 className="font-display text-2xl font-bold">
+      <Card className="rounded-[18px] border-ap-hairline bg-white p-8 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+        <h1 className="font-display text-2xl font-bold tracking-[-0.224px]">
           Pasar ReUse belum bisa dimuat
         </h1>
         <p className="mt-2 text-sm text-muted">
           Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
           lagi.
         </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
+        <Button className="mt-5 min-h-[44px] focus-visible:outline-ap-blue-focus" onClick={() => router.refresh()}>
           Coba lagi
         </Button>
       </Card>
@@ -366,7 +367,7 @@ export function PasarKlien({
       <div className="mb-5 flex flex-wrap items-center gap-2">
         <button
           onClick={() => setFilter("semua")}
-          className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
+          className={`inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus ${
             filter === "semua"
               ? "bg-daun-600 text-white"
               : "border garis-halus text-muted hover:bg-panel-2 hover:text-ink"
@@ -378,7 +379,7 @@ export function PasarKlien({
           <button
             key={k.id}
             onClick={() => setFilter(k.id)}
-            className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
+            className={`inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus ${
               filter === k.id
                 ? "bg-daun-600 text-white"
                 : "border garis-halus text-muted hover:bg-panel-2 hover:text-ink"
@@ -388,9 +389,11 @@ export function PasarKlien({
           </button>
         ))}
         {masuk && (
-          <Button className="ml-auto" onClick={() => setFormBuka(true)}>
-            <Plus size={15} /> Pasang barang
-          </Button>
+          <KacaPill onClick={() => setFormBuka(true)} className="ml-auto min-h-[44px] focus-visible:outline-ap-blue-focus">
+            <span className="inline-flex items-center gap-2">
+              <Plus size={15} /> Pasang barang
+            </span>
+          </KacaPill>
         )}
       </div>
 
@@ -410,9 +413,9 @@ export function PasarKlien({
         </motion.div>
       </AnimatePresence>
       {tampil.length === 0 && (
-        <Card className="p-10 text-center text-sm text-muted">
+        <KacaKartu className="p-10 text-center text-sm text-muted">
           Belum ada barang pada kategori ini.
-        </Card>
+        </KacaKartu>
       )}
 
       <Modal terbuka={formBuka} tutup={() => setFormBuka(false)} judul="Pasang barang bekas">

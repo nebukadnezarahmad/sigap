@@ -8,7 +8,15 @@ import { useUser } from "@/lib/use-user";
 import type { Komentar } from "@/types/database";
 import { waktuRelatif } from "@/lib/utils";
 import { Avatar, Button, Card, Skeleton, Textarea } from "@/components/ui";
+import { KacaPill } from "@/components/eksperimen/kaca";
 import { DemoAuthModal } from "@/components/tombol-demo-login";
+
+/* Fusi visual-fusion: kartu utilitas putih hairline 18px; tombol Kirim
+   pill Action Blue 44px. Bubble komentar + copy + aria tidak diubah. */
+const KARTU =
+  "rounded-[18px] border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
+const PILL_BIRU =
+  "min-h-[44px] border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus";
 
 export function KomentarSection({
   reportId,
@@ -121,7 +129,7 @@ export function KomentarSection({
   }
 
   return (
-    <Card className="p-5">
+    <Card className={`${KARTU} p-5`}>
       <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
         <MessageSquare size={17} />
         Diskusi warga
@@ -181,9 +189,16 @@ export function KomentarSection({
             placeholder="Tulis tanggapan atau info tambahan…"
             aria-label="Tulis komentar"
           />
-          <Button type="submit" disabled={kirim || !teks.trim()} aria-label="Kirim komentar">
-            <SendHorizonal size={16} />
-          </Button>
+          <KacaPill
+            type="submit"
+            disabled={kirim || !teks.trim()}
+            aria-label="Kirim komentar"
+            className={`${PILL_BIRU} min-w-[44px] px-0`}
+          >
+            <span className="inline-flex items-center">
+              <SendHorizonal size={16} />
+            </span>
+          </KacaPill>
         </form>
       ) : (
         <div className="mt-5 rounded-2xl border border-daun-500/25 bg-daun-500/5 p-4">
@@ -198,7 +213,7 @@ export function KomentarSection({
               size="sm"
               variant="sekunder"
               onClick={() => setModalAuth(true)}
-              className="border-daun-500/30 text-daun-700 hover:bg-daun-500/10 dark:text-daun-300"
+              className="min-h-[44px] border-daun-500/30 text-daun-700 hover:bg-daun-500/10 focus-visible:outline-ap-blue-focus dark:text-daun-300"
             >
               Masuk 1-Klik Demo
             </Button>

@@ -5,16 +5,26 @@ import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { Award, Calculator, CheckCircle2, XCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { Button, Card, Label } from "@/components/ui";
+import { Button, Label } from "@/components/ui";
+import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { IkonVektor, type NodeIkon } from "@/lib/ikon-vektor";
 
 type Soal = { tanya: string; opsi: string[]; benar: number };
+
+/* Grammar Apple (FUSI): kartu utilitas putih hairline radius 18;
+   sorotan memakai KacaKartu; fokus Action Blue; target sentuh 44px. */
+const KARTU_UTILITAS =
+  "rounded-[18px] border border-ap-hairline bg-white shadow-none dark:border-line dark:bg-panel dark:text-ink";
+const FOKUS_APPLE =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!";
+const TOMBOL_UTAMA_APPLE =
+  "min-h-[44px] bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus!";
 
 export function GalatEdukasi() {
   const router = useRouter();
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
+      <div className={`${KARTU_UTILITAS} p-8`}>
         <h1 className="font-display text-2xl font-bold">
           Edukasi belum bisa dimuat
         </h1>
@@ -22,10 +32,10 @@ export function GalatEdukasi() {
           Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
           lagi.
         </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
+        <Button className={`mt-5 ${TOMBOL_UTAMA_APPLE}`} onClick={() => router.refresh()}>
           Coba lagi
         </Button>
-      </Card>
+      </div>
     </main>
   );
 }
@@ -117,8 +127,8 @@ function QuizSection({
 
   return (
     <section aria-label="Quiz edukasi">
-      <Card className="overflow-hidden p-0">
-        <div className="border-b garis-halus bg-panel-2/60 px-6 py-4">
+      <div className={`${KARTU_UTILITAS} overflow-hidden p-0`}>
+        <div className="border-b border-ap-hairline bg-ap-parchment/80 px-6 py-4 backdrop-blur dark:border-line dark:bg-panel-2">
           <h2 className="flex items-center gap-2 font-display text-xl font-bold">
             <Award size={19} className="text-kunyit-500" /> Quiz: Seberapa Hijau
             Kamu?
@@ -137,7 +147,7 @@ function QuizSection({
                 Cerdas Lingkungan.
               </p>
               <Button
-                className="mt-4"
+                className={`mt-4 ${TOMBOL_UTAMA_APPLE}`}
                 onClick={() => router.push("/masuk?next=/edukasi")}
               >
                 Masuk sekarang
@@ -152,7 +162,7 @@ function QuizSection({
                   ? "Kamu sudah pernah lulus. Uji lagi dan pertahankan gelarmu."
                   : "Jawab 5 pertanyaan singkat tentang pengelolaan sampah."}
               </p>
-              <Button className="mt-4" size="lg" onClick={() => setMulai(true)}>
+              <Button className={`mt-4 ${TOMBOL_UTAMA_APPLE}`} size="lg" onClick={() => setMulai(true)}>
                 Mulai quiz
               </Button>
             </div>
@@ -160,15 +170,15 @@ function QuizSection({
 
           {masuk && mulai && !selesaiQuiz && (
             <div>
-              <div className="mb-4 flex items-center gap-2">
+              <div className="mb-4 flex items-center gap-2 rounded-full border border-ap-hairline bg-ap-parchment/80 px-3 py-2 backdrop-blur dark:border-line dark:bg-panel-2">
                 {soal.map((_, i) => (
                   <span
                     key={i}
                     className={`h-1.5 rounded-full transition-all ${
                       i < indeks
-                        ? "w-8 bg-daun-500"
+                        ? "w-8 bg-ap-blue"
                         : i === indeks
-                          ? "w-8 bg-daun-600"
+                          ? "w-8 bg-ap-blue-focus"
                           : "w-4 bg-line"
                     }`}
                   />
@@ -187,22 +197,22 @@ function QuizSection({
                     <button
                       key={i}
                       onClick={() => setPilih(i)}
-                      className={`flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm font-medium transition ${
+                      className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-full border px-4 py-3 text-left text-sm font-medium transition ${FOKUS_APPLE} ${
                         dipilihKu
-                          ? "border-daun-500 bg-daun-500/10"
-                          : "garis-halus hover:border-daun-400"
+                          ? "border-ap-blue bg-ap-blue/5"
+                          : "border-ap-hairline bg-white hover:border-ap-blue dark:border-line dark:bg-panel"
                       }`}
                     >
                       {o}
                       {dipilihKu && (
-                        <CheckCircle2 size={16} className="shrink-0 text-daun-600" />
+                        <CheckCircle2 size={16} className="shrink-0 text-ap-blue" />
                       )}
                     </button>
                   );
                 })}
               </div>
               <Button
-                className="mt-5 w-full"
+                className={`mt-5 w-full ${TOMBOL_UTAMA_APPLE}`}
                 size="lg"
                 disabled={!skor}
                 onClick={lanjut}
@@ -218,37 +228,42 @@ function QuizSection({
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center"
             >
-              <p className="angka-tabular font-display text-5xl font-extrabold text-daun-700 dark:text-daun-300">
-                {benar}
-                <span className="text-2xl text-muted">/{soal.length}</span>
-              </p>
-              {benar >= soal.length - 1 ? (
-                <p className="mt-3 flex items-center justify-center gap-2 font-display text-lg font-bold">
-                  <IkonVektor node={ikonHadiah} ukuran={20} /> Lulus — badge
-                  Cerdas Lingkungan
+              <KacaKartu className="p-6 text-center">
+                <p className="angka-tabular font-display text-5xl font-extrabold text-ap-ink dark:text-ink">
+                  {benar}
+                  <span className="text-2xl text-muted">/{soal.length}</span>
                 </p>
-              ) : (
-                <p className="mt-3 flex items-center justify-center gap-2 font-display text-lg font-bold text-muted">
-                  <XCircle size={19} /> Belum lulus — baca materi lagi lalu coba
-                  ulang.
+                {benar >= soal.length - 1 ? (
+                  <p className="mt-3 flex items-center justify-center gap-2 font-display text-lg font-bold">
+                    <IkonVektor node={ikonHadiah} ukuran={20} /> Lulus — badge
+                    Cerdas Lingkungan
+                  </p>
+                ) : (
+                  <p className="mt-3 flex items-center justify-center gap-2 font-display text-lg font-bold text-muted">
+                    <XCircle size={19} /> Belum lulus — baca materi lagi lalu coba
+                    ulang.
+                  </p>
+                )}
+                <p className="mt-2 text-sm text-muted">
+                  {tersimpan
+                    ? benar >= soal.length - 1 && !lulusSebelumnya
+                      ? "+15 poin masuk ke akunmu."
+                      : "Skor tersimpan."
+                    : "Masuk untuk menyimpan skor."}
                 </p>
-              )}
-              <p className="mt-2 text-sm text-muted">
-                {tersimpan
-                  ? benar >= soal.length - 1 && !lulusSebelumnya
-                    ? "+15 poin masuk ke akunmu."
-                    : "Skor tersimpan."
-                  : "Masuk untuk menyimpan skor."}
-              </p>
-              <Button variant="sekunder" className="mt-5" onClick={ulang}>
-                Ulangi quiz
-              </Button>
+                <KacaPill
+                  type="button"
+                  onClick={ulang}
+                  className={`mt-5 min-h-[44px] ${FOKUS_APPLE}`}
+                >
+                  Ulangi quiz
+                </KacaPill>
+              </KacaKartu>
             </motion.div>
           )}
         </div>
-      </Card>
+      </div>
     </section>
   );
 }
@@ -328,7 +343,7 @@ function KalkulatorSection({
 
   return (
     <section aria-label="Kalkulator jejak sampah">
-      <Card className="p-6">
+      <div className={`${KARTU_UTILITAS} p-6`}>
         <h2 className="flex items-center gap-2 font-display text-xl font-bold">
           <Calculator size={19} className="text-kunyit-500" /> Kalkulator Jejak
           Sampah Pribadi
@@ -350,10 +365,10 @@ function KalkulatorSection({
                       setJawaban((j) => ({ ...j, [q.kunci]: i }))
                     }
                     aria-pressed={jawaban[q.kunci] === i}
-                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                    className={`min-h-[44px] rounded-full border px-3 py-1.5 text-xs font-semibold transition ${FOKUS_APPLE} ${
                       jawaban[q.kunci] === i
-                        ? "border-transparent bg-daun-600 text-white"
-                        : "garis-halus text-muted hover:text-ink"
+                        ? "border-transparent bg-ap-blue text-white"
+                        : "border-ap-hairline text-muted hover:border-ap-blue hover:text-ap-blue dark:border-line"
                     }`}
                   >
                     {o}
@@ -365,7 +380,7 @@ function KalkulatorSection({
         </div>
 
         <Button
-          className="mt-5"
+          className={`mt-5 ${TOMBOL_UTAMA_APPLE}`}
           size="lg"
           disabled={!lengkap || proses}
           onClick={hitung}
@@ -378,42 +393,46 @@ function KalkulatorSection({
             key={hasil}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-6 rounded-2xl border garis-halus bg-panel-2/60 p-5 text-center"
+            className="mt-6"
           >
-            <p className="angka-tabular font-serif text-4xl font-semibold text-daun-700 dark:text-daun-300">
-              {hasil.toLocaleString("id-ID")} kg
-            </p>
-            <p className="mt-1 text-sm text-muted">per tahun untuk rumahmu</p>
-            <div className="mx-auto mt-4 max-w-sm">
-              <div className="relative h-3 overflow-hidden rounded-full bg-line">
-                <div
-                  className={`absolute inset-y-0 left-0 rounded-full ${
-                    hasil <= rataRata ? "bg-daun-500" : "bg-kunyit-500"
-                  }`}
-                  style={{
-                    width: `${Math.min(100, (hasil / (rataRata * 2)) * 100)}%`,
-                  }}
-                />
-                <span
-                  className="absolute inset-y-0 w-0.5 bg-ink"
-                  style={{ left: "50%" }}
-                  title="Rata-rata nasional"
-                />
+            <KacaKartu className="p-5 text-center">
+              <p className="angka-tabular font-serif text-4xl font-semibold text-ap-ink dark:text-ink">
+                {hasil.toLocaleString("id-ID")} kg
+              </p>
+              <p className="mt-1 text-sm text-muted">per tahun untuk rumahmu</p>
+              <div className="mx-auto mt-4 max-w-sm">
+                <div className="rounded-full border border-ap-hairline bg-white/60 p-1.5 backdrop-blur dark:border-line dark:bg-panel-2">
+                  <div className="relative h-3 overflow-hidden rounded-full bg-line">
+                    <div
+                      className={`absolute inset-y-0 left-0 rounded-full ${
+                        hasil <= rataRata ? "bg-daun-500" : "bg-kunyit-500"
+                      }`}
+                      style={{
+                        width: `${Math.min(100, (hasil / (rataRata * 2)) * 100)}%`,
+                      }}
+                    />
+                    <span
+                      className="absolute inset-y-0 w-0.5 bg-ink"
+                      style={{ left: "50%" }}
+                      title="Rata-rata nasional"
+                    />
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-muted">
+                  {hasil <= rataRata
+                    ? "Di bawah rata-rata nasional — pertahankan!"
+                    : `Di atas rata-rata nasional (${rataRata} kg) — mulai dari memilah & mengurangi plastik.`}
+                </p>
               </div>
-              <p className="mt-2 text-xs text-muted">
-                {hasil <= rataRata
-                  ? "Di bawah rata-rata nasional — pertahankan!"
-                  : `Di atas rata-rata nasional (${rataRata} kg) — mulai dari memilah & mengurangi plastik.`}
-              </p>
-            </div>
-            {masuk && (
-              <p className="mt-3 text-xs text-muted">
-                Hasil tersimpan di profilmu · +5 poin untuk perhitungan pertama.
-              </p>
-            )}
+              {masuk && (
+                <p className="mt-3 text-xs text-muted">
+                  Hasil tersimpan di profilmu · +5 poin untuk perhitungan pertama.
+                </p>
+              )}
+            </KacaKartu>
           </motion.div>
         )}
-      </Card>
+      </div>
     </section>
   );
 }

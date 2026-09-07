@@ -7,13 +7,27 @@ import { BarChart3, Check, Plus, Users, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import type { Poll } from "./page";
-import { Button, Card, Input, Label } from "@/components/ui";
+import { Button, Input, Label } from "@/components/ui";
+import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
+
+/* Grammar Apple (FUSI): kartu utilitas putih hairline radius 18;
+   sorotan memakai KacaKartu; fokus Action Blue; target sentuh 44px. */
+const KARTU_UTILITAS =
+  "rounded-[18px] border border-ap-hairline bg-white shadow-none dark:border-line dark:bg-panel dark:text-ink";
+const FOKUS_APPLE =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!";
+const TOMBOL_UTAMA_APPLE =
+  "min-h-[44px] bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus!";
+const TOMBOL_SEKUNDER_APPLE =
+  "min-h-[44px] hover:border-ap-blue hover:text-ap-blue focus-visible:outline-ap-blue-focus! dark:hover:text-ap-sky";
+const INPUT_APPLE =
+  "focus:border-ap-blue focus:ring-ap-blue/15 focus-visible:outline-ap-blue-focus!";
 
 export function GalatPolling() {
   const router = useRouter();
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
+      <div className={`${KARTU_UTILITAS} p-8`}>
         <h1 className="font-display text-2xl font-bold">
           Polling Warga belum bisa dimuat
         </h1>
@@ -21,10 +35,10 @@ export function GalatPolling() {
           Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
           lagi.
         </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
+        <Button className={`mt-5 ${TOMBOL_UTAMA_APPLE}`} onClick={() => router.refresh()}>
           Coba lagi
         </Button>
-      </Card>
+      </div>
     </main>
   );
 }
@@ -40,7 +54,7 @@ function PersenBar({  persen,
   jumlah: number;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-xl border garis-halus bg-panel-2 px-4 py-2.5">
+    <div className="relative overflow-hidden rounded-xl border border-ap-hairline bg-ap-parchment/80 px-4 py-2.5 backdrop-blur dark:border-line dark:bg-panel-2">
       <motion.div
         className="absolute inset-y-0 left-0 bg-daun-500/15"
         initial={{ width: 0 }}
@@ -167,12 +181,12 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
   const sudahVote = data.pilihanKu !== null;
 
   return (
-    <Card className="p-6">
+    <div className={`${KARTU_UTILITAS} p-6`}>
       <div className="mb-4 flex items-start justify-between gap-3">
         <h2 className="font-display text-lg font-bold leading-snug">
           {data.pertanyaan}
         </h2>
-        <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-panel-2 px-2.5 py-1 text-xs font-semibold text-muted">
+        <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-ap-parchment px-2.5 py-1 text-xs font-semibold text-muted dark:bg-panel-2">
           <Users size={12} />
           <span className="angka-tabular">{data.totalSuara}</span>
         </span>
@@ -200,7 +214,7 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
                 key={i}
                 onClick={() => pilih(i)}
                 disabled={proses}
-                className="w-full rounded-xl border garis-halus bg-panel-2 px-4 py-2.5 text-left text-sm font-medium transition hover:border-daun-400 hover:bg-daun-500/5 disabled:opacity-50"
+                className={`min-h-[44px] w-full rounded-full border border-ap-hairline bg-white px-4 py-2.5 text-left text-sm font-medium transition hover:border-ap-blue hover:bg-ap-blue/5 disabled:opacity-50 dark:border-line dark:bg-panel ${FOKUS_APPLE}`}
               >
                 {o}
               </button>
@@ -214,7 +228,7 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
             ? "Terima kasih — suaramu tercatat."
             : "Klik salah satu opsi untuk memberi suara."}
       </p>
-    </Card>
+    </div>
   );
 }
 
@@ -280,6 +294,7 @@ function FormBuatPolling({
           value={pertanyaan}
           onChange={(e) => setPertanyaan(e.target.value)}
           placeholder="Pertanyaan untuk warga…"
+          className={INPUT_APPLE}
         />
       </div>
       {opsi.map((o, i) => (
@@ -293,6 +308,7 @@ function FormBuatPolling({
               onChange={(e) =>
                 setOpsi((arr) => arr.map((x, j) => (j === i ? e.target.value : x)))
               }
+              className={INPUT_APPLE}
             />
             {opsi.length > 2 && (
               <Button
@@ -300,6 +316,7 @@ function FormBuatPolling({
                 variant="hantu"
                 onClick={() => setOpsi((arr) => arr.filter((_, j) => j !== i))}
                 aria-label="Hapus opsi"
+                className={`min-h-[44px] min-w-[44px] ${FOKUS_APPLE}`}
               >
                 <X size={15} />
               </Button>
@@ -312,6 +329,7 @@ function FormBuatPolling({
           type="button"
           variant="sekunder"
           size="sm"
+          className={TOMBOL_SEKUNDER_APPLE}
           onClick={() => setOpsi((arr) => [...arr, ""])}
         >
           <Plus size={14} /> Tambah opsi
@@ -323,10 +341,10 @@ function FormBuatPolling({
         </p>
       )}
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="sekunder" onClick={tutup}>
+        <Button type="button" variant="sekunder" className={TOMBOL_SEKUNDER_APPLE} onClick={tutup}>
           Batal
         </Button>
-        <Button type="submit" disabled={proses}>
+        <Button type="submit" className={TOMBOL_UTAMA_APPLE} disabled={proses}>
           {proses ? "Menyimpan…" : "Terbitkan polling"}
         </Button>
       </div>
@@ -357,7 +375,7 @@ export function PollingKlien({
       {isAdmin && (
         <div className="mb-6">
           {formBuka ? (
-            <Card className="p-5">
+            <KacaKartu className="p-5">
               <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
                 <BarChart3 size={17} /> Polling baru
               </h2>
@@ -369,11 +387,17 @@ export function PollingKlien({
                   router.refresh();
                 }}
               />
-            </Card>
+            </KacaKartu>
           ) : (
-            <Button variant="sekunder" onClick={() => setFormBuka(true)}>
-              <Plus size={15} /> Buat polling baru
-            </Button>
+            <KacaPill
+              type="button"
+              onClick={() => setFormBuka(true)}
+              className={`min-h-[44px] ${FOKUS_APPLE}`}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <Plus size={15} /> Buat polling baru
+              </span>
+            </KacaPill>
           )}
         </div>
       )}
@@ -393,9 +417,9 @@ export function PollingKlien({
           ))}
         </AnimatePresence>
         {polls.length === 0 && (
-          <Card className="p-10 text-center text-sm text-muted">
+          <div className={`${KARTU_UTILITAS} p-10 text-center text-sm text-muted`}>
             Belum ada polling aktif.
-          </Card>
+          </div>
         )}
       </div>
     </div>

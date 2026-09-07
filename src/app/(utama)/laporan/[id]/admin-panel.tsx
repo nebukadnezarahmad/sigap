@@ -6,7 +6,14 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
-import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { KacaPill } from "@/components/eksperimen/kaca";
+
+/* Fusi visual-fusion: bingkai kunyit (semantik admin) dipertahankan di atas
+   kartu utilitas putih 18px; tombol Simpan pill Action Blue 44px.
+   Pesan error, role/aria, dan logika simpan tidak diubah. */
+const PILL_BIRU =
+  "min-h-[44px] border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus";
 
 /**
  * Status lanjutan yang sah dari tiap status sekarang. "selesai" sengaja
@@ -132,7 +139,7 @@ export function AdminPanel({
   }
 
   return (
-    <Card className="border-kunyit-500/40 bg-kunyit-100/30 p-5 dark:bg-kunyit-500/5">
+    <Card className="rounded-[18px] border-kunyit-500/40 bg-white p-5 text-ap-ink shadow-none dark:border-kunyit-500/40 dark:bg-panel dark:text-ink">
       <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
         <Wrench size={16} /> Panel Dewan & Petugas
       </h2>
@@ -205,9 +212,11 @@ export function AdminPanel({
         </div>
       )}
       <div className="mt-4 flex items-center gap-3">
-        <Button type="button" onClick={simpan} disabled={proses} aria-busy={proses}>
-          <Save size={16} /> {proses ? "Menyimpan…" : "Simpan perubahan"}
-        </Button>
+        <KacaPill type="button" onClick={simpan} disabled={proses} aria-busy={proses} className={PILL_BIRU}>
+          <span className="inline-flex items-center gap-2">
+            <Save size={16} /> {proses ? "Menyimpan…" : "Simpan perubahan"}
+          </span>
+        </KacaPill>
         {pesan && (
           <span
             role={pesan === "Tersimpan!" ? "status" : "alert"}

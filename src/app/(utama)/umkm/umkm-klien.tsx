@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { Modal } from "@/components/modal";
 
 type Usaha = {
@@ -47,13 +48,13 @@ function KartuUsaha({ usaha }: { usaha: Usaha }) {
   const wa = nomorWa(usaha.whatsapp);
   const meta = KATEGORI.find((k) => k.id === usaha.kategori) ?? KATEGORI[4];
   return (
-    <Card className="flex h-full flex-col p-5">
+    <Card className="flex h-full flex-col rounded-[18px] border-ap-hairline bg-white p-5 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
       <div className="flex items-start gap-3">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400">
           <meta.Ikon size={20} />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="font-display font-bold leading-snug">{usaha.nama}</h2>
+          <h2 className="font-display font-bold leading-snug tracking-[-0.224px]">{usaha.nama}</h2>
           <p className="mt-0.5 text-xs uppercase tracking-wide text-muted">
             {meta.label}
           </p>
@@ -76,7 +77,7 @@ function KartuUsaha({ usaha }: { usaha: Usaha }) {
           href={`https://wa.me/${wa}`}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 flex items-center justify-center gap-1.5 rounded-full bg-daun-600 py-2.5 text-sm font-semibold text-white transition hover:bg-daun-700"
+          className="mt-4 flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-full bg-daun-600 py-2.5 text-sm font-semibold text-white transition hover:bg-daun-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
         >
           <MessageCircle size={15} /> Hubungi via WhatsApp
         </a>
@@ -222,15 +223,15 @@ export function GalatUmkm() {
   const router = useRouter();
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
-        <h1 className="font-display text-2xl font-bold">
+      <Card className="rounded-[18px] border-ap-hairline bg-white p-8 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+        <h1 className="font-display text-2xl font-bold tracking-[-0.224px]">
           UMKM Warga belum bisa dimuat
         </h1>
         <p className="mt-2 text-sm text-muted">
           Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
           lagi.
         </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
+        <Button className="mt-5 min-h-[44px] focus-visible:outline-ap-blue-focus" onClick={() => router.refresh()}>
           Coba lagi
         </Button>
       </Card>
@@ -254,9 +255,11 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
     <div>
       {masuk && (
         <div className="mb-6 flex justify-end">
-          <Button variant="sekunder" onClick={() => setFormBuka(true)}>
-            <Plus size={15} /> Daftarkan usahamu
-          </Button>
+          <KacaPill onClick={() => setFormBuka(true)} className="min-h-[44px] focus-visible:outline-ap-blue-focus">
+            <span className="inline-flex items-center gap-2">
+              <Plus size={15} /> Daftarkan usahamu
+            </span>
+          </KacaPill>
         </div>
       )}
 
@@ -277,9 +280,9 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
         </motion.div>
       </AnimatePresence>
       {tampil.length === 0 && (
-        <Card className="p-10 text-center text-sm text-muted">
+        <KacaKartu className="p-10 text-center text-sm text-muted">
           Belum ada usaha terdaftar. Jadilah yang pertama!
-        </Card>
+        </KacaKartu>
       )}
 
       <Modal terbuka={formBuka} tutup={() => setFormBuka(false)} judul="Daftarkan usaha">

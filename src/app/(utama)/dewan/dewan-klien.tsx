@@ -51,13 +51,28 @@ import { STATUS, hitungSla, type StatusKey } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { Button, Card, Select, StatusChip } from "@/components/ui";
+import { Button, Select, StatusChip } from "@/components/ui";
+import { KacaKartu } from "@/components/eksperimen/kaca";
 import { waktuRelatif } from "@/lib/utils";
 
 const LeafletMap = dynamic(
   () => import("@/components/map/leaflet-map").then((m) => m.LeafletMap),
   { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-panel-2" /> }
 );
+
+/* Grammar Apple (FUSI): kartu utilitas putih hairline radius 18;
+   sorotan memakai KacaKartu; fokus Action Blue; target sentuh 44px.
+   StatusChip + warna semantik (termasuk danger SLA) TIDAK diubah. */
+const KARTU_UTILITAS =
+  "rounded-[18px] border border-ap-hairline bg-white shadow-none dark:border-line dark:bg-panel dark:text-ink";
+const FOKUS_APPLE =
+  "focus-visible:outline-ap-blue-focus! focus-visible:outline-offset-2";
+const TOMBOL_UTAMA_APPLE =
+  "min-h-[44px] bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus!";
+const TOMBOL_SEKUNDER_APPLE =
+  "min-h-[44px] hover:border-ap-blue hover:text-ap-blue focus-visible:outline-ap-blue-focus! dark:hover:text-ap-sky";
+const SELECT_APPLE =
+  "min-h-[44px] focus:border-ap-blue focus:ring-ap-blue/15 focus-visible:outline-ap-blue-focus!";
 
 export function DewanClient({
   daftar: awal,
@@ -302,41 +317,47 @@ export function DewanClient({
   ];
 
   return (
-    <main className="mx-auto max-w-7xl px-4 pb-12 pt-6">
-      <header className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-          Panel dewan
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-          Dashboard Dewan
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Pantau & kelola penanganan laporan permukiman secara realtime.
-        </p>
-      </header>
+    <main>
+      {/* Tile header terang (canvas putih) */}
+      <section className="bg-white text-ap-ink dark:bg-panel dark:text-ink">
+        <div className="mx-auto max-w-7xl px-4 py-12">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ap-blue dark:text-ap-sky">
+            Panel dewan
+          </p>
+          <h1 className="mt-3 font-serif text-[40px] font-semibold leading-[1.1] tracking-[-0.28px]">
+            Dashboard Dewan
+          </h1>
+          <p className="mt-3 max-w-xl text-[17px] leading-[1.47] tracking-[-0.374px] text-muted teks-pretty">
+            Pantau & kelola penanganan laporan permukiman secara realtime.
+          </p>
+        </div>
+      </section>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
-        {kartu.map((k) => (
-          <motion.div
-            key={k.label}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <Card className="flex items-center gap-3.5 p-4">
-              <span className={`flex size-11 items-center justify-center rounded-xl ${k.warna}`}>
-                {k.ikon}
-              </span>
-              <div>
-                <p className="angka-tabular text-2xl font-extrabold leading-none tabular-nums">{k.nilai}</p>
-                <p className="mt-1 text-xs text-muted">{k.label}</p>
-              </div>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
+      {/* Konten parchment */}
+      <section className="bg-ap-parchment text-ap-ink dark:bg-paper dark:text-ink">
+        <div className="mx-auto max-w-7xl px-4 py-8 pb-12">
+          <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+            {kartu.map((k) => (
+              <motion.div
+                key={k.label}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <div className={`${KARTU_UTILITAS} flex items-center gap-3.5 p-4`}>
+                  <span className={`flex size-11 items-center justify-center rounded-xl ${k.warna}`}>
+                    {k.ikon}
+                  </span>
+                  <div>
+                    <p className="angka-tabular text-2xl font-extrabold leading-none tabular-nums">{k.nilai}</p>
+                    <p className="mt-1 text-xs text-muted">{k.label}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
 
       <div className="mb-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <Card className="p-5">
+        <KacaKartu className="p-5">
           <h2 className="mb-4 font-display font-bold">Tren laporan 14 hari</h2>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -369,9 +390,9 @@ export function DewanClient({
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </Card>
+        </KacaKartu>
 
-        <Card className="p-5">
+        <div className={`${KARTU_UTILITAS} p-5`}>
           <h2 className="mb-4 font-display font-bold">Komposisi kategori</h2>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -400,19 +421,19 @@ export function DewanClient({
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </Card>
+        </div>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1fr_420px]">
-        <Card className="overflow-hidden p-0">
+        <div className={`${KARTU_UTILITAS} overflow-hidden p-0`}>
           {dipilih.size > 0 && (
-            <div className="flex flex-wrap items-center gap-3 border-b garis-halus bg-daun-500/5 px-5 py-3">
-              <span className="angka-tabular text-sm font-bold text-daun-700 dark:text-daun-300">
+            <div className="flex flex-wrap items-center gap-3 border-b border-ap-hairline bg-ap-parchment/80 px-5 py-3 backdrop-blur dark:border-line dark:bg-panel-2">
+              <span className="angka-tabular text-sm font-bold text-ap-blue dark:text-ap-sky">
                 {dipilih.size} dipilih
               </span>
               <Select
                 aria-label="Status massal"
-                className="w-44"
+                className={`w-44 ${SELECT_APPLE}`}
                 value={bulkStatus}
                 onChange={(e) => setBulkStatus(e.target.value as StatusKey)}
               >
@@ -422,7 +443,7 @@ export function DewanClient({
                   </option>
                 ))}
               </Select>
-              <Button size="sm" onClick={terapkanBulk} disabled={bulkProses}>
+              <Button size="sm" className={TOMBOL_UTAMA_APPLE} onClick={terapkanBulk} disabled={bulkProses}>
                 {bulkProses
                   ? "Menerapkan…"
                   : `Terapkan ke ${dipilih.size} laporan`}
@@ -430,26 +451,27 @@ export function DewanClient({
               <Button
                 variant="hantu"
                 size="sm"
+                className={TOMBOL_SEKUNDER_APPLE}
                 onClick={() => setDipilih(new Set())}
               >
                 Bersihkan pilihan
               </Button>
             </div>
           )}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b garis-halus px-5 py-3.5">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ap-hairline px-5 py-3.5 dark:border-line">
             <h2 className="font-display font-bold">Kelola laporan</h2>
             <div className="flex items-center gap-2">
               <Button
                 variant="sekunder"
                 size="sm"
                 onClick={eksporCsv}
-                className="!px-3 !py-1.5 text-xs"
+                className={`!px-3 !py-1.5 text-xs ${TOMBOL_SEKUNDER_APPLE}`}
               >
                 <Download size={14} /> Ekspor CSV
               </Button>
               <Select
                 aria-label="Filter status"
-                className="w-40"
+                className={`w-40 ${SELECT_APPLE}`}
                 value={filterStatus}
                 onChange={(e) =>
                   setFilterStatus(e.target.value as "semua" | StatusKey)
@@ -464,7 +486,7 @@ export function DewanClient({
               </Select>
             </div>
           </div>
-          <div className="max-h-[520px] overflow-y-auto divide-y garis-halus">
+          <div className="max-h-[520px] divide-y divide-ap-hairline overflow-y-auto dark:divide-line">
             {daftar
               .filter((r) => filterStatus === "semua" || r.status === filterStatus)
               .map((r) => {
@@ -473,13 +495,15 @@ export function DewanClient({
                   sla.lewatSla && !["selesai", "ditolak"].includes(r.status);
                 return (
                 <div key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
-                  <input
-                    type="checkbox"
-                    checked={dipilih.has(r.id)}
-                    onChange={() => togglePilih(r.id)}
-                    aria-label={`Pilih ${r.judul}`}
-                    className="size-4 accent-daun-600"
-                  />
+                  <label className="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={dipilih.has(r.id)}
+                      onChange={() => togglePilih(r.id)}
+                      aria-label={`Pilih ${r.judul}`}
+                      className={`size-4 accent-ap-blue ${FOKUS_APPLE}`}
+                    />
+                  </label>
                   <div className="min-w-0 flex-1 basis-56">
                     <p className="truncate text-sm font-semibold">{r.judul}</p>
                     <p className="flex items-center gap-1 truncate text-xs text-muted">
@@ -504,11 +528,11 @@ export function DewanClient({
                       if (e.target.value !== (r.petugas ?? ""))
                         tugaskan(r.id, e.target.value);
                     }}
-                    className="w-36 rounded-lg border garis-halus bg-panel px-2.5 py-1.5 text-xs outline-none focus:border-daun-500"
+                    className={`w-36 rounded-lg border border-ap-hairline bg-panel px-2.5 py-1.5 text-xs outline-none transition focus:border-ap-blue dark:border-line ${FOKUS_APPLE}`}
                   />
                   <Select
                     aria-label={`Ubah status ${r.judul}`}
-                    className="w-36"
+                    className={`w-36 ${SELECT_APPLE}`}
                     value={r.status}
                     onChange={(e) => ubahStatus(r.id, e.target.value as StatusKey)}
                   >
@@ -527,24 +551,28 @@ export function DewanClient({
               </p>
             )}
           </div>
-        </Card>
+        </div>
 
-        <Card className="flex flex-col overflow-hidden p-0">
-          <div className="flex items-center justify-between border-b garis-halus px-5 py-3.5">
+        <div className={`${KARTU_UTILITAS} flex flex-col overflow-hidden p-0`}>
+          <div className="flex items-center justify-between border-b border-ap-hairline px-5 py-3.5 dark:border-line">
             <h2 className="font-display font-bold">Peta kepadatan (heatmap)</h2>
             <button
               onClick={() => setHeatAktif((v) => !v)}
               role="switch"
               aria-checked={heatAktif}
-              className={`relative h-6 w-11 rounded-full transition ${
-                heatAktif ? "bg-daun-600" : "bg-line"
-              }`}
+              className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full ${FOKUS_APPLE}`}
             >
               <span
-                className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-[background-color,border-color,box-shadow,color] ${
-                  heatAktif ? "left-[22px]" : "left-0.5"
+                className={`relative h-6 w-11 rounded-full transition ${
+                  heatAktif ? "bg-ap-blue" : "bg-line"
                 }`}
-              />
+              >
+                <span
+                  className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-[background-color,border-color,box-shadow,color] ${
+                    heatAktif ? "left-[22px]" : "left-0.5"
+                  }`}
+                />
+              </span>
             </button>
           </div>
           <div className="h-[480px] flex-1">
@@ -553,8 +581,10 @@ export function DewanClient({
               panas={heatAktif ? panasLive : undefined}
             />
           </div>
-        </Card>
-      </div>
+        </div>
+        </div>
+        </div>
+      </section>
     </main>
   );
 }

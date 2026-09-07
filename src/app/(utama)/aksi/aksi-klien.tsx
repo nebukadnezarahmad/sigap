@@ -7,18 +7,32 @@ import { CalendarDays, MapPin, Plus, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import type { EventAksi } from "./page";
-import { Button, Card, Input, Label, Textarea } from "@/components/ui";
+import { Button, Input, Label, Textarea } from "@/components/ui";
+import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { formatTanggal } from "@/lib/utils";
 
 function apakahLewat(tanggal: string) {
   return new Date(tanggal).getTime() < Date.now();
 }
 
+/* Grammar Apple (FUSI): kartu utilitas putih hairline radius 18;
+   sorotan memakai KacaKartu; fokus Action Blue; target sentuh 44px. */
+const KARTU_UTILITAS =
+  "rounded-[18px] border border-ap-hairline bg-white shadow-none dark:border-line dark:bg-panel dark:text-ink";
+const FOKUS_APPLE =
+  "focus-visible:outline-ap-blue-focus! focus-visible:outline-offset-2";
+const TOMBOL_UTAMA_APPLE =
+  "min-h-[44px] bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus!";
+const TOMBOL_SEKUNDER_APPLE =
+  "min-h-[44px] hover:border-ap-blue hover:text-ap-blue focus-visible:outline-ap-blue-focus! dark:hover:text-ap-sky";
+const INPUT_APPLE =
+  "focus:border-ap-blue focus:ring-ap-blue/15 focus-visible:outline-ap-blue-focus!";
+
 export function GalatAksi() {
   const router = useRouter();
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
+      <div className={`${KARTU_UTILITAS} p-8`}>
         <h1 className="font-display text-2xl font-bold">
           Aksi Bersama belum bisa dimuat
         </h1>
@@ -26,10 +40,10 @@ export function GalatAksi() {
           Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
           lagi.
         </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
+        <Button className={`mt-5 ${TOMBOL_UTAMA_APPLE}`} onClick={() => router.refresh()}>
           Coba lagi
         </Button>
-      </Card>
+      </div>
     </main>
   );
 }
@@ -125,9 +139,9 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
   const dekat = apakahLewat(data.tanggal);
 
   return (
-    <Card className="overflow-hidden p-0">
+    <div className={`${KARTU_UTILITAS} overflow-hidden p-0`}>
       <div className="flex items-stretch">
-        <div className="flex w-20 shrink-0 flex-col items-center justify-center bg-daun-600/10 py-4 text-daun-800 dark:text-daun-200">
+        <div className="flex w-20 shrink-0 flex-col items-center justify-center bg-ap-blue/10 py-4 text-ap-blue dark:text-ap-sky">
           <span className="angka-tabular font-display text-2xl font-extrabold leading-none">
             {new Date(data.tanggal).getDate()}
           </span>
@@ -160,6 +174,7 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
             <Button
               variant={data.akuIkut ? "utama" : "sekunder"}
               size="sm"
+              className={data.akuIkut ? TOMBOL_UTAMA_APPLE : TOMBOL_SEKUNDER_APPLE}
               onClick={toggle}
               disabled={!masuk || proses || dekat}
             >
@@ -176,7 +191,7 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -237,6 +252,7 @@ function FormAksi({ tutup, selesai }: { tutup: () => void; selesai: (baru?: Even
           value={judul}
           onChange={(e) => setJudul(e.target.value)}
           placeholder="cth. Sabtu Bersih: Bengkel Sungai Sektor 4"
+          className={INPUT_APPLE}
         />
       </div>
       <div>
@@ -249,6 +265,7 @@ function FormAksi({ tutup, selesai }: { tutup: () => void; selesai: (baru?: Even
           value={deskripsi}
           onChange={(e) => setDeskripsi(e.target.value)}
           placeholder="Rencana kegiatan, yang perlu dibawa, kuota…"
+          className={INPUT_APPLE}
         />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -260,6 +277,7 @@ function FormAksi({ tutup, selesai }: { tutup: () => void; selesai: (baru?: Even
             required
             value={tanggal}
             onChange={(e) => setTanggal(e.target.value)}
+            className={INPUT_APPLE}
           />
         </div>
         <div>
@@ -269,6 +287,7 @@ function FormAksi({ tutup, selesai }: { tutup: () => void; selesai: (baru?: Even
             value={alamat}
             onChange={(e) => setAlamat(e.target.value)}
             placeholder="Alamat titik kumpul"
+            className={INPUT_APPLE}
           />
         </div>
       </div>
@@ -278,10 +297,10 @@ function FormAksi({ tutup, selesai }: { tutup: () => void; selesai: (baru?: Even
         </p>
       )}
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="sekunder" onClick={tutup}>
+        <Button type="button" variant="sekunder" className={TOMBOL_SEKUNDER_APPLE} onClick={tutup}>
           Batal
         </Button>
-        <Button type="submit" disabled={proses}>
+        <Button type="submit" className={TOMBOL_UTAMA_APPLE} disabled={proses}>
           {proses ? "Menyimpan…" : "Buat aksi"}
         </Button>
       </div>
@@ -310,7 +329,7 @@ export function AksiKlien({
       {masuk && (
         <div className="mb-6">
           {formBuka ? (
-            <Card className="p-5">
+            <KacaKartu className="p-5">
               <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
                 <Plus size={17} /> Buat aksi baru
               </h2>
@@ -322,11 +341,17 @@ export function AksiKlien({
                   router.refresh();
                 }}
               />
-            </Card>
+            </KacaKartu>
           ) : (
-            <Button variant="sekunder" onClick={() => setFormBuka(true)}>
-              <Plus size={15} /> Buat aksi bersama
-            </Button>
+            <KacaPill
+              type="button"
+              onClick={() => setFormBuka(true)}
+              className={`min-h-[44px] ${FOKUS_APPLE}`}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <Plus size={15} /> Buat aksi bersama
+              </span>
+            </KacaPill>
           )}
         </div>
       )}
@@ -346,9 +371,9 @@ export function AksiKlien({
           ))}
         </AnimatePresence>
         {events.length === 0 && (
-          <Card className="p-10 text-center text-sm text-muted">
+          <div className={`${KARTU_UTILITAS} p-10 text-center text-sm text-muted`}>
             Belum ada aksi mendatang. Jadilah pemrakarsa yang pertama!
-          </Card>
+          </div>
         )}
       </div>
     </div>

@@ -1,14 +1,29 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, ImagePlus, Loader2, MapPin, Send, ThumbsUp } from "lucide-react";
 import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";
+import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
+
+/* Fusi visual-fusion: isi modal sebagai panel frosted (backdrop-blur 20px +
+   saturate 180%, edge terang) tanpa shadow berat — scrim backdrop milik
+   Modal tidak disentuh. Tombol Kirim/Dukung pill Action Blue 44px.
+   Copy, pesan error, role/aria, dan logika validasi/kirim tidak diubah. */
+const GAYA_FROSTED: CSSProperties = {
+  backdropFilter: "blur(20px) saturate(180%)",
+  WebkitBackdropFilter: "blur(20px) saturate(180%)",
+};
+const PANEL_FROSTED =
+  "rounded-[18px] border border-white/40 bg-white/60 shadow-none backdrop-blur-[20px] backdrop-saturate-[180%] dark:border-white/15 dark:bg-[#131d19]/55";
+const PILL_BIRU =
+  "min-h-[44px] border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus";
+const SENTUH_44 = "min-h-[44px] focus-visible:outline-ap-blue-focus";
 
 const LeafletMap = dynamic(
   () => import("./leaflet-map").then((m) => m.LeafletMap),
@@ -183,7 +198,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
 
   if (!user) {
     return (
-      <div className="space-y-4 py-2">
+      <KacaKartu className="space-y-4 p-4">
         <div className="text-center">
           <p className="font-display font-bold text-base">
             Masuk untuk Melaporkan Masalah
@@ -203,15 +218,15 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         <div className="flex items-center justify-between border-t garis-halus pt-3 text-xs text-muted">
           <span>Punya akun sendiri?</span>
           <div className="flex gap-2">
-            <Button size="sm" variant="sekunder" onClick={() => router.push("/masuk?next=/peta?lapor=1")}>
+            <Button size="sm" variant="sekunder" onClick={() => router.push("/masuk?next=/peta?lapor=1")} className={SENTUH_44}>
               Masuk Manual
             </Button>
-            <Button size="sm" onClick={() => router.push("/daftar?next=/peta?lapor=1")}>
+            <Button size="sm" onClick={() => router.push("/daftar?next=/peta?lapor=1")} className={`${SENTUH_44} bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus`}>
               Daftar Akun
             </Button>
           </div>
         </div>
-      </div>
+      </KacaKartu>
     );
   }
 
@@ -319,7 +334,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   }
 
   return (
-    <form onSubmit={kirim} className="grid gap-5 sm:grid-cols-2">
+    <form onSubmit={kirim} style={GAYA_FROSTED} className={`${PANEL_FROSTED} grid gap-5 p-4 sm:grid-cols-2 sm:p-5`}>
       <div className="space-y-4">
         <div>
           <Label htmlFor="judul">Judul laporan</Label>
@@ -493,19 +508,21 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
                   {laporanMirip[0].vote_count} dukungan warga · Status: {STATUS[laporanMirip[0].status as StatusKey]?.label ?? laporanMirip[0].status}
                 </p>
                 <div className="mt-2.5 flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
+                  <KacaPill
                     type="button"
                     onClick={() => handleDukungLaporanMirip(laporanMirip[0].id)}
-                    className="bg-daun-600 hover:bg-daun-700 text-white"
+                    className={PILL_BIRU}
                   >
-                    <ThumbsUp size={12} /> Dukung laporan ini
-                  </Button>
+                    <span className="inline-flex items-center gap-1.5 text-xs">
+                      <ThumbsUp size={12} /> Dukung laporan ini
+                    </span>
+                  </KacaPill>
                   <Button
                     size="sm"
                     variant="sekunder"
                     type="button"
                     onClick={() => setAbaikanDuplikat(true)}
+                    className={SENTUH_44}
                   >
                     Ini Masalah Berbeda
                   </Button>
@@ -522,15 +539,17 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         )}
 
         <div className="mt-3 flex w-full flex-col gap-2">
-          <Button type="submit" disabled={proses} aria-busy={proses} size="lg" className="w-full">
-            {proses ? (
-              <Loader2 size={16} aria-hidden className="animate-spin" />
-            ) : (
-              <Send size={16} aria-hidden />
-            )}
-            {proses ? "Mengirim laporan…" : "Kirim laporan (+10 poin)"}
-          </Button>
-          <Button type="button" variant="sekunder" onClick={mintaTutup} disabled={proses} className="w-full">
+          <KacaPill type="submit" disabled={proses} aria-busy={proses} className={`${PILL_BIRU} w-full px-7 py-3 text-base`}>
+            <span className="inline-flex items-center gap-2">
+              {proses ? (
+                <Loader2 size={16} aria-hidden className="animate-spin" />
+              ) : (
+                <Send size={16} aria-hidden />
+              )}
+              {proses ? "Mengirim laporan…" : "Kirim laporan (+10 poin)"}
+            </span>
+          </KacaPill>
+          <Button type="button" variant="sekunder" onClick={mintaTutup} disabled={proses} className={`${SENTUH_44} w-full`}>
             Batal
           </Button>
         </div>

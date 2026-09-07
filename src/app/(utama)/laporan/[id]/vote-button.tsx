@@ -5,8 +5,14 @@ import { motion } from "motion/react";
 import { ThumbsUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
-import { Button } from "@/components/ui";
+import { KacaPill } from "@/components/eksperimen/kaca";
 import { DemoAuthModal } from "@/components/tombol-demo-login";
+
+/* Fusi visual-fusion: pill kaca; status aktif diisi Action Blue (FUSI b).
+   Copy, pesan error, aria, dan logika vote tidak diubah. */
+const PILL_KACA = "min-h-[44px] focus-visible:outline-ap-blue-focus";
+const PILL_BIRU =
+  "min-h-[44px] border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus";
 
 export function VoteButton({
   reportId,
@@ -86,24 +92,26 @@ export function VoteButton({
     <>
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-3">
-          <Button
+          <KacaPill
             type="button"
-            variant={sudahVote ? "utama" : "sekunder"}
             onClick={toggle}
             disabled={proses}
             aria-pressed={sudahVote}
             aria-busy={proses}
             title={user ? "" : "Masuk untuk mendukung laporan ini"}
+            className={sudahVote ? PILL_BIRU : PILL_KACA}
           >
-            <ThumbsUp size={16} className={sudahVote ? "fill-current" : ""} />
-            <motion.span key={jumlah}>{jumlah}</motion.span>
-            <span>{sudahVote ? "Didukung" : "Dukung laporan ini"}</span>
-          </Button>
+            <span className="inline-flex items-center gap-2">
+              <ThumbsUp size={16} className={sudahVote ? "fill-current" : ""} />
+              <motion.span key={jumlah}>{jumlah}</motion.span>
+              <span>{sudahVote ? "Didukung" : "Dukung laporan ini"}</span>
+            </span>
+          </KacaPill>
           {!user && (
             <button
               type="button"
               onClick={() => setModalAuth(true)}
-              className="text-xs text-muted hover:text-ink hover:underline transition"
+              className="min-h-[44px] text-xs text-ap-blue transition hover:underline focus-visible:outline-ap-blue-focus"
             >
               masuk untuk memberi dukungan
             </button>

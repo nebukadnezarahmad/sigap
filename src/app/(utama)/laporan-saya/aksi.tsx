@@ -5,7 +5,15 @@ import { useRouter } from "next/navigation";
 import { Loader2, Pencil, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Input, Label, Textarea } from "@/components/ui";
+import { KacaPill } from "@/components/eksperimen/kaca";
 import { Modal } from "@/components/modal";
+
+/* Fusi visual-fusion: tombol Simpan pill Action Blue 44px; tombol lain
+   tetap variannya (danger sekunder dipertahankan) + target 44px.
+   Copy, pesan error, role/aria, dan logika simpan/hapus tidak diubah. */
+const PILL_BIRU =
+  "min-h-[44px] border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus";
+const SENTUH_44 = "min-h-[44px] focus-visible:outline-ap-blue-focus";
 
 type Ringkas = {
   id: string;
@@ -78,7 +86,7 @@ export function AksiLaporanSaya({
             onClick={() => setBukaEdit(true)}
             aria-label="Sunting laporan"
             title="Sunting laporan"
-            className="!px-2.5"
+            className="!px-2.5 min-h-[44px] min-w-[44px] focus-visible:outline-ap-blue-focus"
           >
             <Pencil size={15} />
           </Button>
@@ -88,7 +96,7 @@ export function AksiLaporanSaya({
             onClick={() => setMintaHapus(true)}
             aria-label="Hapus laporan"
             title="Hapus laporan"
-            className="!px-2.5"
+            className="!px-2.5 min-h-[44px] min-w-[44px] focus-visible:outline-ap-blue-focus"
           >
             <Trash2 size={15} />
           </Button>
@@ -148,13 +156,15 @@ export function AksiLaporanSaya({
             </p>
           )}
           <div className="flex justify-end gap-2 pt-1">
-            <Button type="button" variant="sekunder" onClick={() => setBukaEdit(false)}>
+            <Button type="button" variant="sekunder" onClick={() => setBukaEdit(false)} className={SENTUH_44}>
               Batal
             </Button>
-            <Button type="submit" disabled={proses} aria-busy={proses}>
-              {proses && <Loader2 size={16} aria-hidden className="animate-spin" />}
-              {proses ? "Menyimpan laporan…" : "Simpan perubahan"}
-            </Button>
+            <KacaPill type="submit" disabled={proses} aria-busy={proses} className={PILL_BIRU}>
+              <span className="inline-flex items-center gap-2">
+                {proses && <Loader2 size={16} aria-hidden className="animate-spin" />}
+                {proses ? "Menyimpan laporan…" : "Simpan perubahan"}
+              </span>
+            </KacaPill>
           </div>
         </form>
       </Modal>
@@ -175,10 +185,10 @@ export function AksiLaporanSaya({
           </p>
         )}
         <div className="mt-5 flex justify-end gap-2">
-          <Button type="button" variant="sekunder" onClick={() => setMintaHapus(false)} disabled={proses}>
+          <Button type="button" variant="sekunder" onClick={() => setMintaHapus(false)} disabled={proses} className={SENTUH_44}>
             Batal
           </Button>
-          <Button type="button" variant="bahaya" onClick={hapus} disabled={proses} aria-busy={proses}>
+          <Button type="button" variant="bahaya" onClick={hapus} disabled={proses} aria-busy={proses} className={SENTUH_44}>
             {proses && <Loader2 size={16} aria-hidden className="animate-spin" />}
             {proses ? "Menghapus laporan…" : "Ya, hapus laporan"}
           </Button>

@@ -19,33 +19,35 @@ export default async function HalamanLayanan() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
+      <header className="mb-6 rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
           Nomor yang wajib dihafal
         </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+        <h1 className="mt-1 font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px]">
           Direktori Layanan
         </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
+        <p className="mt-2 max-w-2xl text-muted teks-pretty">
           Kontak darurat dan layanan harian lingkunganmu — satu ketukan untuk
           menelepon atau chat WhatsApp. Tidak perlu lagi mencari-cari saat
           keadaan mendesak.
         </p>
       </header>
 
-      <LayananKlien
-        awal={
-          (layanan ?? []).map((l) => ({
-            id: l.id,
-            nama: l.nama,
-            kategori: l.kategori,
-            telepon: l.telepon,
-            bisaWa: l.bisa_wa,
-            alamat: l.alamat,
-            jam: l.jam_layanan,
-          }))
-        }
-      />
+      <div className="rounded-[18px] border border-ap-hairline bg-ap-parchment p-4 shadow-none sm:p-6 dark:border-line dark:bg-panel-2">
+        <LayananKlien
+          awal={
+            (layanan ?? []).map((l) => ({
+              id: l.id,
+              nama: l.nama,
+              kategori: l.kategori,
+              telepon: l.telepon,
+              bisaWa: l.bisa_wa,
+              alamat: l.alamat,
+              jam: l.jam_layanan,
+            }))
+          }
+        />
+      </div>
     </main>
   );
 }

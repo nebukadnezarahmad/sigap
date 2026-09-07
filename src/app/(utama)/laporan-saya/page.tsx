@@ -11,6 +11,11 @@ import { GerbangLaporanSaya } from "./gerbang-laporan-saya";
 export const metadata: Metadata = { title: "Laporan Saya" };
 export const dynamic = "force-dynamic";
 
+/* Fusi visual-fusion: kartu utilitas putih hairline 18px tanpa shadow;
+   link CTA Action Blue; Fraunces + StatusChip tetap. */
+const KARTU =
+  "rounded-[18px] border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
+
 export default async function HalamanLaporanSaya() {
   const supabase = await createClient();
   if (!supabase) redirect("/peta");
@@ -55,10 +60,10 @@ export default async function HalamanLaporanSaya() {
       </header>
 
       {daftar.length === 0 ? (
-        <Card className="p-10 text-center">
+        <Card className={`${KARTU} p-10 text-center`}>
           <p className="text-muted">
             Kamu belum membuat laporan.{" "}
-            <Link href="/peta?lapor=1" className="font-semibold text-daun-700 hover:underline dark:text-daun-300">
+            <Link href="/peta?lapor=1" className="font-semibold text-ap-blue hover:underline focus-visible:outline-ap-blue-focus dark:text-ap-sky">
               Buat laporan pertamamu
             </Link>
             .
@@ -67,7 +72,7 @@ export default async function HalamanLaporanSaya() {
       ) : (
         <div className="space-y-3">
           {daftar.map((r) => (
-            <Card key={r.id} className="p-5">
+            <Card key={r.id} className={`${KARTU} p-5`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex flex-wrap items-center gap-2">
@@ -118,7 +123,7 @@ export default async function HalamanLaporanSaya() {
           </p>
           <div className="space-y-2">
             {area.map((a) => (
-              <Card key={a.id} className="flex items-center justify-between gap-3 p-4">
+              <Card key={a.id} className={`${KARTU} flex items-center justify-between gap-3 p-4`}>
                 <div>
                   <p className="text-sm font-semibold">{a.label}</p>
                   <p className="angka-tabular text-xs text-muted">

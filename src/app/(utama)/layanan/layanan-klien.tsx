@@ -14,6 +14,7 @@ import {
   Shield,
 } from "lucide-react";
 import { Button, Card } from "@/components/ui";
+import { KacaKartu } from "@/components/eksperimen/kaca";
 
 type Layanan = {
   id: string;
@@ -44,15 +45,15 @@ export function GalatLayanan() {
   const router = useRouter();
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
-        <h1 className="font-display text-2xl font-bold">
+      <Card className="rounded-[18px] border-ap-hairline bg-white p-8 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+        <h1 className="font-display text-2xl font-bold tracking-[-0.224px]">
           Direktori Layanan belum bisa dimuat
         </h1>
         <p className="mt-2 text-sm text-muted">
           Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
           lagi.
         </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
+        <Button className="mt-5 min-h-[44px] focus-visible:outline-ap-blue-focus" onClick={() => router.refresh()}>
           Coba lagi
         </Button>
       </Card>
@@ -97,7 +98,7 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
           onChange={(e) => setKueri(e.target.value)}
           placeholder="Cari layanan… (mis. damkar, PLN, sampah)"
           aria-label="Cari layanan"
-          className="w-full rounded-full border garis-halus bg-panel py-3 pl-11 pr-4 text-sm outline-none transition focus:border-daun-400"
+          className="h-[44px] w-full rounded-full border border-ap-hairline bg-white py-3 pl-11 pr-5 text-sm text-ap-ink outline-none transition placeholder:text-muted/70 focus:border-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:border-line dark:bg-panel dark:text-ink"
         />
       </div>
 
@@ -115,10 +116,10 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
                   return (
                     <Card
                       key={l.id}
-                      className="flex flex-wrap items-center gap-3 p-4"
+                      className="flex flex-wrap items-center gap-3 rounded-[18px] border-ap-hairline bg-white p-4 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink"
                     >
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-display font-bold">{l.nama}</h3>
+                        <h3 className="font-display font-bold tracking-[-0.224px]">{l.nama}</h3>
                         <p className="mt-0.5 text-xs text-muted">
                           {l.telepon}
                           {l.jam ? ` · ${l.jam}` : ""}
@@ -127,7 +128,7 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
                       </div>
                       <a
                         href={`tel:${l.telepon.replace(/[^+\d]/g, "")}`}
-                        className="flex items-center gap-1.5 rounded-full bg-daun-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-daun-700"
+                        className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-full bg-daun-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-daun-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
                       >
                         <Phone size={14} /> Telepon
                       </a>
@@ -136,7 +137,7 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
                           href={`https://wa.me/${wa}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex items-center gap-1.5 rounded-full border garis-halus px-4 py-2 text-sm font-semibold transition hover:bg-panel-2"
+                          className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-full border garis-halus px-4 py-2 text-sm font-semibold transition hover:bg-panel-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
                         >
                           <MessageCircle size={14} /> WhatsApp
                         </a>
@@ -149,9 +150,9 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
           );
         })}
         {grup.length === 0 && (
-          <Card className="p-10 text-center text-sm text-muted">
+          <KacaKartu className="p-10 text-center text-sm text-muted">
             Tidak ada layanan yang cocok dengan pencarianmu.
-          </Card>
+          </KacaKartu>
         )}
       </div>
     </div>

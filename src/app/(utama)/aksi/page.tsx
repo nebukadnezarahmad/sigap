@@ -59,21 +59,29 @@ export default async function HalamanAksi() {
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-          Gerakan bersama
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-          Aksi Bersama
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Dari laporan menjadi aksi nyata. Ikut satu aksi = +5 poin; ikut dua
-          aksi membuka badge Relawan.
-        </p>
-      </header>
+    <main>
+      {/* Tile header terang (canvas putih) */}
+      <section className="bg-white text-ap-ink dark:bg-panel dark:text-ink">
+        <div className="mx-auto max-w-3xl px-4 py-12">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ap-blue dark:text-ap-sky">
+            Gerakan bersama
+          </p>
+          <h1 className="mt-3 font-serif text-[40px] font-semibold leading-[1.1] tracking-[-0.28px]">
+            Aksi Bersama
+          </h1>
+          <p className="mt-3 max-w-xl text-[17px] leading-[1.47] tracking-[-0.374px] text-muted teks-pretty">
+            Dari laporan menjadi aksi nyata. Ikut satu aksi = +5 poin; ikut dua
+            aksi membuka badge Relawan.
+          </p>
+        </div>
+      </section>
 
-      <AksiKlien awal={daftar} masuk={!!user} />
+      {/* Konten parchment */}
+      <section className="bg-ap-parchment text-ap-ink dark:bg-paper dark:text-ink">
+        <div className="mx-auto max-w-3xl px-4 py-10">
+          <AksiKlien awal={daftar} masuk={!!user} />
+        </div>
+      </section>
     </main>
   );
 }

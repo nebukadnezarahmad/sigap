@@ -18,6 +18,12 @@ import { MomenSelesai } from "./momen-selesai";
 
 export const dynamic = "force-dynamic";
 
+/* Fusi visual-fusion (docs/DESIGN-apple.md FUSI): kartu utilitas putih
+   hairline 18px tanpa shadow; CTA pill Action Blue; Fraunces tetap;
+   StatusChip + warna semantik tidak diubah. */
+const KARTU =
+  "rounded-[18px] border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
+
 export default async function HalamanLaporan({
   params,
 }: {
@@ -88,7 +94,7 @@ export default async function HalamanLaporan({
     <main className="mx-auto max-w-4xl px-4 py-8">
       <Link
         href="/peta"
-        className="mb-5 inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-ink"
+        className="mb-5 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-ap-blue transition hover:underline focus-visible:outline-ap-blue-focus"
       >
         <ArrowLeft size={15} /> Kembali ke peta
       </Link>
@@ -191,7 +197,7 @@ export default async function HalamanLaporan({
             </div>
           )}
 
-          <Card className="p-5">
+          <Card className={`${KARTU} p-5`}>
             <p className="whitespace-pre-line leading-relaxed">{r.deskripsi}</p>
             {r.alamat_teks && (
               <p className="mt-3 flex items-center gap-1.5 border-t garis-halus pt-3 text-sm text-muted">
@@ -213,7 +219,7 @@ export default async function HalamanLaporan({
           </div>
 
           {fotoSesudah.length > 0 && (
-            <Card className="border-daun-500/40 p-5">
+            <Card className="rounded-[18px] border-daun-500/40 bg-white p-5 text-ap-ink shadow-none dark:bg-panel dark:text-ink">
               <h2 className="mb-3 flex items-center gap-2 font-display font-bold text-daun-700 dark:text-daun-300">
                 <CheckCircle2 size={17} /> Bukti penyelesaian
               </h2>
@@ -263,7 +269,7 @@ export default async function HalamanLaporan({
         </div>
 
         <aside className="space-y-5">
-          <Card className="overflow-hidden p-0">
+          <Card className={`${KARTU} overflow-hidden p-0`}>
             <div className="h-56 w-full">
               <LeafletMap
                 mode="satu"
@@ -285,7 +291,7 @@ export default async function HalamanLaporan({
             </p>
           </Card>
 
-          <Card className="p-5">
+          <Card className={`${KARTU} p-5`}>
             <h2 className="mb-4 font-display font-bold">Linimasa penanganan</h2>
             <ol className="space-y-4">
               {(r.report_events ?? []).length === 0 && (
@@ -326,7 +332,7 @@ export default async function HalamanLaporan({
             </ol>
           </Card>
 
-          <Card className="bg-panel-2 p-5 text-center">
+          <Card className={`${KARTU} p-5 text-center`}>
             <p className="font-display text-lg font-bold">
               {kategoriBySlug(kat?.slug ?? "").nama}
             </p>

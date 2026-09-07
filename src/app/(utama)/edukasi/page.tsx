@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { Card } from "@/components/ui";
 import { NODE_LAIN } from "@/lib/ikon-vektor";
 import { EdukasiKlien, GalatEdukasi } from "./edukasi-klien";
 
@@ -128,52 +127,63 @@ export default async function HalamanEdukasi() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <header className="mb-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-          Sekolah lingkungan
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-          Edukasi Permukiman
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Materi ringkas untuk memulai perubahan dari rumah — lengkap dengan quiz
-          dan kalkulator jejak sampah pribadi.
-        </p>
-      </header>
-
-      <section aria-label="Materi" className="mb-12 grid gap-4 sm:grid-cols-2">
-        {MATERI.map((m, i) => (
-          <Card key={m.slug} className="flex flex-col p-6">
-            <span
-              aria-hidden
-              className="font-display text-4xl font-extrabold text-daun-600/15 dark:text-daun-300/15"
-            >
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <h2 className="mt-2 font-display text-lg font-bold">{m.judul}</h2>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted teks-pretty">
-              {m.ringkas}
-            </p>
-            <ul className="mt-3 space-y-1.5 border-t garis-halus pt-3">
-              {m.poin.map((pt) => (
-                <li key={pt} className="flex items-start gap-2 text-sm">
-                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-daun-500" />
-                  {pt}
-                </li>
-              ))}
-            </ul>
-          </Card>
-        ))}
+    <main>
+      {/* Tile header terang (canvas putih) */}
+      <section className="bg-white text-ap-ink dark:bg-panel dark:text-ink">
+        <div className="mx-auto max-w-4xl px-4 py-12">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ap-blue dark:text-ap-sky">
+            Sekolah lingkungan
+          </p>
+          <h1 className="mt-3 font-serif text-[40px] font-semibold leading-[1.1] tracking-[-0.28px]">
+            Edukasi Permukiman
+          </h1>
+          <p className="mt-3 max-w-xl text-[17px] leading-[1.47] tracking-[-0.374px] text-muted teks-pretty">
+            Materi ringkas untuk memulai perubahan dari rumah — lengkap dengan quiz
+            dan kalkulator jejak sampah pribadi.
+          </p>
+        </div>
       </section>
 
-      <EdukasiKlien
-        soal={SOAL}
-        masuk={!!user}
-        lulusSebelumnya={lulusSebelumnya}
-        kgTahunAwal={kgTahun}
-        ikonHadiah={NODE_LAIN.cerdas_lingkungan ?? NODE_LAIN.semai}
-      />
+      {/* Konten parchment */}
+      <section className="bg-ap-parchment text-ap-ink dark:bg-paper dark:text-ink">
+        <div className="mx-auto max-w-4xl px-4 py-10">
+          <section aria-label="Materi" className="mb-12 grid gap-4 sm:grid-cols-2">
+            {MATERI.map((m, i) => (
+              <div
+                key={m.slug}
+                className="flex flex-col rounded-[18px] border border-ap-hairline bg-white p-6 shadow-none dark:border-line dark:bg-panel dark:text-ink"
+              >
+                <span
+                  aria-hidden
+                  className="font-display text-4xl font-extrabold text-ap-blue/15 dark:text-ap-sky/20"
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h2 className="mt-2 font-display text-lg font-bold">{m.judul}</h2>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted teks-pretty">
+                  {m.ringkas}
+                </p>
+                <ul className="mt-3 space-y-1.5 border-t border-ap-hairline pt-3 dark:border-line">
+                  {m.poin.map((pt) => (
+                    <li key={pt} className="flex items-start gap-2 text-sm">
+                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-ap-blue" />
+                      {pt}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </section>
+
+          <EdukasiKlien
+            soal={SOAL}
+            masuk={!!user}
+            lulusSebelumnya={lulusSebelumnya}
+            kgTahunAwal={kgTahun}
+            ikonHadiah={NODE_LAIN.cerdas_lingkungan ?? NODE_LAIN.semai}
+          />
+        </div>
+      </section>
     </main>
   );
 }

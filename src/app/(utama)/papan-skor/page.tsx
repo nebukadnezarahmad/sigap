@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { BADGES } from "@/lib/constants";
 import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
 import { Avatar } from "@/components/ui";
+import { KacaKartu } from "@/components/eksperimen/kaca";
+import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { BadgeSaya } from "./badge-saya";
 
 export const metadata: Metadata = {
@@ -43,23 +45,27 @@ export default async function HalamanPapanSkor() {
   const urutanPodium = [podium[1], podium[0], podium[2]].filter(Boolean);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <header className="mb-10 text-center">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-daun-600/10 px-3 py-1 text-xs font-bold text-daun-700 dark:text-daun-300 uppercase tracking-wider mb-2">
-          <ShieldCheck size={14} /> Piagam Partisipasi Sipil
-        </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-semibold leading-[1.1] tracking-[-0.28px]">
-          Daftar Kehormatan Warga
-        </h1>
-        <p className="mt-2 text-sm text-muted max-w-lg mx-auto teks-pretty">
-          Apresiasi bagi warga yang aktif menjaga lingkungan: Melaporkan masalah (<b>+10</b>), komentar solusi (<b>+3</b>), dan mendukung laporan warga lain (<b>+1</b>).
-        </p>
-      </header>
+    <main className="pb-10">
+      <PitaGradient tone="gelap">
+        <header className="text-center">
+          <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+            <ShieldCheck size={14} /> Piagam Partisipasi Sipil
+          </div>
+          <h1 className="font-serif text-3xl sm:text-4xl font-semibold leading-[1.1] tracking-[-0.28px] text-white">
+            Daftar Kehormatan Warga
+          </h1>
+          <p className="mt-2 text-sm text-white/85 max-w-lg mx-auto teks-pretty">
+            Apresiasi bagi warga yang aktif menjaga lingkungan: Melaporkan masalah (<b>+10</b>), komentar solusi (<b>+3</b>), dan mendukung laporan warga lain (<b>+1</b>).
+          </p>
+        </header>
+      </PitaGradient>
+
+      <div className="mx-auto max-w-4xl px-4 pt-10">
 
       {!dbAktif && (
-        <div className="mb-6 rounded-[18px] border border-ap-hairline bg-white p-6 text-center text-sm text-muted shadow-none dark:border-line dark:bg-panel">
+        <KacaKartu className="mb-6 p-6 text-center text-sm text-muted">
           Database belum tersambung — papan skor akan tampil setelah Supabase diatur.
-        </div>
+        </KacaKartu>
       )}
 
       {pemimpin.length > 0 && (
@@ -67,9 +73,9 @@ export default async function HalamanPapanSkor() {
           {urutanPodium.map((p) => {
             const juara = podium.indexOf(p) + 1;
             return (
-              <div
+              <KacaKartu
                 key={p.id}
-                className={`flex flex-col items-center rounded-[18px] border border-ap-hairline bg-white px-3 py-6 text-center text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink ${
+                className={`flex flex-col items-center px-3 py-6 text-center ${
                   juara === 1 ? "ring-2 ring-kunyit-500" : ""
                 }`}
               >
@@ -88,14 +94,14 @@ export default async function HalamanPapanSkor() {
                 <p className="angka-tabular mt-1.5 rounded-full bg-daun-600/10 px-3 py-0.5 text-sm font-bold text-daun-700 dark:text-daun-300">
                   {p.poin} poin
                 </p>
-              </div>
+              </KacaKartu>
             );
           })}
         </div>
       )}
 
       {sisanya.length > 0 && (
-        <div className="mb-10 divide-y divide-ap-hairline overflow-hidden rounded-[18px] border border-ap-hairline bg-white shadow-none dark:divide-line dark:border-line dark:bg-panel">
+        <KacaKartu className="mb-10 divide-y divide-ap-hairline overflow-hidden dark:divide-line">
           {sisanya.map((p, i) => (
             <div key={p.id} className="flex items-center gap-3 px-4 py-3">
               <span className="angka-tabular w-6 text-center text-sm font-bold tabular-nums text-muted">
@@ -109,24 +115,25 @@ export default async function HalamanPapanSkor() {
               <span className="angka-tabular text-sm font-bold">{p.poin}</span>
             </div>
           ))}
-        </div>
+        </KacaKartu>
       )}
 
       <section aria-label="Koleksi badge">
         <h2 className="mb-4 font-display text-xl font-bold tracking-[-0.224px]">Koleksi Badge</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {BADGES.map((b) => (
-            <div key={b.key} className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+            <KacaKartu key={b.key} className="p-6">
               <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
                 <IkonVektor node={nodeBadge(b)} ukuran={20} />
               </span>
               <p className="mt-2 font-display text-sm font-bold">{b.nama}</p>
               <p className="mt-0.5 text-xs text-muted">{b.deskripsi}</p>
-            </div>
+            </KacaKartu>
           ))}
         </div>
         <BadgeSaya />
       </section>
+      </div>
     </main>
   );
 }

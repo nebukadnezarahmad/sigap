@@ -7,8 +7,15 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import { Button, Card } from "@/components/ui";
+import { KacaPill } from "@/components/eksperimen/kaca";
 import { DemoAuthModal } from "@/components/tombol-demo-login";
 import type { StatusKey } from "@/lib/constants";
+
+/* Fusi visual-fusion: pill kaca; aksi primer diisi Action Blue (FUSI b).
+   Warna semantik (oranye verifikasi, danger tolak) + copy + aria + RPC tetap. */
+const PILL_KACA = "min-h-[44px] focus-visible:outline-ap-blue-focus";
+const PILL_BIRU =
+  "min-h-[44px] border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus";
 
 export function KonfirmasiButton({
   reportId,
@@ -126,7 +133,7 @@ export function KonfirmasiButton({
   if (status === "menunggu_verifikasi") {
     return (
       <div className="w-full space-y-3">
-        <Card className="border-orange-500/40 bg-orange-500/10 p-5">
+        <Card className="rounded-[18px] border-orange-500/40 bg-orange-500/10 p-5 shadow-none">
           <div className="flex items-start gap-3">
             <AlertCircle size={20} className="mt-0.5 shrink-0 text-orange-600 dark:text-orange-400" />
             <div className="min-w-0 flex-1">
@@ -152,24 +159,26 @@ export function KonfirmasiButton({
               )}
 
               <div className="mt-4 flex flex-wrap gap-2.5">
-                <Button
+                <KacaPill
                   type="button"
                   onClick={toggleKonfirmasi}
                   disabled={proses}
                   aria-pressed={sudah}
                   aria-busy={proses}
-                  className="bg-daun-600 hover:bg-daun-700 text-white"
+                  className={PILL_BIRU}
                 >
-                  <CheckCircle2 size={16} />
-                  {sudah ? "Sudah Kamu Verifikasi" : "Ya, Masalah Sudah Selesai"}
-                </Button>
+                  <span className="inline-flex items-center gap-2">
+                    <CheckCircle2 size={16} />
+                    {sudah ? "Sudah Kamu Verifikasi" : "Ya, Masalah Sudah Selesai"}
+                  </span>
+                </KacaPill>
                 <Button
                   type="button"
                   variant="sekunder"
                   onClick={tolakVerifikasi}
                   disabled={proses}
                   aria-busy={proses}
-                  className="border-danger/30 text-danger hover:bg-danger/10"
+                  className="min-h-[44px] border-danger/30 text-danger hover:bg-danger/10 focus-visible:outline-ap-blue-focus"
                 >
                   <XCircle size={16} /> Masalah Belum Beres
                 </Button>
@@ -192,25 +201,27 @@ export function KonfirmasiButton({
   return (
     <>
       <div className="flex flex-col gap-2">
-        <Button
+        <KacaPill
           type="button"
-          variant={sudah ? "utama" : "sekunder"}
           onClick={toggleKonfirmasi}
           disabled={proses}
           aria-pressed={sudah}
           aria-busy={proses}
           title={masuk ? "" : "Masuk untuk konfirmasi"}
+          className={sudah ? PILL_BIRU : PILL_KACA}
         >
-          <Eye size={16} className={sudah ? "fill-current" : ""} />
-          <motion.span key={jumlah}>{jumlah}</motion.span>
-          <span>
-            {status === "selesai"
-              ? "Diverifikasi Warga"
-              : sudah
-              ? "Kukonfirmasi Ada"
-              : "Saya juga melihat ini"}
+          <span className="inline-flex items-center gap-2">
+            <Eye size={16} className={sudah ? "fill-current" : ""} />
+            <motion.span key={jumlah}>{jumlah}</motion.span>
+            <span>
+              {status === "selesai"
+                ? "Diverifikasi Warga"
+                : sudah
+                ? "Kukonfirmasi Ada"
+                : "Saya juga melihat ini"}
+            </span>
           </span>
-        </Button>
+        </KacaPill>
         {pesan && (
           <p
             role={pesan.includes("Gagal") ? "alert" : "status"}
