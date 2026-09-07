@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import {
   Ambulance,
@@ -12,6 +13,7 @@ import {
   Search,
   Shield,
 } from "lucide-react";
+import { Button, Card } from "@/components/ui";
 
 type Layanan = {
   id: string;
@@ -36,6 +38,26 @@ function nomorWa(telepon: string) {
   if (digit.startsWith("62")) return digit;
   if (digit.startsWith("0")) return `62${digit.slice(1)}`;
   return null;
+}
+
+export function GalatLayanan() {
+  const router = useRouter();
+  return (
+    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+      <Card className="p-8">
+        <h1 className="font-display text-2xl font-bold">
+          Direktori Layanan belum bisa dimuat
+        </h1>
+        <p className="mt-2 text-sm text-muted">
+          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
+          lagi.
+        </p>
+        <Button className="mt-5" onClick={() => router.refresh()}>
+          Coba lagi
+        </Button>
+      </Card>
+    </main>
+  );
 }
 
 export function LayananKlien({ awal }: { awal: Layanan[] }) {
@@ -91,12 +113,12 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
                 {daftar.map((l) => {
                   const wa = l.bisaWa ? nomorWa(l.telepon) : null;
                   return (
-                    <div
+                    <Card
                       key={l.id}
-                      className="flex flex-wrap items-center gap-3 rounded-2xl border garis-halus bg-panel p-4"
+                      className="flex flex-wrap items-center gap-3 p-4"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="font-display font-bold">{l.nama}</p>
+                        <h3 className="font-display font-bold">{l.nama}</h3>
                         <p className="mt-0.5 text-xs text-muted">
                           {l.telepon}
                           {l.jam ? ` · ${l.jam}` : ""}
@@ -119,7 +141,7 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
                           <MessageCircle size={14} /> WhatsApp
                         </a>
                       )}
-                    </div>
+                    </Card>
                   );
                 })}
               </motion.div>
@@ -127,9 +149,9 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
           );
         })}
         {grup.length === 0 && (
-          <div className="rounded-2xl border garis-halus bg-panel p-10 text-center text-sm text-muted">
+          <Card className="p-10 text-center text-sm text-muted">
             Tidak ada layanan yang cocok dengan pencarianmu.
-          </div>
+          </Card>
         )}
       </div>
     </div>

@@ -200,7 +200,7 @@ export default async function HalamanTransparansi() {
             label: "Total laporan warga",
             nilai: total,
             ikon: <CheckCircle2 size={20} />,
-            warna: "text-sky-600 dark:text-sky-400 bg-sky-500/10",
+            warna: "text-muted bg-panel-2",
           },
           {
             label: "Tingkat tuntas",
@@ -234,7 +234,7 @@ export default async function HalamanTransparansi() {
               {k.ikon}
             </span>
             <div>
-              <p className="angka-tabular font-display text-2xl font-extrabold leading-none">
+              <p className="angka-tabular text-2xl font-extrabold leading-none tabular-nums">
                 {k.nilai}
               </p>
               <p className="mt-1 text-xs text-muted">{k.label}</p>
@@ -258,7 +258,7 @@ export default async function HalamanTransparansi() {
                 <IkonKategori slug={k.slug} ukuran={13} />
                 <span className="truncate">{k.nama}</span>
               </div>
-              <p className="angka-tabular mt-1 font-display text-xl font-black text-ap-ink dark:text-ink">
+              <p className="angka-tabular mt-1 text-xl font-black tabular-nums text-ap-ink dark:text-ink">
                 {SLA_KATEGORI[k.slug] ?? 7} Hari
               </p>
               <p className="text-[11px] text-muted">Target respon & beres</p>
@@ -288,15 +288,18 @@ export default async function HalamanTransparansi() {
         ) : (
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-left text-sm">
+              <caption className="sr-only">
+                Daftar laporan warga yang melewati batas waktu SLA
+              </caption>
               <thead>
                 <tr className="border-b border-ap-hairline text-xs text-muted dark:border-line">
-                  <th className="pb-2 font-semibold">Judul Masalah</th>
-                  <th className="pb-2 font-semibold">Kategori</th>
-                  <th className="pb-2 font-semibold">Tgl Lapor</th>
-                  <th className="pb-2 font-semibold">Target SLA</th>
-                  <th className="pb-2 font-semibold text-danger">Keterlambatan</th>
-                  <th className="pb-2 font-semibold">Status</th>
-                  <th className="pb-2 font-semibold text-right">Aksi</th>
+                  <th scope="col" className="pb-2 font-semibold">Judul Masalah</th>
+                  <th scope="col" className="pb-2 font-semibold">Kategori</th>
+                  <th scope="col" className="pb-2 font-semibold">Tgl Lapor</th>
+                  <th scope="col" className="pb-2 font-semibold">Target SLA</th>
+                  <th scope="col" className="pb-2 font-semibold text-danger">Keterlambatan</th>
+                  <th scope="col" className="pb-2 font-semibold">Status</th>
+                  <th scope="col" className="pb-2 font-semibold text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ap-hairline dark:divide-line">
@@ -311,10 +314,10 @@ export default async function HalamanTransparansi() {
                     <td className="py-3 text-xs text-muted">
                       {formatTanggal(r.created_at)}
                     </td>
-                    <td className="angka-tabular py-3 text-xs font-medium">
+                    <td className="angka-tabular py-3 text-xs font-medium tabular-nums">
                       {r.sla.targetHari} hari
                     </td>
-                    <td className="angka-tabular py-3 text-xs font-bold text-danger">
+                    <td className="angka-tabular py-3 text-xs font-bold tabular-nums text-danger">
                       +{r.sla.hariTerlambat} hari
                     </td>
                     <td className="py-3">
@@ -323,6 +326,7 @@ export default async function HalamanTransparansi() {
                     <td className="py-3 text-right">
                       <Link
                         href={`/laporan/${r.id}`}
+                        aria-label={`Detail laporan ${r.judul}`}
                         className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-full px-3 py-1 text-xs font-semibold text-ap-blue hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky dark:hover:bg-ap-sky/10"
                       >
                         Detail <ExternalLink size={12} />
@@ -397,7 +401,7 @@ export default async function HalamanTransparansi() {
                 className="flex items-center gap-2 rounded-full bg-panel-2 px-4 py-2"
               >
                 <StatusChip status={s} />
-                <span className="angka-tabular font-display font-bold">{statusCount[s] ?? 0}</span>
+                <span className="angka-tabular font-bold tabular-nums">{statusCount[s] ?? 0}</span>
               </div>
             ))}
           </div>

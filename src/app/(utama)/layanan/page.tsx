@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { LayananKlien } from "./layanan-klien";
+import { GalatLayanan, LayananKlien } from "./layanan-klien";
 
 export const metadata: Metadata = { title: "Direktori Layanan" };
 export const dynamic = "force-dynamic";
@@ -9,11 +9,7 @@ export default async function HalamanLayanan() {
   const supabase = await createClient();
 
   if (!supabase) {
-    return (
-      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-bold">Database belum tersambung</h1>
-      </main>
-    );
+    return <GalatLayanan />;
   }
 
   const { data: layanan } = await supabase

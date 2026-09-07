@@ -7,7 +7,7 @@ import {
   CheckCircle2,
   MapPin,
   Megaphone,
-  Sparkles,
+  Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI } from "@/lib/constants";
@@ -22,20 +22,20 @@ const LANGKAH = [
   {
     nomor: "01",
     ikon: MapPin,
-    judul: "Lapor dalam 30 detik",
-    isi: "Klik titik di peta, tempel foto bukti, pilih kategori. Setiap laporan langsung terlihat oleh dewan.",
+    judul: "Tandai masalah dalam 30 detik",
+    isi: "Tandai titik di peta, sertakan foto, pilih kategori. Laporanmu langsung terlihat oleh dewan dan warga sekitar.",
   },
   {
     nomor: "02",
     ikon: Megaphone,
     judul: "Warga serentak mendukung",
-    isi: "Dukungan warga lain menaikkan prioritas penanganan dan mempercepat tindak lanjut di lapangan.",
+    isi: "Dukungan dari warga lain, termasuk kamu, menaikkan prioritas penanganan dan mempercepat tindak lanjut di lapangan.",
   },
   {
     nomor: "03",
     ikon: CheckCircle2,
-    judul: "Verifikasi tuntas transparan",
-    isi: "Petugas wajib upload foto sesudah, dan laporan disahkan selesai setelah diverifikasi minimal 2 warga.",
+    judul: "Penanganan yang bisa kamu cek",
+    isi: "Petugas menyertakan foto sesudah penanganan, dan laporan selesai setelah diverifikasi minimal 2 warga di lapangan.",
   },
 ];
 
@@ -54,6 +54,7 @@ const KARTU_UTILITAS =
 
 export default async function Beranda() {
   let statistik = { total: 0, selesai: 0, warga: 0 };
+  let statistikGagal = false;
   let hitungKategori = new Map<string, number>();
   let titikAwal: {
     id: string;
@@ -89,6 +90,9 @@ export default async function Beranda() {
         selesai: selesai.count ?? 0,
         warga: warga.count ?? 0,
       };
+      if (laporan.error || selesai.error || warga.error) {
+        statistikGagal = true;
+      }
       hitungKategori = new Map();
       for (const r of (perKategori.data ?? []) as unknown as LaporanDenganRelasi[]) {
         const slug = r.categories?.slug ?? "lainnya";
@@ -112,9 +116,11 @@ export default async function Beranda() {
           status: r.status,
         }));
       }
+    } else {
+      statistikGagal = true;
     }
   } catch {
-    /* fallback nol */
+    statistikGagal = true;
   }
 
   return (
@@ -168,8 +174,14 @@ export default async function Beranda() {
                   key={label as string}
                   className={`${KARTU_UTILITAS} p-6`}
                 >
-                  <dd className="font-serif text-3xl font-semibold text-ap-ink">
-                    <AngkaHidup nilai={nilai as number} />
+                  <dd className="font-serif text-3xl font-semibold tabular-nums angka-tabular text-ap-ink">
+                    {statistikGagal ? (
+                      <span aria-label={`${label as string} tidak tersedia`}>
+                        —
+                      </span>
+                    ) : (
+                      <AngkaHidup nilai={nilai as number} />
+                    )}
                   </dd>
                   <dt className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-ap-ink/60">
                     {label}
@@ -267,7 +279,7 @@ export default async function Beranda() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
                     <div className="absolute bottom-3 left-3 right-3 text-white">
                       <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-md">
-                        <Sparkles size={11} /> Aksi Lapangan Warga
+                        <Users size={11} /> Aksi lapangan warga
                       </span>
                       <p className="mt-1.5 text-sm font-bold">
                         Gotong Royong & Verifikasi Warga
@@ -278,8 +290,8 @@ export default async function Beranda() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between px-1 pt-4 text-xs">
-                    <span className="text-ap-ink/60">Partisipasi Aktif RT/RW</span>
-                    <span className="font-bold text-ap-blue">✓ Terverifikasi Lapangan</span>
+                    <span className="text-ap-ink/60">Partisipasi aktif RT/RW</span>
+                    <span className="font-bold text-ap-blue">Terverifikasi lapangan</span>
                   </div>
                 </div>
               </Terungkap>
@@ -323,12 +335,12 @@ export default async function Beranda() {
                     >
                       <IkonKategori slug={k.slug} ukuran={15} />
                     </span>
-                    <span className="angka-tabular rounded-full bg-ap-parchment px-2 py-0.5 text-xs font-bold text-ap-ink">
-                      {hitungKategori.get(k.slug) ?? 0}
+                    <span className="angka-tabular rounded-full bg-ap-parchment px-2 py-0.5 text-xs font-bold tabular-nums text-ap-ink">
+                      {statistikGagal ? "—" : (hitungKategori.get(k.slug) ?? 0)}
                     </span>
                   </div>
-                  <div className="mt-4">
-                    <p className="truncate font-display text-sm font-bold text-ap-ink">
+                  <div className="mt-4 min-w-0">
+                    <p className="truncate text-sm font-bold text-ap-ink">
                       {k.nama}
                     </p>
                     <p className="mt-1 text-[11px] font-semibold text-ap-blue">
@@ -350,13 +362,13 @@ export default async function Beranda() {
         <div className="mx-auto max-w-6xl px-4 py-20">
           <Terungkap>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-ap-blue">
-              <Building2 size={15} /> Arsitektur Solusi Infinitera 2.0
+              <Building2 size={15} /> Pilar layanan SIGAP
             </div>
             <h2 className={`${H2_TILE} max-w-2xl`}>
-              Ekosistem Civic-Tech Tertutup & Akuntabel
+              Ekosistem civic-tech yang terhubung dan akuntabel
             </h2>
             <p className={`mt-3 max-w-2xl text-ap-ink/70 ${BODY_TILE}`}>
-              Bukan sekadar form pengaduan biasa. SIGAP dirancang dengan siklus data lengkap dari mitigasi duplikasi spasial hingga verifikasi silang oleh warga.
+              Bukan sekadar formulir aduan. SIGAP merawat setiap laporanmu dari pencatatan yang rapi hingga verifikasi bersama warga.
             </p>
           </Terungkap>
 
@@ -366,22 +378,22 @@ export default async function Beranda() {
               <div className={`flex w-full flex-col justify-between ${KARTU_UTILITAS} p-6`}>
                 <div>
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-ap-parchment px-3 py-1 text-xs font-bold text-ap-blue">
-                    <MapPin size={13} /> Pilar 01 · Masukan Data Bersih
+                    <MapPin size={13} /> Pilar 01 · Catatan warga yang rapi
                   </span>
                   <h3 className="mt-4 font-serif text-2xl font-semibold text-ap-ink">
-                    Peta Spasial & Deduplikasi Geospasial 100m
+                    Satu titik untuk satu masalah dalam 100 meter
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-ap-ink/70 teks-pretty">
-                    Mencegah penumpukan laporan kembar di titik yang sama. Ketika warga meletakkan pin, algoritma PostGIS memindai masalah serupa dalam radius 100 meter dan mengajak warga ikut mendukung alih-alih membuat entri duplikat.
+                    Supaya tidak ada laporan ganda di titik yang sama. Saat kamu menandai pin, sistem memeriksa masalah serupa dalam radius 100 meter dan mengajakmu mendukung laporan yang sudah ada.
                   </p>
                   <div className="mt-6 space-y-2 rounded-lg border border-ap-hairline bg-ap-parchment p-4 text-xs">
                     <div className="flex items-center justify-between text-ap-ink/60">
-                      <span>Indeks Spasial</span>
+                      <span>Basis data wilayah</span>
                       <span className="font-mono font-semibold text-ap-ink">PostGIS GiST 4326</span>
                     </div>
                     <div className="flex items-center justify-between text-ap-ink/60">
-                      <span>Radius Filter</span>
-                      <span className="font-semibold text-ap-blue">≤ 100 Meter</span>
+                      <span>Jarak pantau</span>
+                      <span className="font-semibold text-ap-blue">≤ 100 meter</span>
                     </div>
                   </div>
                 </div>
@@ -390,7 +402,7 @@ export default async function Beranda() {
                   href="/peta"
                   className={`mt-8 inline-flex min-h-[44px] items-center gap-2 text-[17px] font-semibold text-ap-blue ${FOKUS_APPLE}`}
                 >
-                  Buka Peta & Coba Lapor <ArrowRight size={15} />
+                  Lihat peta dan coba melapor <ArrowRight size={15} />
                 </Link>
               </div>
             </Terungkap>
@@ -486,6 +498,7 @@ export default async function Beranda() {
                   sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
                   className="object-cover"
                 />
+                {/* Overlay dipertahankan: label putih di atas foto, penjamin kontras */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
                 <p className="absolute bottom-2.5 left-3.5 right-3.5 text-xs font-bold text-white">
                   Target SDG 11: Kota & Permukiman Berkelanjutan

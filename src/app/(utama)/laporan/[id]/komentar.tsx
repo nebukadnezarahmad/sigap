@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import type { Komentar } from "@/types/database";
 import { waktuRelatif } from "@/lib/utils";
-import { Avatar, Button, Card, Textarea } from "@/components/ui";
+import { Avatar, Button, Card, Skeleton, Textarea } from "@/components/ui";
 import { DemoAuthModal } from "@/components/tombol-demo-login";
 
 export function KomentarSection({
@@ -132,7 +132,11 @@ export function KomentarSection({
 
       <div className="space-y-4">
         {!terisi && (
-          <p className="text-sm text-muted">Memuat komentar…</p>
+          <div role="status" aria-label="Memuat komentar" className="space-y-3">
+            <Skeleton className="h-14 w-full" />
+            <Skeleton className="h-14 w-11/12" />
+            <Skeleton className="h-14 w-4/5" />
+          </div>
         )}
         <AnimatePresence initial={false}>
           {daftar.map((k) => (

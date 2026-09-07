@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, ImagePlus, MapPin, Send, ThumbsUp } from "lucide-react";
+import { AlertTriangle, ImagePlus, Loader2, MapPin, Send, ThumbsUp } from "lucide-react";
 import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
@@ -12,7 +12,14 @@ import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
 const LeafletMap = dynamic(
   () => import("./leaflet-map").then((m) => m.LeafletMap),
-  { ssr: false }
+  {
+    ssr: false,
+    loading: () => (
+      <p role="status" aria-label="Memuat peta" className="flex h-full min-h-64 items-center justify-center p-6 text-sm text-muted">
+        Memuat peta…
+      </p>
+    ),
+  }
 );
 
 const PUSAT_KOTA: [number, number] = [-6.2, 106.816666];
@@ -51,8 +58,36 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   const [files, setFiles] = useState<File[]>([]);
   const [proses, setProses] = useState(false);
   const [pesan, setPesan] = useState<string | null>(null);
+  const [galatJudul, setGalatJudul] = useState<string | null>(null);
+  const [galatDeskripsi, setGalatDeskripsi] = useState<string | null>(null);
+  const [galatPeta, setGalatPeta] = useState<string | null>(null);
   const [laporanMirip, setLaporanMirip] = useState<LaporanMirip[]>([]);
   const [abaikanDuplikat, setAbaikanDuplikat] = useState(false);
+
+  const kotor =
+    judul.trim() !== "" ||
+    deskripsi.trim() !== "" ||
+    alamat.trim() !== "" ||
+    files.length > 0 ||
+    posisi !== null;
+
+  // Proteksi draf hilang: peringatkan bila tab ditutup saat formulir kotor
+  useEffect(() => {
+    if (!kotor) return;
+    function saatTutup(e: BeforeUnloadEvent) {
+      e.preventDefault();
+    }
+    window.addEventListener("beforeunload", saatTutup);
+    return () => window.removeEventListener("beforeunload", saatTutup);
+  }, [kotor]);
+
+  function mintaTutup() {
+    if (kotor && !proses) {
+      const yakin = window.confirm("Draf laporan belum terkirim. Tutup dan buang draf?");
+      if (!yakin) return;
+    }
+    selesai();
+  }
 
   // Cek duplikasi saat posisi atau kategori berubah
   useEffect(() => {
@@ -183,13 +218,30 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   async function kirim(e: React.FormEvent) {
     e.preventDefault();
     setPesan(null);
+    setGalatJudul(null);
+    setGalatDeskripsi(null);
+    setGalatPeta(null);
     const pelapor = user;
     if (!pelapor) return;
 
+    let fokusId: string | null = null;
+    if (judul.trim().length < 10) {
+      setGalatJudul("Judul minimal 10 karakter. Tulis ringkasan masalah secara spesifik.");
+      fokusId ??= "judul";
+    }
+    if (deskripsi.trim().length < 20) {
+      setGalatDeskripsi("Deskripsi minimal 20 karakter. Jelaskan kondisi, durasi, dan dampaknya.");
+      fokusId ??= "deskripsi";
+    }
     if (!posisi) {
-      setPesan("Klik lokasi masalah di peta dulu ya.");
+      setGalatPeta("Klik lokasi masalah di peta dulu, lalu kirim lagi.");
+      fokusId ??= "peta-pilih";
+    }
+    if (fokusId) {
+      document.getElementById(fokusId)?.focus();
       return;
     }
+    if (!posisi) return;
 
     if (
       posisi.lat < -90 ||
@@ -197,7 +249,8 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       posisi.lng < -180 ||
       posisi.lng > 180
     ) {
-      setPesan("Koordinat di luar jangkauan (lat -90..90, lng -180..180).");
+      setGalatPeta("Koordinat di luar jangkauan (lat -90..90, lng -180..180). Geser titik di peta lalu coba lagi.");
+      document.getElementById("peta-pilih")?.focus();
       return;
     }
 
@@ -206,7 +259,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       const supabase = createClient();
 
       for (const f of files) {
-        if (f.size > 5 * 1024 * 1024) throw new Error("Setiap foto maksimal 5 MB.");
+        if (f.size > 5 * 1024 * 1024) throw new Error("Setiap foto maksimal 5 MB. Pilih foto lebih kecil lalu coba lagi.");
       }
 
       // Unggah sekali per file langsung ke report_photos;
@@ -217,7 +270,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         const { error: upErr } = await supabase.storage
           .from("foto-laporan")
           .upload(path, f, { contentType: f.type });
-        if (upErr) throw new Error(`Gagal unggah foto: ${upErr.message}`);
+        if (upErr) throw new Error(`Gagal unggah foto: ${upErr.message} Periksa koneksi lalu coba lagi.`);
         const { data: pub } = supabase.storage
           .from("foto-laporan")
           .getPublicUrl(path);
@@ -245,7 +298,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         })
         .select("id")
         .single();
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(`${error.message} Periksa koneksi lalu coba lagi.`);
 
       if (urls.length > 0 && inserted) {
         const baris = urls.map((url) => ({
@@ -259,7 +312,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       selesai();
       router.refresh();
     } catch (err) {
-      setPesan(err instanceof Error ? err.message : "Terjadi kesalahan.");
+      setPesan(err instanceof Error ? `${err.message} Periksa koneksi lalu coba lagi.` : "Terjadi kesalahan. Periksa koneksi lalu coba lagi.");
     } finally {
       setProses(false);
     }
@@ -272,17 +325,30 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           <Label htmlFor="judul">Judul laporan</Label>
           <Input
             id="judul"
+            name="judul"
+            autoComplete="off"
             required
             maxLength={120}
             value={judul}
-            onChange={(e) => setJudul(e.target.value)}
-            placeholder="Contoh: TPS liar di ujung Jl. Melati"
+            onChange={(e) => {
+              setJudul(e.target.value);
+              if (galatJudul) setGalatJudul(null);
+            }}
+            placeholder="Contoh: TPS liar di ujung Jl. Melati…"
+            aria-invalid={!!galatJudul}
+            aria-describedby={galatJudul ? "galat-judul" : undefined}
           />
+          {galatJudul && (
+            <p id="galat-judul" role="alert" className="mt-1.5 text-xs font-semibold text-danger">
+              {galatJudul}
+            </p>
+          )}
         </div>
         <div>
           <Label htmlFor="kategori">Kategori</Label>
           <Select
             id="kategori"
+            name="kategori"
             value={slugKategori}
             onChange={(e) => setSlugKategori(e.target.value)}
           >
@@ -297,20 +363,34 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           <Label htmlFor="deskripsi">Deskripsi</Label>
           <Textarea
             id="deskripsi"
+            name="deskripsi"
+            autoComplete="off"
             required
             rows={4}
             value={deskripsi}
-            onChange={(e) => setDeskripsi(e.target.value)}
-            placeholder="Jelaskan kondisi, sudah berapa lama, dan dampaknya bagi warga…"
+            onChange={(e) => {
+              setDeskripsi(e.target.value);
+              if (galatDeskripsi) setGalatDeskripsi(null);
+            }}
+            placeholder="Contoh: tumpukan sampah menutup setengah jalan sejak 3 hari…"
+            aria-invalid={!!galatDeskripsi}
+            aria-describedby={galatDeskripsi ? "galat-deskripsi" : undefined}
           />
+          {galatDeskripsi && (
+            <p id="galat-deskripsi" role="alert" className="mt-1.5 text-xs font-semibold text-danger">
+              {galatDeskripsi}
+            </p>
+          )}
         </div>
         <div>
           <Label htmlFor="alamat">Patokan alamat (opsional)</Label>
           <Input
             id="alamat"
+            name="alamat"
+            autoComplete="street-address"
             value={alamat}
             onChange={(e) => setAlamat(e.target.value)}
-            placeholder="Depan Masjid Al-Ikhlas, RT 03"
+            placeholder="Contoh: depan Masjid Al-Ikhlas, RT 03…"
           />
         </div>
         <div>
@@ -325,6 +405,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
               : "Pilih foto kondisi terbaru…"}
             <input
               id="foto"
+              name="foto"
               type="file"
               accept="image/*"
               multiple
@@ -356,34 +437,45 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           </span>
         </Label>
         <div className="min-h-64 flex-1 overflow-hidden rounded-xl border garis-halus">
-          <LeafletMap
-            mode="pilih"
-            zoom={15}
-            pusat={PUSAT_KOTA}
-            titik={
-              posisi
-                ? [
-                    {
-                      id: "baru",
-                      lat: posisi.lat,
-                      lng: posisi.lng,
-                      warna:
-                        KATEGORI.find((k) => k.slug === slugKategori)?.warna ??
-                        "#64748b",
-                      slug: slugKategori,
-                      judul: "Lokasi laporanmu",
-                    },
-                  ]
-                : []
-            }
-            onPilih={(lat, lng) => setPosisi({ lat, lng })}
-          />
+          <div id="peta-pilih" tabIndex={-1} className="h-full focus:outline-none">
+            <LeafletMap
+              mode="pilih"
+              zoom={15}
+              pusat={PUSAT_KOTA}
+              titik={
+                posisi
+                  ? [
+                      {
+                        id: "baru",
+                        lat: posisi.lat,
+                        lng: posisi.lng,
+                        warna:
+                          KATEGORI.find((k) => k.slug === slugKategori)?.warna ??
+                          "#64748b",
+                        slug: slugKategori,
+                        judul: "Lokasi laporanmu",
+                      },
+                    ]
+                  : []
+              }
+              onPilih={(lat, lng) => {
+                setPosisi({ lat, lng });
+                if (galatPeta) setGalatPeta(null);
+              }}
+            />
+          </div>
         </div>
-        <p className="mt-1.5 text-xs text-muted">
-          {posisi
-            ? `Titik terpilih: ${posisi.lat.toFixed(5)}, ${posisi.lng.toFixed(5)}`
-            : "Belum ada titik dipilih"}
-        </p>
+        {galatPeta ? (
+          <p role="alert" className="mt-1.5 text-xs font-semibold text-danger">
+            {galatPeta}
+          </p>
+        ) : (
+          <p className="mt-1.5 text-xs text-muted">
+            {posisi
+              ? `Titik terpilih: ${posisi.lat.toFixed(5)}, ${posisi.lng.toFixed(5)}`
+              : "Belum ada titik dipilih"}
+          </p>
+        )}
 
         {/* Kartu Peringatan Deduplikasi Cerdas */}
         {laporanMirip.length > 0 && !abaikanDuplikat && (
@@ -407,7 +499,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
                     onClick={() => handleDukungLaporanMirip(laporanMirip[0].id)}
                     className="bg-daun-600 hover:bg-daun-700 text-white"
                   >
-                    <ThumbsUp size={12} /> Ikut Dukung (+1 Poin)
+                    <ThumbsUp size={12} /> Dukung laporan ini
                   </Button>
                   <Button
                     size="sm"
@@ -429,9 +521,19 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           </p>
         )}
 
-        <Button type="submit" disabled={proses} size="lg" className="mt-3 w-full">
-          <Send size={16} /> {proses ? "Mengirim…" : "Kirim laporan (+10 poin)"}
-        </Button>
+        <div className="mt-3 flex w-full flex-col gap-2">
+          <Button type="submit" disabled={proses} aria-busy={proses} size="lg" className="w-full">
+            {proses ? (
+              <Loader2 size={16} aria-hidden className="animate-spin" />
+            ) : (
+              <Send size={16} aria-hidden />
+            )}
+            {proses ? "Mengirim laporan…" : "Kirim laporan (+10 poin)"}
+          </Button>
+          <Button type="button" variant="sekunder" onClick={mintaTutup} disabled={proses} className="w-full">
+            Batal
+          </Button>
+        </div>
       </div>
     </form>
   );

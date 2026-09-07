@@ -98,7 +98,7 @@ export default async function HalamanPapanSkor() {
         <div className="mb-10 divide-y divide-ap-hairline overflow-hidden rounded-[18px] border border-ap-hairline bg-white shadow-none dark:divide-line dark:border-line dark:bg-panel">
           {sisanya.map((p, i) => (
             <div key={p.id} className="flex items-center gap-3 px-4 py-3">
-              <span className="angka-tabular w-6 text-center font-display font-bold text-muted">
+              <span className="angka-tabular w-6 text-center text-sm font-bold tabular-nums text-muted">
                 {i + 4}
               </span>
               <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={34} />

@@ -37,7 +37,7 @@ function ToggleTema() {
     <button
       onClick={ubah}
       aria-label={gelap ? "Mode terang" : "Mode gelap"}
-      className="flex size-10 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+      className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
     >
       <span className="hidden dark:block">
         <Sun size={18} />
@@ -55,6 +55,7 @@ export function SiteHeader() {
   const { user, profil } = useUser();
   const [modalDemoBuka, setModalDemoBuka] = useState(false);
   const [menuBuka, setMenuBuka] = useState(false);
+  const [akunBuka, setAkunBuka] = useState(false);
 
   const tautan = [
     { href: "/peta", label: "Peta" },
@@ -92,7 +93,7 @@ export function SiteHeader() {
               key={t.href}
               href={t.href}
               className={cn(
-                "rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                "inline-flex min-h-[44px] items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
                 pathname.startsWith(t.href)
                   ? "bg-daun-600/10 text-daun-700 dark:text-daun-300 font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
@@ -105,7 +106,7 @@ export function SiteHeader() {
             <Link
               href="/dewan"
               className={cn(
-                "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
                 pathname.startsWith("/dewan")
                   ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
@@ -122,7 +123,7 @@ export function SiteHeader() {
             onClick={() => setMenuBuka((v) => !v)}
             aria-expanded={menuBuka}
             aria-label={menuBuka ? "Tutup menu navigasi" : "Buka menu navigasi"}
-            className="flex size-10 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 md:hidden"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 md:hidden"
           >
             {menuBuka ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -131,11 +132,27 @@ export function SiteHeader() {
             <div className="group relative">
               <button
                 aria-label="Menu akun"
-                className="flex items-center rounded-full transition hover:ring-4 hover:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+                aria-expanded={akunBuka}
+                aria-haspopup="menu"
+                onClick={() => setAkunBuka((v) => !v)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setAkunBuka((v) => !v);
+                  }
+                  if (e.key === "Escape") setAkunBuka(false);
+                }}
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition hover:ring-4 hover:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
               >
                 <Avatar nama={profil?.nama_lengkap ?? "?"} url={profil?.avatar_url} ukuran={34} />
               </button>
-              <div className="invisible absolute right-0 top-full z-20 w-56 translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <div
+                role="menu"
+                className={cn(
+                  "invisible absolute right-0 top-full z-20 w-56 translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100",
+                  akunBuka && "visible translate-y-0 opacity-100"
+                )}
+              >
                 <div className="border-b garis-halus px-3 pb-2 pt-1.5">
                   <p className="truncate text-sm font-semibold">
                     {profil?.nama_lengkap ?? user.email}
@@ -195,14 +212,17 @@ export function SiteHeader() {
                 variant="sekunder"
                 size="sm"
                 onClick={() => setModalDemoBuka(true)}
-                className="hidden sm:inline-flex items-center gap-1.5 border-daun-500/30 text-daun-700 hover:bg-daun-500/10 dark:text-daun-300"
+                className="hidden sm:inline-flex min-h-[44px] items-center gap-1.5 border-daun-500/30 text-daun-700 hover:bg-daun-500/10 dark:text-daun-300"
               >
                 <Sparkles size={14} className="text-daun-600 dark:text-daun-400" />
                 Akun Demo
               </Button>
-              <Button onClick={() => router.push("/masuk")} size="sm">
+              <Link
+                href="/masuk"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 active:scale-[0.97] bg-daun-600 text-white shadow-[0_1px_2px_rgb(23_67_42/0.2),0_6px_16px_-6px_rgb(23_67_42/0.35)] hover:bg-daun-700 hover:shadow-[0_2px_4px_rgb(23_67_42/0.2),0_10px_24px_-6px_rgb(23_67_42/0.4)]"
+              >
                 Masuk
-              </Button>
+              </Link>
             </div>
           )}
         </div>

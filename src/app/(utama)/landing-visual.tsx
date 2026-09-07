@@ -103,7 +103,7 @@ const LeafletMap = dynamic(
       <div className="flex h-full w-full items-center justify-center bg-ap-parchment text-xs text-ap-ink/60">
         <span className="flex items-center gap-2 font-medium">
           <span className="size-2 animate-ping rounded-full bg-ap-blue" />
-          Memuat Peta Spasial Realtime...
+          Memuat peta wilayah…
         </span>
       </div>
     ),
@@ -227,8 +227,8 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-ap-blue/10 px-2.5 py-0.5 text-[11px] font-bold text-ap-blue">
-            {titik.length} Laporan Aktif
+          <span className="rounded-full bg-daun-500/10 px-2.5 py-0.5 text-[11px] font-bold tabular-nums angka-tabular text-daun-700 dark:text-daun-300">
+            {titik.length} laporan aktif
           </span>
           <span className="hidden text-[11px] text-ap-ink/60 sm:inline">· Realtime</span>
         </div>
@@ -315,7 +315,7 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
                     href={`/laporan/${laporanTerpilih.id}`}
                     className={`inline-flex min-h-[44px] items-center gap-1 text-[11px] font-bold text-ap-blue transition hover:underline ${FOKUS_APPLE}`}
                   >
-                    Buka Detail <ArrowRight size={12} />
+                    Lihat detail <ArrowRight size={12} />
                   </Link>
                 </div>
               </KacaKartu>
@@ -326,15 +326,15 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
 
       {/* Bottom Bar Controls & Navigation */}
       <div className="flex min-h-[44px] items-center justify-between gap-2 border-t border-ap-hairline bg-ap-parchment px-4 py-2.5 text-xs">
-        <span className="flex items-center gap-1.5 text-[11px] text-ap-ink/60">
-          <MapPin size={13} className="text-ap-blue" />
-          Klik sembarang pin untuk melihat status
+        <span className="flex min-w-0 items-center gap-1.5 text-[11px] text-ap-ink/60">
+          <MapPin size={13} className="shrink-0 text-ap-blue" />
+          <span className="truncate">Pilih pin untuk melihat status laporan di sekitarmu</span>
         </span>
         <Link
           href="/peta"
-          className={`inline-flex min-h-[44px] items-center gap-1 text-[11px] font-bold text-ap-blue transition hover:underline ${FOKUS_APPLE}`}
+          className={`inline-flex min-h-[44px] shrink-0 items-center gap-1 text-[11px] font-bold text-ap-blue transition hover:underline ${FOKUS_APPLE}`}
         >
-          Jelajahi Peta Penuh <ExternalLink size={12} />
+          Lihat peta lengkap <ExternalLink size={12} />
         </Link>
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { Loader2, Pencil, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Input, Label, Textarea } from "@/components/ui";
 import { Modal } from "@/components/modal";
@@ -45,7 +45,7 @@ export function AksiLaporanSaya({
       .eq("id", laporan.id);
     setProses(false);
     if (error) {
-      setPesan(error.message);
+      setPesan(`${error.message} Periksa koneksi lalu coba lagi.`);
       return;
     }
     setBukaEdit(false);
@@ -54,11 +54,18 @@ export function AksiLaporanSaya({
 
   async function hapus() {
     setProses(true);
-    const supabase = createClient();
-    await supabase.from("reports").delete().eq("id", laporan.id);
-    setProses(false);
-    setMintaHapus(false);
-    router.refresh();
+    setPesan(null);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from("reports").delete().eq("id", laporan.id);
+      if (error) throw error;
+      setMintaHapus(false);
+      router.refresh();
+    } catch (e) {
+      setPesan(e instanceof Error ? `${e.message} Periksa koneksi lalu coba lagi.` : "Gagal menghapus laporan. Periksa koneksi lalu coba lagi.");
+    } finally {
+      setProses(false);
+    }
   }
 
   return (
@@ -102,33 +109,40 @@ export function AksiLaporanSaya({
             <Label htmlFor="edit-judul">Judul</Label>
             <Input
               id="edit-judul"
+              name="judul"
+              autoComplete="off"
               required
               maxLength={120}
               value={judul}
               onChange={(e) => setJudul(e.target.value)}
+              placeholder="Contoh: TPS liar di ujung Jl. Melati…"
             />
           </div>
           <div>
             <Label htmlFor="edit-deskripsi">Deskripsi</Label>
             <Textarea
               id="edit-deskripsi"
+              name="deskripsi"
               required
               rows={5}
               maxLength={4000}
               value={deskripsi}
               onChange={(e) => setDeskripsi(e.target.value)}
+              placeholder="Contoh: tumpukan sampah menutup setengah jalan sejak 3 hari…"
             />
           </div>
           <div>
             <Label htmlFor="edit-alamat">Patokan alamat</Label>
             <Input
               id="edit-alamat"
+              name="alamat"
+              autoComplete="street-address"
               value={alamat}
               onChange={(e) => setAlamat(e.target.value)}
-              placeholder="Opsional"
+              placeholder="Contoh: depan Masjid Al-Ikhlas, RT 03…"
             />
           </div>
-          {pesan && (
+          {pesan && bukaEdit && (
             <p role="alert" className="rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
               {pesan}
             </p>
@@ -137,8 +151,9 @@ export function AksiLaporanSaya({
             <Button type="button" variant="sekunder" onClick={() => setBukaEdit(false)}>
               Batal
             </Button>
-            <Button type="submit" disabled={proses}>
-              {proses ? "Menyimpan…" : "Simpan perubahan"}
+            <Button type="submit" disabled={proses} aria-busy={proses}>
+              {proses && <Loader2 size={16} aria-hidden className="animate-spin" />}
+              {proses ? "Menyimpan laporan…" : "Simpan perubahan"}
             </Button>
           </div>
         </form>
@@ -154,12 +169,18 @@ export function AksiLaporanSaya({
           &quot;{laporan.judul}&quot; beserta foto, komentar, dan dukungannya
           akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.
         </p>
+        {pesan && mintaHapus && (
+          <p role="alert" className="mt-3 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
+            {pesan}
+          </p>
+        )}
         <div className="mt-5 flex justify-end gap-2">
-          <Button variant="sekunder" onClick={() => setMintaHapus(false)}>
+          <Button type="button" variant="sekunder" onClick={() => setMintaHapus(false)} disabled={proses}>
             Batal
           </Button>
-          <Button variant="bahaya" onClick={hapus} disabled={proses}>
-            {proses ? "Menghapus…" : "Ya, hapus"}
+          <Button type="button" variant="bahaya" onClick={hapus} disabled={proses} aria-busy={proses}>
+            {proses && <Loader2 size={16} aria-hidden className="animate-spin" />}
+            {proses ? "Menghapus laporan…" : "Ya, hapus laporan"}
           </Button>
         </div>
       </Modal>

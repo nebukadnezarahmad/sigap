@@ -20,9 +20,9 @@ export default function LayoutUtama({
       <Gerak>
         <SiteHeader />
         <CommandPalette />
-        <main id="isi-utama" tabIndex={-1}>
+        <div id="isi-utama" tabIndex={-1}>
           {children}
-        </main>
+        </div>
         <footer className="mt-16 bg-[#f5f5f7] print:hidden">
           <div className="mx-auto max-w-6xl px-4 py-16 text-muted">
             <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
