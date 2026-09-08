@@ -6,11 +6,17 @@ import { createClient } from "@/lib/supabase/client";
 import type { Profil } from "@/types/database";
 
 export function useUser() {
+  const supabaseTersedia = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
   const [user, setUser] = useState<User | null>(null);
   const [profil, setProfil] = useState<Profil | null>(null);
-  const [muat, setMuat] = useState(true);
+  const [muat, setMuat] = useState(supabaseTersedia);
 
   useEffect(() => {
+    if (!supabaseTersedia) return;
+
     const supabase = createClient();
     let batal = false;
 
@@ -53,7 +59,7 @@ export function useUser() {
       batal = true;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [supabaseTersedia]);
 
   return { user, profil, muat };
 }
