@@ -319,7 +319,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   }
 
   return (
-    <form onSubmit={kirim} className="grid gap-5 sm:grid-cols-2">
+    <form onSubmit={kirim} className="grid gap-5 lg:grid-cols-2">
       <div className="space-y-4">
         <div>
           <Label htmlFor="judul">Judul laporan</Label>

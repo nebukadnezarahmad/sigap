@@ -24,6 +24,7 @@ import {
   Check,
   ChevronDown,
   History,
+  ListFilter,
   MessageSquare,
   SlidersHorizontal,
   ThumbsUp,
@@ -113,7 +114,10 @@ export function Jelajah({
     null
   );
   const [cariLokasi, setCariLokasi] = useState(false);
-  const [pop, setPop] = useState<"kategori" | "status" | null>(null);
+  const [pop, setPop] = useState<"kategori" | "status" | "lainnya" | null>(
+    null
+  );
+  const [tabSeluler, setTabSeluler] = useState<"peta" | "daftar">("peta");
   const [layerFasilitas, setLayerFasilitas] = useState(false);
   const [fasTerpilih, setFasTerpilih] = useState<FasilitasRingkas | null>(null);
   const [modalFasilitas, setModalFasilitas] = useState(false);
@@ -247,6 +251,9 @@ export function Jelajah({
 
   const terpilih = laporan.find((r) => r.id === terpilihId) ?? null;
 
+  const lainAktif =
+    (pusatSaya ? 1 : 0) + (layerFasilitas ? 1 : 0) + (periodeIdx !== null ? 1 : 0);
+
   function aktifkanSekitarSaya() {
     if (pusatSaya) {
       setPusatSaya(null);
@@ -301,9 +308,9 @@ export function Jelajah({
         </div>
       )}
 
-      <div className="mb-4 rounded-2xl border garis-halus bg-panel p-2.5">
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="relative min-w-48 flex-1">
+      <div className="mb-4 space-y-2.5 rounded-2xl border garis-halus bg-panel p-2.5">
+        <div>
+          <label className="relative block">
             <Search
               size={15}
               className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
@@ -316,7 +323,9 @@ export function Jelajah({
               className="h-10 w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-action focus:ring-4 focus:ring-action/15"
             />
           </label>
+        </div>
 
+        <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <button
               onClick={() => setPop(pop === "kategori" ? null : "kategori")}
@@ -466,77 +475,98 @@ export function Jelajah({
             )}
           </div>
 
-          <span aria-hidden className="mx-1 hidden h-6 w-px bg-line sm:block" />
-
-          <button
-            onClick={aktifkanSekitarSaya}
-            aria-pressed={!!pusatSaya}
-            className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
-              pusatSaya
-                ? "border-transparent bg-action text-white"
-                : "text-muted hover:text-ink"
-            }`}
-            style={
-              pusatSaya ? undefined : { borderColor: "var(--line)" }
-            }
-          >
-            <Crosshair size={15} />
-            {cariLokasi
-              ? "Mencari…"
-              : pusatSaya
-                ? "≤ 2 km"
-                : "Sekitar saya"}
-          </button>
-
-          <button
-            onClick={() => setLayerFasilitas((v) => !v)}
-            aria-pressed={layerFasilitas}
-            className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
-              layerFasilitas
-                ? "border-transparent bg-teal-600 text-white"
-                : "text-muted hover:text-ink"
-            }`}
-            style={
-              layerFasilitas ? undefined : { borderColor: "var(--line)" }
-            }
-          >
-            <Recycle size={15} />
-            Fasilitas
-          </button>
-
-          {layerFasilitas && (
+          <div className="relative">
             <button
-              onClick={() => setModalFasilitas(true)}
-              className="flex min-h-[44px] items-center gap-1.5 rounded-full border border-dashed px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-teal-500 hover:text-ink"
-              style={{ borderColor: "var(--line)" }}
-            >
-              + Tambah fasilitas
-            </button>
-          )}
-
-          <TombolIkutiArea pusatSaya={pusatSaya} />
-
-          <button
-            onClick={() => {
-              if (periodeIdx === null) setPeriodeIdx(BULAN.length - 1);
-              else {
-                setPeriodeIdx(null);
-                setMainkan(false);
+              onClick={() => setPop(pop === "lainnya" ? null : "lainnya")}
+              aria-expanded={pop === "lainnya"}
+              className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+                pop === "lainnya" || lainAktif > 0
+                  ? "border-action/50 bg-action/5 text-action"
+                  : "text-muted hover:text-ink"
+              }`}
+              style={
+                pop === "lainnya" || lainAktif > 0
+                  ? undefined
+                  : { borderColor: "var(--line)" }
               }
-            }}
-            aria-pressed={periodeIdx !== null}
-            className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
-              periodeIdx !== null
-                ? "border-transparent bg-action text-white"
-                : "text-muted hover:text-ink"
-            }`}
-            style={
-              periodeIdx !== null ? undefined : { borderColor: "var(--line)" }
-            }
-          >
-            <History size={15} />
-            Garis waktu
-          </button>
+            >
+              <ListFilter size={15} />
+              Filter lain
+              {lainAktif > 0 && (
+                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-action text-[11px] font-bold text-white">
+                  {lainAktif}
+                </span>
+              )}
+              <ChevronDown
+                size={14}
+                className={`transition-transform duration-300 ${pop === "lainnya" ? "rotate-180" : ""}`}
+              />
+            </button>
+            {pop === "lainnya" && (
+              <div className="absolute left-0 top-full z-30 mt-2 flex w-72 flex-col gap-1 rounded-2xl border garis-halus bg-panel p-2 shadow-xl">
+                <button
+                  onClick={aktifkanSekitarSaya}
+                  aria-pressed={!!pusatSaya}
+                  className={`flex min-h-[44px] w-full items-center justify-start gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                    pusatSaya
+                      ? "bg-action text-white"
+                      : "hover:bg-panel-2"
+                  }`}
+                >
+                  <Crosshair size={15} />
+                  {cariLokasi
+                    ? "Mencari…"
+                    : pusatSaya
+                      ? "Sekitar saya · ≤ 2 km"
+                      : "Sekitar saya"}
+                </button>
+                <button
+                  onClick={() => setLayerFasilitas((v) => !v)}
+                  aria-pressed={layerFasilitas}
+                  className={`flex min-h-[44px] w-full items-center justify-start gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                    layerFasilitas
+                      ? "bg-action text-white"
+                      : "hover:bg-panel-2"
+                  }`}
+                >
+                  <Recycle size={15} />
+                  Fasilitas hijau
+                </button>
+                {layerFasilitas && (
+                  <button
+                    onClick={() => {
+                      setModalFasilitas(true);
+                      setPop(null);
+                    }}
+                    className="flex min-h-[44px] w-full items-center justify-start gap-2 rounded-xl border border-dashed garis-halus px-3 py-2 text-xs font-semibold text-muted transition hover:border-action hover:text-ink"
+                  >
+                    + Tambah fasilitas
+                  </button>
+                )}
+                <div className="[&_button]:w-full [&_button]:justify-start [&_button]:border-transparent [&_button]:bg-transparent [&_button]:px-3">
+                  <TombolIkutiArea pusatSaya={pusatSaya} />
+                </div>
+                <button
+                  onClick={() => {
+                    if (periodeIdx === null) setPeriodeIdx(BULAN.length - 1);
+                    else {
+                      setPeriodeIdx(null);
+                      setMainkan(false);
+                    }
+                  }}
+                  aria-pressed={periodeIdx !== null}
+                  className={`flex min-h-[44px] w-full items-center justify-start gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                    periodeIdx !== null
+                      ? "bg-action text-white"
+                      : "hover:bg-panel-2"
+                  }`}
+                >
+                  <History size={15} />
+                  Garis waktu
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {periodeIdx !== null && (
@@ -579,8 +609,30 @@ export function Jelajah({
         />
       )}
 
+      <div
+        className="mb-3 grid grid-cols-2 gap-1 rounded-full border garis-halus bg-panel p-1 lg:hidden"
+        role="tablist"
+        aria-label="Tampilan peta"
+      >
+        {(["peta", "daftar"] as const).map((t) => (
+          <button
+            key={t}
+            role="tab"
+            aria-selected={tabSeluler === t}
+            onClick={() => setTabSeluler(t)}
+            className={`min-h-[40px] rounded-full text-sm font-semibold transition ${
+              tabSeluler === t ? "bg-action text-white" : "text-muted"
+            }`}
+          >
+            {t === "peta" ? "Peta" : `Daftar · ${tersaring.length}`}
+          </button>
+        ))}
+      </div>
+
       <div className="grid h-[64dvh] min-h-[460px] grid-rows-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_360px]">
-        <Card className="relative min-h-0 overflow-hidden p-0">
+        <Card
+          className={`relative min-h-0 overflow-hidden p-0 ${tabSeluler === "daftar" ? "hidden lg:block" : ""}`}
+        >
           <LeafletMap
             pusat={
               pusatSaya ? [pusatSaya.lat, pusatSaya.lng] : undefined
@@ -607,7 +659,9 @@ export function Jelajah({
         </Card>
 
         <aside
-          className="hidden min-h-0 flex-col gap-3 overflow-y-auto pr-1 lg:flex"
+          className={`min-h-0 flex-col gap-3 overflow-y-auto pr-1 lg:flex ${
+            tabSeluler === "peta" ? "hidden" : "flex"
+          }`}
           aria-label="Daftar laporan"
         >
           <AnimatePresence initial={false}>
