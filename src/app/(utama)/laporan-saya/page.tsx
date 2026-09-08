@@ -14,11 +14,12 @@ export const metadata: Metadata = { title: "Laporan Saya" };
 export const dynamic = "force-dynamic";
 
 /* Fusi visual-fusion: kartu utilitas putih hairline 18px tanpa shadow;
-   link CTA Action Blue; Fraunces + StatusChip tetap.
+   link CTA Action Blue; Fraunces + StatusChip tetap. Dark: tile netral
+   ap-tile1 + teks putih + hairline netral (tanpa hijau-lumpur).
    Alasan state: satu ikon kecil per state (relevan, bukan dekorasi);
    skeleton tanpa shimmer agar tenang mengikuti MOTION 1. */
 const KARTU =
-  "rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
+  "rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white";
 
 /* Skeleton muat: dipakai sebagai fallback Suspense/loading agar daftar
    tidak melompat saat data diambil. Tanpa ilustrasi karena ini muat. */

@@ -44,7 +44,7 @@ const LeafletMap = dynamic(
   () => import("./leaflet-map").then((m) => m.LeafletMap),
   {
     ssr: false,
-    loading: () => <div className="h-full w-full animate-pulse bg-panel-2" />,
+    loading: () => <div className="h-full w-full animate-pulse bg-ap-parchment dark:bg-ap-tile2" />,
   }
 );
 
@@ -314,13 +314,13 @@ export function Jelajah({
       <div className="mx-auto max-w-7xl px-4 pt-6">
 
       {!dbAktif && (
-        <div className="mb-4 flex items-center gap-2 rounded-[18px] border border-kunyit-500/40 bg-white px-4 py-3 text-sm text-kunyit-600 shadow-none dark:bg-panel dark:text-kunyit-300">
+        <div className="mb-4 flex items-center gap-2 rounded-[18px] border border-kunyit-500/40 bg-white px-4 py-3 text-sm text-kunyit-600 shadow-none dark:border-kunyit-500/40 dark:bg-ap-tile1 dark:text-white">
           <WifiOff size={16} /> Database belum tersambung — atur env Supabase lalu
           jalankan schema.sql (lihat README).
         </div>
       )}
 
-      <div className="mb-4 rounded-[18px] border border-ap-hairline bg-white p-2.5 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+      <div className="mb-4 rounded-[18px] border border-ap-hairline bg-white p-2.5 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
         <div className="flex flex-wrap items-center gap-2">
           <label className="relative min-w-48 flex-1">
             <Search
@@ -332,7 +332,7 @@ export function Jelajah({
               onChange={(e) => setKueri(e.target.value)}
               placeholder="Cari judul atau isi laporan…"
               aria-label="Cari laporan"
-              className="h-11 min-h-[44px] w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
+              className="h-11 min-h-[44px] w-full rounded-full border garis-halus bg-ap-parchment pl-10 pr-4 text-sm text-ap-ink outline-none transition placeholder:text-ap-ink/40 focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none dark:border-white/15 dark:bg-ap-tile2 dark:text-white dark:placeholder:text-white/40"
             />
           </label>
 
@@ -340,7 +340,7 @@ export function Jelajah({
             <KacaPill
               onClick={() => setPop(pop === "kategori" ? null : "kategori")}
               aria-expanded={pop === "kategori"}
-              className={`min-h-[44px] px-4 ${FOKUS_KACA} ${
+              className={`min-h-[44px] px-4 dark:text-white ${FOKUS_KACA} ${
                 pop === "kategori" || fKategori.length > 0
                   ? "border-ap-blue/50 bg-ap-blue/10 text-ap-blue dark:border-ap-sky/40 dark:bg-ap-sky/15 dark:text-ap-sky"
                   : ""
@@ -363,7 +363,7 @@ export function Jelajah({
             {pop === "kategori" && (
               /* R-34: kaca gelap dirapatkan di atas ubin peta yang terang agar
                  teks terang tetap kontras; blur kaca dipertahankan. */
-              <KacaKartu className="absolute right-0 top-full z-30 mt-2 w-64 max-w-[calc(100vw-2rem)] p-2 dark:bg-[#131d19]/90">
+              <KacaKartu className="absolute right-0 top-full z-30 mt-2 w-64 max-w-[calc(100vw-2rem)] p-2 dark:border-white/15 dark:bg-ap-tile2/90 dark:text-white">
                 {KATEGORI.map((k) => {
                   const aktif = fKategori.includes(k.slug);
                   return (
@@ -377,13 +377,13 @@ export function Jelajah({
                         )
                       }
                       aria-pressed={aktif}
-                      className="flex min-h-[44px] w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition hover:bg-panel-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
+                      className="flex min-h-[44px] w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition hover:bg-ap-parchment focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none dark:hover:bg-white/10"
                     >
                       <span
                         className={`flex size-4 items-center justify-center rounded border transition ${
                           aktif
                             ? "border-ap-blue bg-ap-blue text-white"
-                            : "border-line"
+                            : "border-ap-hairline dark:border-white/25"
                         }`}
                       >
                         {aktif && <Check size={11} strokeWidth={3} />}
@@ -398,7 +398,7 @@ export function Jelajah({
                 {fKategori.length > 0 && (
                   <button
                     onClick={() => setFKategori([])}
-                    className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
+                    className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-muted transition hover:bg-ap-parchment hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none dark:hover:bg-white/10 dark:hover:text-white"
                   >
                     <X size={12} /> Reset kategori
                   </button>
@@ -411,7 +411,7 @@ export function Jelajah({
             <KacaPill
               onClick={() => setPop(pop === "status" ? null : "status")}
               aria-expanded={pop === "status"}
-              className={`min-h-[44px] px-4 ${FOKUS_KACA} ${
+              className={`min-h-[44px] px-4 dark:text-white ${FOKUS_KACA} ${
                 pop === "status" || fStatus.length > 0
                   ? "border-ap-blue/50 bg-ap-blue/10 text-ap-blue dark:border-ap-sky/40 dark:bg-ap-sky/15 dark:text-ap-sky"
                   : ""
@@ -436,7 +436,7 @@ export function Jelajah({
               </span>
             </KacaPill>
             {pop === "status" && (
-              <KacaKartu className="absolute right-0 top-full z-30 mt-2 w-52 max-w-[calc(100vw-2rem)] p-2 dark:bg-[#131d19]/90">
+              <KacaKartu className="absolute right-0 top-full z-30 mt-2 w-52 max-w-[calc(100vw-2rem)] p-2 dark:border-white/15 dark:bg-ap-tile2/90 dark:text-white">
                 {(Object.keys(STATUS) as StatusKey[]).map((st) => {
                   const aktif = fStatus.includes(st);
                   return (
@@ -450,13 +450,13 @@ export function Jelajah({
                         )
                       }
                       aria-pressed={aktif}
-                      className="flex min-h-[44px] w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition hover:bg-panel-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
+                      className="flex min-h-[44px] w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition hover:bg-ap-parchment focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none dark:hover:bg-white/10"
                     >
                       <span
                         className={`flex size-4 items-center justify-center rounded border transition ${
                           aktif
                             ? "border-ap-blue bg-ap-blue text-white"
-                            : "border-line"
+                            : "border-ap-hairline dark:border-white/25"
                         }`}
                       >
                         {aktif && <Check size={11} strokeWidth={3} />}
@@ -472,7 +472,7 @@ export function Jelajah({
                 {fStatus.length > 0 && (
                   <button
                     onClick={() => setFStatus([])}
-                    className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
+                    className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-muted transition hover:bg-ap-parchment hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none dark:hover:bg-white/10 dark:hover:text-white"
                   >
                     <X size={12} /> Reset status
                   </button>
@@ -481,12 +481,12 @@ export function Jelajah({
             )}
           </div>
 
-          <span aria-hidden className="mx-1 hidden h-6 w-px bg-line sm:block" />
+          <span aria-hidden className="mx-1 hidden h-6 w-px bg-ap-hairline sm:block dark:bg-white/15" />
 
           <KacaPill
             onClick={aktifkanSekitarSaya}
             aria-pressed={!!pusatSaya}
-            className={`min-h-[44px] px-4 ${FOKUS_KACA} ${
+            className={`min-h-[44px] px-4 dark:text-white ${FOKUS_KACA} ${
               pusatSaya
                 ? "border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white"
                 : ""
@@ -505,7 +505,7 @@ export function Jelajah({
           <KacaPill
             onClick={() => setLayerFasilitas((v) => !v)}
             aria-pressed={layerFasilitas}
-            className={`min-h-[44px] px-4 ${FOKUS_KACA} ${
+            className={`min-h-[44px] px-4 dark:text-white ${FOKUS_KACA} ${
               layerFasilitas
                 ? "border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white"
                 : ""
@@ -520,7 +520,7 @@ export function Jelajah({
           {layerFasilitas && (
             <KacaPill
               onClick={() => setModalFasilitas(true)}
-              className={`min-h-[44px] border-dashed px-3 py-1.5 text-xs hover:border-ap-blue/60 ${FOKUS_KACA}`}
+              className={`min-h-[44px] border-dashed px-3 py-1.5 text-xs hover:border-ap-blue/60 dark:text-white ${FOKUS_KACA}`}
             >
               + Tambah fasilitas
             </KacaPill>
@@ -537,7 +537,7 @@ export function Jelajah({
               }
             }}
             aria-pressed={periodeIdx !== null}
-            className={`min-h-[44px] px-4 ${FOKUS_KACA} ${
+            className={`min-h-[44px] px-4 dark:text-white ${FOKUS_KACA} ${
               periodeIdx !== null
                 ? "border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white"
                 : ""
@@ -551,7 +551,7 @@ export function Jelajah({
         </div>
 
         {periodeIdx !== null && (
-          <div className="mt-2.5 flex flex-wrap items-center gap-3 border-t garis-halus px-1 pt-2.5">
+          <div className="mt-2.5 flex flex-wrap items-center gap-3 border-t garis-halus px-1 pt-2.5 dark:border-white/10">
             <button
               onClick={() => setMainkan((v) => !v)}
               aria-label={mainkan ? "Jeda" : "Putar"}
@@ -593,7 +593,7 @@ export function Jelajah({
       {/* R-03: di ponsel peta dipadatkan agar cuplikan daftar terlihat di
           bawahnya; desktop tidak berubah. */}
       <div className="grid h-[56dvh] min-h-[400px] grid-rows-[minmax(0,1fr)] gap-4 lg:h-[64dvh] lg:min-h-[460px] lg:grid-cols-[1fr_360px]">
-        <Card className="relative min-h-0 overflow-hidden rounded-[18px] border-ap-hairline bg-white p-0 shadow-none dark:border-line dark:bg-panel">
+        <Card className="relative min-h-0 overflow-hidden rounded-[18px] border-ap-hairline bg-white p-0 shadow-none dark:border-white/15 dark:bg-ap-tile1">
           <LeafletMap
             pusat={
               pusatSaya ? [pusatSaya.lat, pusatSaya.lng] : undefined
@@ -612,7 +612,7 @@ export function Jelajah({
             }}
           />
           {periodeIdx !== null && (
-            <KacaBar className="pointer-events-none absolute left-3 top-3 z-[500] rounded-lg border px-3 py-1.5 font-display text-sm font-bold dark:bg-[#0c1310]/85">
+            <KacaBar className="pointer-events-none absolute left-3 top-3 z-[500] rounded-lg border px-3 py-1.5 font-display text-sm font-bold dark:border-white/15 dark:bg-ap-tile1/85 dark:text-white">
               <History size={13} className="inline align-[-2px]" /> s.d.{" "}
               {BULAN[periodeIdx].label}
             </KacaBar>
@@ -643,7 +643,7 @@ export function Jelajah({
                   tabIndex={0}
                   role="button"
                   aria-label={`Buka laporan ${r.judul}`}
-                  className={`cursor-pointer p-4 transition hover:border-ap-blue/50 motion-reduce:transition-none ${FOKUS_KACA} ${
+                  className={`cursor-pointer bg-white/60 p-4 transition hover:border-ap-blue/50 motion-reduce:transition-none dark:border-white/15 dark:bg-ap-tile2/80 dark:text-white ${FOKUS_KACA} ${
                     terpilihId === r.id ? "ring-2 ring-ap-blue" : ""
                   }`}
                 >
@@ -685,7 +685,7 @@ export function Jelajah({
             </p>
           )}
           {tersaring.length === 0 && (
-            <KacaKartu className="flex flex-col items-center gap-2 p-8 text-center text-muted">
+            <KacaKartu className="flex flex-col items-center gap-2 bg-white/60 p-8 text-center text-muted dark:border-white/15 dark:bg-ap-tile2/80">
               <MapPinOff size={28} />
               <p className="text-sm">
                 {periodeIdx !== null
@@ -702,11 +702,11 @@ export function Jelajah({
           sama dengan desktop; judul Fraunces dipertahankan, tanpa emoji. */}
       <section
         aria-label="Daftar laporan"
-        className="mt-4 overflow-hidden rounded-[18px] border border-ap-hairline bg-white shadow-none lg:hidden dark:border-line dark:bg-panel"
+        className="mt-4 overflow-hidden rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-none lg:hidden dark:border-white/15 dark:bg-ap-tile1 dark:text-white"
       >
         <div
           aria-hidden
-          className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-line"
+          className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-ap-hairline dark:bg-white/15"
         />
         <div className="flex items-baseline justify-between gap-2 px-4 pb-1 pt-2">
           <h2 className="font-display text-lg font-bold">Daftar laporan</h2>
@@ -716,13 +716,13 @@ export function Jelajah({
         </div>
         {tersaring.length > 0 ? (
           <>
-            <ul className="lembar-geser max-h-80 divide-y divide-line overflow-y-auto px-2 pb-2">
+            <ul className="lembar-geser max-h-80 divide-y divide-ap-hairline overflow-y-auto px-2 pb-2 dark:divide-white/10">
               {tersaring.slice(0, 20).map((r) => (
                 <li key={r.id}>
                   <button
                     onClick={() => setTerpilihId(r.id)}
                     aria-label={`Buka laporan ${r.judul}`}
-                    className={`flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-panel-2 motion-reduce:transition-none ${FOKUS_KACA} ${
+                    className={`flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-ap-parchment motion-reduce:transition-none dark:hover:bg-white/10 ${FOKUS_KACA} ${
                       terpilihId === r.id ? "ring-2 ring-ap-blue" : ""
                     }`}
                   >
@@ -752,7 +752,7 @@ export function Jelajah({
                 </li>
               ))}
             </ul>
-            <p className="angka-tabular border-t garis-halus px-4 py-2 text-center text-xs tabular-nums text-muted">
+            <p className="angka-tabular border-t garis-halus px-4 py-2 text-center text-xs tabular-nums text-muted dark:border-white/10">
               menampilkan {Math.min(20, tersaring.length)} dari{" "}
               {tersaring.length} laporan
             </p>

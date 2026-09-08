@@ -322,7 +322,7 @@ export default async function HalamanTransparansi() {
       </div>
 
       {/* Standar SLA Kategori */}
-      <section className="mb-6 rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+      <section className="mb-6 rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
         <h2 className="font-display text-base font-bold tracking-[-0.224px]">
           Standar Target Waktu Penanganan (SLA Resmi per Kategori)
         </h2>
@@ -330,13 +330,13 @@ export default async function HalamanTransparansi() {
           {KATEGORI.filter((k) => k.slug !== "lainnya").map((k) => (
             <div
               key={k.slug}
-              className="rounded-lg border border-ap-hairline bg-ap-pearl p-3 text-left dark:border-line dark:bg-panel-2"
+              className="rounded-lg border border-ap-hairline bg-ap-pearl p-3 text-left dark:border-white/15 dark:bg-ap-tile2"
             >
               <div className="flex items-center gap-1.5 text-xs font-semibold text-muted">
                 <IkonKategori slug={k.slug} ukuran={13} />
                 <span className="truncate">{k.nama}</span>
               </div>
-              <p className="angka-tabular mt-1 text-xl font-black tabular-nums text-ap-ink dark:text-ink">
+              <p className="angka-tabular mt-1 text-xl font-black tabular-nums text-ap-ink dark:text-white">
                 {SLA_KATEGORI[k.slug] ?? 7} Hari
               </p>
               <p className="text-[11px] text-muted">Target respon & beres</p>
@@ -346,8 +346,8 @@ export default async function HalamanTransparansi() {
       </section>
 
       {/* Papan Keterlambatan Publik (Overdue Watchlist) */}
-      <section className="mb-6 rounded-[18px] border border-danger/30 bg-white p-6 shadow-none dark:bg-panel">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ap-hairline pb-3 dark:border-line">
+      <section className="mb-6 rounded-[18px] border border-danger/30 bg-white p-6 text-ap-ink shadow-none dark:border-danger/40 dark:bg-ap-tile1 dark:text-white">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ap-hairline pb-3 dark:border-white/15">
           <div className="flex items-center gap-2">
             <AlertTriangle className="text-danger" size={18} />
             <h2 className="font-display font-bold text-lg tracking-[-0.224px]">
@@ -379,7 +379,7 @@ export default async function HalamanTransparansi() {
                 Daftar laporan warga yang melewati batas waktu SLA
               </caption>
               <thead>
-                <tr className="border-b border-ap-hairline text-xs text-muted dark:border-line">
+                <tr className="border-b border-ap-hairline text-xs text-muted dark:border-white/15 dark:text-white/70">
                   <th scope="col" className="pb-2 font-semibold">Judul Masalah</th>
                   <th scope="col" className="pb-2 font-semibold">Kategori</th>
                   <th scope="col" className="pb-2 font-semibold">Tgl Lapor</th>
@@ -389,10 +389,10 @@ export default async function HalamanTransparansi() {
                   <th scope="col" className="pb-2 font-semibold text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ap-hairline dark:divide-line">
+              <tbody className="divide-y divide-ap-hairline dark:divide-white/15">
                 {laporanLewatSla.slice(0, 10).map((r) => (
-                  <tr key={r.id} className="hover:bg-panel-2/40 transition">
-                    <td className="py-3 font-semibold text-ink max-w-xs truncate">
+                  <tr key={r.id} className="transition hover:bg-ap-parchment dark:hover:bg-white/5">
+                    <td className="max-w-xs truncate py-3 font-semibold text-ap-ink dark:text-white">
                       {r.judul}
                     </td>
                     <td className="py-3 text-xs text-muted">
@@ -430,29 +430,29 @@ export default async function HalamanTransparansi() {
       {/* Insight Otomatis */}
       <div className="mb-6 grid gap-3 md:grid-cols-2">
         {teratas && (
-          <div className="flex items-start gap-3 rounded-[18px] border border-kunyit-500/40 bg-white p-6 shadow-none dark:bg-panel">
+          <div className="flex items-start gap-3 rounded-[18px] border border-kunyit-500/40 bg-white p-6 text-ap-ink shadow-none dark:border-kunyit-500/40 dark:bg-ap-tile1 dark:text-white">
             <TrendingUp className="mt-0.5 text-kunyit-500" size={20} />
             <div>
               <p className="font-display font-bold tracking-[-0.224px]">Tren Kenaikan Laporan</p>
-              <p className="mt-1 text-sm text-muted">
+              <p className="mt-1 text-sm text-muted dark:text-white/70">
                 Laporan{" "}
-                <b className="inline-flex items-center gap-1 text-ink">
+                <b className="inline-flex items-center gap-1 text-ap-ink dark:text-white">
                   <IkonKategori slug={teratas.slug} ukuran={13} /> {teratas.nama}
                 </b>{" "}
-                naik <b className="angka-tabular text-ink">{teratas.naik} laporan</b> dibanding
+                naik <b className="angka-tabular text-ap-ink dark:text-white">{teratas.naik} laporan</b> dibanding
                 minggu lalu ({teratas.kini} vs {teratas.lalu}). Memerlukan alokasi petugas tambahan.
               </p>
             </div>
           </div>
         )}
         {tercepat && (
-          <div className="flex items-start gap-3 rounded-[18px] border border-daun-500/40 bg-white p-6 shadow-none dark:bg-panel">
+          <div className="flex items-start gap-3 rounded-[18px] border border-daun-500/40 bg-white p-6 text-ap-ink shadow-none dark:bg-ap-tile1 dark:text-white">
             <TrendingDown className="mt-0.5 text-daun-600 dark:text-daun-400" size={20} />
             <div>
               <p className="font-display font-bold tracking-[-0.224px]">Kinerja Tertinggi</p>
-              <p className="mt-1 text-sm text-muted">
-                Kategori <b className="angka-tabular text-ink">{tercepat.nama}</b> memiliki tingkat ketuntasan tertinggi yaitu{" "}
-                <b className="angka-tabular text-ink">{tercepat.persen}%</b> ({tercepat.selesai}/
+              <p className="mt-1 text-sm text-muted dark:text-white/70">
+                Kategori <b className="angka-tabular text-ap-ink dark:text-white">{tercepat.nama}</b> memiliki tingkat ketuntasan tertinggi yaitu{" "}
+                <b className="angka-tabular text-ap-ink dark:text-white">{tercepat.persen}%</b> ({tercepat.selesai}/
                 {tercepat.total} laporan diselesaikan).
               </p>
             </div>
@@ -462,14 +462,14 @@ export default async function HalamanTransparansi() {
 
       {/* Grafik Laporan & Kategori */}
       <div className="mb-6 grid gap-4 lg:grid-cols-2">
-        <section className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+        <section className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
           <h2 className="mb-4 font-display font-bold tracking-[-0.224px]">
             Tren Laporan Masuk vs Selesai (6 Bulan)
           </h2>
           <GrafikBulanan data={bulan} />
         </section>
 
-        <section className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+        <section className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
           <h2 className="mb-4 font-display font-bold tracking-[-0.224px]">
             Tingkat Ketuntasan per Kategori
           </h2>
@@ -479,13 +479,13 @@ export default async function HalamanTransparansi() {
 
       {/* Distribusi Status & Open Data API Info */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <section className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink sm:col-span-2">
+        <section className="rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white sm:col-span-2">
           <h2 className="mb-4 font-display font-bold tracking-[-0.224px]">Distribusi Status Penanganan</h2>
           <div className="flex flex-wrap gap-3">
             {(Object.keys(STATUS) as StatusKey[]).map((s) => (
               <div
                 key={s}
-                className="flex items-center gap-2 rounded-full bg-panel-2 px-4 py-2"
+                className="flex items-center gap-2 rounded-full border border-ap-hairline bg-ap-pearl px-4 py-2 dark:border-white/15 dark:bg-ap-tile2"
               >
                 <StatusChip status={s} />
                 <span className="angka-tabular font-bold tabular-nums">{statusCount[s] ?? 0}</span>
@@ -494,7 +494,7 @@ export default async function HalamanTransparansi() {
           </div>
         </section>
 
-        <section className="flex flex-col justify-between rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+        <section className="flex flex-col justify-between rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
           <div>
             <h2 className="font-display font-bold text-base tracking-[-0.224px]">Open Data API Warga</h2>
             <p className="mt-2 text-xs text-muted leading-relaxed">

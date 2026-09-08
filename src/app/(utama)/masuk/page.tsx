@@ -11,9 +11,10 @@ import { KacaKartu } from "@/components/eksperimen/kaca";
 import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
-/* Bahasa eksperimen: header pita gelap + teks putih, form di atas parchment,
-   KacaKartu 18px, CTA pil biru 44px Action Blue + :focus-visible, tabular
-   untuk email. Rute, logika, dan auth TETAP. Fraunces tetap. */
+/* Bahasa eksperimen: header pita gelap + teks putih, form kartu putih bersih
+   di atas parchment, CTA pil biru 44px Action Blue + :focus-visible, tabular
+   untuk email. Rute, logika, dan auth TETAP. Fraunces tetap.
+   R-31: putih dominan light, tile ap-tile1/2 + teks putih dark. */
 
 const INPUT_APPLE =
   "min-h-[44px] tabular-nums focus:border-ap-blue focus:ring-ap-blue/15 focus-visible:outline-ap-blue-focus";
@@ -60,11 +61,11 @@ function FormulirMasuk() {
   return (
     <div className="mx-auto w-full max-w-md space-y-4">
       {butuhAdmin && (
-        <div className="rounded-[18px] border border-kunyit-500/30 bg-white p-4 dark:border-line dark:bg-panel">
+        <div className="rounded-[18px] border border-kunyit-500/30 bg-white p-4 text-ap-ink dark:border-kunyit-500/40 dark:bg-ap-tile1 dark:text-white">
           <div className="flex items-start gap-3">
             <ShieldAlert size={20} className="mt-0.5 shrink-0 text-kunyit-700 dark:text-kunyit-400" />
             <div>
-              <p className="text-sm font-bold text-ap-ink dark:text-ink">
+              <p className="text-sm font-bold text-ap-ink dark:text-white">
                 Khusus Dashboard Dewan
               </p>
               <p className="mt-1 text-xs text-muted leading-relaxed">
@@ -76,8 +77,8 @@ function FormulirMasuk() {
         </div>
       )}
 
-      <KacaKartu className="bg-white/60 p-7 text-ap-ink dark:bg-white/10 dark:text-ink">
-        <div className="mb-6 rounded-[18px] border border-ap-hairline bg-ap-pearl p-4 dark:border-line dark:bg-panel-2">
+      <KacaKartu className="border-ap-hairline bg-white p-7 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
+        <div className="mb-6 rounded-[18px] border border-ap-hairline bg-ap-pearl p-4 dark:border-white/15 dark:bg-ap-tile2">
           <div className="mb-3 flex items-center justify-between gap-2">
             <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ap-blue dark:text-ap-sky">
               <UserRound size={14} /> Coba dulu dengan akun demo
@@ -89,9 +90,9 @@ function FormulirMasuk() {
           <PilihanAkunDemo tujuan={tujuan} ringkas />
         </div>
 
-        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wide text-muted">
-          <span className="h-px flex-1 bg-ap-hairline dark:bg-line" /> atau masuk manual{" "}
-          <span className="h-px flex-1 bg-ap-hairline dark:bg-line" />
+        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wide text-muted dark:text-white/70">
+          <span className="h-px flex-1 bg-ap-hairline dark:bg-white/15" /> atau masuk manual{" "}
+          <span className="h-px flex-1 bg-ap-hairline dark:bg-white/15" />
         </div>
 
         <form onSubmit={masuk} className="space-y-4">
@@ -135,15 +136,15 @@ function FormulirMasuk() {
           </button>
         </form>
 
-        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wide text-muted">
-          <span className="h-px flex-1 bg-ap-hairline dark:bg-line" /> atau{" "}
-          <span className="h-px flex-1 bg-ap-hairline dark:bg-line" />
+        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wide text-muted dark:text-white/70">
+          <span className="h-px flex-1 bg-ap-hairline dark:bg-white/15" /> atau{" "}
+          <span className="h-px flex-1 bg-ap-hairline dark:bg-white/15" />
         </div>
 
         <button
           type="button"
           onClick={masukGoogle}
-          className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-ap-hairline bg-white px-5 py-2.5 text-sm font-semibold text-ap-ink transition hover:border-ap-blue hover:text-ap-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:border-line dark:bg-panel dark:text-ink dark:hover:border-ap-sky dark:hover:text-ap-sky"
+          className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-ap-hairline bg-white px-5 py-2.5 text-sm font-semibold text-ap-ink transition hover:border-ap-blue hover:text-ap-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:border-white/15 dark:bg-ap-tile2 dark:text-white dark:hover:border-ap-sky dark:hover:text-ap-sky"
         >
           Lanjut dengan Google
         </button>
@@ -173,7 +174,7 @@ export default function HalamanMasuk() {
           </p>
         </header>
       </PitaGradient>
-      <div className="bg-ap-parchment px-4 pb-14 pt-8 text-ap-ink dark:bg-paper dark:text-ink">
+      <div className="bg-ap-parchment px-4 pb-14 pt-8 text-ap-ink dark:bg-black dark:text-white">
         <Suspense fallback={null}>
           <FormulirMasuk />
         </Suspense>

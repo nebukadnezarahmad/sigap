@@ -102,7 +102,7 @@ export function AksiLaporanSaya({
           </Button>
         </>
       ) : (
-        <span className="rounded-full bg-panel-2 px-3 py-1 text-[11px] font-semibold text-muted">
+        <span className="rounded-full border border-ap-hairline bg-ap-parchment px-3 py-1 text-[11px] font-semibold text-ap-ink/60 dark:border-white/15 dark:bg-white/10 dark:text-white/70">
           Terkunci
         </span>
       )}

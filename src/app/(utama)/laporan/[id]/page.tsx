@@ -20,9 +20,10 @@ export const dynamic = "force-dynamic";
 
 /* Fusi visual-fusion (docs/DESIGN-apple.md FUSI): kartu utilitas putih
    hairline 18px tanpa shadow; CTA pill Action Blue; Fraunces tetap;
-   StatusChip + warna semantik tidak diubah. */
+   StatusChip + warna semantik tidak diubah. Dark: tile netral ap-tile1
+   + teks putih + hairline netral (tanpa hijau-lumpur). */
 const KARTU =
-  "rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
+  "rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white";
 
 export default async function HalamanLaporan({
   params,
@@ -130,7 +131,7 @@ export default async function HalamanLaporan({
                   className={`angka-tabular flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums ${
                     sla.lewatSla
                       ? "bg-danger/15 text-danger font-bold"
-                      : "bg-panel-2 text-muted border garis-halus"
+                      : "bg-ap-parchment text-muted border garis-halus dark:border-white/15 dark:bg-white/10 dark:text-white/70"
                   }`}
                   title={`Target SLA Kategori: ${sla.targetHari} hari (Jatuh tempo: ${formatTanggal(sla.jatuhTempo.toISOString())})`}
                 >
@@ -189,7 +190,7 @@ export default async function HalamanLaporan({
                   key={f.id}
                   src={f.url}
                   alt={`Foto ${i + 1} — ${r.judul}`}
-                  className={`w-full rounded-[18px] border border-ap-hairline object-cover shadow-none dark:border-line ${
+                  className={`w-full rounded-[18px] border border-ap-hairline object-cover shadow-none dark:border-white/15 ${
                     galeri.length === 1 ? "max-h-[420px]" : "h-44 sm:h-52"
                   }`}
                 />
@@ -200,7 +201,7 @@ export default async function HalamanLaporan({
           <Card className={`${KARTU} p-5`}>
             <p className="whitespace-pre-line leading-relaxed">{r.deskripsi}</p>
             {r.alamat_teks && (
-              <p className="mt-3 flex items-center gap-1.5 border-t border-ap-hairline pt-3 text-sm text-muted dark:border-line">
+              <p className="mt-3 flex items-center gap-1.5 border-t border-ap-hairline pt-3 text-sm text-muted dark:border-white/10">
                 <MapPin size={13} /> {r.alamat_teks}
               </p>
             )}
@@ -219,7 +220,7 @@ export default async function HalamanLaporan({
           </div>
 
           {fotoSesudah.length > 0 && (
-            <Card className="rounded-[18px] border-daun-500/40 bg-white p-5 text-ap-ink shadow-none dark:bg-panel dark:text-ink">
+            <Card className="rounded-[18px] border-daun-500/40 bg-white p-5 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
               <h2 className="mb-3 flex items-center gap-2 font-display font-bold text-daun-700 dark:text-daun-300">
                 <CheckCircle2 size={17} /> Bukti penyelesaian
               </h2>
@@ -308,14 +309,14 @@ export default async function HalamanLaporan({
                 .map((ev) => (
                   <li key={ev.id} className="relative pl-6">
                     <span
-                      className="absolute left-0 top-1 size-3 rounded-full ring-4 ring-ap-pearl dark:ring-panel-2"
+                      className="absolute left-0 top-1 size-3 rounded-full ring-4 ring-ap-pearl dark:ring-white/15"
                       style={{
                         backgroundColor:
                           STATUS[ev.status as StatusKey]?.warna ?? "#94a3b8",
                       }}
                     />
                     <span
-                      className="absolute left-[5.5px] top-4 h-[calc(100%+16px)] w-px bg-ap-hairline dark:bg-line"
+                      className="absolute left-[5.5px] top-4 h-[calc(100%+16px)] w-px bg-ap-hairline dark:bg-white/15"
                       aria-hidden
                     />
                     <p className="text-sm font-semibold">

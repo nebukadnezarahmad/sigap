@@ -6,10 +6,12 @@ import { KacaKartu } from "@/components/eksperimen/kaca";
 import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
-/* Bahasa eksperimen: header pita gelap + teks putih, konten parchment;
-   KacaKartu 18px tanpa shadow; link pill 44px Action Blue + :focus-visible;
-   tabular untuk email demo; Fraunces tetap. Kunci kunyit identitas gerbang
-   + teks, rute, dan logika TETAP. Copy civic kamu, tanpa emoji. */
+/* Bahasa eksperimen: header pita gelap + teks putih, konten putih dominan
+   light / hitam netral dark; KacaKartu 18px tanpa shadow; link pill 44px
+   Action Blue + :focus-visible; tabular untuk email demo; Fraunces tetap.
+   Kunci kunyit identitas gerbang + teks, rute, dan logika TETAP. Copy civic
+   kamu, tanpa emoji. R-31: putih frosted light, tile ap-tile1/2 + teks putih
+   dark (tanpa hijau-lumpur). */
 const LINK_PILL_APPLE =
   "inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-ap-blue hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky dark:hover:bg-ap-sky/10";
 
@@ -36,15 +38,15 @@ export function GerbangDewan({
         </header>
       </PitaGradient>
 
-      {/* Konten parchment */}
-      <section className="bg-ap-parchment text-ap-ink dark:bg-paper dark:text-ink">
+      {/* Konten putih dominan light, hitam netral dark */}
+      <section className="bg-white text-ap-ink dark:bg-black dark:text-white">
         <div className="mx-auto max-w-lg px-4 pb-16">
-          <KacaKartu className="bg-white/60 p-8 text-center text-ap-ink dark:bg-white/10 dark:text-ink">
+          <KacaKartu className="bg-white/70 p-8 text-center text-ap-ink dark:border-white/15 dark:bg-ap-tile1/80 dark:text-white">
             <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-kunyit-500/15 text-kunyit-700 dark:text-kunyit-400">
               <Crown size={28} strokeWidth={1.8} />
             </div>
 
-            <div className="rounded-[18px] border border-ap-hairline bg-ap-pearl p-4 text-left tabular-nums dark:border-line dark:bg-panel-2">
+            <div className="rounded-[18px] border border-ap-hairline bg-ap-pearl p-4 text-left tabular-nums dark:border-white/15 dark:bg-ap-tile2">
               <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ap-blue dark:text-ap-sky">
                 <UserRound size={14} /> Masuk cepat sebagai Dewan
               </p>

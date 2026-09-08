@@ -32,13 +32,14 @@ export function BadgeSaya() {
 
   if (!user)
     return (
-      <p className="mt-4 text-sm text-muted">
+      <p className="mt-4 text-sm text-muted dark:text-white/70">
         Masuk untuk melihat progres badge dan poinmu.
       </p>
     );
 
   return (
-    <KacaKartu className="mt-6 p-6">
+    /* R-31: kartu progres putih frosted hairline di light, tile netral ap-tile2 di dark; chip milik tetap semantik hijau. */
+    <KacaKartu className="mt-6 border-ap-hairline bg-white/80 p-6 dark:border-white/15 dark:bg-ap-tile2/80 dark:text-white">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="font-display font-bold">Progresmu</h3>
         {poin !== null && (
@@ -61,7 +62,7 @@ export function BadgeSaya() {
               className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 punya
                   ? "border-transparent bg-daun-600 text-white"
-                  : "border-ap-hairline text-muted opacity-60 dark:border-line"
+                  : "border-ap-hairline text-muted opacity-60 dark:border-white/15 dark:text-white/70"
               }`}
               title={b.deskripsi}
             >

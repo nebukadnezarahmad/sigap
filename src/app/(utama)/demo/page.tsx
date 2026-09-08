@@ -48,7 +48,8 @@ const TUR = [
 
 export default function HalamanDemo() {
   return (
-    <main className="pb-12">
+    /* R-31: canvas putih Apple dominan di light dan tile netral ap-tile1 di dark agar tak muram-hijau; hero PitaGradient tetap sebagai identitas. */
+    <main className="bg-white pb-12 text-ap-ink dark:bg-ap-tile1 dark:text-white">
       <PitaGradient tone="gelap">
         <header className="text-center">
           <p className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-white">
@@ -69,7 +70,7 @@ export default function HalamanDemo() {
       <section aria-label="Akun demo instan" className="mb-12">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-display text-lg font-bold">Akun Demo Siap Pakai</h2>
-          <span className="text-xs text-muted">Tanpa perlu mendaftar</span>
+          <span className="text-xs text-muted dark:text-white/70">Tanpa perlu mendaftar</span>
         </div>
         <PilihanAkunDemo />
       </section>
@@ -78,17 +79,18 @@ export default function HalamanDemo() {
         <h2 className="mb-4 font-display text-lg font-bold">Alur Pengujian Utama</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {TUR.map((t) => (
-            <KacaKartu key={t.judul} className="flex flex-col p-5">
+            /* R-31: kartu utility putih frosted hairline di light, tile netral ap-tile2 di dark; ikon tetap pill biru. */
+            <KacaKartu key={t.judul} className="flex flex-col border-ap-hairline bg-white/80 p-5 dark:border-white/15 dark:bg-ap-tile2/80 dark:text-white">
               <span className="flex size-10 items-center justify-center rounded-lg bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
                 <t.ikon size={18} strokeWidth={1.8} />
               </span>
               <h3 className="mt-3 font-display font-bold">{t.judul}</h3>
-              <p className="mt-1 flex-1 text-sm leading-relaxed text-muted">
+              <p className="mt-1 flex-1 text-sm leading-relaxed text-muted dark:text-white/70">
                 {t.isi}
               </p>
               <Link
                 href={t.href}
-                className="group mt-4 inline-flex min-h-[44px] items-center gap-1.5 self-start rounded-full border border-white/40 bg-white/60 px-5 text-sm font-semibold text-ink backdrop-blur-[20px] transition-colors duration-300 hover:bg-white/75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:border-white/15 dark:bg-white/10 dark:text-ink dark:hover:bg-white/15"
+                className="group mt-4 inline-flex min-h-[44px] items-center gap-1.5 self-start rounded-full border border-ap-hairline bg-white/70 px-5 text-sm font-semibold text-ink backdrop-blur-[20px] transition-colors duration-300 hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
               >
                 {t.label}
                 <ArrowRight
@@ -107,9 +109,9 @@ export default function HalamanDemo() {
       </section>
 
       <section aria-label="Checklist fitur">
-        <KacaKartu className="p-6">
+        <KacaKartu className="border-ap-hairline bg-white/80 p-6 dark:border-white/15 dark:bg-ap-tile2/80 dark:text-white">
           <h2 className="font-display font-bold text-base">Checklist Fungsional & Keamanan (SDG 11)</h2>
-          <ul className="mt-4 grid gap-x-6 gap-y-2 text-sm tabular-nums text-muted sm:grid-cols-2">
+          <ul className="mt-4 grid gap-x-6 gap-y-2 text-sm tabular-nums text-muted dark:text-white/70 sm:grid-cols-2">
             {[
               "Peta spasial PostGIS + Marker Cluster + Heatmap",
               "Lapor pin-drop presisi + multi-foto bukti",
