@@ -69,22 +69,29 @@ export default async function HalamanPapanSkor() {
             return (
               <Card
                 key={p.id}
-                className={`flex flex-col items-center p-5 text-center ${
-                  juara === 1 ? "ring-2 ring-kunyit-500" : ""
+                className={`flex w-full flex-col items-center p-5 text-center ${
+                  juara === 1
+                    ? "ring-2 ring-kunyit-500 sm:-translate-y-3 sm:shadow-xl"
+                    : ""
                 }`}
               >
                 <span className="mb-2">
                   {juara === 1 ? (
-                    <Crown size={26} className="text-kunyit-500" />
+                    <Crown size={30} className="text-kunyit-500" />
                   ) : (
                     <Medal size={22} className={juara === 2 ? "text-slate-400" : "text-amber-700"} />
                   )}
                 </span>
-                <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={juara === 1 ? 64 : 52} />
-                <p className="mt-2 truncate font-display font-bold">
+                <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={juara === 1 ? 72 : 52} />
+                <p
+                  className="mt-2 w-full truncate font-display font-bold"
+                  title={p.nama_lengkap}
+                >
                   {p.nama_lengkap}
                 </p>
-                <p className="truncate text-xs text-muted">@{p.username}</p>
+                <p className="w-full truncate text-xs text-muted" title={`@${p.username}`}>
+                  @{p.username}
+                </p>
                 <p className="angka-tabular mt-1.5 rounded-full bg-daun-600/10 px-3 py-0.5 text-sm font-bold text-daun-700 dark:text-daun-300">
                   {p.poin} poin
                 </p>
@@ -103,8 +110,12 @@ export default async function HalamanPapanSkor() {
               </span>
               <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={34} />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{p.nama_lengkap}</p>
-                <p className="truncate text-xs text-muted">@{p.username}</p>
+                <p className="truncate text-sm font-semibold" title={p.nama_lengkap}>
+                  {p.nama_lengkap}
+                </p>
+                <p className="truncate text-xs text-muted" title={`@${p.username}`}>
+                  @{p.username}
+                </p>
               </div>
               <span className="angka-tabular text-sm font-bold">{p.poin}</span>
             </div>

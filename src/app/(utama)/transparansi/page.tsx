@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import { KATEGORI, STATUS, SLA_KATEGORI, hitungSla, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { Card, StatusChip, Button } from "@/components/ui";
+import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
 import { formatTanggal } from "@/lib/utils";
 import { GrafikBulanan, GrafikKategori } from "./grafik";
 import { TombolCetak } from "./tombol-cetak";
@@ -56,11 +57,9 @@ export default async function HalamanTransparansi() {
   const supabase = await createClient();
   if (!supabase) {
     return (
-      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-bold">
-          Database belum tersambung
-        </h1>
-      </main>
+      <KontenUtama>
+        <GalatMuatUlang judul="Database belum tersambung" />
+      </KontenUtama>
     );
   }
 
@@ -185,13 +184,116 @@ export default async function HalamanTransparansi() {
         </div>
         <div className="flex items-center gap-2">
           <Link href="/api/open-data" target="_blank">
-            <Button variant="sekunder" size="sm" className="hidden sm:inline-flex gap-1.5">
+            <Button variant="sekunder" size="sm" className="inline-flex gap-1.5">
               <FileSpreadsheet size={15} /> Open Data (JSON)
             </Button>
           </Link>
           <TombolCetak />
         </div>
       </header>
+
+      {/* Papan Keterlambatan Publik (Overdue Watchlist) */}
+      <Card className="mb-6 border-danger/30 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b garis-halus pb-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="text-danger" size={18} />
+            <h2 className="font-display font-bold text-lg">
+              Papan Keterlambatan Publik
+            </h2>
+          </div>
+          <span className="rounded-full bg-danger/10 px-2.5 py-0.5 text-xs font-bold text-danger">
+            {laporanLewatSla.length} perlu tindakan cepat
+          </span>
+        </div>
+
+        {laporanLewatSla.length === 0 ? (
+          <div className="py-8 text-center text-sm text-muted">
+            Luar biasa! Tidak ada laporan warga yang melewati batas waktu SLA
+            saat ini.
+          </div>
+        ) : (
+          <>
+            <div className="mt-3 hidden overflow-x-auto sm:block">
+              <table className="w-full text-left text-sm">
+                <caption className="sr-only">
+                  Daftar laporan warga yang melewati batas waktu SLA
+                </caption>
+                <thead>
+                  <tr className="border-b garis-halus text-xs text-muted">
+                    <th scope="col" className="pb-2 font-semibold">Judul Masalah</th>
+                    <th scope="col" className="pb-2 font-semibold">Kategori</th>
+                    <th scope="col" className="pb-2 font-semibold">Tgl Lapor</th>
+                    <th scope="col" className="pb-2 font-semibold">Target SLA</th>
+                    <th scope="col" className="pb-2 font-semibold text-danger">Keterlambatan</th>
+                    <th scope="col" className="pb-2 font-semibold">Status</th>
+                    <th scope="col" className="pb-2 font-semibold text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-garis-halus">
+                  {laporanLewatSla.slice(0, 10).map((r) => (
+                    <tr key={r.id} className="hover:bg-panel-2/40 transition">
+                      <td className="py-3 font-semibold text-ink max-w-xs truncate">
+                        {r.judul}
+                      </td>
+                      <td className="py-3 text-xs text-muted">
+                        {r.categories?.nama ?? "Lainnya"}
+                      </td>
+                      <td className="py-3 text-xs text-muted">
+                        {formatTanggal(r.created_at)}
+                      </td>
+                      <td className="py-3 text-xs font-medium tabular-nums">
+                        {r.sla.targetHari} hari
+                      </td>
+                      <td className="py-3 text-xs font-bold tabular-nums text-danger">
+                        +{r.sla.hariTerlambat} hari
+                      </td>
+                      <td className="py-3">
+                        <StatusChip status={r.status as StatusKey} />
+                      </td>
+                      <td className="py-3 text-right">
+                        <Link
+                          href={`/laporan/${r.id}`}
+                          aria-label={`Detail laporan ${r.judul}`}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-action hover:underline"
+                        >
+                          Detail <ExternalLink size={12} />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <ul className="mt-3 space-y-2.5 sm:hidden">
+              {laporanLewatSla.slice(0, 10).map((r) => (
+                <li
+                  key={r.id}
+                  className="rounded-2xl border garis-halus bg-panel-2/40 p-3.5"
+                >
+                  <p className="text-sm font-bold leading-snug">{r.judul}</p>
+                  <p className="mt-1 text-xs text-muted">
+                    {r.categories?.nama ?? "Lainnya"} ·{" "}
+                    {formatTanggal(r.created_at)}
+                  </p>
+                  <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-danger/10 px-2.5 py-1 text-[11px] font-bold tabular-nums text-danger">
+                      +{r.sla.hariTerlambat} hari
+                    </span>
+                    <StatusChip status={r.status as StatusKey} />
+                    <Link
+                      href={`/laporan/${r.id}`}
+                      aria-label={`Detail laporan ${r.judul}`}
+                      className="ml-auto inline-flex min-h-[44px] items-center gap-1 text-xs font-semibold text-action hover:underline"
+                    >
+                      Detail <ExternalLink size={12} />
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </Card>
 
       {/* Ringkasan Metrik Utama */}
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -262,79 +364,6 @@ export default async function HalamanTransparansi() {
             </div>
           ))}
         </div>
-      </Card>
-
-      {/* Papan Keterlambatan Publik (Overdue Watchlist) */}
-      <Card className="mb-6 border-danger/30 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b garis-halus pb-3">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="text-danger" size={18} />
-            <h2 className="font-display font-bold text-lg">
-              Papan Keterlambatan Publik (*Overdue Watchlist*)
-            </h2>
-          </div>
-          <span className="rounded-full bg-danger/10 px-2.5 py-0.5 text-xs font-bold text-danger">
-            {laporanLewatSla.length} Laporan Perlu Tindakan Cepat
-          </span>
-        </div>
-
-        {laporanLewatSla.length === 0 ? (
-          <div className="py-8 text-center text-sm text-muted">
-            ✓ Luar biasa! Tidak ada laporan warga yang melewati batas waktu SLA saat ini.
-          </div>
-        ) : (
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <caption className="sr-only">
-                Daftar laporan warga yang melewati batas waktu SLA
-              </caption>
-              <thead>
-                <tr className="border-b garis-halus text-xs text-muted">
-                  <th scope="col" className="pb-2 font-semibold">Judul Masalah</th>
-                  <th scope="col" className="pb-2 font-semibold">Kategori</th>
-                  <th scope="col" className="pb-2 font-semibold">Tgl Lapor</th>
-                  <th scope="col" className="pb-2 font-semibold">Target SLA</th>
-                  <th scope="col" className="pb-2 font-semibold text-danger">Keterlambatan</th>
-                  <th scope="col" className="pb-2 font-semibold">Status</th>
-                  <th scope="col" className="pb-2 font-semibold text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-garis-halus">
-                {laporanLewatSla.slice(0, 10).map((r) => (
-                  <tr key={r.id} className="hover:bg-panel-2/40 transition">
-                    <td className="py-3 font-semibold text-ink max-w-xs truncate">
-                      {r.judul}
-                    </td>
-                    <td className="py-3 text-xs text-muted">
-                      {r.categories?.nama ?? "Lainnya"}
-                    </td>
-                    <td className="py-3 text-xs text-muted">
-                      {formatTanggal(r.created_at)}
-                    </td>
-                    <td className="py-3 text-xs font-medium tabular-nums">
-                      {r.sla.targetHari} hari
-                    </td>
-                    <td className="py-3 text-xs font-bold tabular-nums text-danger">
-                      +{r.sla.hariTerlambat} hari
-                    </td>
-                    <td className="py-3">
-                      <StatusChip status={r.status as StatusKey} />
-                    </td>
-                    <td className="py-3 text-right">
-                      <Link
-                        href={`/laporan/${r.id}`}
-                        aria-label={`Detail laporan ${r.judul}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-action hover:underline"
-                      >
-                        Detail <ExternalLink size={12} />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </Card>
 
       {/* Insight Otomatis */}

@@ -270,19 +270,19 @@ export function DewanClient({
       label: "Total laporan",
       nilai: total,
       ikon: <Activity size={20} />,
-      warna: "text-muted bg-panel-2",
+      warna: "text-action bg-action/10",
     },
     {
       label: "Sedang diproses",
       nilai: aktif,
       ikon: <Flame size={20} />,
-      warna: "text-muted bg-panel-2",
+      warna: "text-kunyit-600 dark:text-kunyit-400 bg-kunyit-500/10",
     },
     {
       label: "Selesai",
       nilai: selesai,
       ikon: <CheckCircle2 size={20} />,
-      warna: "text-muted bg-panel-2",
+      warna: "text-daun-700 dark:text-daun-300 bg-daun-500/10",
     },
     {
       label: "Warga terdaftar",
@@ -412,7 +412,7 @@ export function DewanClient({
               </span>
               <Select
                 aria-label="Status massal"
-                className="w-44"
+                className="w-36 sm:w-44"
                 value={bulkStatus}
                 onChange={(e) => setBulkStatus(e.target.value as StatusKey)}
               >
@@ -449,7 +449,7 @@ export function DewanClient({
               </Button>
               <Select
                 aria-label="Filter status"
-                className="w-40"
+                className="w-32 sm:w-40"
                 value={filterStatus}
                 onChange={(e) =>
                   setFilterStatus(e.target.value as "semua" | StatusKey)
@@ -480,7 +480,7 @@ export function DewanClient({
                     aria-label={`Pilih ${r.judul}`}
                     className="size-4 accent-action"
                   />
-                  <div className="min-w-0 flex-1 basis-56">
+                  <div className="min-w-0 flex-1 basis-full sm:basis-56">
                     <p className="truncate text-sm font-semibold">{r.judul}</p>
                     <p className="flex items-center gap-1 truncate text-xs text-muted">
                       <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={12} />
@@ -504,11 +504,11 @@ export function DewanClient({
                       if (e.target.value !== (r.petugas ?? ""))
                         tugaskan(r.id, e.target.value);
                     }}
-                    className="w-36 rounded-lg border garis-halus bg-panel px-2.5 py-1.5 text-xs outline-none focus:border-action"
+                    className="w-28 rounded-lg border garis-halus bg-panel px-2.5 py-1.5 text-xs outline-none focus:border-action sm:w-36"
                   />
                   <Select
                     aria-label={`Ubah status ${r.judul}`}
-                    className="w-36"
+                    className="w-28 sm:w-36"
                     value={r.status}
                     onChange={(e) => ubahStatus(r.id, e.target.value as StatusKey)}
                   >
@@ -529,7 +529,7 @@ export function DewanClient({
           </div>
         </Card>
 
-        <Card className="flex flex-col overflow-hidden p-0">
+        <Card className="order-first flex flex-col overflow-hidden p-0 xl:order-none">
           <div className="flex items-center justify-between border-b garis-halus px-5 py-3.5">
             <h2 className="font-display font-bold">Peta kepadatan (heatmap)</h2>
             <button
@@ -547,7 +547,7 @@ export function DewanClient({
               />
             </button>
           </div>
-          <div className="h-[480px] flex-1">
+          <div className="h-[320px] sm:h-[420px] xl:h-[480px] xl:flex-1">
             <LeafletMap
               titik={titikPeta}
               panas={heatAktif ? panasLive : undefined}
