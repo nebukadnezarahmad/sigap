@@ -296,7 +296,7 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-ap-shadow">
+      <div className="overflow-hidden rounded-[18px] border border-ap-hairline bg-ap-canvas text-ap-ink shadow-ap-shadow">
       {/* Top Bar Status */}
       <div className="flex min-h-[52px] flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-ap-hairline bg-ap-parchment px-3 py-2.5 text-xs sm:px-4">
         <div className="flex min-w-0 items-center gap-2">

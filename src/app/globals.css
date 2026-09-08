@@ -125,8 +125,8 @@
 
 /* Product imagery is the only surface that uses the signature shadow. */
 @theme {
-  --color-ap-parchment: #f5f5f7;
-  --color-ap-pearl: #fafafc;
+  --color-ap-parchment: var(--ap-panel);
+  --color-ap-pearl: var(--ap-elevated);
   --color-ap-tile1: #272729;
   --color-ap-tile2: #2a2a2c;
   --shadow-ap-shadow: rgba(0, 0, 0, 0.22) 3px 5px 30px;

@@ -104,7 +104,7 @@ export default async function Beranda() {
           }
         }
       `}</style>
-      <section className="bg-white text-ap-ink" aria-labelledby="judul-utama">
+      <section className="bg-ap-canvas text-ap-ink" aria-labelledby="judul-utama">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:py-16 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16 lg:py-20">
           <div className="max-w-xl">
             <p className={EYEBROW_LIGHT}>Peta laporan warga</p>
@@ -214,7 +214,7 @@ export default async function Beranda() {
         </div>
       </section>
 
-      <section className="bg-white text-ap-ink" aria-labelledby="judul-peran">
+      <section className="bg-ap-canvas text-ap-ink" aria-labelledby="judul-peran">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
           <Terungkap>
             <p className={EYEBROW_LIGHT}>Ruang kerja SIGAP</p>
@@ -263,7 +263,7 @@ export default async function Beranda() {
             </Terungkap>
 
             <Terungkap tunda={0.1}>
-              <article className="grid overflow-hidden rounded-[18px] border border-ap-hairline bg-white lg:grid-cols-[0.92fr_1.08fr]">
+              <article className="grid overflow-hidden rounded-[18px] border border-ap-hairline bg-ap-canvas lg:grid-cols-[0.92fr_1.08fr]">
                 <div className="order-2 relative min-h-64 lg:order-1 lg:min-h-80">
                   <Image
                     src="/images/gotong-royong.jpg"
