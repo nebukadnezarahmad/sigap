@@ -103,7 +103,7 @@ export function VoteButton({
           >
             <span className="inline-flex items-center gap-2">
               <ThumbsUp size={16} className={sudahVote ? "fill-current" : ""} />
-              <motion.span key={jumlah}>{jumlah}</motion.span>
+              <motion.span key={jumlah} className="tabular-nums">{jumlah}</motion.span>
               <span>{sudahVote ? "Didukung" : "Dukung laporan ini"}</span>
             </span>
           </KacaPill>
@@ -111,7 +111,7 @@ export function VoteButton({
             <button
               type="button"
               onClick={() => setModalAuth(true)}
-              className="min-h-[44px] text-xs text-ap-blue transition hover:underline focus-visible:outline-ap-blue-focus"
+              className="inline-flex min-h-[44px] items-center rounded-full px-3 text-xs font-semibold text-ap-blue transition hover:bg-ap-blue/10 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky dark:hover:bg-ap-sky/10"
             >
               masuk untuk memberi dukungan
             </button>

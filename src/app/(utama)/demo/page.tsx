@@ -80,7 +80,7 @@ export default function HalamanDemo() {
         <div className="grid gap-4 sm:grid-cols-2">
           {TUR.map((t) => (
             <KacaKartu key={t.judul} className="flex flex-col p-5">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+              <span className="flex size-10 items-center justify-center rounded-lg bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
                 <t.ikon size={18} strokeWidth={1.8} />
               </span>
               <h3 className="mt-3 font-display font-bold">{t.judul}</h3>
@@ -97,7 +97,7 @@ export default function HalamanDemo() {
                   className="transition-transform group-hover:translate-x-0.5"
                 />
                 {t.khususAdmin && (
-                  <span className="rounded-full bg-kunyit-500/15 px-2 py-0.5 text-[10px] font-bold text-kunyit-600">
+                  <span className="rounded-full bg-kunyit-500/15 px-2 py-0.5 text-[10px] font-bold text-kunyit-600 dark:text-kunyit-400">
                     perlu akun dewan
                   </span>
                 )}
@@ -110,7 +110,7 @@ export default function HalamanDemo() {
       <section aria-label="Checklist fitur">
         <KacaKartu className="p-6">
           <h2 className="font-display font-bold text-base">Checklist Fungsional & Keamanan (SDG 11)</h2>
-          <ul className="mt-4 grid gap-x-6 gap-y-2 text-sm text-muted sm:grid-cols-2">
+          <ul className="mt-4 grid gap-x-6 gap-y-2 text-sm tabular-nums text-muted sm:grid-cols-2">
             {[
               "Peta spasial PostGIS + Marker Cluster + Heatmap",
               "Lapor pin-drop presisi + multi-foto bukti",

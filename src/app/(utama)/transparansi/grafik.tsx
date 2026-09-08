@@ -6,7 +6,8 @@ import { Skeleton } from "@/components/ui";
 const gayaTooltip = {
   background: "var(--panel)",
   border: "1px solid var(--line)",
-  borderRadius: 16,
+  borderRadius: 12,
+  boxShadow: "none",
   padding: "10px 14px",
   fontSize: 12,
 } as const;
@@ -54,13 +55,13 @@ const IsiGrafikBulanan = dynamic<{ data: DataBulanan[] }>(
                 dataKey="masuk"
                 name="Masuk"
                 fill="var(--chart-masuk, var(--muted))"
-                radius={[6, 6, 0, 0]}
+                radius={[8, 8, 0, 0]}
               />
               <Bar
                 dataKey="tuntas"
                 name="Selesai"
                 fill="var(--chart-selesai, var(--color-daun-500))"
-                radius={[6, 6, 0, 0]}
+                radius={[8, 8, 0, 0]}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -121,7 +122,7 @@ const IsiGrafikKategori = dynamic<{ data: DataKategori[] }>(
 
 export function GrafikBulanan({ data }: { data: DataBulanan[] }) {
   return (
-    <div className="h-60 [--chart-masuk:var(--muted)] [--chart-selesai:var(--color-daun-500)] dark:[--chart-selesai:var(--color-daun-400)]">
+    <div className="angka-tabular h-60 tabular-nums [--chart-masuk:var(--muted)] [--chart-selesai:var(--color-daun-500)] dark:[--chart-selesai:var(--color-daun-400)]">
       <IsiGrafikBulanan data={data} />
     </div>
   );
@@ -129,7 +130,7 @@ export function GrafikBulanan({ data }: { data: DataBulanan[] }) {
 
 export function GrafikKategori({ data }: { data: DataKategori[] }) {
   return (
-    <div className="h-60">
+    <div className="angka-tabular h-60 tabular-nums">
       <IsiGrafikKategori data={data} />
     </div>
   );

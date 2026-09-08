@@ -73,6 +73,14 @@ const TOMBOL_SEKUNDER_APPLE =
   "min-h-[44px] hover:border-ap-blue hover:text-ap-blue focus-visible:outline-ap-blue-focus! dark:hover:text-ap-sky";
 const SELECT_APPLE =
   "min-h-[44px] focus:border-ap-blue focus:ring-ap-blue/15 focus-visible:outline-ap-blue-focus!";
+/* Tooltip grafik mengikuti acuan transparansi/grafik.tsx: token var, radius 16. */
+const GAYA_TOOLTIP_APPLE = {
+  background: "var(--panel)",
+  border: "1px solid var(--line)",
+  borderRadius: 16,
+  padding: "10px 14px",
+  fontSize: 12,
+} as const;
 
 export function DewanClient({
   daftar: awal,
@@ -364,26 +372,19 @@ export function DewanClient({
               <AreaChart data={tren} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gradDaun" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2e9e57" stopOpacity={0.45} />
-                    <stop offset="100%" stopColor="#2e9e57" stopOpacity={0.02} />
+                    <stop offset="0%" stopColor="var(--color-daun-500)" stopOpacity={0.45} />
+                    <stop offset="100%" stopColor="var(--color-daun-500)" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" vertical={false} />
                 <XAxis dataKey="tanggal" tick={{ fontSize: 11 }} stroke="var(--muted)" />
                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} stroke="var(--muted)" />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--panel)",
-                    border: "1px solid var(--line)",
-                    borderRadius: 12,
-                    fontSize: 13,
-                  }}
-                />
+                <Tooltip contentStyle={GAYA_TOOLTIP_APPLE} />
                 <Area
                   type="monotone"
                   dataKey="jumlah"
                   name="Laporan"
-                  stroke="#237f45"
+                  stroke="var(--color-daun-600)"
                   strokeWidth={2.5}
                   fill="url(#gradDaun)"
                 />
@@ -405,14 +406,7 @@ export function DewanClient({
                   tick={{ fontSize: 11 }}
                   stroke="var(--muted)"
                 />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--panel)",
-                    border: "1px solid var(--line)",
-                    borderRadius: 12,
-                    fontSize: 13,
-                  }}
-                />
+                <Tooltip contentStyle={GAYA_TOOLTIP_APPLE} />
                 <Bar dataKey="jumlah" name="Laporan" radius={[0, 8, 8, 0]} barSize={18}>
                   {kategori.map((k) => (
                     <Cell key={k.nama} fill={k.warna} />
@@ -528,7 +522,7 @@ export function DewanClient({
                       if (e.target.value !== (r.petugas ?? ""))
                         tugaskan(r.id, e.target.value);
                     }}
-                    className={`w-36 rounded-lg border border-ap-hairline bg-panel px-2.5 py-1.5 text-xs outline-none transition focus:border-ap-blue dark:border-line ${FOKUS_APPLE}`}
+                    className={`w-36 min-h-[44px] rounded-lg border border-ap-hairline bg-panel px-2.5 py-1.5 text-xs outline-none transition focus:border-ap-blue dark:border-line ${FOKUS_APPLE}`}
                   />
                   <Select
                     aria-label={`Ubah status ${r.judul}`}
@@ -568,7 +562,7 @@ export function DewanClient({
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-[background-color,border-color,box-shadow,color] ${
+                  className={`absolute top-0.5 size-5 rounded-full bg-white shadow-none transition-[background-color,border-color,box-shadow,color] ${
                     heatAktif ? "left-[22px]" : "left-0.5"
                   }`}
                 />

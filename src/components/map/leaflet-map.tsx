@@ -344,7 +344,7 @@ export function LeafletMap({
       {/* Perbesar kontrol zoom bawaan Leaflet (30px) ke target 44px,
           plus cincin fokus yang jelas untuk marker keyboard. */}
       <style>{`.sigap-peta .leaflet-bar a{width:44px!important;height:44px!important;line-height:44px!important}
-.sigap-peta .leaflet-marker-icon:focus-visible{outline:3px solid var(--color-daun-600);outline-offset:3px;border-radius:12px}`}</style>
+.sigap-peta .leaflet-marker-icon:focus-visible{outline:3px solid var(--color-ap-blue-focus);outline-offset:3px;border-radius:12px}`}</style>
       <div className="relative h-full w-full" onKeyDown={pilihTengah}>
         <div
           ref={refDiv}
@@ -362,18 +362,18 @@ export function LeafletMap({
               type="button"
               onClick={pakaiLokasiSaya}
               disabled={mencariLokasi}
-              className="pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full border garis-halus bg-panel/95 px-4 text-sm font-semibold shadow-lg backdrop-blur transition hover:border-daun-400 disabled:opacity-60"
+              className="pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full border border-ap-hairline bg-white/85 px-4 text-sm font-semibold text-ap-ink shadow-none backdrop-blur transition hover:border-ap-blue/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! disabled:opacity-60 motion-reduce:transition-none dark:border-white/15 dark:bg-[#131d19]/80 dark:text-ink"
             >
               {mencariLokasi ? "Mencari…" : "Pakai lokasi saya"}
             </button>
-            <p className="rounded-lg bg-panel/90 px-2.5 py-1 text-[11px] leading-snug text-muted shadow backdrop-blur">
+            <p className="rounded-lg border border-ap-hairline bg-white/85 px-2.5 py-1 text-[11px] leading-snug text-muted shadow-none backdrop-blur dark:border-white/15 dark:bg-[#131d19]/80">
               Keyboard: geser dengan tombol panah, tekan Enter untuk menandai
               titik tengah.
             </p>
             {statusLokasi && (
               <p
                 role="status"
-                className="rounded-lg bg-panel/90 px-2.5 py-1 text-[11px] leading-snug text-ink shadow backdrop-blur"
+                className="rounded-lg border border-ap-hairline bg-white/85 px-2.5 py-1 text-[11px] leading-snug text-ap-ink shadow-none backdrop-blur dark:border-white/15 dark:bg-[#131d19]/80 dark:text-ink"
               >
                 {statusLokasi}
               </p>
@@ -390,7 +390,7 @@ export function LeafletMap({
             <button
               type="button"
               onClick={() => cbRef.current.onKlikTitik?.(t.id)}
-              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[2000] focus:min-h-11 focus:rounded-full focus:bg-daun-700 focus:px-5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-xl"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[2000] focus:min-h-11 focus:rounded-full focus:bg-ap-blue focus:px-5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-none focus:outline-ap-blue-focus"
             >
               Buka laporan: {t.judul}
             </button>

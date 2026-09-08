@@ -133,7 +133,7 @@ export function KonfirmasiButton({
   if (status === "menunggu_verifikasi") {
     return (
       <div className="w-full space-y-3">
-        <Card className="rounded-[18px] border-orange-500/40 bg-orange-500/10 p-5 shadow-none">
+        <Card className="rounded-[18px] border border-orange-500/40 bg-orange-500/10 p-5 shadow-none">
           <div className="flex items-start gap-3">
             <AlertCircle size={20} className="mt-0.5 shrink-0 text-orange-600 dark:text-orange-400" />
             <div className="min-w-0 flex-1">
@@ -141,7 +141,7 @@ export function KonfirmasiButton({
                 <p className="font-display font-bold text-base text-ink">
                   Tahap Verifikasi Warga Sekitar
                 </p>
-                <span className="rounded-full bg-orange-500/20 px-2.5 py-0.5 text-xs font-bold text-orange-700 dark:text-orange-300">
+                <span className="rounded-full bg-orange-500/20 px-2.5 py-0.5 text-xs font-bold tabular-nums text-orange-700 dark:text-orange-300">
                   {jumlah}/2 Konfirmasi Warga
                 </span>
               </div>
@@ -212,7 +212,7 @@ export function KonfirmasiButton({
         >
           <span className="inline-flex items-center gap-2">
             <Eye size={16} className={sudah ? "fill-current" : ""} />
-            <motion.span key={jumlah}>{jumlah}</motion.span>
+            <motion.span key={jumlah} className="tabular-nums">{jumlah}</motion.span>
             <span>
               {status === "selesai"
                 ? "Diverifikasi Warga"

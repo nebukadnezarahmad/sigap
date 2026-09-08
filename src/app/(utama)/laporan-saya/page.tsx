@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 /* Fusi visual-fusion: kartu utilitas putih hairline 18px tanpa shadow;
    link CTA Action Blue; Fraunces + StatusChip tetap. */
 const KARTU =
-  "rounded-[18px] border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
+  "rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
 
 export default async function HalamanLaporanSaya() {
   const supabase = await createClient();
@@ -50,8 +50,8 @@ export default async function HalamanLaporanSaya() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <h1 className="font-display text-3xl font-bold">Laporan Saya</h1>
+      <header className="mb-8 rounded-[18px] border border-ap-hairline bg-ap-pearl p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+        <h1 className="font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px]">Laporan Saya</h1>
         <p className="mt-2 text-muted">
           Sunting laporan selama statusnya masih{" "}
           <b className="text-ink">Baru</b>. Setelah diverifikasi dewan, isinya
@@ -63,7 +63,7 @@ export default async function HalamanLaporanSaya() {
         <Card className={`${KARTU} p-10 text-center`}>
           <p className="text-muted">
             Kamu belum membuat laporan.{" "}
-            <Link href="/peta?lapor=1" className="font-semibold text-ap-blue hover:underline focus-visible:outline-ap-blue-focus dark:text-ap-sky">
+            <Link href="/peta?lapor=1" className="inline-flex min-h-[44px] items-center rounded-full px-3 font-semibold text-ap-blue hover:bg-ap-blue/10 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky">
               Buat laporan pertamamu
             </Link>
             .
@@ -86,14 +86,14 @@ export default async function HalamanLaporanSaya() {
                   </div>
                   <Link
                     href={`/laporan/${r.id}`}
-                    className="font-display font-bold hover:underline"
+                    className="inline-flex min-h-[44px] items-center rounded-full font-display font-bold text-ap-blue hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky"
                   >
                     {r.judul}
                   </Link>
                   <p className="mt-1 line-clamp-2 text-sm text-muted">
                     {r.deskripsi}
                   </p>
-                  <p className="angka-tabular mt-2 text-xs text-muted">
+                  <p className="angka-tabular mt-2 text-xs tabular-nums text-muted">
                     {r.vote_count ?? 0} dukungan · {r.comment_count ?? 0}{" "}
                     komentar
                   </p>
@@ -126,7 +126,7 @@ export default async function HalamanLaporanSaya() {
               <Card key={a.id} className={`${KARTU} flex items-center justify-between gap-3 p-4`}>
                 <div>
                   <p className="text-sm font-semibold">{a.label}</p>
-                  <p className="angka-tabular text-xs text-muted">
+                  <p className="angka-tabular text-xs tabular-nums text-muted">
                     radius {a.radius_m} m
                   </p>
                 </div>

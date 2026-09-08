@@ -91,7 +91,7 @@ export default async function HalamanPapanSkor() {
                   {p.nama_lengkap}
                 </p>
                 <p className="truncate text-xs text-muted">@{p.username}</p>
-                <p className="angka-tabular mt-1.5 rounded-full bg-daun-600/10 px-3 py-0.5 text-sm font-bold text-daun-700 dark:text-daun-300">
+                <p className="angka-tabular mt-1.5 rounded-full bg-daun-600/10 px-3 py-0.5 text-sm font-bold tabular-nums text-daun-700 dark:text-daun-300">
                   {p.poin} poin
                 </p>
               </KacaKartu>
@@ -112,7 +112,7 @@ export default async function HalamanPapanSkor() {
                 <p className="truncate text-sm font-semibold">{p.nama_lengkap}</p>
                 <p className="truncate text-xs text-muted">@{p.username}</p>
               </div>
-              <span className="angka-tabular text-sm font-bold">{p.poin}</span>
+              <span className="angka-tabular text-sm font-bold tabular-nums">{p.poin}</span>
             </div>
           ))}
         </KacaKartu>

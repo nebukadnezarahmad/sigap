@@ -7,6 +7,10 @@ import { createClient } from "@/lib/supabase/client";
 import { Modal } from "@/components/modal";
 import { Button } from "@/components/ui";
 
+/* Fusi visual-fusion: target sentuh 44px + :focus-visible Action Blue.
+   Varian danger/sekunder, copy, pesan error, aria, dan logika tetap. */
+const SENTUH_44 = "min-h-[44px] focus-visible:outline-ap-blue-focus";
+
 export function HapusAreaKlien({ id }: { id: string }) {
   const router = useRouter();
   const [proses, setProses] = useState(false);
@@ -42,7 +46,7 @@ export function HapusAreaKlien({ id }: { id: string }) {
         aria-label="Berhenti ikuti area"
         aria-busy={proses}
         title="Berhenti ikuti"
-        className="flex size-8 items-center justify-center rounded-lg text-muted transition hover:bg-danger/10 hover:text-danger"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-danger/10 hover:text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
       >
         <BellOff size={15} />
       </button>
@@ -60,7 +64,7 @@ export function HapusAreaKlien({ id }: { id: string }) {
           Kamu bisa mengikutinya lagi kapan pun dari halaman peta.
         </p>
         {pesan && (
-          <p role="alert" className="mt-3 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
+          <p role="alert" className="mt-3 rounded-[11px] bg-danger/10 px-3 py-2 text-sm text-danger">
             {pesan}
           </p>
         )}
@@ -70,6 +74,7 @@ export function HapusAreaKlien({ id }: { id: string }) {
             variant="sekunder"
             onClick={() => setBuka(false)}
             disabled={proses}
+            className={SENTUH_44}
           >
             Batal
           </Button>
@@ -79,6 +84,7 @@ export function HapusAreaKlien({ id }: { id: string }) {
             onClick={hapus}
             disabled={proses}
             aria-busy={proses}
+            className={SENTUH_44}
           >
             {proses ? "Memproses…" : "Ya, berhenti ikuti"}
           </Button>

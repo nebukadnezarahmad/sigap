@@ -22,8 +22,8 @@ const GAYA_FROSTED: CSSProperties = {
 const PANEL_FROSTED =
   "rounded-[18px] border border-white/40 bg-white/60 shadow-none backdrop-blur-[20px] backdrop-saturate-[180%] dark:border-white/15 dark:bg-[#131d19]/55";
 const PILL_BIRU =
-  "min-h-[44px] border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus";
-const SENTUH_44 = "min-h-[44px] focus-visible:outline-ap-blue-focus";
+  "min-h-[44px] border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus! dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus";
+const SENTUH_44 = "min-h-[44px] focus-visible:outline-ap-blue-focus!";
 
 const LeafletMap = dynamic(
   () => import("./leaflet-map").then((m) => m.LeafletMap),
@@ -208,7 +208,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-daun-500/30 bg-daun-500/5 p-4">
+        <div className="rounded-[18px] border border-daun-500/30 bg-white p-4 shadow-none dark:bg-panel">
           <p className="mb-2.5 text-xs font-bold uppercase tracking-wider text-daun-700 dark:text-daun-300">
             Masuk Cepat Mode Demo (1-Klik untuk Juri)
           </p>
@@ -221,7 +221,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             <Button size="sm" variant="sekunder" onClick={() => router.push("/masuk?next=/peta?lapor=1")} className={SENTUH_44}>
               Masuk Manual
             </Button>
-            <Button size="sm" onClick={() => router.push("/daftar?next=/peta?lapor=1")} className={`${SENTUH_44} bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus`}>
+            <Button size="sm" onClick={() => router.push("/daftar?next=/peta?lapor=1")} className={`${SENTUH_44} bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus!`}>
               Daftar Akun
             </Button>
           </div>
@@ -352,6 +352,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             placeholder="Contoh: TPS liar di ujung Jl. Melati…"
             aria-invalid={!!galatJudul}
             aria-describedby={galatJudul ? "galat-judul" : undefined}
+            className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           />
           {galatJudul && (
             <p id="galat-judul" role="alert" className="mt-1.5 text-xs font-semibold text-danger">
@@ -366,6 +367,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             name="kategori"
             value={slugKategori}
             onChange={(e) => setSlugKategori(e.target.value)}
+            className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           >
             {KATEGORI.map((k) => (
               <option key={k.slug} value={k.slug}>
@@ -390,6 +392,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             placeholder="Contoh: tumpukan sampah menutup setengah jalan sejak 3 hari…"
             aria-invalid={!!galatDeskripsi}
             aria-describedby={galatDeskripsi ? "galat-deskripsi" : undefined}
+            className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           />
           {galatDeskripsi && (
             <p id="galat-deskripsi" role="alert" className="mt-1.5 text-xs font-semibold text-danger">
@@ -406,13 +409,14 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             value={alamat}
             onChange={(e) => setAlamat(e.target.value)}
             placeholder="Contoh: depan Masjid Al-Ikhlas, RT 03…"
+            className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           />
         </div>
         <div>
           <Label htmlFor="foto">Foto kondisi (maks. 4, opsional)</Label>
           <label
             htmlFor="foto"
-            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed garis-halus px-3.5 py-3 text-sm text-muted transition hover:border-daun-400 hover:text-ink"
+            className="flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[18px] border border-dashed border-ap-hairline px-3.5 py-3 text-sm text-muted transition hover:border-ap-blue/60 hover:text-ink focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ap-blue-focus! motion-reduce:transition-none dark:border-line"
           >
             <ImagePlus size={18} />
             {files.length > 0
@@ -451,8 +455,8 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             <MapPin size={13} /> Klik peta untuk menandai titik masalah
           </span>
         </Label>
-        <div className="min-h-64 flex-1 overflow-hidden rounded-xl border garis-halus">
-          <div id="peta-pilih" tabIndex={-1} className="h-full focus:outline-none">
+        <div className="min-h-64 flex-1 overflow-hidden rounded-[18px] border border-ap-hairline shadow-none dark:border-line">
+          <div id="peta-pilih" tabIndex={-1} className="h-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!">
             <LeafletMap
               mode="pilih"
               zoom={15}
@@ -485,7 +489,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             {galatPeta}
           </p>
         ) : (
-          <p className="mt-1.5 text-xs text-muted">
+          <p className="angka-tabular mt-1.5 text-xs tabular-nums text-muted">
             {posisi
               ? `Titik terpilih: ${posisi.lat.toFixed(5)}, ${posisi.lng.toFixed(5)}`
               : "Belum ada titik dipilih"}
@@ -494,17 +498,17 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
 
         {/* Kartu Peringatan Deduplikasi Cerdas */}
         {laporanMirip.length > 0 && !abaikanDuplikat && (
-          <div className="mt-3 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-left">
+          <div className="mt-3 rounded-[18px] border border-amber-500/40 bg-amber-500/10 p-3.5 text-left shadow-none">
             <div className="flex items-start gap-2.5">
               <AlertTriangle size={17} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                <p className="angka-tabular text-xs font-bold uppercase tracking-wider tabular-nums text-amber-700 dark:text-amber-400">
                   Laporan Serupa Ditemukan ({Math.round(laporanMirip[0].jarak_m)} m dari titikmu)
                 </p>
                 <p className="mt-1 text-sm font-semibold truncate text-ink">
                   {laporanMirip[0].judul}
                 </p>
-                <p className="mt-0.5 text-xs text-muted">
+                <p className="angka-tabular mt-0.5 text-xs tabular-nums text-muted">
                   {laporanMirip[0].vote_count} dukungan warga · Status: {STATUS[laporanMirip[0].status as StatusKey]?.label ?? laporanMirip[0].status}
                 </p>
                 <div className="mt-2.5 flex flex-wrap gap-2">
@@ -533,7 +537,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         )}
 
         {pesan && (
-          <p role="alert" className="mt-2 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
+          <p role="alert" className="mt-2 rounded-[18px] bg-danger/10 px-3 py-2 text-sm text-danger">
             {pesan}
           </p>
         )}

@@ -151,7 +151,7 @@ export function AksiLaporanSaya({
             />
           </div>
           {pesan && bukaEdit && (
-            <p role="alert" className="rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
+            <p role="alert" className="rounded-[11px] bg-danger/10 px-3 py-2 text-sm text-danger">
               {pesan}
             </p>
           )}
@@ -180,7 +180,7 @@ export function AksiLaporanSaya({
           akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.
         </p>
         {pesan && mintaHapus && (
-          <p role="alert" className="mt-3 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
+          <p role="alert" className="mt-3 rounded-[11px] bg-danger/10 px-3 py-2 text-sm text-danger">
             {pesan}
           </p>
         )}

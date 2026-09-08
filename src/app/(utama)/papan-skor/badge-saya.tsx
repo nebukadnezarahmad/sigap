@@ -7,6 +7,7 @@ import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
 import { Lock } from "lucide-react";
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
+import { KacaKartu } from "@/components/eksperimen/kaca";
 
 export function BadgeSaya() {
   const { user } = useUser();
@@ -37,7 +38,7 @@ export function BadgeSaya() {
     );
 
   return (
-    <div className="mt-6 rounded-2xl border border-daun-500/30 bg-daun-500/5 p-5">
+    <KacaKartu className="mt-6 p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="font-display font-bold">Progresmu</h3>
         {poin !== null && (
@@ -60,7 +61,7 @@ export function BadgeSaya() {
               className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 punya
                   ? "border-transparent bg-daun-600 text-white"
-                  : "garis-halus text-muted opacity-60"
+                  : "border-ap-hairline text-muted opacity-60 dark:border-line"
               }`}
               title={b.deskripsi}
             >
@@ -76,6 +77,6 @@ export function BadgeSaya() {
           );
         })}
       </ul>
-    </div>
+    </KacaKartu>
   );
 }

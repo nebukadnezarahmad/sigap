@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic";
    hairline 18px tanpa shadow; CTA pill Action Blue; Fraunces tetap;
    StatusChip + warna semantik tidak diubah. */
 const KARTU =
-  "rounded-[18px] border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
+  "rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
 
 export default async function HalamanLaporan({
   params,
@@ -94,7 +94,7 @@ export default async function HalamanLaporan({
     <main className="mx-auto max-w-4xl px-4 py-8">
       <Link
         href="/peta"
-        className="mb-5 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-ap-blue transition hover:underline focus-visible:outline-ap-blue-focus"
+        className="mb-5 inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-ap-blue transition hover:bg-ap-blue/10 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky dark:hover:bg-ap-sky/10"
       >
         <ArrowLeft size={15} /> Kembali ke peta
       </Link>
@@ -127,7 +127,7 @@ export default async function HalamanLaporan({
               {/* Badge Target SLA */}
               {r.status !== "selesai" && (
                 <span
-                  className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                  className={`angka-tabular flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums ${
                     sla.lewatSla
                       ? "bg-danger/15 text-danger font-bold"
                       : "bg-panel-2 text-muted border garis-halus"
@@ -152,13 +152,13 @@ export default async function HalamanLaporan({
                 {waktuRelatif(r.created_at)}
               </span>
             </div>
-            <h1 className="font-display text-3xl font-bold leading-tight">
+            <h1 className="font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px]">
               {r.judul}
             </h1>
             <div className="mt-3 flex items-center gap-2.5">
               <Link
                 href={`/warga/${profilPelapor?.username ?? ""}`}
-                className="flex items-center gap-2.5 transition hover:opacity-80"
+                className="flex items-center gap-2.5 rounded-full transition hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
               >
                 <Avatar
                   nama={profilPelapor?.nama_lengkap ?? "Warga"}
@@ -189,7 +189,7 @@ export default async function HalamanLaporan({
                   key={f.id}
                   src={f.url}
                   alt={`Foto ${i + 1} — ${r.judul}`}
-                  className={`w-full rounded-2xl border garis-halus object-cover shadow-sm ${
+                  className={`w-full rounded-[18px] border border-ap-hairline object-cover shadow-none dark:border-line ${
                     galeri.length === 1 ? "max-h-[420px]" : "h-44 sm:h-52"
                   }`}
                 />
@@ -200,7 +200,7 @@ export default async function HalamanLaporan({
           <Card className={`${KARTU} p-5`}>
             <p className="whitespace-pre-line leading-relaxed">{r.deskripsi}</p>
             {r.alamat_teks && (
-              <p className="mt-3 flex items-center gap-1.5 border-t garis-halus pt-3 text-sm text-muted">
+              <p className="mt-3 flex items-center gap-1.5 border-t border-ap-hairline pt-3 text-sm text-muted dark:border-line">
                 <MapPin size={13} /> {r.alamat_teks}
               </p>
             )}
@@ -236,7 +236,7 @@ export default async function HalamanLaporan({
                       key={f.id}
                       src={f.url}
                       alt="Kondisi setelah ditangani"
-                      className="h-44 w-full rounded-xl object-cover"
+                      className="h-44 w-full rounded-lg object-cover"
                     />
                   ))}
                 </div>
@@ -249,7 +249,7 @@ export default async function HalamanLaporan({
                       key={f.id}
                       src={f.url}
                       alt="Kondisi setelah ditangani"
-                      className="h-36 w-full rounded-xl object-cover"
+                      className="h-36 w-full rounded-lg object-cover"
                     />
                   ))}
                 </div>
@@ -286,7 +286,7 @@ export default async function HalamanLaporan({
                 ]}
               />
             </div>
-            <p className="px-4 py-2.5 text-center text-xs text-muted">
+            <p className="angka-tabular px-4 py-2.5 text-center text-xs tabular-nums text-muted">
               {koordinat[0].toFixed(5)}, {koordinat[1].toFixed(5)}
             </p>
           </Card>
@@ -308,14 +308,14 @@ export default async function HalamanLaporan({
                 .map((ev) => (
                   <li key={ev.id} className="relative pl-6">
                     <span
-                      className="absolute left-0 top-1 size-3 rounded-full ring-4 ring-panel"
+                      className="absolute left-0 top-1 size-3 rounded-full ring-4 ring-ap-pearl dark:ring-panel-2"
                       style={{
                         backgroundColor:
                           STATUS[ev.status as StatusKey]?.warna ?? "#94a3b8",
                       }}
                     />
                     <span
-                      className="absolute left-[5.5px] top-4 h-[calc(100%+16px)] w-px bg-line"
+                      className="absolute left-[5.5px] top-4 h-[calc(100%+16px)] w-px bg-ap-hairline dark:bg-line"
                       aria-hidden
                     />
                     <p className="text-sm font-semibold">
@@ -324,7 +324,7 @@ export default async function HalamanLaporan({
                     {ev.catatan && (
                       <p className="mt-0.5 text-sm text-muted">{ev.catatan}</p>
                     )}
-                    <p className="mt-0.5 text-xs text-muted">
+                    <p className="angka-tabular mt-0.5 text-xs tabular-nums text-muted">
                       {formatTanggal(ev.created_at)}
                     </p>
                   </li>

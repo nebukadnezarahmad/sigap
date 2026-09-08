@@ -14,7 +14,7 @@ import { DemoAuthModal } from "@/components/tombol-demo-login";
 /* Fusi visual-fusion: kartu utilitas putih hairline 18px; tombol Kirim
    pill Action Blue 44px. Bubble komentar + copy + aria tidak diubah. */
 const KARTU =
-  "rounded-[18px] border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
+  "rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
 const PILL_BIRU =
   "min-h-[44px] border-transparent bg-ap-blue text-white hover:bg-ap-blue-focus focus-visible:outline-ap-blue-focus dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus";
 
@@ -133,7 +133,7 @@ export function KomentarSection({
       <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
         <MessageSquare size={17} />
         Diskusi warga
-        <span className="text-sm font-normal text-muted">
+        <span className="angka-tabular text-sm font-normal tabular-nums text-muted">
           ({jumlahAwal > daftar.length ? jumlahAwal : daftar.length})
         </span>
       </h2>
@@ -201,7 +201,7 @@ export function KomentarSection({
           </KacaPill>
         </form>
       ) : (
-        <div className="mt-5 rounded-2xl border border-daun-500/25 bg-daun-500/5 p-4">
+        <div className="mt-5 rounded-[18px] border border-daun-500/25 bg-daun-500/5 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold">Ingin ikut berdiskusi?</p>

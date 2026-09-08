@@ -281,7 +281,10 @@ export function Jelajah({
             Peta Masalah Permukiman
           </h1>
           <p className="text-sm text-muted">
-            {tersaring.length} laporan ditampilkan ·{" "}
+            <span className="angka-tabular tabular-nums">
+              {tersaring.length}
+            </span>{" "}
+            laporan ditampilkan ·{" "}
             <span
               className={`inline-flex items-center gap-1 ${
                 realtimeAktif ? "text-daun-600 dark:text-daun-400" : ""
@@ -296,19 +299,23 @@ export function Jelajah({
             </span>
           </p>
         </div>
-        <Button size="lg" onClick={() => setModalBuka(true)}>
+        <Button
+          size="lg"
+          onClick={() => setModalBuka(true)}
+          className="min-h-[44px] border-transparent bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus! dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus"
+        >
           <Plus size={18} strokeWidth={3} /> Laporkan Masalah
         </Button>
       </div>
 
       {!dbAktif && (
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-kunyit-500/40 bg-kunyit-100/50 px-4 py-3 text-sm text-kunyit-600">
+        <div className="mb-4 flex items-center gap-2 rounded-[18px] border border-kunyit-500/40 bg-white px-4 py-3 text-sm text-kunyit-600 shadow-none dark:bg-panel dark:text-kunyit-300">
           <WifiOff size={16} /> Database belum tersambung — atur env Supabase lalu
           jalankan schema.sql (lihat README).
         </div>
       )}
 
-      <div className="mb-4 rounded-2xl border garis-halus bg-panel p-2.5">
+      <div className="mb-4 rounded-[18px] border border-ap-hairline bg-white p-2.5 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
         <div className="flex flex-wrap items-center gap-2">
           <label className="relative min-w-48 flex-1">
             <Search
@@ -320,7 +327,7 @@ export function Jelajah({
               onChange={(e) => setKueri(e.target.value)}
               placeholder="Cari judul atau isi laporan…"
               aria-label="Cari laporan"
-              className="h-10 w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15"
+              className="h-11 min-h-[44px] w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
             />
           </label>
 
@@ -344,7 +351,7 @@ export function Jelajah({
                 )}
                 <ChevronDown
                   size={14}
-                  className={`transition-transform duration-300 ${pop === "kategori" ? "rotate-180" : ""}`}
+                  className={`transition-transform duration-300 motion-reduce:transition-none ${pop === "kategori" ? "rotate-180" : ""}`}
                 />
               </span>
             </KacaPill>
@@ -363,7 +370,7 @@ export function Jelajah({
                         )
                       }
                       aria-pressed={aktif}
-                      className="flex min-h-[44px] w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition hover:bg-panel-2"
+                      className="flex min-h-[44px] w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition hover:bg-panel-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
                     >
                       <span
                         className={`flex size-4 items-center justify-center rounded border transition ${
@@ -384,7 +391,7 @@ export function Jelajah({
                 {fKategori.length > 0 && (
                   <button
                     onClick={() => setFKategori([])}
-                    className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink"
+                    className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
                   >
                     <X size={12} /> Reset kategori
                   </button>
@@ -417,7 +424,7 @@ export function Jelajah({
                 )}
                 <ChevronDown
                   size={14}
-                  className={`transition-transform duration-300 ${pop === "status" ? "rotate-180" : ""}`}
+                  className={`transition-transform duration-300 motion-reduce:transition-none ${pop === "status" ? "rotate-180" : ""}`}
                 />
               </span>
             </KacaPill>
@@ -436,7 +443,7 @@ export function Jelajah({
                         )
                       }
                       aria-pressed={aktif}
-                      className="flex min-h-[44px] w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition hover:bg-panel-2"
+                      className="flex min-h-[44px] w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition hover:bg-panel-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
                     >
                       <span
                         className={`flex size-4 items-center justify-center rounded border transition ${
@@ -458,7 +465,7 @@ export function Jelajah({
                 {fStatus.length > 0 && (
                   <button
                     onClick={() => setFStatus([])}
-                    className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink"
+                    className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
                   >
                     <X size={12} /> Reset status
                   </button>
@@ -555,7 +562,7 @@ export function Jelajah({
               max={BULAN.length - 1}
               value={periodeIdx}
               onChange={(e) => setPeriodeIdx(Number(e.target.value))}
-              className="w-52 accent-ap-blue"
+              className="w-52 accent-ap-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
               aria-label="Pilih periode waktu"
             />
             <span className="text-xs font-semibold text-muted">
@@ -577,7 +584,7 @@ export function Jelajah({
       )}
 
       <div className="grid h-[64dvh] min-h-[460px] grid-rows-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_360px]">
-        <Card className="relative min-h-0 overflow-hidden p-0">
+        <Card className="relative min-h-0 overflow-hidden rounded-[18px] border-ap-hairline bg-white p-0 shadow-none dark:border-line dark:bg-panel">
           <LeafletMap
             pusat={
               pusatSaya ? [pusatSaya.lat, pusatSaya.lng] : undefined
@@ -596,7 +603,7 @@ export function Jelajah({
             }}
           />
           {periodeIdx !== null && (
-            <KacaBar className="pointer-events-none absolute left-3 top-3 z-[500] rounded-xl border px-3 py-1.5 font-display text-sm font-bold">
+            <KacaBar className="pointer-events-none absolute left-3 top-3 z-[500] rounded-lg border px-3 py-1.5 font-display text-sm font-bold">
               <History size={13} className="inline align-[-2px]" /> s.d.{" "}
               {BULAN[periodeIdx].label}
             </KacaBar>
@@ -627,7 +634,7 @@ export function Jelajah({
                   tabIndex={0}
                   role="button"
                   aria-label={`Buka laporan ${r.judul}`}
-                  className={`cursor-pointer p-4 transition hover:border-ap-blue/50 ${FOKUS_KACA} ${
+                  className={`cursor-pointer p-4 transition hover:border-ap-blue/50 motion-reduce:transition-none ${FOKUS_KACA} ${
                     terpilihId === r.id ? "ring-2 ring-ap-blue" : ""
                   }`}
                 >
@@ -651,10 +658,10 @@ export function Jelajah({
                   </p>
                   <div className="mt-2.5 flex items-center gap-3 text-xs text-muted">
                     <StatusChip status={r.status} />
-                    <span className="flex items-center gap-1">
+                    <span className="angka-tabular flex items-center gap-1 tabular-nums">
                       <ThumbsUp size={11} /> {r.vote_count}
                     </span>
-                    <span className="flex items-center gap-1">
+                    <span className="angka-tabular flex items-center gap-1 tabular-nums">
                       <MessageSquare size={11} /> {r.comment_count}
                     </span>
                   </div>
@@ -663,7 +670,7 @@ export function Jelajah({
             ))}
           </AnimatePresence>
           {tersaring.length > 0 && (
-            <p className="py-1 text-center text-xs text-muted">
+            <p className="angka-tabular py-1 text-center text-xs tabular-nums text-muted">
               menampilkan {Math.min(40, tersaring.length)} dari{" "}
               {tersaring.length} laporan
             </p>
@@ -701,10 +708,10 @@ export function Jelajah({
                 {kategoriBySlug(terpilih.categories?.slug ?? "").nama}
               </span>
               <span className="text-xs text-muted">
-                <span className="flex items-center gap-1">
+                <span className="angka-tabular flex items-center gap-1 tabular-nums">
                   <ThumbsUp size={12} /> {terpilih.vote_count}
                 </span>
-                <span className="flex items-center gap-1">
+                <span className="angka-tabular flex items-center gap-1 tabular-nums">
                   <MessageSquare size={12} /> {terpilih.comment_count}
                 </span>
               </span>
@@ -717,11 +724,15 @@ export function Jelajah({
               <img
                 src={terpilih.foto_url}
                 alt={terpilih.judul}
-                className="max-h-64 w-full rounded-xl object-cover"
+                className="max-h-64 w-full rounded-lg object-cover"
               />
             )}
             <Link href={`/laporan/${terpilih.id}`} className="block pt-1">
-              <Button className="w-full">Buka halaman lengkap →</Button>
+              <Button
+                className="min-h-[44px] w-full border-transparent bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus! dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus"
+              >
+                Buka halaman lengkap →
+              </Button>
             </Link>
           </div>
         )}

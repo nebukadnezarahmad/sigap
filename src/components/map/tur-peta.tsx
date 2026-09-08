@@ -109,7 +109,7 @@ export function TurPeta() {
           ref={refPemicu}
           type="button"
           onClick={() => setLangkah(0)}
-          className="fixed bottom-5 left-5 z-[1100] inline-flex min-h-11 items-center gap-2 rounded-full border garis-halus bg-panel/95 px-4 text-sm font-semibold shadow-xl backdrop-blur transition hover:border-daun-400"
+          className="fixed bottom-5 left-5 z-[1100] inline-flex min-h-11 items-center gap-2 rounded-full border border-ap-hairline bg-white/85 px-4 text-sm font-semibold text-ap-ink shadow-none backdrop-blur transition hover:border-ap-blue/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none dark:border-white/15 dark:bg-[#131d19]/80 dark:text-ink"
         >
           <Compass size={16} aria-hidden /> Pemandu peta
         </button>
@@ -122,7 +122,7 @@ export function TurPeta() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
-            className="fixed bottom-5 left-5 z-[1100] w-80 rounded-2xl border garis-halus bg-panel p-5 shadow-2xl outline-none"
+            className="fixed bottom-5 left-5 z-[1100] w-80 rounded-[18px] border border-ap-hairline bg-white p-5 text-ap-ink shadow-none outline-none dark:border-line dark:bg-panel dark:text-ink"
             role="dialog"
             aria-modal="true"
             aria-labelledby="tur-peta-judul"
@@ -132,13 +132,13 @@ export function TurPeta() {
               {LANGKAH.map((_, i) => (
                 <span
                   key={i}
-                  className={`h-1.5 rounded-full transition-[width,background-color] ${
-                    i === langkah ? "w-6 bg-daun-600" : "w-1.5 bg-line"
+                  className={`h-1.5 rounded-full transition-[width,background-color] motion-reduce:transition-none ${
+                    i === langkah ? "w-6 bg-ap-blue" : "w-1.5 bg-line"
                   }`}
                 />
               ))}
             </div>
-            <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+            <span className="mb-1 flex size-10 items-center justify-center rounded-lg bg-ap-blue/10 text-ap-blue dark:bg-ap-sky/15 dark:text-ap-sky">
               {(() => {
                 const Ikon = LANGKAH[langkah].Ikon;
                 return <Ikon size={20} strokeWidth={1.8} aria-hidden />;
@@ -160,13 +160,13 @@ export function TurPeta() {
               <button
                 type="button"
                 onClick={tutup}
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-4 text-sm font-semibold text-muted transition hover:text-ink"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-4 text-sm font-semibold text-muted transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
               >
                 Lewati
               </button>
               <Button
                 size="md"
-                className="min-h-11 min-w-11"
+                className="min-h-11 min-w-11 border-transparent bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus! dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus"
                 onClick={() =>
                   langkah >= LANGKAH.length - 1
                     ? tutup()

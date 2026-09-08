@@ -13,7 +13,7 @@ export function SebelumSesudah({
   const [posisi, setPosisi] = useState(50);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border garis-halus select-none focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-daun-600 has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-daun-600">
+    <div className="relative overflow-hidden rounded-[18px] border garis-halus select-none focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ap-blue-focus has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ap-blue-focus">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={sesudah}
@@ -58,7 +58,7 @@ export function SebelumSesudah({
         value={posisi}
         onChange={(e) => setPosisi(Number(e.target.value))}
         aria-label="Geser perbandingan sebelum dan sesudah"
-        className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+        className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
       />
 
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">

@@ -139,7 +139,7 @@ export function AdminPanel({
   }
 
   return (
-    <Card className="rounded-[18px] border-kunyit-500/40 bg-white p-5 text-ap-ink shadow-none dark:border-kunyit-500/40 dark:bg-panel dark:text-ink">
+    <Card className="rounded-[18px] border border-kunyit-500/40 bg-white p-5 text-ap-ink shadow-none dark:border-kunyit-500/40 dark:bg-panel dark:text-ink">
       <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
         <Wrench size={16} /> Panel Dewan & Petugas
       </h2>
@@ -192,7 +192,7 @@ export function AdminPanel({
         <div className="mt-3 space-y-2">
           <label
             htmlFor="foto-sesudah"
-            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-daun-500/50 bg-daun-500/5 px-3.5 py-3 text-sm text-ink transition hover:border-daun-500 hover:bg-daun-500/10"
+            className="flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[18px] border border-dashed border-daun-500/50 bg-daun-500/5 px-3.5 py-3 text-sm text-ink transition hover:border-daun-500 hover:bg-daun-500/10 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ap-blue-focus has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ap-blue-focus"
           >
             <ImagePlus size={17} className="text-daun-600 dark:text-daun-400" />
             <span className="font-semibold">

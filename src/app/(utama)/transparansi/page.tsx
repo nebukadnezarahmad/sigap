@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import { KATEGORI, STATUS, SLA_KATEGORI, hitungSla, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { StatusChip, Button } from "@/components/ui";
+import { KacaKartu } from "@/components/eksperimen/kaca";
 import { formatTanggal } from "@/lib/utils";
 import { GrafikBulanan, GrafikKategori } from "./grafik";
 import { TombolCetak } from "./tombol-cetak";
@@ -173,7 +174,7 @@ export default async function HalamanTransparansi() {
     <main className="mx-auto max-w-6xl px-4 py-10">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-daun-700 dark:text-daun-400">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-ap-blue dark:text-ap-sky">
             <ShieldCheck size={16} /> Rapor Akuntabilitas Publik
           </div>
           <h1 className="mt-1 font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px]">
@@ -185,7 +186,7 @@ export default async function HalamanTransparansi() {
         </div>
         <div className="flex items-center gap-2">
           <Link href="/api/open-data" target="_blank">
-            <Button variant="sekunder" size="sm" className="hidden min-h-[44px] sm:inline-flex gap-1.5">
+              <Button variant="sekunder" size="sm" className="hidden min-h-[44px] sm:inline-flex gap-1.5 focus-visible:outline-ap-blue-focus">
               <FileSpreadsheet size={15} /> Open Data (JSON)
             </Button>
           </Link>
@@ -200,7 +201,7 @@ export default async function HalamanTransparansi() {
             label: "Total laporan warga",
             nilai: total,
             ikon: <CheckCircle2 size={20} />,
-            warna: "text-muted bg-panel-2",
+            warna: "text-ap-blue dark:text-ap-sky bg-ap-blue/10",
           },
           {
             label: "Tingkat tuntas",
@@ -224,12 +225,12 @@ export default async function HalamanTransparansi() {
                 : "text-daun-700 dark:text-daun-300 bg-daun-500/10",
           },
         ].map((k) => (
-          <div
+          <KacaKartu
             key={k.label}
-            className="flex items-center gap-3.5 rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink"
+            className="flex items-center gap-3.5 p-6"
           >
             <span
-              className={`flex size-11 items-center justify-center rounded-xl ${k.warna}`}
+              className={`flex size-11 items-center justify-center rounded-lg ${k.warna}`}
             >
               {k.ikon}
             </span>
@@ -239,7 +240,7 @@ export default async function HalamanTransparansi() {
               </p>
               <p className="mt-1 text-xs text-muted">{k.label}</p>
             </div>
-          </div>
+          </KacaKartu>
         ))}
       </div>
 
@@ -276,7 +277,7 @@ export default async function HalamanTransparansi() {
               Papan Keterlambatan Publik (*Overdue Watchlist*)
             </h2>
           </div>
-          <span className="rounded-full bg-danger/10 px-2.5 py-0.5 text-xs font-bold text-danger">
+          <span className="rounded-full bg-danger/10 px-2.5 py-0.5 text-xs font-bold tabular-nums text-danger">
             {laporanLewatSla.length} Laporan Perlu Tindakan Cepat
           </span>
         </div>
@@ -415,7 +416,7 @@ export default async function HalamanTransparansi() {
             </p>
           </div>
           <Link href="/api/open-data" target="_blank" className="mt-4">
-            <Button variant="sekunder" size="sm" className="w-full min-h-[44px] gap-1.5 text-xs">
+              <Button variant="sekunder" size="sm" className="w-full min-h-[44px] gap-1.5 text-xs focus-visible:outline-ap-blue-focus">
               <ExternalLink size={13} /> Akses /api/open-data
             </Button>
           </Link>

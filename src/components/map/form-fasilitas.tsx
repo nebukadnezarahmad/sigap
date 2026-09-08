@@ -8,6 +8,14 @@ import { JENIS_FASILITAS } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Input, Label, Select } from "@/components/ui";
+import { KacaKartu } from "@/components/eksperimen/kaca";
+
+/* Fusi visual-fusion (sejajar buat-laporan.tsx): tombol Kirim pill
+   Action Blue 44px; Batal 44px dengan fokus Action Blue.
+   Copy, role/aria, dan logika validasi/kirim tidak diubah. */
+const PILL_BIRU =
+  "min-h-[44px] border-transparent bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus! dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus";
+const SENTUH_44 = "min-h-[44px] focus-visible:outline-ap-blue-focus!";
 
 const LeafletMap = dynamic(
   () => import("./leaflet-map").then((m) => m.LeafletMap),
@@ -62,10 +70,15 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
 
   if (!user) {
     return (
-      <div className="space-y-4 text-center">
+      <KacaKartu className="space-y-4 p-4 text-center">
         <p className="text-sm text-muted">Masuk dulu untuk menambah fasilitas.</p>
-        <Button onClick={() => router.push("/masuk?next=/peta")}>Masuk</Button>
-      </div>
+        <Button
+          onClick={() => router.push("/masuk?next=/peta")}
+          className={`${PILL_BIRU} w-full`}
+        >
+          Masuk
+        </Button>
+      </KacaKartu>
     );
   }
 
@@ -126,6 +139,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
             placeholder="Contoh: Bank Sampah Melati Jaya…"
             aria-invalid={!!galatNama}
             aria-describedby={galatNama ? "galat-f-nama" : undefined}
+            className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           />
           {galatNama && (
             <p id="galat-f-nama" role="alert" className="mt-1.5 text-xs font-semibold text-danger">
@@ -140,6 +154,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
             name="jenis"
             value={jenis}
             onChange={(e) => setJenis(e.target.value)}
+            className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           >
             {JENIS_FASILITAS.map((f) => (
               <option key={f.jenis} value={f.jenis}>
@@ -157,6 +172,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
             value={alamat}
             onChange={(e) => setAlamat(e.target.value)}
             placeholder="Contoh: Jl. Melati Raya No. 21…"
+            className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           />
         </div>
         <div>
@@ -168,6 +184,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
             value={jam}
             onChange={(e) => setJam(e.target.value)}
             placeholder="Contoh: Senin–Sabtu 08.00–16.00…"
+            className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           />
         </div>
       </div>
@@ -178,8 +195,8 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
             <MapPin size={13} /> Klik peta untuk menandai lokasi
           </span>
         </Label>
-        <div className="min-h-56 flex-1 overflow-hidden rounded-xl border garis-halus">
-          <div id="peta-fasilitas" tabIndex={-1} className="h-full focus:outline-none">
+        <div className="min-h-56 flex-1 overflow-hidden rounded-[18px] border border-ap-hairline shadow-none dark:border-line">
+          <div id="peta-fasilitas" tabIndex={-1} className="h-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!">
             <LeafletMap
               mode="pilih"
               zoom={14}
@@ -211,11 +228,11 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
           </p>
         )}
         {pesan && (
-          <p role="alert" className="mt-2 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
+          <p role="alert" className="mt-2 rounded-[18px] bg-danger/10 px-3 py-2 text-sm text-danger">
             {pesan}
           </p>
         )}
-        <Button type="submit" disabled={proses} aria-busy={proses} className="mt-3 w-full">
+        <Button type="submit" disabled={proses} aria-busy={proses} className={`mt-3 w-full ${PILL_BIRU}`}>
           {proses ? (
             <Loader2 size={16} aria-hidden className="animate-spin" />
           ) : (
@@ -223,7 +240,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
           )}
           {proses ? "Menyimpan fasilitas…" : "Simpan fasilitas (+8 poin)"}
         </Button>
-        <Button type="button" variant="sekunder" onClick={mintaTutup} disabled={proses} className="mt-2 w-full">
+        <Button type="button" variant="sekunder" onClick={mintaTutup} disabled={proses} className={`mt-2 w-full ${SENTUH_44}`}>
           Batal
         </Button>
       </div>
