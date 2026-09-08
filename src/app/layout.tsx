@@ -16,7 +16,10 @@ const fraunces = Fraunces({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#237f45",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f5f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#111113" },
+  ],
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -43,7 +46,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: temaScript }} />
       </head>
-      <body className={`${poppins.variable} ${fraunces.variable} grain font-sans antialiased`}>
+      <body className={`${poppins.variable} ${fraunces.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

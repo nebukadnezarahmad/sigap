@@ -36,7 +36,7 @@ function ToggleTema() {
     <button
       onClick={ubah}
       aria-label={gelap ? "Mode terang" : "Mode gelap"}
-      className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+      className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
     >
       <span className="hidden dark:block">
         <Sun size={18} />
@@ -76,9 +76,9 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
         <Link
           href="/"
-          className="flex items-center gap-2 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+          className="flex items-center gap-2 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
         >
-          <span className="flex size-8 items-center justify-center rounded-xl bg-daun-600 text-white">
+          <span className="flex size-8 items-center justify-center rounded-xl bg-action text-white">
             <MapPin size={17} strokeWidth={2.5} />
           </span>
           <span className="font-display text-lg font-bold tracking-tight">
@@ -92,9 +92,9 @@ export function SiteHeader() {
               key={t.href}
               href={t.href}
               className={cn(
-                "inline-flex min-h-[44px] items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                "inline-flex min-h-[44px] items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
                 pathname.startsWith(t.href)
-                  ? "bg-daun-600/10 text-daun-700 dark:text-daun-300 font-semibold"
+                  ? "bg-action/10 text-action font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
               )}
             >
@@ -105,7 +105,7 @@ export function SiteHeader() {
             <Link
               href="/dewan"
               className={cn(
-                "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
                 pathname.startsWith("/dewan")
                   ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
@@ -122,7 +122,7 @@ export function SiteHeader() {
             onClick={() => setMenuBuka((v) => !v)}
             aria-expanded={menuBuka}
             aria-label={menuBuka ? "Tutup menu navigasi" : "Buka menu navigasi"}
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 md:hidden"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action md:hidden"
           >
             {menuBuka ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -141,7 +141,7 @@ export function SiteHeader() {
                   }
                   if (e.key === "Escape") setAkunBuka(false);
                 }}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition hover:ring-4 hover:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition hover:ring-4 hover:ring-action/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
               >
                 <Avatar nama={profil?.nama_lengkap ?? "?"} url={profil?.avatar_url} ukuran={34} />
               </button>
@@ -211,14 +211,14 @@ export function SiteHeader() {
                 variant="sekunder"
                 size="sm"
                 onClick={() => setModalDemoBuka(true)}
-                className="hidden sm:inline-flex min-h-[44px] items-center gap-1.5 border-daun-500/30 text-daun-700 hover:bg-daun-500/10 dark:text-daun-300"
+                className="hidden sm:inline-flex min-h-[44px] items-center gap-1.5 border-action/30 text-action hover:bg-action/10"
               >
-                <Sparkles size={14} className="text-daun-600 dark:text-daun-400" />
+                <Sparkles size={14} className="text-action" />
                 Akun Demo
               </Button>
               <Link
                 href="/masuk"
-                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 active:scale-[0.97] bg-daun-600 text-white shadow-[0_1px_2px_rgb(23_67_42/0.2),0_6px_16px_-6px_rgb(23_67_42/0.35)] hover:bg-daun-700 hover:shadow-[0_2px_4px_rgb(23_67_42/0.2),0_10px_24px_-6px_rgb(23_67_42/0.4)]"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action active:scale-[0.97] bg-action text-white shadow-[0_1px_2px_rgb(0_102_204/0.25),0_6px_16px_-6px_rgb(0_102_204/0.4)] hover:bg-action-hover hover:shadow-[0_2px_4px_rgb(0_102_204/0.25),0_10px_24px_-6px_rgb(0_102_204/0.45)]"
               >
                 Masuk
               </Link>
@@ -239,9 +239,9 @@ export function SiteHeader() {
                   href={t.href}
                   onClick={() => setMenuBuka(false)}
                   className={cn(
-                    "flex min-h-[44px] items-center rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                    "flex min-h-[44px] items-center rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
                     pathname.startsWith(t.href)
-                      ? "bg-daun-600/10 text-daun-700 dark:text-daun-300 font-semibold"
+                      ? "bg-action/10 text-action font-semibold"
                       : "text-muted hover:bg-panel-2 hover:text-ink"
                   )}
                 >
@@ -255,7 +255,7 @@ export function SiteHeader() {
                   href="/dewan"
                   onClick={() => setMenuBuka(false)}
                   className={cn(
-                    "flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                    "flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
                     pathname.startsWith("/dewan")
                       ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
                       : "text-muted hover:bg-panel-2 hover:text-ink"

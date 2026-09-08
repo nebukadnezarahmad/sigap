@@ -1,47 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  BarChart3,
-  Building2,
-  CheckCircle2,
-  MapPin,
-  Megaphone,
-  Users,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, ChevronRight, MapPin, ScanLine, ShieldCheck, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
-import { Card } from "@/components/ui";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { AngkaHidup, PetaHeroVisual, Terungkap } from "./landing-visual";
+import styles from "./beranda.module.css";
 
 export const dynamic = "force-dynamic";
 
 const LANGKAH = [
-  {
-    nomor: "01",
-    ikon: MapPin,
-    judul: "Tandai masalah dalam 30 detik",
-    isi: "Tandai titik di peta, sertakan foto, pilih kategori. Laporanmu langsung terlihat oleh dewan dan warga sekitar.",
-  },
-  {
-    nomor: "02",
-    ikon: Megaphone,
-    judul: "Warga serentak mendukung",
-    isi: "Dukungan dari warga lain, termasuk kamu, menaikkan prioritas penanganan dan mempercepat tindak lanjut di lapangan.",
-  },
-  {
-    nomor: "03",
-    ikon: CheckCircle2,
-    judul: "Penanganan yang bisa kamu cek",
-    isi: "Petugas menyertakan foto sesudah penanganan, dan laporan selesai setelah diverifikasi minimal 2 warga di lapangan.",
-  },
+  { nomor: "01", ikon: MapPin, judul: "Lihat. Tandai. Laporkan.", isi: "Pilih titik di peta, tambahkan foto, dan ceritakan masalah yang kamu temui." },
+  { nomor: "02", ikon: Users, judul: "Bergerak bersama.", isi: "Warga memberi dukungan. Dewan memverifikasi dan menugaskan penanganan." },
+  { nomor: "03", ikon: ShieldCheck, judul: "Selesai, dengan bukti.", isi: "Foto penanganan dan konfirmasi warga melengkapi perjalanan setiap laporan." },
 ];
 
 export default async function Beranda() {
   let statistik = { total: 0, selesai: 0, warga: 0 };
   let statistikGagal = false;
+  let kategoriGagal = false;
   let hitungKategori = new Map<string, number>();
   let titikAwal: {
     id: string;
@@ -80,6 +58,7 @@ export default async function Beranda() {
       if (laporan.error || selesai.error || warga.error) {
         statistikGagal = true;
       }
+      kategoriGagal = Boolean(perKategori.error);
       hitungKategori = new Map();
       for (const r of (perKategori.data ?? []) as unknown as LaporanDenganRelasi[]) {
         const slug = r.categories?.slug ?? "lainnya";
@@ -105,426 +84,154 @@ export default async function Beranda() {
       }
     } else {
       statistikGagal = true;
+      kategoriGagal = true;
     }
   } catch {
     statistikGagal = true;
+    kategoriGagal = true;
   }
 
   return (
-    <main>
-      <section className="relative overflow-hidden bg-pola-grid border-b garis-halus">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
-          <div className="animate-muncul">
-            <h1 className="font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
-              Masalah lingkungan di sekitarmu,{" "}
-              <span className="text-daun-600 dark:text-daun-400">
-                terpetakan.
-              </span>{" "}
-              <em className="font-light italic text-kunyit-700 dark:text-kunyit-300">
-                Diselesaikan.
-              </em>
-            </h1>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted teks-pretty">
-              SIGAP menghubungkan warga dan pemerintah desa/kota lewat peta
-              interaktif: laporkan sampah menumpuk, drainase macet, atau lampu
-              jalan mati — lalu pantau penanganannya secara transparan.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link href="/peta" className="group inline-flex">
-                <span className="inline-flex items-center gap-3 rounded-full bg-daun-600 py-2.5 pl-7 pr-2.5 text-base font-semibold text-white shadow-[0_1px_2px_rgb(23_67_42/0.2),0_8px_20px_-6px_rgb(23_67_42/0.4)] transition-[transform,background-color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-daun-700 active:scale-[0.98]">
-                  Buka peta interaktif
-                  <span className="flex size-8 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                    <ArrowRight size={16} strokeWidth={2.2} />
-                  </span>
-                </span>
-              </Link>
-              <Link
-                href="/daftar"
-                className="rounded-full border garis-halus bg-panel px-6 py-3 text-base font-semibold text-ink transition-[border-color,color] duration-300 hover:border-daun-400 hover:text-daun-700 dark:hover:text-daun-300 shadow-sm"
-              >
-                Gabung jadi warga SIGAP
-              </Link>
-            </div>
-
-            <dl className="mt-10 flex gap-10">
-              {[
-                ["Laporan masuk", statistik.total],
-                ["Selesai ditangani", statistik.selesai],
-                ["Warga aktif", statistik.warga],
-              ].map(([label, nilai]) => (
-                <div key={label as string}>
-                  <dd className="text-2xl font-bold tabular-nums angka-tabular text-daun-700 dark:text-daun-300 sm:text-3xl">
-                    {statistikGagal ? (
-                      <span aria-label={`${label as string} tidak tersedia`}>
-                        —
-                      </span>
-                    ) : (
-                      <AngkaHidup nilai={nilai as number} />
-                    )}
-                  </dd>
-                  <dt className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-muted">
-                    {label}
-                  </dt>
-                </div>
-              ))}
-            </dl>
-
-            {/* Cuplikan Foto Lingkungan Nyata */}
-            <div className="mt-8 flex items-center gap-3.5 rounded-2xl border garis-halus bg-panel/80 p-2.5 backdrop-blur-sm max-w-lg shadow-sm">
-              <div className="relative size-12 shrink-0 overflow-hidden rounded-xl">
-                <Image
-                  src="/images/lingkungan-permukiman.jpg"
-                  alt="Kawasan permukiman kota hijau"
-                  fill
-                  sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
-                  priority
-                  className="object-cover"
-                />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-ink truncate">
-                  Kawasan Permukiman Berkelanjutan
-                </p>
-                <p className="text-[11px] text-muted truncate">
-                  Kota Harapan · Terintegrasi Pos Ronda, DLH & Warga RT/RW
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <Terungkap tunda={0.15}>
-            <PetaHeroVisual awalTitik={titikAwal} />
-          </Terungkap>
-        </div>
-      </section>
-
-      {/* Section Cara Kerja & Gotong Royong Warga */}
-      <section
-        className="mx-auto max-w-6xl px-4 py-24 bg-pola-topografi"
-        aria-label="Cara kerja"
-      >
-        <div className="grid gap-12 lg:grid-cols-12 items-center">
-          <div className="lg:col-span-7">
-            <Terungkap>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-                Cara kerja
-              </p>
-              <h2 className="mt-2 max-w-xl font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
-                Tiga Langkah Mudah Menjaga Lingkungan Bersama
-              </h2>
-            </Terungkap>
-            <div className="mt-10 space-y-8">
-              {LANGKAH.map((l, i) => (
-                <Terungkap key={l.nomor} tunda={i * 0.08}>
-                  <div className="relative flex items-start gap-4 border-l-2 border-daun-600/30 pl-6">
-                    <span
-                      aria-hidden
-                      className="absolute -left-[13px] top-1 flex size-6 items-center justify-center rounded-full bg-daun-600 font-display text-[10px] font-bold text-white shadow-sm"
-                    >
-                      {i + 1}
-                    </span>
-                    <div>
-                      <h3 className="flex items-center gap-2 font-display text-lg font-bold">
-                        <span className="flex size-7 items-center justify-center rounded-lg bg-daun-600/10 text-daun-700 dark:text-daun-300">
-                          <l.ikon size={15} />
-                        </span>
-                        {l.judul}
-                      </h3>
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted teks-pretty">
-                        {l.isi}
-                      </p>
-                    </div>
-                  </div>
-                </Terungkap>
-              ))}
-            </div>
-          </div>
-
-          {/* Kartu Foto Gotong Royong Warga Lapangan */}
-          <div className="lg:col-span-5">
-            <Terungkap tunda={0.2}>
-              <div className="relative overflow-hidden rounded-2xl border garis-halus bg-panel p-2.5 shadow-xl">
-                <div className="relative h-80 w-full overflow-hidden rounded-xl">
-                  <Image
-                    src="/images/gotong-royong.jpg"
-                    alt="Warga RT gotong royong dan verifikasi lingkungan"
-                    fill
-                    sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
-                    className="object-cover"
-                  />
-                  {/* Overlay dipertahankan: teks putih di atas foto, penjamin kontras */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-                  <div className="absolute bottom-3 left-3 right-3 text-white">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-md">
-                      <Users size={11} /> Aksi lapangan warga
-                    </span>
-                    <p className="mt-1.5 text-sm font-bold">
-                      Gotong Royong & Verifikasi Warga
-                    </p>
-                    <p className="text-[11px] text-white/80 leading-relaxed">
-                      RT 05 / RW 03 · Masalah selesai divalidasi langsung oleh 2 warga sekitar.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between gap-2 p-3 text-xs">
-                  <span className="min-w-0 truncate text-muted">Partisipasi aktif RT/RW</span>
-                  <span className="inline-flex shrink-0 items-center gap-1 font-bold text-daun-700 dark:text-daun-300"><CheckCircle2 size={13} /> Terverifikasi lapangan</span>
-                </div>
-              </div>
-            </Terungkap>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="border-y garis-halus bg-panel-2/60 py-24"
-        aria-label="Kategori laporan"
-      >
-        <div className="mx-auto max-w-6xl px-4">
-          <Terungkap className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-                Standar Cakupan & SLA Resmi
-              </p>
-              <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
-                6 Kategori Permukiman dengan Target SLA Terikat
-              </h2>
-            </div>
-            <p className="max-w-sm text-sm text-muted teks-pretty">
-              Setiap kategori memiliki target waktu penanganan (*Service Level Agreement*) resmi yang dipantau publik secara transparan.
-            </p>
-          </Terungkap>
-          <Terungkap tunda={0.1}>
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-              {KATEGORI.map((k) => (
-                <div
-                  key={k.slug}
-                  className="flex flex-col justify-between rounded-2xl border garis-halus bg-panel p-4 shadow-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className="flex size-8 items-center justify-center rounded-xl"
-                      style={{ backgroundColor: `${k.warna}20`, color: k.warna }}
-                      role="img"
-                      aria-label={k.nama}
-                    >
-                      <IkonKategori slug={k.slug} ukuran={15} />
-                    </span>
-                    <span className="angka-tabular rounded-full bg-panel-2 px-2 py-0.5 text-xs font-bold tabular-nums text-muted">
-                      {statistikGagal ? "—" : (hitungKategori.get(k.slug) ?? 0)}
-                    </span>
-                  </div>
-                  <div className="mt-4 min-w-0">
-                    <p className="font-display font-bold text-sm text-ink truncate">
-                      {k.nama}
-                    </p>
-                    <p className="mt-1 text-[11px] font-semibold text-daun-700 dark:text-daun-300">
-                      SLA: {k.slug === "sampah" ? "3 Hari" : k.slug === "jalan" ? "14 Hari" : k.slug === "ruang-hijau" ? "21 Hari" : "7 Hari"}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Terungkap>
-        </div>
-      </section>
-
-      {/* Arsitektur Solusi — Asymmetric Editorial Layout */}
-      <section
-        className="mx-auto max-w-6xl px-4 py-24"
-        aria-label="Pilar solusi SIGAP"
-      >
-        <Terungkap>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-kunyit-700 dark:text-kunyit-300">
-            <Building2 size={15} /> Pilar layanan SIGAP
-          </div>
-          <h2 className="mt-2 max-w-2xl font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
-            Ekosistem civic-tech yang terhubung dan akuntabel
-          </h2>
-          <p className="mt-3 max-w-2xl text-muted text-base">
-            Bukan sekadar formulir aduan. SIGAP merawat setiap laporanmu dari pencatatan yang rapi hingga verifikasi bersama warga.
+    <main className={styles.home}>
+      <section className={styles.hero} aria-labelledby="judul-beranda">
+        <div className={styles.heroCopy}>
+          <Link href="/demo" className={styles.introLink}>
+            <span className={styles.introDot} aria-hidden="true" />
+            Kenali SIGAP. Mulai dari sekitarmu.
+            <ChevronRight size={14} aria-hidden="true" />
+          </Link>
+          <h1 id="judul-beranda" className={styles.heroTitle}>
+            Lingkungan lebih baik.<br />
+            <span>Dimulai dari kamu.</span>
+          </h1>
+          <p className={styles.heroDescription}>
+            Satu tempat untuk melapor, saling mendukung, dan melihat perubahan.
+            Dari titik di peta, sampai masalah benar-benar selesai.
           </p>
-        </Terungkap>
-
-        <div className="mt-12 grid gap-6 lg:grid-cols-12">
-          {/* Spotlight Kiri: Peta Spasial & Deduplikasi */}
-          <Terungkap className="lg:col-span-6 flex">
-            <Card className="flex w-full flex-col justify-between border-daun-600/30 p-8">
-              <div>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-daun-600/15 px-3 py-1 text-xs font-bold text-daun-700 dark:text-daun-300">
-                  <MapPin size={13} /> Pilar 01 · Catatan warga yang rapi
-                </span>
-                <h3 className="mt-4 font-serif text-2xl font-semibold">
-                  Satu titik untuk satu masalah dalam 100 meter
-                </h3>
-                <p className="mt-3 leading-relaxed text-muted text-sm teks-pretty">
-                  Supaya tidak ada laporan ganda di titik yang sama. Saat kamu menandai pin, sistem memeriksa masalah serupa dalam radius 100 meter dan mengajakmu mendukung laporan yang sudah ada.
-                </p>
-                <div className="mt-6 rounded-xl border garis-halus bg-panel p-4 text-xs space-y-2">
-                  <div className="flex items-center justify-between gap-2 text-muted">
-                    <span className="min-w-0 truncate">Basis data wilayah</span>
-                    <span className="font-mono text-ink font-semibold">PostGIS GiST 4326</span>
-                  </div>
-                  <div className="flex items-center justify-between gap-2 text-muted">
-                    <span className="min-w-0 truncate">Jarak pantau</span>
-                    <span className="font-semibold text-daun-700 dark:text-daun-300">≤ 100 meter</span>
-                  </div>
-                </div>
-              </div>
-
-              <Link
-                href="/peta"
-                className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300"
-              >
-                Lihat peta dan coba melapor <ArrowRight size={15} />
-              </Link>
-            </Card>
-          </Terungkap>
-
-          {/* 3 Blok Kanan: Dashboard, Verifikasi Warga, Transparansi */}
-          <div className="lg:col-span-6 space-y-4 flex flex-col justify-between">
-            <Terungkap tunda={0.1}>
-              <Card className="p-6 transition hover:border-daun-400">
-                <div className="flex items-start gap-4">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
-                    <Building2 size={20} />
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="font-display font-bold text-lg">
-                      Dasbor dewan dengan target SLA
-                    </h3>
-                    <p className="mt-1 text-xs text-muted leading-relaxed">
-                      Target hari penanganan yang mengikat (3–21 hari), penugasan petugas teknis (DLH/PU), serta peta sebaran masalah yang bisa kamu pantau.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </Terungkap>
-
-            <Terungkap tunda={0.2}>
-              <Card className="p-6 transition hover:border-daun-400">
-                <div className="flex items-start gap-4">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
-                    <CheckCircle2 size={20} />
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="font-display font-bold text-lg text-ink">
-                      Verifikasi warga dan foto bukti
-                    </h3>
-                    <p className="mt-1 text-xs text-muted leading-relaxed">
-                      Tidak ada penutupan laporan sepihak. Dewan menyertakan foto sesudah penanganan, dan status selesai butuh minimal 2 konfirmasi warga di lapangan.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </Terungkap>
-
-            <Terungkap tunda={0.3}>
-              <Card className="p-6 transition hover:border-daun-400">
-                <div className="flex items-start gap-4">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
-                    <BarChart3 size={20} />
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="font-display font-bold text-lg">
-                      Papan keterlambatan publik dan data terbuka
-                    </h3>
-                    <p className="mt-1 text-xs text-muted leading-relaxed">
-                      Daftar laporan yang melewati target waktu tayang terbuka, siap dicetak untuk rapat RT/RW, dan tersedia sebagai data terbuka.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </Terungkap>
+          <div className={styles.actions}>
+            <Link href="/peta" className={styles.primaryLink}>
+              Jelajahi peta <ArrowUpRight size={18} aria-hidden="true" />
+            </Link>
+            <Link href="/demo" className={styles.secondaryLink}>
+              Lihat cara kerjanya <ChevronRight size={17} aria-hidden="true" />
+            </Link>
           </div>
+          <p className={styles.heroNote}>Terbuka untuk dilihat. Mudah untuk ikut peduli.</p>
+        </div>
+        <div className={styles.productStage}>
+          <PetaHeroVisual awalTitik={titikAwal} />
         </div>
       </section>
 
-      {/* Section Mengapa Ini Penting — Factsheet Dossier */}
-      <section className="mx-auto max-w-6xl px-4 py-24" aria-label="Mengapa penting">
-        <div className="rounded-2xl border garis-halus bg-panel p-8 sm:p-12 shadow-sm">
-          <div className="grid items-center gap-10 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-kunyit-700 dark:text-kunyit-300">
-                Lembar Fakta Permukiman
-              </p>
-              <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-semibold tracking-tight">
-                Mengapa SIGAP Mendesak untuk Kota Kita?
-              </h2>
-              <p className="mt-4 leading-relaxed text-muted text-sm sm:text-base teks-pretty">
-                Data SIPSN Kementerian Lingkungan Hidup mencatat timbulan sampah nasional mencapai <b className="text-ink font-semibold">±33,79 juta ton pada 2024</b>, dan hanya sekitar sepertiga yang berhasil dikelola dengan baik. Mayoritas sisanya menumpuk persis di lingkungan permukiman: drainase tersumbat, TPS liar di tikungan jalan, dan fasilitas publik terbengkalai.
-              </p>
-              <p className="mt-3 leading-relaxed text-muted text-sm sm:text-base teks-pretty">
-                Perubahan nyata dimulai dari lingkup terkecil: koordinasi RT/RW yang transparan dan terdata secara digital.
-              </p>
-              <p className="mt-6 text-xs text-muted/80">
-                Sumber Resmi: SIPSN KLHK 2024–2025 · Publikasi Riset BRIN (2025)
-              </p>
+      <section className={styles.proof} aria-label="Aktivitas SIGAP">
+        <p>Setiap laporan punya arti.<br /><span>Ini yang sudah tercatat di SIGAP.</span></p>
+        <dl className={styles.stats}>
+          {[
+            { label: "laporan masuk", nilai: statistik.total },
+            { label: "selesai ditangani", nilai: statistik.selesai },
+            { label: "warga terdaftar", nilai: statistik.warga },
+          ].map(({ label, nilai }) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{statistikGagal ? <span aria-label="Data belum tersedia">—</span> : <AngkaHidup nilai={nilai} />}</dd>
             </div>
+          ))}
+        </dl>
+        {statistikGagal && <p className={styles.dataNote}>Statistik belum dapat dimuat.</p>}
+      </section>
 
-            <div className="lg:col-span-5 flex flex-col gap-3">
-              <div className="relative h-48 w-full overflow-hidden rounded-xl border garis-halus shadow-sm">
-                <Image
-                  src="/images/kota-sdg11.jpg"
-                  alt="Koridor transportasi dan ruang hijau perkotaan berkelanjutan SDG 11"
-                  fill
-                  sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
-                  className="object-cover"
-                />
-                {/* Overlay dipertahankan: label putih di atas foto, penjamin kontras */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                <p className="absolute bottom-2.5 left-3.5 right-3.5 text-xs font-bold text-white">
-                  Target SDG 11: Kota & Permukiman Berkelanjutan
-                </p>
-              </div>
+      <section className={styles.journey} aria-labelledby="judul-alur">
+        <Terungkap>
+          <div className={styles.sectionHeading}>
+            <p className={styles.kicker}>Dari laporan menjadi perubahan</p>
+            <h2 id="judul-alur">Kecil langkahnya.<br /><span>Terasa dampaknya.</span></h2>
+            <p>Masalah di sekitar kita layak mendapat perhatian.<br className="hidden sm:block" /> SIGAP membuat prosesnya terlihat, dari awal sampai akhir.</p>
+          </div>
+          <div className={styles.steps}>
+            {LANGKAH.map(({ nomor, ikon: Ikon, judul, isi }) => (
+              <article key={nomor} className={styles.step}>
+                <div className={styles.stepTop}><Ikon size={27} strokeWidth={1.5} aria-hidden="true" /><span>{nomor}</span></div>
+                <h3>{judul}</h3><p>{isi}</p>
+              </article>
+            ))}
+          </div>
+        </Terungkap>
+      </section>
 
-              {[
-                { angka: "33,79 Jt", unit: "Ton", label: "Timbulan sampah nasional tahun 2024" },
-                { angka: "~32%", unit: "Terkelola", label: "Sampah yang tertangani dengan baik" },
-                { angka: "56,7%", unit: "Rumah Tangga", label: "Berasal dari aktivitas permukiman warga" },
-              ].map((f) => (
-                <div
-                  key={f.label}
-                  className="rounded-2xl border garis-halus bg-panel-2 p-3.5 text-left"
-                >
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl font-bold tabular-nums angka-tabular text-ink">
-                      {f.angka}
-                    </span>
-                    <span className="text-xs font-bold text-daun-700 dark:text-daun-300 uppercase">
-                      {f.unit}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 text-xs text-muted">{f.label}</p>
+      <section className={styles.features} aria-labelledby="judul-fitur">
+        <div className={styles.featureIntro}>
+          <div><p className={styles.kicker}>Lebih dekat. Lebih jelas.</p><h2 id="judul-fitur">Kepedulian, bertemu tindakan.</h2></div>
+          <Link href="/peta" className={styles.secondaryLink}>Temukan di sekitarmu <ArrowUpRight size={18} aria-hidden="true" /></Link>
+        </div>
+        <div className={styles.featureGrid}>
+          <Terungkap className={styles.featureLarge}>
+            <div className={styles.featureText}>
+              <span className={styles.featureIcon}><MapPin size={24} strokeWidth={1.5} aria-hidden="true" /></span>
+              <h3>Masalahnya dekat.<br />Solusinya dimulai di sini.</h3>
+              <p>Dari sampah menumpuk hingga lampu jalan mati. Temukan laporan berdasarkan kategori dan lokasi di peta.</p>
+            </div>
+            <div className={styles.categories}>
+              {KATEGORI.map((k) => (
+                <div key={k.slug} className={styles.category}>
+                  <span className={styles.categoryIcon}><IkonKategori slug={k.slug} ukuran={21} /></span>
+                  <span>{k.nama}</span>
+                  <span className={styles.categoryCount}>{kategoriGagal ? "—" : (hitungKategori.get(k.slug) ?? 0).toLocaleString("id-ID")}</span>
                 </div>
               ))}
             </div>
-          </div>
+            <Link href="/peta" className={styles.featureLink}>Buka peta laporan <ArrowRight size={18} aria-hidden="true" /></Link>
+          </Terungkap>
+          <Terungkap className={styles.featureSmall} tunda={0.08}>
+            <span className={styles.featureIcon}><ScanLine size={24} strokeWidth={1.5} aria-hidden="true" /></span>
+            <h3>Bukan sekadar<br />berganti status.</h3>
+            <p>Penanganan menyertakan foto bukti. Status selesai membutuhkan konfirmasi warga.</p>
+            <div className={styles.verification}>
+              <span className={styles.checkIcon}><Check size={26} aria-hidden="true" /></span>
+              <div><strong>Bukti yang bisa dilihat.</strong><span>Proses yang bisa diikuti.</span></div>
+            </div>
+            <Link href="/laporan-saya" className={styles.featureLink}>Ikuti laporanmu <ArrowRight size={18} aria-hidden="true" /></Link>
+          </Terungkap>
+          <Terungkap className={styles.featureSmall} tunda={0.12}>
+            <span className={styles.featureIcon}><ShieldCheck size={24} strokeWidth={1.5} aria-hidden="true" /></span>
+            <h3>Terbuka untuk<br />semua warga.</h3>
+            <p>Lihat target penanganan, laporan yang terlambat, dan hasil kerja dewan dalam satu halaman transparansi.</p>
+            <Link href="/transparansi" className={styles.featureLink}>Lihat transparansi <ArrowRight size={18} aria-hidden="true" /></Link>
+          </Terungkap>
         </div>
       </section>
 
-      {/* Banner Call to Action */}
-      <section className="mx-auto max-w-6xl px-4 pb-24">
-        <Terungkap>
-          <div className="relative overflow-hidden rounded-2xl bg-daun-700 p-10 text-center text-white sm:p-16 shadow-2xl">
-            <h2 className="font-serif text-3xl font-semibold sm:text-4xl">
-              Lingkunganmu Menunggu Tindakan Nyata.
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-white/85 text-base sm:text-lg teks-pretty">
-              Butuh 30 detik untuk menandai masalah di peta. Penanganannya tercatat dan dipantau bersama seluruh warga.
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center items-center gap-3">
-              <Link href="/peta" className="group inline-flex">
-                <span className="inline-flex items-center gap-3 rounded-full bg-white py-3 pl-8 pr-3 text-base font-bold text-daun-800 transition-all hover:bg-daun-50 active:scale-[0.98] shadow-lg">
-                  Buka Peta Interaktif
-                  <span className="flex size-8 items-center justify-center rounded-full bg-daun-600/15 transition-transform group-hover:translate-x-0.5">
-                    <ArrowRight size={16} strokeWidth={2.2} className="text-daun-700" />
-                  </span>
-                </span>
-              </Link>
-            </div>
-          </div>
-        </Terungkap>
+      <section className={styles.community} aria-labelledby="judul-komunitas">
+        <div className={styles.communityPhoto}>
+          <Image src="/images/lingkungan-permukiman.jpg" alt="Suasana jalan permukiman dengan pepohonan, rumah, dan aktivitas warga" fill sizes="(max-width: 760px) 100vw, 55vw" className="object-cover" />
+          <span className={styles.photoCaption}>Lingkungan yang kita rawat bersama.</span>
+        </div>
+        <div className={styles.communityCopy}>
+          <p className={styles.kicker}>Rumah. Jalan. Lingkungan kita.</p>
+          <h2>Tempat tinggal.<br /><span>Tempat kita peduli.</span></h2>
+          <p>Jalan yang kita lewati setiap hari. Saluran air di depan rumah. Ruang hijau tempat anak bermain. Semua berawal dari perhatian orang-orang di sekitarnya.</p>
+          <Link href="/papan-skor" className={styles.secondaryLink}>Kenali kontribusi warga <ArrowUpRight size={18} aria-hidden="true" /></Link>
+          <span className={styles.sdg}><span aria-hidden="true">11</span> Kota dan permukiman berkelanjutan</span>
+        </div>
+        <div className={styles.buktiStrip} aria-label="Didokumentasikan warga">
+          <figure className={styles.buktiItem}>
+            <Image src="/images/gotong-royong.jpg" alt="Warga bergotong royong membersihkan lingkungan" fill sizes="(max-width: 760px) 100vw, 40vw" className="object-cover" loading="lazy" />
+            <figcaption>Gotong royong warga</figcaption>
+          </figure>
+          <figure className={styles.buktiItem}>
+            <Image src="/images/kota-sdg11.jpg" alt="Koridor kota dengan ruang hijau dan transportasi publik" fill sizes="(max-width: 760px) 100vw, 40vw" className="object-cover" loading="lazy" />
+            <figcaption>Kota yang kita tuju</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section className={styles.closing} aria-labelledby="judul-mulai">
+        <span className={styles.appIcon}><MapPin size={37} strokeWidth={1.6} aria-hidden="true" /></span>
+        <h2 id="judul-mulai">Ada yang perlu<br /><span>kita bereskan?</span></h2>
+        <p>Mulai dari satu titik. Mulai dari lingkunganmu.</p>
+        <div className={styles.actions}>
+          <Link href="/peta?lapor=1" className={styles.primaryLink}>Buat laporan <ArrowUpRight size={18} aria-hidden="true" /></Link>
+          <Link href="/daftar" className={styles.secondaryLink}>Bergabung sebagai warga <ChevronRight size={17} aria-hidden="true" /></Link>
+        </div>
       </section>
     </main>
   );

@@ -3,22 +3,29 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  color-scheme: light dark;
-  --paper: #f6f4ef;
+  color-scheme: light;
+  --paper: #f5f5f7;
   --panel: #ffffff;
-  --panel-2: #fbfaf7;
-  --ink: #1a2420;
-  --muted: #5c6b64;
-  --line: #e5e1d8;
+  --panel-2: #eeeef1;
+  --ink: #1d1d1f;
+  --muted: #64646b;
+  --line: #dedee3;
+  --action: #0066cc;
+  --action-hover: #0055ad;
+  --action-soft: #eaf3ff;
 }
 
 .dark {
-  --paper: #0c1310;
-  --panel: #131d19;
-  --panel-2: #17241f;
-  --ink: #ecf2ee;
-  --muted: #93a39b;
-  --line: #24312b;
+  color-scheme: dark;
+  --paper: #111113;
+  --panel: #1c1c1f;
+  --panel-2: #252529;
+  --ink: #f5f5f7;
+  --muted: #a1a1a9;
+  --line: #35353b;
+  --action: #80baff;
+  --action-hover: #a3ceff;
+  --action-soft: #172c46;
 }
 
 @theme inline {
@@ -28,6 +35,9 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-action: var(--action);
+  --color-action-hover: var(--action-hover);
+  --color-action-soft: var(--action-soft);
 
   --color-daun-50: #f0f9f1;
   --color-daun-100: #dcf3e0;
@@ -51,7 +61,7 @@
   --color-danger: #dc2626;
   --color-sdg11: #fd9d24;
 
-  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-display: var(--font-poppins), sans-serif;
   --font-sans: var(--font-poppins), sans-serif;
   --font-serif: var(--font-fraunces), Georgia, serif;
 
@@ -126,12 +136,12 @@ h3 {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-daun-600);
+  outline: 2px solid var(--action);
   outline-offset: 2px;
 }
 
 .dark :focus-visible {
-  outline-color: var(--color-daun-300);
+  outline-color: var(--action);
 }
 
 .angka-tabular {
@@ -205,14 +215,14 @@ img.foto-laporan {
   top: 12px;
   padding: 8px 16px;
   border-radius: 999px;
-  background: var(--color-daun-700);
+  background: var(--action);
   color: white;
   font-size: 13px;
   font-weight: 600;
 }
 
 ::selection {
-  background: var(--color-daun-500);
+  background: var(--action);
   color: white;
 }
 

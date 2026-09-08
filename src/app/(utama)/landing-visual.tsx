@@ -2,55 +2,16 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
-import { STATUS, type StatusKey } from "@/lib/constants";
+import { kategoriBySlug, STATUS, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { ArrowRight, ExternalLink, MapPin, X } from "lucide-react";
+import { ArrowUpRight, Check, ChevronRight, Map, MapPin, Radio } from "lucide-react";
+import styles from "./landing-visual.module.css";
 
 export function AngkaHidup({ nilai }: { nilai: number }) {
-  const [tampil, setTampil] = useState(nilai);
-  const [prevNilai, setPrevNilai] = useState(nilai);
-  if (nilai !== prevNilai) {
-    setPrevNilai(nilai);
-    setTampil(nilai);
-  }
-
-  useEffect(() => {
-    if (nilai <= 0) {
-      return;
-    }
-    if (
-      typeof window !== "undefined" &&
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return;
-    }
-    const mulai = performance.now();
-    const durasi = 800;
-    let raf = 0;
-
-    function tick(sekarang: number) {
-      const p = Math.min(1, (sekarang - mulai) / durasi);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setTampil(Math.round(eased * nilai));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    }
-
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [nilai]);
-
-  return (
-    <span
-      className="angka-tabular inline-block tabular-nums"
-      style={{ minWidth: `${String(nilai).length}ch` }}
-    >
-      {tampil.toLocaleString("id-ID")}
-    </span>
-  );
+  return <span className="angka-tabular tabular-nums">{nilai.toLocaleString("id-ID")}</span>;
 }
 
 export function Terungkap({
@@ -62,13 +23,15 @@ export function Terungkap({
   tunda?: number;
   className?: string;
 }) {
+  const kurangiGerak = useReducedMotion();
+
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 24, filter: "blur(4px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, delay: tunda, ease: [0.32, 0.72, 0, 1] }}
+      initial={false}
+      whileInView={kurangiGerak ? undefined : { y: [12, 0] }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.65, delay: tunda, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
@@ -90,25 +53,23 @@ const LeafletMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full w-full items-center justify-center bg-panel-2 text-xs text-muted">
-        <span className="flex items-center gap-2 font-medium">
-          <span className="size-2 animate-ping rounded-full bg-daun-500" />
-          Memuat peta wilayah…
-        </span>
+      <div className={styles.mapLoading} role="status">
+        <Map size={30} strokeWidth={1.4} aria-hidden="true" />
+        <span>Menyiapkan peta lingkungan…</span>
       </div>
     ),
   }
 );
 
-const FALLBACK_TITIK: TitikHero[] = [
+const CONTOH_TITIK: TitikHero[] = [
   {
     id: "demo-1",
     lat: -6.2088,
     lng: 106.8456,
     warna: "#65a30d",
     slug: "sampah",
-    judul: "Sampah Liar Depan Pasar RT 03",
-    status: "menunggu_verifikasi",
+    judul: "Sampah menumpuk di depan pasar",
+    status: "diverifikasi",
   },
   {
     id: "demo-2",
@@ -116,16 +77,16 @@ const FALLBACK_TITIK: TitikHero[] = [
     lng: 106.849,
     warna: "#0284c7",
     slug: "drainase",
-    judul: "Got Tersumbat Sedimen Tebal",
+    judul: "Saluran air perlu dibersihkan",
     status: "dikerjakan",
   },
   {
     id: "demo-3",
     lat: -6.205,
     lng: 106.842,
-    warna: "#f59e0b",
+    warna: "#b45309",
     slug: "lampu",
-    judul: "PJU Padam Tikungan Utama",
+    judul: "Lampu jalan kembali menyala",
     status: "selesai",
   },
   {
@@ -134,197 +95,202 @@ const FALLBACK_TITIK: TitikHero[] = [
     lng: 106.841,
     warna: "#78716c",
     slug: "jalan",
-    judul: "Lubang Ambles 80cm",
-    status: "diverifikasi",
+    judul: "Jalan berlubang di persimpangan",
+    status: "baru",
   },
 ];
 
-export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
-  const [titik, setTitik] = useState<TitikHero[]>(
-    awalTitik && awalTitik.length > 0 ? awalTitik : FALLBACK_TITIK
-  );
-  const [terpilihId, setTerpilihId] = useState<string | null>(null);
+const ADA_KONFIGURASI = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
-  // Sinkronisasi realtime dari Supabase
+type BarisLaporan = {
+  id: string;
+  lat: number | string;
+  lng: number | string;
+  judul: string;
+  status: string;
+  categories: { slug: string; warna: string } | null;
+};
+
+function titikValid(titik: TitikHero) {
+  return Number.isFinite(titik.lat) && Number.isFinite(titik.lng) &&
+    Math.abs(titik.lat) <= 90 && Math.abs(titik.lng) <= 180;
+}
+
+function warnaKategori(warna: string): CSSProperties {
+  return { "--category-color": /^#[0-9a-f]{6}$/i.test(warna) ? warna : "#64748b" } as CSSProperties;
+}
+
+export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
+  const [laporan, setLaporan] = useState<TitikHero[]>(() => (awalTitik ?? []).filter(titikValid));
+  const [terpilihId, setTerpilihId] = useState<string | null>(null);
+  const [koneksi, setKoneksi] = useState<"menghubungkan" | "terhubung" | "tertunda">("menghubungkan");
+  const [gagalMemuat, setGagalMemuat] = useState(false);
+  const contoh = laporan.length === 0;
+  const titik = contoh ? CONTOH_TITIK : laporan;
+  const terpilih = titik.find((item) => item.id === terpilihId) ?? titik[0];
+  const statusInfo = terpilih.status ? STATUS[terpilih.status as StatusKey] : undefined;
+  const pusat = useMemo<[number, number]>(() => [terpilih.lat, terpilih.lng], [terpilih.lat, terpilih.lng]);
+
   useEffect(() => {
+    if (!ADA_KONFIGURASI) return;
+
+    let aktif = true;
+    let urutan = 0;
+    const controller = new AbortController();
     const supabase = createClient();
-    if (!supabase) return;
+
+    async function muatLaporan() {
+      const permintaan = ++urutan;
+      try {
+        const { data, error } = await supabase
+          .from("reports")
+          .select("id, judul, lat, lng, status, categories(slug, warna)")
+          .not("lat", "is", null)
+          .not("lng", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(30)
+          .abortSignal(controller.signal);
+
+        if (!aktif || permintaan !== urutan) return;
+        if (error) {
+          setGagalMemuat(true);
+          return;
+        }
+        const hasil = (data as unknown as BarisLaporan[]).map((baris) => ({
+          id: baris.id,
+          judul: baris.judul,
+          lat: Number(baris.lat),
+          lng: Number(baris.lng),
+          status: baris.status,
+          slug: baris.categories?.slug ?? "lainnya",
+          warna: baris.categories?.warna ?? "#64748b",
+        })).filter(titikValid);
+        setLaporan(hasil);
+        setGagalMemuat(false);
+      } catch {
+        if (aktif && permintaan === urutan) setGagalMemuat(true);
+      }
+    }
 
     const channel = supabase
       .channel("hero-reports-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "reports" },
-        async () => {
-          try {
-            const { data } = await supabase
-              .from("reports")
-              .select("id, judul, lat, lng, status, categories(slug, nama, warna)")
-              .not("lat", "is", null)
-              .not("lng", "is", null)
-              .order("created_at", { ascending: false })
-              .limit(30);
-
-            if (data && data.length > 0) {
-              const hasil: TitikHero[] = (data as unknown as {
-                id: string;
-                lat: number | string;
-                lng: number | string;
-                judul: string;
-                status: string;
-                categories: { slug: string; nama: string; warna: string } | null;
-              }[]).map((r) => ({
-                id: r.id,
-                lat: Number(r.lat),
-                lng: Number(r.lng),
-                warna: r.categories?.warna ?? "#2e9e57",
-                slug: r.categories?.slug ?? "sampah",
-                judul: r.judul,
-                status: r.status,
-              }));
-              setTitik(hasil);
-            }
-          } catch {
-            /* pertahankan data lokal */
-          }
+      .on("postgres_changes", { event: "*", schema: "public", table: "reports" }, () => {
+        void muatLaporan();
+      })
+      .subscribe((status) => {
+        if (!aktif) return;
+        if (status === "SUBSCRIBED") {
+          setKoneksi("terhubung");
+          void muatLaporan();
+        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          setKoneksi("tertunda");
         }
-      )
-      .subscribe();
+      });
 
+    void muatLaporan();
     return () => {
-      supabase.removeChannel(channel);
+      aktif = false;
+      controller.abort();
+      void supabase.removeChannel(channel);
     };
   }, []);
 
-  const laporanTerpilih =
-    titik.find((t) => t.id === terpilihId) ?? (terpilihId === null ? titik[0] : null);
-
-  const statusInfo = laporanTerpilih?.status
-    ? STATUS[laporanTerpilih.status as StatusKey]
-    : null;
+  const statusKoneksi = contoh
+    ? "Pratinjau demo"
+    : !ADA_KONFIGURASI
+      ? "Data tersimpan"
+      : gagalMemuat || koneksi === "tertunda"
+        ? "Pembaruan tertunda"
+        : koneksi === "terhubung"
+          ? "Pembaruan langsung"
+          : "Menghubungkan…";
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border garis-halus bg-panel p-2 shadow-2xl">
-      {/* Top Bar Status */}
-      <div className="flex items-center justify-between gap-2 border-b garis-halus bg-panel-2/90 px-4 py-2.5 rounded-t-xl text-xs">
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-daun-400 opacity-75" />
-            <span className="relative inline-flex size-2 rounded-full bg-daun-500" />
-          </span>
-          <span className="truncate font-semibold text-ink tracking-tight">
-            Peta wilayah
+    <div className={styles.showcase}>
+      <div className={styles.window}>
+        <div className={styles.titlebar}>
+          <div className={styles.trafficLights} aria-hidden="true"><i /><i /><i /></div>
+          <span className={styles.windowTitle}><Map size={14} aria-hidden="true" /> SIGAP · Peta lingkungan</span>
+          <span className={styles.connection} data-live={!contoh && !gagalMemuat && koneksi === "terhubung"} role="status">
+            <span />{statusKoneksi}
           </span>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <span className="rounded-full bg-daun-500/10 px-2.5 py-0.5 text-[11px] font-bold tabular-nums angka-tabular text-daun-700 dark:text-daun-300">
-            {titik.length} laporan aktif
-          </span>
-          <span className="hidden sm:inline text-[11px] text-muted">· Realtime</span>
-        </div>
-      </div>
 
-      {/* Area Peta Nyata Leaflet */}
-      <div className="relative h-[380px] w-full overflow-hidden rounded-xl bg-panel-2">
-        <LeafletMap
-          titik={titik}
-          terpilih={terpilihId}
-          onKlikTitik={(id) => setTerpilihId(id)}
-          zoom={14}
-          pusat={
-            titik.length > 0
-              ? [titik[0].lat, titik[0].lng]
-              : [-6.2088, 106.8456]
-          }
-          className="h-full w-full"
-        />
+        <div className={styles.workspace}>
+          <aside className={styles.sidebar} aria-label="Daftar laporan pada peta">
+            <div className={styles.sidebarHeading}>
+              <span className={styles.appIcon}><MapPin size={21} strokeWidth={2.1} aria-hidden="true" /></span>
+              <div><p className={styles.eyebrow}>LINGKUNGAN KITA</p><h3>Setiap titik, berarti.</h3></div>
+            </div>
+            <div className={styles.listHeading}>
+              <span>{contoh ? "Contoh laporan" : "Laporan terbaru"}</span>
+              <span className={styles.count}>{titik.length}</span>
+            </div>
+            <ul className={styles.reportList}>
+              {titik.map((item) => {
+                const status = item.status ? STATUS[item.status as StatusKey] : undefined;
+                return (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      className={styles.reportButton}
+                      aria-pressed={item.id === terpilih.id}
+                      onClick={() => setTerpilihId(item.id)}
+                      style={warnaKategori(item.warna)}
+                    >
+                      <span className={styles.categoryIcon}><IkonKategori slug={item.slug} ukuran={17} /></span>
+                      <span className={styles.reportCopy}><strong>{item.judul}</strong><span>{status?.label ?? "Status belum tersedia"}</span></span>
+                      <ChevronRight className={styles.reportArrow} size={14} aria-hidden="true" />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className={styles.mobileSelector}>
+              <label htmlFor="hero-pilih-laporan">{contoh ? "Pilih contoh laporan" : "Pilih laporan"}</label>
+              <select id="hero-pilih-laporan" value={terpilih.id} onChange={(event) => setTerpilihId(event.target.value)}>
+                {titik.map((item) => <option value={item.id} key={item.id}>{item.judul}</option>)}
+              </select>
+            </div>
+            <p className={styles.sidebarNote}>
+              <Radio size={15} aria-hidden="true" />
+              {contoh ? "Data contoh untuk menjelajahi SIGAP." : "Pilih laporan untuk melihat lokasinya."}
+            </p>
+          </aside>
 
-        {/* Floating Dossier Card saat pin diklik / dipilih */}
-        <AnimatePresence>
-          {laporanTerpilih && (
-            <motion.div
-              key={laporanTerpilih.id}
-              initial={{ opacity: 0, y: 14, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.96 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="absolute bottom-3 left-3 right-3 sm:left-auto sm:right-3 sm:w-80 z-[1000] rounded-2xl border garis-halus bg-panel/95 p-3.5 shadow-2xl backdrop-blur-md"
-            >
-              <div className="flex items-start justify-between gap-2 border-b garis-halus pb-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span
-                    className="flex size-7 shrink-0 items-center justify-center rounded-lg"
-                    style={{
-                      backgroundColor: `${laporanTerpilih.warna}20`,
-                      color: laporanTerpilih.warna,
-                    }}
-                  >
-                    <IkonKategori slug={laporanTerpilih.slug} ukuran={14} />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-ink truncate">
-                      {laporanTerpilih.judul}
-                    </p>
-                    <p className="text-[10px] text-muted capitalize">
-                      Kategori: {laporanTerpilih.slug.replace("-", " ")}
-                    </p>
-                  </div>
-                </div>
-                {terpilihId && (
-                  <button
-                    onClick={() => setTerpilihId(null)}
-                    className="rounded-full p-1 text-muted hover:bg-panel-2 hover:text-ink transition"
-                    aria-label="Tutup"
-                  >
-                    <X size={13} />
-                  </button>
-                )}
+          <div className={styles.mapArea}>
+            <LeafletMap titik={titik} terpilih={terpilih.id} onKlikTitik={setTerpilihId} pusat={pusat} zoom={14} className={styles.mapCanvas} />
+            <div className={styles.mapLabel}><span />{contoh ? "Peta contoh · Jakarta" : "Peta laporan warga"}</div>
+            <article className={styles.dossier} aria-live="polite" aria-atomic="true">
+              <div className={styles.dossierHeading}>
+                <span className={styles.dossierCategory} style={warnaKategori(terpilih.warna)}>
+                  <IkonKategori slug={terpilih.slug} ukuran={18} />
+                </span>
+                <span className={styles.dossierEyebrow}>{contoh ? "CONTOH LAPORAN" : "LAPORAN WARGA"}</span>
+                {statusInfo?.label === "Selesai" && <span className={styles.completed}><Check size={13} aria-label="Selesai" /></span>}
               </div>
-
-              <div className="mt-2.5 flex items-center justify-between">
-                {statusInfo ? (
-                  <span
-                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold"
-                    style={{
-                      backgroundColor: `${statusInfo.warna}18`,
-                      color: statusInfo.warna,
-                    }}
-                  >
-                    <span
-                      className="size-1.5 rounded-full"
-                      style={{ backgroundColor: statusInfo.warna }}
-                    />
-                    {statusInfo.label}
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-muted">Terpantau</span>
-                )}
-
-                <Link
-                  href={`/laporan/${laporanTerpilih.id}`}
-                  className="inline-flex shrink-0 items-center gap-1 text-[11px] font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300 dark:hover:text-daun-200 transition"
-                >
-                  Lihat detail <ArrowRight size={12} />
+              <h4>{terpilih.judul}</h4>
+              <p className={styles.dossierMeta}>{kategoriBySlug(terpilih.slug).nama}</p>
+              <div className={styles.dossierBottom}>
+                <span className={styles.statusBadge}>
+                  <span style={{ backgroundColor: statusInfo?.warna ?? "#64748b" }} />
+                  {statusInfo?.label ?? "Status belum tersedia"}
+                </span>
+                <Link href={contoh ? "/peta" : `/laporan/${terpilih.id}`} className={styles.detailLink}>
+                  {contoh ? "Jelajahi peta" : "Lihat detail"}<ArrowUpRight size={15} aria-hidden="true" />
                 </Link>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </article>
+          </div>
+        </div>
+        <div className={styles.statusbar}>
+          <span><MapPin size={13} aria-hidden="true" />{contoh ? "Data demo, bukan laporan warga." : "Lokasi dan status dalam satu pandangan."}</span>
+          <Link href="/peta">Buka peta lengkap <ArrowUpRight size={13} aria-hidden="true" /></Link>
+        </div>
       </div>
-
-      {/* Bottom Bar Controls & Navigation */}
-      <div className="flex items-center justify-between gap-2 border-t garis-halus bg-panel-2/80 px-4 py-2.5 rounded-b-xl text-xs">
-        <span className="flex min-w-0 items-center gap-1.5 text-[11px] text-muted">
-          <MapPin size={13} className="shrink-0 text-daun-600 dark:text-daun-400" />
-          <span className="truncate">Pilih pin untuk melihat status laporan di sekitarmu</span>
-        </span>
-        <Link
-          href="/peta"
-          className="inline-flex shrink-0 items-center gap-1 font-bold text-daun-700 hover:text-daun-800 dark:text-daun-300 dark:hover:text-daun-200 text-[11px] transition"
-        >
-          Lihat peta lengkap <ExternalLink size={12} />
-        </Link>
-      </div>
+      <p className={styles.caption}>Ini peta interaktif. Coba pilih salah satu laporan.</p>
     </div>
   );
 }
