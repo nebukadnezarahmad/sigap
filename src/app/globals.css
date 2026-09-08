@@ -3,22 +3,52 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  color-scheme: light dark;
-  --paper: #f6f4ef;
-  --panel: #ffffff;
-  --panel-2: #fbfaf7;
-  --ink: #1a2420;
-  --muted: #5c6b64;
-  --line: #e5e1d8;
+  color-scheme: light;
+  --ap-canvas: #ffffff;
+  --ap-panel: #f5f5f7;
+  --ap-elevated: #fafafc;
+  --ap-ink: #1d1d1f;
+  --ap-ink-muted: #6e6e73;
+  --ap-hairline: #e0e0e0;
+  --ap-blue: #0066cc;
+  --ap-blue-focus: #0071e3;
+  --ap-sky: #2997ff;
+  --ap-success: #237f45;
+  --ap-warning: #b45309;
+  --ap-danger: #dc2626;
+  --ap-info: #0284c7;
+
+  /* Legacy aliases keep untouched domain widgets on the same surfaces. */
+  --paper: var(--ap-canvas);
+  --panel: var(--ap-panel);
+  --panel-2: var(--ap-elevated);
+  --ink: var(--ap-ink);
+  --muted: var(--ap-ink-muted);
+  --line: var(--ap-hairline);
 }
 
 .dark {
-  --paper: #0c1310;
-  --panel: #131d19;
-  --panel-2: #17241f;
-  --ink: #ecf2ee;
-  --muted: #93a39b;
-  --line: #24312b;
+  color-scheme: dark;
+  --ap-canvas: #1d1d1f;
+  --ap-panel: #272729;
+  --ap-elevated: #2a2a2c;
+  --ap-ink: #f5f5f7;
+  --ap-ink-muted: #a1a1a6;
+  --ap-hairline: #424245;
+  --ap-blue: #0066cc;
+  --ap-blue-focus: #0071e3;
+  --ap-sky: #2997ff;
+  --ap-success: #8ad5a0;
+  --ap-warning: #fbbf24;
+  --ap-danger: #f87171;
+  --ap-info: #38bdf8;
+
+  --paper: var(--ap-canvas);
+  --panel: var(--ap-panel);
+  --panel-2: var(--ap-elevated);
+  --ink: var(--ap-ink);
+  --muted: var(--ap-ink-muted);
+  --line: var(--ap-hairline);
 }
 
 @theme inline {
@@ -28,6 +58,19 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-ap-canvas: var(--ap-canvas);
+  --color-ap-panel: var(--ap-panel);
+  --color-ap-elevated: var(--ap-elevated);
+  --color-ap-ink: var(--ap-ink);
+  --color-ap-ink-muted: var(--ap-ink-muted);
+  --color-ap-hairline: var(--ap-hairline);
+  --color-ap-blue: var(--ap-blue);
+  --color-ap-blue-focus: var(--ap-blue-focus);
+  --color-ap-sky: var(--ap-sky);
+  --color-ap-success: var(--ap-success);
+  --color-ap-warning: var(--ap-warning);
+  --color-ap-danger: var(--ap-danger);
+  --color-ap-info: var(--ap-info);
 
   --color-daun-50: #f0f9f1;
   --color-daun-100: #dcf3e0;
@@ -80,27 +123,24 @@
   }
 }
 
-/* Eksperimen visual-fusion: token Apple berprefix ap- (ADDITIVE, token lama tidak diubah) */
+/* Product imagery is the only surface that uses the signature shadow. */
 @theme {
-  --color-ap-blue: #0066cc;
-  --color-ap-blue-focus: #0071e3;
-  --color-ap-sky: #2997ff;
-  --color-ap-ink: #1d1d1f;
   --color-ap-parchment: #f5f5f7;
   --color-ap-pearl: #fafafc;
   --color-ap-tile1: #272729;
   --color-ap-tile2: #2a2a2c;
-  --color-ap-hairline: #e0e0e0;
   --shadow-ap-shadow: rgba(0, 0, 0, 0.22) 3px 5px 30px;
 }
 
 body {
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--ap-canvas);
+  color: var(--ap-ink);
 }
 
 html {
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #isi-utama {
@@ -111,6 +151,13 @@ h1,
 h2,
 h3 {
   text-wrap: balance;
+}
+
+p,
+li,
+blockquote,
+figcaption {
+  text-wrap: pretty;
 }
 
 h1 {
@@ -140,12 +187,12 @@ h3 {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-daun-600);
+  outline: 2px solid var(--ap-blue-focus);
   outline-offset: 2px;
 }
 
 .dark :focus-visible {
-  outline-color: var(--color-daun-300);
+  outline-color: var(--ap-blue-focus);
 }
 
 .angka-tabular {
@@ -156,13 +203,9 @@ h3 {
   text-wrap: pretty;
 }
 
-img.foto-laporan {
-  outline: 1px solid rgb(0 0 0 / 0.08);
+img {
+  outline: 1px solid var(--ap-hairline);
   outline-offset: -1px;
-}
-
-.dark img.foto-laporan {
-  outline-color: rgb(255 255 255 / 0.1);
 }
 
 .bayi-daun {
@@ -222,14 +265,14 @@ img.foto-laporan {
   top: 12px;
   padding: 8px 16px;
   border-radius: 999px;
-  background: var(--color-daun-700);
+  background: var(--ap-blue);
   color: white;
   font-size: 13px;
   font-weight: 600;
 }
 
 ::selection {
-  background: var(--color-daun-500);
+  background: var(--ap-blue);
   color: white;
 }
 
@@ -292,8 +335,8 @@ img.foto-laporan {
 /* Safe-area poni (R-03, misi R-21): layout memakai viewport-fit=cover
    sehingga viewport membentang ke bawah poni. env() bernilai 0 di perangkat
    tanpa poni, jadi aturan ini tanpa efek di desktop. Atas ditangani bar
-   lengket header, kiri/kanan/bawah ditangani di sini. color-scheme: light
-   dark sudah dideklarasikan di :root di atas dan dipertahankan. */
+   lengket header, kiri/kanan/bawah ditangani di sini. color-scheme terang/gelap
+   dideklarasikan pada :root dan .dark di atas. */
 body {
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);

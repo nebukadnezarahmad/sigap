@@ -13,17 +13,18 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
+        "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full font-semibold transition-[transform,background-color,border-color,color,opacity] duration-200 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus disabled:pointer-events-none disabled:opacity-50 active:scale-[0.95] motion-reduce:transition-none motion-reduce:active:scale-100",
         size === "sm" && "px-3.5 py-1.5 text-sm",
         size === "md" && "px-5 py-2.5 text-sm",
         size === "lg" && "px-7 py-3 text-base",
         variant === "utama" &&
-          "bg-daun-600 text-white shadow-[0_1px_2px_rgb(23_67_42/0.2),0_6px_16px_-6px_rgb(23_67_42/0.35)] hover:bg-daun-700 hover:shadow-[0_2px_4px_rgb(23_67_42/0.2),0_10px_24px_-6px_rgb(23_67_42/0.4)]",
+          "bg-ap-blue text-white hover:bg-ap-blue-focus",
         variant === "sekunder" &&
-          "border garis-halus bg-panel text-ink hover:border-daun-400 hover:text-daun-700 dark:hover:text-daun-300",
-        variant === "hantu" && "text-muted hover:bg-panel-2 hover:text-ink",
+          "border border-ap-hairline bg-ap-canvas text-ap-ink hover:border-ap-blue hover:text-ap-blue",
+        variant === "hantu" &&
+          "text-ap-ink-muted hover:bg-ap-elevated hover:text-ap-ink",
         variant === "bahaya" &&
-          "bg-danger/10 text-danger hover:bg-danger hover:text-white",
+          "bg-ap-danger/10 text-ap-danger hover:bg-ap-danger hover:text-white",
         className
       )}
       {...props}
@@ -42,7 +43,7 @@ export function Card({
   void _varian;
   return (
     <div
-      className={cn("rounded-xl border garis-halus bg-panel", className)}
+      className={cn("rounded-xl border border-ap-hairline bg-ap-panel", className)}
       {...props}
     />
   );
@@ -55,7 +56,7 @@ export function Input({
   return (
     <input
       className={cn(
-        "w-full rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+        "min-h-[44px] w-full rounded-xl border border-ap-hairline bg-ap-canvas px-3.5 py-2.5 text-sm text-ap-ink outline-none transition-[background-color,border-color,box-shadow,color] duration-200 ease-out placeholder:text-ap-ink-muted/70 focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus motion-reduce:transition-none",
         className
       )}
       {...props}
@@ -70,7 +71,7 @@ export function Textarea({
   return (
     <textarea
       className={cn(
-        "w-full rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+        "min-h-[44px] w-full rounded-xl border border-ap-hairline bg-ap-canvas px-3.5 py-2.5 text-sm text-ap-ink outline-none transition-[background-color,border-color,box-shadow,color] duration-200 ease-out placeholder:text-ap-ink-muted/70 focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus motion-reduce:transition-none",
         className
       )}
       {...props}
@@ -86,7 +87,7 @@ export function Select({
   return (
     <select
       className={cn(
-        "w-full appearance-none rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+        "min-h-[44px] w-full appearance-none rounded-xl border border-ap-hairline bg-ap-canvas px-3.5 py-2.5 text-sm text-ap-ink outline-none transition-[background-color,border-color,box-shadow,color] duration-200 ease-out focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus motion-reduce:transition-none",
         className
       )}
       {...props}
@@ -151,7 +152,7 @@ export function Avatar({
   return (
     <span
       aria-hidden
-      className="flex shrink-0 items-center justify-center rounded-full bg-daun-600 font-display font-bold text-white"
+      className="flex shrink-0 items-center justify-center rounded-full bg-ap-blue font-display font-bold text-white"
       style={{ width: ukuran, height: ukuran, fontSize: ukuran * 0.38 }}
     >
       {inisial(nama || "?")}
@@ -163,7 +164,7 @@ export function Skeleton({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "animate-pulse rounded-xl bg-line/60 dark:bg-line",
+        "animate-pulse rounded-xl bg-ap-hairline/60 motion-reduce:animate-none",
         className
       )}
     />

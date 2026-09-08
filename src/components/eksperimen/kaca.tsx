@@ -5,16 +5,8 @@ import type {
 } from "react";
 import { cn } from "@/lib/utils";
 
-// Pola meniru liquid-glass-js (container.js): kaca = snapshot buram di belakang
-// permukaan + tint + sorotan tepi. Di sini cukup CSS: backdrop-filter
-// blur(20px) saturate(180%), lapisan translucent, specular edge 1px
-// rgba(255,255,255,.35). Sengaja tanpa WebGL/canvas: murah, SSR-aman,
-// dan konsisten dengan token terang+gelap repo ini.
-// Prinsip pakai: hanya untuk bar interaktif/toolbar/kartu terapung,
-// bukan seluruh halaman. Tanpa animasi/shimmer sehingga aman untuk
-// prefers-reduced-motion (globals.css juga sudah menonaktifkan transisi
-// saat reduced-motion). Kontras: teks memakai text-ink di atas lapisan
-// translucent terang+gelap yang sudah diuji dua mode.
+// Glass is a deliberate accent for bars, toolbars, and selected floating
+// context. Solid tokenized surfaces remain the default for content cards.
 
 const FILTER_KACA: CSSProperties = {
   backdropFilter: "blur(20px) saturate(180%)",
@@ -23,7 +15,7 @@ const FILTER_KACA: CSSProperties = {
 
 const GAYA_SPEKULAR: CSSProperties = {
   boxShadow:
-    "inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(255, 255, 255, 0.08), 0 8px 24px -12px rgb(0 0 0 / 0.25)",
+    "inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(255, 255, 255, 0.08)",
 };
 
 type KacaBarProps = HTMLAttributes<HTMLElement> & {
@@ -39,10 +31,10 @@ export function KacaBar({
   const Tag = as as "div";
   return (
     <Tag
-      style={{ ...FILTER_KACA, ...GAYA_SPEKULAR, ...style }}
+      style={{ ...FILTER_KACA, ...style }}
       className={cn(
-        "sticky top-0 z-[900] border-b border-white/40 bg-paper/70 text-ink",
-        "dark:border-white/15 dark:bg-[#0c1310]/60",
+        "sticky top-0 z-[900] border-b border-ap-hairline bg-ap-panel/85 text-ap-ink",
+        "dark:border-white/15 dark:bg-ap-panel/85",
         "motion-reduce:transition-none",
         className
       )}
@@ -51,17 +43,27 @@ export function KacaBar({
   );
 }
 
+type KacaKartuProps = HTMLAttributes<HTMLDivElement> & {
+  glass?: boolean;
+};
+
 export function KacaKartu({
   className,
   style,
+  glass = false,
   ...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: KacaKartuProps) {
   return (
     <div
-      style={{ ...FILTER_KACA, ...GAYA_SPEKULAR, ...style }}
+      style={{
+        ...(glass ? FILTER_KACA : {}),
+        ...(glass ? GAYA_SPEKULAR : {}),
+        ...style,
+      }}
       className={cn(
-        "rounded-[18px] border border-white/40 bg-white/60 text-ink",
-        "dark:border-white/15 dark:bg-[#131d19]/55",
+        "rounded-[18px] border border-ap-hairline bg-ap-panel text-ap-ink",
+        glass &&
+          "border-white/40 bg-white/60 dark:border-white/15 dark:bg-ap-tile2/80",
         "motion-reduce:transition-none",
         className
       )}
@@ -83,14 +85,14 @@ export function KacaPill({
 }: KacaPillProps) {
   return (
     <button
-      style={{ ...FILTER_KACA, ...GAYA_SPEKULAR, ...style }}
+      style={{ ...FILTER_KACA, ...(berkilau ? GAYA_SPEKULAR : {}), ...style }}
       className={cn(
-        "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full",
-        "border border-white/40 bg-white/60 px-5 py-2.5 text-sm font-semibold text-ink",
-        "transition-[transform,background-color,border-color,box-shadow,color] duration-300",
-        "hover:bg-white/75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
-        "active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50",
-        "dark:border-white/15 dark:bg-white/10 dark:text-ink dark:hover:bg-white/15",
+        "relative inline-flex min-h-[44px] items-center justify-center gap-2 overflow-hidden rounded-full",
+        "border border-ap-hairline bg-ap-panel/80 px-5 py-2.5 text-sm font-semibold text-ap-ink",
+        "transition-[transform,background-color,border-color,box-shadow,color,opacity] duration-200 ease-out",
+        "hover:bg-ap-elevated focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus",
+        "active:scale-[0.95] disabled:pointer-events-none disabled:opacity-50",
+        "dark:border-white/15 dark:bg-ap-tile2/80 dark:text-ap-ink dark:hover:bg-ap-tile2",
         "motion-reduce:transition-none motion-reduce:active:scale-100",
         className
       )}

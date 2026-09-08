@@ -23,13 +23,13 @@ export default function LayoutUtama({
         <div id="isi-utama" tabIndex={-1}>
           {children}
         </div>
-        <footer className="mt-16 bg-[#f5f5f7] print:hidden">
-          <div className="mx-auto max-w-6xl px-4 py-16 text-muted">
+        <footer className="mt-16 bg-ap-panel text-ap-ink-muted print:hidden">
+          <div className="mx-auto max-w-6xl px-4 py-16">
             <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
               <p className="text-[14px] font-semibold leading-[1.29] tracking-[-0.224px]">
                 SIGAP{" "}
-                <span className="font-normal text-muted">
-                  — Lapor. Serentak. Selesai.
+                <span className="font-normal text-ap-ink-muted">
+                  : Lapor. Serentak. Selesai.
                 </span>
               </p>
               <nav
@@ -40,14 +40,14 @@ export default function LayoutUtama({
                   <Link
                     key={t.href}
                     href={t.href}
-                    className="inline-flex min-h-[44px] items-center text-[17px] leading-[2.41] transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+                    className="inline-flex min-h-[44px] items-center text-[17px] leading-[2.41] transition-[color,background-color] duration-200 hover:text-ap-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus motion-reduce:transition-none"
                   >
                     {t.label}
                   </Link>
                 ))}
               </nav>
             </div>
-            <p className="mt-8 border-t border-black/10 pt-4 text-xs leading-relaxed">
+            <p className="mt-8 border-t border-ap-hairline pt-4 text-xs leading-relaxed">
               Untuk Kota & Permukiman Berkelanjutan · SDG 11 · Infinitera 2.0
             </p>
           </div>
