@@ -229,6 +229,13 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
 
   // Sinkronisasi realtime dari Supabase
   useEffect(() => {
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      return;
+    }
+
     const supabase = createClient();
     if (!supabase) return;
 
