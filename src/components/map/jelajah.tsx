@@ -29,7 +29,7 @@ import {
   ThumbsUp,
   X,
 } from "lucide-react";
-import { waktuRelatif } from "@/lib/utils";
+import { formatBulan, waktuRelatif } from "@/lib/utils";
 import { StatusChip, Button, Card } from "@/components/ui";
 import { KacaBar, KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { Modal } from "@/components/modal";
@@ -56,7 +56,7 @@ const BULAN = (() => {
     d.setMonth(d.getMonth() + 1);
     d.setHours(0, 0, 0, 0);
     out.push({
-      label: d.toLocaleDateString("id-ID", { month: "short" }),
+      label: formatBulan(d),
       akhir: new Date(d.getTime() - 1).toISOString(),
     });
   }
@@ -311,7 +311,7 @@ export function Jelajah({
 
       {!dbAktif && (
         <div className="mb-4 flex min-w-0 items-start gap-2 rounded-[18px] border border-kunyit-500/40 bg-white px-4 py-3 text-sm text-kunyit-600 shadow-none dark:border-kunyit-500/40 dark:bg-ap-tile1 dark:text-white">
-          <WifiOff size={16} /> Database belum tersambung — atur env Supabase lalu
+            <WifiOff size={16} /> Database belum tersambung. Atur env Supabase lalu
           jalankan schema.sql (lihat README).
         </div>
       )}
@@ -856,7 +856,7 @@ export function Jelajah({
               <p className="text-sm text-muted">Jam: {fasTerpilih.jam_buka}</p>
             )}
             <p className="text-xs text-muted">
-              Lokasi titik perkiraan — konfirmasi ke pengelola sebelum berkunjung.
+              Lokasi titik perkiraan. Konfirmasi ke pengelola sebelum berkunjung.
             </p>
           </div>
         )}

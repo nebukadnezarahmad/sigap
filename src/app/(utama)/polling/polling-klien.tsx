@@ -251,7 +251,7 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
         {!masuk
           ? "Masuk untuk memberi suara."
           : sudahVote
-            ? "Terima kasih — suaramu tercatat."
+            ? "Terima kasih. Suaramu tercatat."
             : "Klik salah satu opsi untuk memberi suara."}
       </p>
     </div>

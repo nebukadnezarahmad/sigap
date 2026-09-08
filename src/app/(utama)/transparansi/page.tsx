@@ -16,7 +16,7 @@ import { IkonKategori } from "@/lib/ikon-vektor";
 import { StatusChip, Button, Skeleton } from "@/components/ui";
 import { KacaKartu } from "@/components/eksperimen/kaca";
 import { PitaGradient } from "@/components/eksperimen/pita-gradient";
-import { formatTanggal } from "@/lib/utils";
+import { formatBulan, formatTanggal } from "@/lib/utils";
 import { GrafikBulanan, GrafikKategori } from "./grafik";
 import { TombolCetak } from "./tombol-cetak";
 
@@ -180,7 +180,7 @@ export default async function HalamanTransparansi() {
     const d = new Date();
     d.setDate(1);
     d.setMonth(d.getMonth() - i);
-    const label = d.toLocaleDateString("id-ID", { month: "short" });
+    const label = formatBulan(d);
     const akhir = new Date(d.getFullYear(), d.getMonth() + 1, 1);
     const mulai = new Date(d.getFullYear(), d.getMonth(), 1);
     bulan.push({

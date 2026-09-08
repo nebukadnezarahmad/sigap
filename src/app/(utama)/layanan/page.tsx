@@ -27,7 +27,7 @@ export default async function HalamanLayanan() {
           Direktori Layanan
         </h1>
         <p className="mt-2 max-w-2xl text-muted teks-pretty">
-          Kontak darurat dan layanan harian lingkunganmu — satu ketukan untuk
+          Kontak darurat dan layanan harian lingkunganmu. Satu ketukan untuk
           menelepon atau chat WhatsApp. Tidak perlu lagi mencari-cari saat
           keadaan mendesak.
         </p>

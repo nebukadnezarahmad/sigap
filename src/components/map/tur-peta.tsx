@@ -10,7 +10,7 @@ const LANGKAH = [
   {
     Ikon: IkonPeta,
     judul: "Selamat datang di peta SIGAP",
-    isi: "Setiap pin adalah laporan warga — warnanya menunjukkan jenis masalahnya.",
+    isi: "Setiap pin adalah laporan warga. Warnanya menunjukkan jenis masalahnya.",
   },
   {
     Ikon: Compass,

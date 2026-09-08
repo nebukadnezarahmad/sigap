@@ -11,7 +11,7 @@ export default function TidakDitemukan() {
         Titik ini kosong di peta
       </h1>
       <p className="mt-3 max-w-md text-muted">
-        Halaman yang kamu cari tidak ada — mungkin laporannya sudah ditangani
+        Halaman yang kamu cari tidak ada. Mungkin laporannya sudah ditangani
         dan diarsipkan, atau tautannya salah ketik.
       </p>
       <div className="mt-7 flex gap-3">

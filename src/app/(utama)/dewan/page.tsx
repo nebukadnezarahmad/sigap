@@ -17,7 +17,7 @@ export default async function HalamanDewan() {
       <main className="mx-auto max-w-3xl px-4 py-16 text-center">
         <h1 className="font-display text-2xl font-bold">Database belum tersambung</h1>
         <p className="mt-2 text-muted">
-          Isi env Supabase lalu jalankan schema.sql — lihat README.
+          Isi env Supabase lalu jalankan schema.sql. Lihat README.
         </p>
       </main>
     );

@@ -17,6 +17,12 @@ export function formatAngka(value: number) {
   return new Intl.NumberFormat("id-ID").format(value);
 }
 
+export function formatBulan(iso: string | Date) {
+  return new Intl.DateTimeFormat("id-ID", { month: "short" }).format(
+    new Date(iso)
+  );
+}
+
 export function waktuRelatif(iso: string) {
   const detik = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (detik < 60) return "baru saja";

@@ -88,7 +88,7 @@ export async function GET(req: Request) {
 
   return NextResponse.json(
     {
-      lisensi: "CC BY 4.0 — atribusi SIGAP / Infinitera 2.0",
+      lisensi: "CC BY 4.0: atribusi SIGAP / Infinitera 2.0",
       kebijakan_privasi: "Koordinat dibulatkan ke grid ~100m untuk melindungi privasi lokasi rumah warga.",
       dihasilkan_pada: new Date().toISOString(),
       jumlah: daftar.length,

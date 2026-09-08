@@ -23,11 +23,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "SIGAP — Lapor. Serentak. Selesai.",
+    default: "SIGAP | Lapor. Serentak. Selesai.",
     template: "%s · SIGAP",
   },
   description:
-    "Platform pelaporan masalah permukiman berbasis peta interaktif. Warga melapor, saling dukung, pemerintah menindaklanjuti — transparan dan terukur.",
+    "Platform pelaporan masalah permukiman berbasis peta interaktif. Warga melapor, saling dukung, pemerintah menindaklanjuti secara transparan dan terukur.",
 };
 
 const temaScript = `

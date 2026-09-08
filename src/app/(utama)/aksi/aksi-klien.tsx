@@ -9,7 +9,7 @@ import { useUser } from "@/lib/use-user";
 import type { EventAksi } from "./page";
 import { Button, Input, Label, Skeleton, Textarea } from "@/components/ui";
 import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
-import { formatTanggal } from "@/lib/utils";
+import { formatBulan, formatTanggal } from "@/lib/utils";
 
 function apakahLewat(tanggal: string) {
   return new Date(tanggal).getTime() < Date.now();
@@ -177,7 +177,7 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
             {new Date(data.tanggal).getDate()}
           </span>
           <span className="angka-tabular text-xs font-bold uppercase">
-            {new Date(data.tanggal).toLocaleDateString("id-ID", { month: "short" })}
+            {formatBulan(data.tanggal)}
           </span>
         </div>
         <div className="min-w-0 flex-1 p-5">
@@ -430,4 +430,3 @@ export function AksiKlien({
     </div>
   );
 }
-

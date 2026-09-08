@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "SIGAP — Lapor. Serentak. Selesai.",
+    name: "SIGAP | Lapor. Serentak. Selesai.",
     short_name: "SIGAP",
     description:
       "Platform pelaporan masalah permukiman berbasis peta interaktif untuk kota dan desa berkelanjutan.",
