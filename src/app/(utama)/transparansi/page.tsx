@@ -324,7 +324,7 @@ export default async function HalamanTransparansi() {
                       <Link
                         href={`/laporan/${r.id}`}
                         aria-label={`Detail laporan ${r.judul}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-daun-700 hover:underline dark:text-daun-300"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-action hover:underline"
                       >
                         Detail <ExternalLink size={12} />
                       </Link>

@@ -406,8 +406,8 @@ export function DewanClient({
       <div className="grid gap-4 xl:grid-cols-[1fr_420px]">
         <Card className="overflow-hidden p-0">
           {dipilih.size > 0 && (
-            <div className="flex flex-wrap items-center gap-3 border-b garis-halus bg-daun-500/5 px-5 py-3">
-              <span className="angka-tabular text-sm font-bold text-daun-700 dark:text-daun-300">
+            <div className="flex flex-wrap items-center gap-3 border-b garis-halus bg-action/5 px-5 py-3">
+              <span className="angka-tabular text-sm font-bold text-action">
                 {dipilih.size} dipilih
               </span>
               <Select
@@ -478,7 +478,7 @@ export function DewanClient({
                     checked={dipilih.has(r.id)}
                     onChange={() => togglePilih(r.id)}
                     aria-label={`Pilih ${r.judul}`}
-                    className="size-4 accent-daun-600"
+                    className="size-4 accent-action"
                   />
                   <div className="min-w-0 flex-1 basis-56">
                     <p className="truncate text-sm font-semibold">{r.judul}</p>
@@ -504,7 +504,7 @@ export function DewanClient({
                       if (e.target.value !== (r.petugas ?? ""))
                         tugaskan(r.id, e.target.value);
                     }}
-                    className="w-36 rounded-lg border garis-halus bg-panel px-2.5 py-1.5 text-xs outline-none focus:border-daun-500"
+                    className="w-36 rounded-lg border garis-halus bg-panel px-2.5 py-1.5 text-xs outline-none focus:border-action"
                   />
                   <Select
                     aria-label={`Ubah status ${r.judul}`}
@@ -537,7 +537,7 @@ export function DewanClient({
               role="switch"
               aria-checked={heatAktif}
               className={`relative h-6 w-11 rounded-full transition ${
-                heatAktif ? "bg-daun-600" : "bg-line"
+                heatAktif ? "bg-action" : "bg-line"
               }`}
             >
               <span
