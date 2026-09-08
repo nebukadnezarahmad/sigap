@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, MapPin, Send } from "lucide-react";
 import { JENIS_FASILITAS } from "@/lib/constants";
@@ -23,7 +24,7 @@ const LeafletMap = dynamic(
     ssr: false,
     loading: () => (
       <p role="status" aria-label="Memuat peta" className="flex h-full min-h-56 items-center justify-center p-6 text-sm text-muted">
-        Memuat peta…
+        Memuat peta
       </p>
     ),
   }
@@ -72,12 +73,12 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
     return (
       <KacaKartu className="space-y-4 p-4 text-center">
         <p className="text-sm text-muted">Masuk dulu untuk menambah fasilitas.</p>
-        <Button
-          onClick={() => router.push("/masuk?next=/peta")}
-          className={`${PILL_BIRU} w-full`}
+        <Link
+          href="/masuk?next=/peta"
+          className={`${PILL_BIRU} inline-flex w-full items-center justify-center rounded-full px-5 py-2.5 font-semibold`}
         >
           Masuk
-        </Button>
+        </Link>
       </KacaKartu>
     );
   }
@@ -121,7 +122,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
   }
 
   return (
-    <form onSubmit={kirim} className="grid gap-5 sm:grid-cols-2">
+    <form onSubmit={kirim} aria-busy={proses} aria-describedby={pesan ? "galat-simpan-fasilitas" : undefined} className="grid gap-5 sm:grid-cols-2">
       <div className="space-y-4">
         <div>
           <Label htmlFor="f-nama">Nama fasilitas</Label>
@@ -136,7 +137,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
               setNama(e.target.value);
               if (galatNama) setGalatNama(null);
             }}
-            placeholder="Contoh: Bank Sampah Melati Jaya…"
+            placeholder="Contoh: Bank Sampah Melati Jaya"
             aria-invalid={!!galatNama}
             aria-describedby={galatNama ? "galat-f-nama" : undefined}
             className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
@@ -171,7 +172,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
             autoComplete="street-address"
             value={alamat}
             onChange={(e) => setAlamat(e.target.value)}
-            placeholder="Contoh: Jl. Melati Raya No. 21…"
+            placeholder="Contoh: Jl. Melati Raya No. 21"
             className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           />
         </div>
@@ -183,22 +184,26 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
             autoComplete="off"
             value={jam}
             onChange={(e) => setJam(e.target.value)}
-            placeholder="Contoh: Senin–Sabtu 08.00–16.00…"
+            placeholder="Contoh: Senin–Sabtu 08.00–16.00"
             className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           />
         </div>
       </div>
 
-      <div className="flex flex-col">
-        <Label>
+      <fieldset
+        aria-describedby={`peta-fasilitas-bantuan${galatPeta ? " galat-peta-fasilitas" : ""}`}
+        className="flex min-w-0 flex-col"
+      >
+        <legend id="peta-fasilitas-label" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">
           <span className="inline-flex items-center gap-1.5">
-            <MapPin size={13} /> Klik peta untuk menandai lokasi
+            <MapPin size={13} aria-hidden /> Klik peta untuk menandai lokasi
           </span>
-        </Label>
+        </legend>
         <div className="min-h-56 flex-1 overflow-hidden rounded-[18px] border border-ap-hairline shadow-none dark:border-line">
-          <div id="peta-fasilitas" tabIndex={-1} className="h-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!">
+          <div id="peta-fasilitas" role="group" aria-labelledby="peta-fasilitas-label" aria-describedby={`peta-fasilitas-bantuan${galatPeta ? " galat-peta-fasilitas" : ""}`} tabIndex={-1} className="h-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!">
             <LeafletMap
               mode="pilih"
+              describedBy={`peta-fasilitas-bantuan${galatPeta ? " galat-peta-fasilitas" : ""}`}
               zoom={14}
               pusat={PUSAT_KOTA}
               titik={
@@ -222,13 +227,16 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
             />
           </div>
         </div>
+        <p id="peta-fasilitas-bantuan" className="sr-only">
+          Klik peta atau gunakan tombol panah lalu tekan Enter untuk memilih titik.
+        </p>
         {galatPeta && (
-          <p role="alert" className="mt-1.5 text-xs font-semibold text-danger">
+          <p id="galat-peta-fasilitas" role="alert" className="mt-1.5 text-xs font-semibold text-danger">
             {galatPeta}
           </p>
         )}
         {pesan && (
-          <p role="alert" className="mt-2 rounded-[18px] bg-danger/10 px-3 py-2 text-sm text-danger">
+          <p id="galat-simpan-fasilitas" role="alert" aria-live="assertive" className="mt-2 rounded-[18px] bg-danger/10 px-3 py-2 text-sm text-danger">
             {pesan}
           </p>
         )}
@@ -238,12 +246,12 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
           ) : (
             <Send size={16} aria-hidden />
           )}
-          {proses ? "Menyimpan fasilitas…" : "Simpan fasilitas (+8 poin)"}
+          {proses ? "Menyimpan fasilitas" : "Simpan fasilitas (+8 poin)"}
         </Button>
         <Button type="button" variant="sekunder" onClick={mintaTutup} disabled={proses} className={`mt-2 w-full ${SENTUH_44}`}>
           Batal
         </Button>
-      </div>
+      </fieldset>
     </form>
   );
 }

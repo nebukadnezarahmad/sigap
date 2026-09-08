@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BellPlus, Crosshair, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -19,10 +20,7 @@ export function TombolIkutiArea({
   const [selesai, setSelesai] = useState(false);
 
   async function ikuti() {
-    if (!user) {
-      router.push("/masuk?next=/peta");
-      return;
-    }
+    if (!user) return;
     setProses(true);
     setPesan(null);
 
@@ -63,27 +61,43 @@ export function TombolIkutiArea({
 
   return (
     <div className="relative">
-      <Button
-        variant={selesai ? "utama" : "sekunder"}
-        size="sm"
-        onClick={ikuti}
-        disabled={proses}
-        title="Dapatkan notifikasi laporan baru dalam radius 1 km"
-      >
-        {proses ? (
-          <Loader2 size={14} className="animate-spin" />
-        ) : selesai ? (
-          <Crosshair size={14} />
-        ) : (
-          <BellPlus size={14} />
-        )}
-        {selesai ? "Area diikuti" : "Ikuti area"}
-      </Button>
+      {user ? (
+        <Button
+          variant={selesai ? "utama" : "sekunder"}
+          size="sm"
+          onClick={ikuti}
+          disabled={proses}
+          aria-busy={proses}
+          aria-describedby={pesan ? "galat-ikuti-area" : undefined}
+          title="Dapatkan notifikasi laporan baru dalam radius 1 km"
+        >
+          {proses ? (
+            <Loader2 size={14} aria-hidden className="animate-spin" />
+          ) : selesai ? (
+            <Crosshair size={14} aria-hidden />
+          ) : (
+            <BellPlus size={14} aria-hidden />
+          )}
+          {selesai ? "Area diikuti" : "Ikuti area"}
+        </Button>
+      ) : (
+        <Link
+          href="/masuk?next=/peta"
+          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-ap-hairline bg-ap-canvas px-3.5 py-1.5 text-sm font-semibold text-ap-ink hover:border-ap-blue hover:text-ap-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
+          title="Masuk untuk mendapat notifikasi laporan baru dalam radius 1 km"
+        >
+          <BellPlus size={14} aria-hidden />
+          Ikuti area
+        </Link>
+      )}
       {pesan && (
-        <p role="alert" className="absolute right-0 top-full z-30 mt-2 w-56 rounded-xl bg-danger/10 px-3 py-2 text-xs text-danger">
+        <p id="galat-ikuti-area" role="alert" aria-live="assertive" className="absolute right-0 top-full z-30 mt-2 w-56 rounded-xl bg-danger/10 px-3 py-2 text-xs text-danger">
           {pesan}
         </p>
       )}
+      <span role="status" aria-live="polite" className="sr-only">
+        {selesai ? "Area berhasil diikuti." : ""}
+      </span>
     </div>
   );
 }

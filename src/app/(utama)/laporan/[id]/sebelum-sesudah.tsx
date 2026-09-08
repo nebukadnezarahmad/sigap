@@ -18,6 +18,10 @@ export function SebelumSesudah({
       <img
         src={sesudah}
         alt="Kondisi sesudah ditangani"
+        width={1200}
+        height={800}
+        loading="lazy"
+        decoding="async"
         className="h-72 w-full object-cover sm:h-80"
         draggable={false}
       />
@@ -29,8 +33,12 @@ export function SebelumSesudah({
         <img
           src={sebelum}
           alt="Kondisi sebelum ditangani"
+          width={1200}
+          height={800}
+          loading="lazy"
+          decoding="async"
           className="h-72 w-full object-cover sm:h-80"
-          style={{ width: "100%" , maxWidth: "none" }}
+          style={{ width: "100%", maxWidth: "none" }}
           draggable={false}
         />
         <span className="absolute left-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white backdrop-blur-sm">
@@ -47,7 +55,7 @@ export function SebelumSesudah({
         style={{ left: `${posisi}%` }}
       >
         <span className="absolute left-1/2 top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-daun-600 text-white shadow-lg">
-          <MoveHorizontal size={16} />
+          <MoveHorizontal size={16} aria-hidden />
         </span>
       </span>
 
@@ -58,10 +66,12 @@ export function SebelumSesudah({
         value={posisi}
         onChange={(e) => setPosisi(Number(e.target.value))}
         aria-label="Geser perbandingan sebelum dan sesudah"
+        aria-describedby="bantuan-sebelum-sesudah"
+        aria-valuetext={`${posisi}% kondisi sebelum`}
         className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
       />
 
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+      <div id="bantuan-sebelum-sesudah" className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
         Geser untuk membandingkan
       </div>
     </div>

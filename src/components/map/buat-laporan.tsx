@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useState, useEffect, type CSSProperties } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, ImagePlus, Loader2, MapPin, Send, ThumbsUp } from "lucide-react";
 import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
@@ -12,7 +13,7 @@ import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
 /* Fusi visual-fusion: isi modal sebagai panel frosted (backdrop-blur 20px +
-   saturate 180%, edge terang) tanpa shadow berat — scrim backdrop milik
+   saturate 180%, edge terang) tanpa shadow berat; scrim backdrop milik
    Modal tidak disentuh. Tombol Kirim/Dukung pill Action Blue 44px.
    Copy, pesan error, role/aria, dan logika validasi/kirim tidak diubah. */
 const GAYA_FROSTED: CSSProperties = {
@@ -31,7 +32,7 @@ const LeafletMap = dynamic(
     ssr: false,
     loading: () => (
       <p role="status" aria-label="Memuat peta" className="flex h-full min-h-64 items-center justify-center p-6 text-sm text-muted">
-        Memuat peta…
+        Memuat peta
       </p>
     ),
   }
@@ -218,12 +219,12 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         <div className="flex items-center justify-between border-t garis-halus pt-3 text-xs text-muted">
           <span>Punya akun sendiri?</span>
           <div className="flex gap-2">
-            <Button size="sm" variant="sekunder" onClick={() => router.push("/masuk?next=/peta?lapor=1")} className={SENTUH_44}>
+            <Link href="/masuk?next=/peta?lapor=1" className={`inline-flex min-h-11 items-center justify-center rounded-full border border-ap-hairline bg-ap-canvas px-3.5 py-1.5 text-sm font-semibold text-ap-ink hover:border-ap-blue hover:text-ap-blue ${SENTUH_44}`}>
               Masuk Manual
-            </Button>
-            <Button size="sm" onClick={() => router.push("/daftar?next=/peta?lapor=1")} className={`${SENTUH_44} bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus!`}>
+            </Link>
+            <Link href="/daftar?next=/peta?lapor=1" className={`inline-flex min-h-11 items-center justify-center rounded-full bg-ap-blue px-3.5 py-1.5 text-sm font-semibold text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none ${SENTUH_44} focus-visible:outline-ap-blue-focus!`}>
               Daftar Akun
-            </Button>
+            </Link>
           </div>
         </div>
       </KacaKartu>
@@ -334,7 +335,13 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   }
 
   return (
-    <form onSubmit={kirim} style={GAYA_FROSTED} className={`${PANEL_FROSTED} grid gap-5 p-4 sm:grid-cols-2 sm:p-5`}>
+    <form
+      onSubmit={kirim}
+      style={GAYA_FROSTED}
+      aria-busy={proses}
+      aria-describedby={pesan ? "galat-kirim-laporan" : undefined}
+      className={`${PANEL_FROSTED} grid gap-5 p-4 sm:grid-cols-2 sm:p-5`}
+    >
       <div className="space-y-4">
         <div>
           <Label htmlFor="judul">Judul laporan</Label>
@@ -349,7 +356,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
               setJudul(e.target.value);
               if (galatJudul) setGalatJudul(null);
             }}
-            placeholder="Contoh: TPS liar di ujung Jl. Melati…"
+            placeholder="Contoh: TPS liar di ujung Jl. Melati"
             aria-invalid={!!galatJudul}
             aria-describedby={galatJudul ? "galat-judul" : undefined}
             className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
@@ -389,7 +396,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
               setDeskripsi(e.target.value);
               if (galatDeskripsi) setGalatDeskripsi(null);
             }}
-            placeholder="Contoh: tumpukan sampah menutup setengah jalan sejak 3 hari…"
+            placeholder="Contoh: tumpukan sampah menutup setengah jalan sejak 3 hari"
             aria-invalid={!!galatDeskripsi}
             aria-describedby={galatDeskripsi ? "galat-deskripsi" : undefined}
             className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
@@ -408,20 +415,22 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             autoComplete="street-address"
             value={alamat}
             onChange={(e) => setAlamat(e.target.value)}
-            placeholder="Contoh: depan Masjid Al-Ikhlas, RT 03…"
+            placeholder="Contoh: depan Masjid Al-Ikhlas, RT 03"
             className="min-h-[44px] rounded-[18px] focus-visible:outline-ap-blue-focus!"
           />
         </div>
         <div>
-          <Label htmlFor="foto">Foto kondisi (maks. 4, opsional)</Label>
+          <p className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">
+            Foto kondisi (maks. 4, opsional)
+          </p>
           <label
             htmlFor="foto"
             className="flex min-h-[44px] cursor-pointer items-center gap-2 rounded-[18px] border border-dashed border-ap-hairline px-3.5 py-3 text-sm text-muted transition hover:border-ap-blue/60 hover:text-ink focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ap-blue-focus! motion-reduce:transition-none dark:border-line"
           >
-            <ImagePlus size={18} />
+            <ImagePlus size={18} aria-hidden />
             {files.length > 0
               ? `${files.length} foto dipilih`
-              : "Pilih foto kondisi terbaru…"}
+              : "Pilih foto kondisi terbaru"}
             <input
               id="foto"
               name="foto"
@@ -449,16 +458,20 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         </div>
       </div>
 
-      <div className="flex flex-col">
-        <Label>
+      <fieldset
+        aria-describedby={`peta-pilih-bantuan${galatPeta ? " galat-peta" : ""}`}
+        className="flex min-w-0 flex-col"
+      >
+        <legend id="peta-pilih-label" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">
           <span className="inline-flex items-center gap-1.5">
-            <MapPin size={13} /> Klik peta untuk menandai titik masalah
+            <MapPin size={13} aria-hidden /> Klik peta untuk menandai titik masalah
           </span>
-        </Label>
+        </legend>
         <div className="min-h-64 flex-1 overflow-hidden rounded-[18px] border border-ap-hairline shadow-none dark:border-line">
-          <div id="peta-pilih" tabIndex={-1} className="h-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!">
+          <div id="peta-pilih" role="group" aria-labelledby="peta-pilih-label" aria-describedby={`peta-pilih-bantuan${galatPeta ? " galat-peta" : ""}`} tabIndex={-1} className="h-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!">
             <LeafletMap
               mode="pilih"
+              describedBy={`peta-pilih-bantuan${galatPeta ? " galat-peta" : ""}`}
               zoom={15}
               pusat={PUSAT_KOTA}
               titik={
@@ -484,8 +497,11 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             />
           </div>
         </div>
+        <p id="peta-pilih-bantuan" className="sr-only">
+          Klik peta atau gunakan tombol panah lalu tekan Enter untuk memilih titik.
+        </p>
         {galatPeta ? (
-          <p role="alert" className="mt-1.5 text-xs font-semibold text-danger">
+          <p id="galat-peta" role="alert" className="mt-1.5 text-xs font-semibold text-danger">
             {galatPeta}
           </p>
         ) : (
@@ -500,7 +516,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         {laporanMirip.length > 0 && !abaikanDuplikat && (
           <div className="mt-3 rounded-[18px] border border-amber-500/40 bg-amber-500/10 p-3.5 text-left shadow-none">
             <div className="flex items-start gap-2.5">
-              <AlertTriangle size={17} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+              <AlertTriangle size={17} aria-hidden className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
               <div className="min-w-0 flex-1">
                 <p className="angka-tabular text-xs font-bold uppercase tracking-wider tabular-nums text-amber-700 dark:text-amber-400">
                   Laporan Serupa Ditemukan ({Math.round(laporanMirip[0].jarak_m)} m dari titikmu)
@@ -518,7 +534,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
                     className={PILL_BIRU}
                   >
                     <span className="inline-flex items-center gap-1.5 text-xs">
-                      <ThumbsUp size={12} /> Dukung laporan ini
+                      <ThumbsUp size={12} aria-hidden /> Dukung laporan ini
                     </span>
                   </KacaPill>
                   <Button
@@ -537,7 +553,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         )}
 
         {pesan && (
-          <p role="alert" className="mt-2 rounded-[18px] bg-danger/10 px-3 py-2 text-sm text-danger">
+          <p id="galat-kirim-laporan" role="alert" aria-live="assertive" className="mt-2 rounded-[18px] bg-danger/10 px-3 py-2 text-sm text-danger">
             {pesan}
           </p>
         )}
@@ -550,14 +566,14 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
               ) : (
                 <Send size={16} aria-hidden />
               )}
-              {proses ? "Mengirim laporan…" : "Kirim laporan (+10 poin)"}
+              {proses ? "Mengirim laporan" : "Kirim laporan (+10 poin)"}
             </span>
           </KacaPill>
           <Button type="button" variant="sekunder" onClick={mintaTutup} disabled={proses} className={`${SENTUH_44} w-full`}>
             Batal
           </Button>
         </div>
-      </div>
+      </fieldset>
     </form>
   );
 }

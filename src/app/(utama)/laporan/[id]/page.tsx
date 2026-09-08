@@ -97,7 +97,7 @@ export default async function HalamanLaporan({
         href="/peta"
         className="mb-5 inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-ap-blue transition hover:bg-ap-blue/10 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky dark:hover:bg-ap-sky/10"
       >
-        <ArrowLeft size={15} /> Kembali ke peta
+        <ArrowLeft size={15} aria-hidden /> Kembali ke peta
       </Link>
 
       {r.status === "selesai" && (
@@ -121,7 +121,7 @@ export default async function HalamanLaporan({
               </span>
               {r.petugas && (
                 <span className="flex items-center gap-1 rounded-full bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300">
-                  <Wrench size={12} /> {r.petugas}
+                  <Wrench size={12} aria-hidden /> {r.petugas}
                 </span>
               )}
 
@@ -137,12 +137,12 @@ export default async function HalamanLaporan({
                 >
                   {sla.lewatSla ? (
                     <>
-                      <AlertTriangle size={12} className="text-danger shrink-0" />
+                      <AlertTriangle size={12} aria-hidden className="text-danger shrink-0" />
                       <span>Lewat SLA {sla.hariTerlambat} hr</span>
                     </>
                   ) : (
                     <>
-                      <Timer size={12} className="text-muted shrink-0" />
+                      <Timer size={12} aria-hidden className="text-muted shrink-0" />
                       <span>SLA: sisa {sla.sisaHari} hr (target {sla.targetHari} hr)</span>
                     </>
                   )}
@@ -189,7 +189,11 @@ export default async function HalamanLaporan({
                 <img
                   key={f.id}
                   src={f.url}
-                  alt={`Foto ${i + 1} — ${r.judul}`}
+                  alt={`Foto ${i + 1}: ${r.judul}`}
+                  width={1200}
+                  height={800}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
                   className={`w-full rounded-[18px] border border-ap-hairline object-cover shadow-none dark:border-white/15 ${
                     galeri.length === 1 ? "max-h-[420px]" : "h-44 sm:h-52"
                   }`}
@@ -202,7 +206,7 @@ export default async function HalamanLaporan({
             <p className="whitespace-pre-line leading-relaxed">{r.deskripsi}</p>
             {r.alamat_teks && (
               <p className="mt-3 flex items-center gap-1.5 border-t border-ap-hairline pt-3 text-sm text-muted dark:border-white/10">
-                <MapPin size={13} /> {r.alamat_teks}
+                <MapPin size={13} aria-hidden /> {r.alamat_teks}
               </p>
             )}
           </Card>
@@ -222,7 +226,7 @@ export default async function HalamanLaporan({
           {fotoSesudah.length > 0 && (
             <Card className="rounded-[18px] border-daun-500/40 bg-white p-5 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
               <h2 className="mb-3 flex items-center gap-2 font-display font-bold text-daun-700 dark:text-daun-300">
-                <CheckCircle2 size={17} /> Bukti penyelesaian
+                <CheckCircle2 size={17} aria-hidden /> Bukti penyelesaian
               </h2>
               {galeri.length > 0 ? (
                 <SebelumSesudah
@@ -237,6 +241,10 @@ export default async function HalamanLaporan({
                       key={f.id}
                       src={f.url}
                       alt="Kondisi setelah ditangani"
+                      width={1200}
+                      height={800}
+                      loading="lazy"
+                      decoding="async"
                       className="h-44 w-full rounded-lg object-cover"
                     />
                   ))}
@@ -250,6 +258,10 @@ export default async function HalamanLaporan({
                       key={f.id}
                       src={f.url}
                       alt="Kondisi setelah ditangani"
+                      width={1200}
+                      height={800}
+                      loading="lazy"
+                      decoding="async"
                       className="h-36 w-full rounded-lg object-cover"
                     />
                   ))}
@@ -338,7 +350,7 @@ export default async function HalamanLaporan({
               {kategoriBySlug(kat?.slug ?? "").nama}
             </p>
             <p className="mt-1 text-sm text-muted">
-              Dilaporkan lewat SIGAP — platform partisipasi permukiman.
+              Dilaporkan lewat SIGAP, platform partisipasi permukiman.
             </p>
           </Card>
         </aside>

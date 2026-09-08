@@ -31,6 +31,7 @@ export function KomentarSection({
   const [kirim, setKirim] = useState(false);
   const [terisi, setTerisi] = useState(false);
   const [modalAuth, setModalAuth] = useState(false);
+  const [pesan, setPesan] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -41,8 +42,12 @@ export function KomentarSection({
       .eq("report_id", reportId)
       .order("created_at", { ascending: true })
       .limit(100)
-      .then(({ data }) => {
-        setDaftar(data ?? []);
+      .then(({ data, error }) => {
+        if (error) {
+          setPesan("Komentar belum bisa dimuat. Coba lagi nanti.");
+        } else {
+          setDaftar(data ?? []);
+        }
         setTerisi(true);
       });
 
@@ -104,7 +109,11 @@ export function KomentarSection({
           setDaftar((s) => s.filter((k) => k.id !== lama.id));
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          setPesan("Pembaruan diskusi terputus. Muat ulang halaman untuk mencoba lagi.");
+        }
+      });
 
     return () => {
       supabase.removeChannel(ch);
@@ -115,13 +124,16 @@ export function KomentarSection({
     e.preventDefault();
     if (!user || !teks.trim() || kirim) return;
     setKirim(true);
+    setPesan(null);
     const supabase = createClient();
     const { data, error } = await supabase
       .from("comments")
       .insert({ report_id: reportId, user_id: user.id, isi: teks.trim() })
       .select("*, profiles(id,username,nama_lengkap,avatar_url)")
       .single();
-    if (!error && data) {
+    if (error) {
+      setPesan("Komentar belum terkirim. Coba lagi nanti.");
+    } else if (data) {
       setDaftar((s) => [...s, data]);
       setTeks("");
     }
@@ -131,7 +143,7 @@ export function KomentarSection({
   return (
     <Card className={`${KARTU} p-5`}>
       <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
-        <MessageSquare size={17} />
+        <MessageSquare size={17} aria-hidden />
         Diskusi warga
         <span className="angka-tabular text-sm font-normal tabular-nums text-muted">
           ({jumlahAwal > daftar.length ? jumlahAwal : daftar.length})
@@ -172,23 +184,37 @@ export function KomentarSection({
             </motion.article>
           ))}
         </AnimatePresence>
-        {terisi && daftar.length === 0 && (
+        {pesan && (
+          <p id="galat-komentar" role="alert" aria-live="assertive" className="rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
+            {pesan}
+          </p>
+        )}
+        {terisi && !pesan && daftar.length === 0 && (
           <p className="text-sm text-muted">
-            Belum ada komentar — jadilah suara pertama.
+            Belum ada komentar. Jadilah suara pertama.
           </p>
         )}
       </div>
 
       {user ? (
-        <form onSubmit={kirimKomentar} className="mt-5 flex items-end gap-3">
+        <form onSubmit={kirimKomentar} className="mt-5 flex items-end gap-3" aria-busy={kirim}>
+          <label htmlFor="komentar-isi" className="sr-only">
+            Tulis komentar
+          </label>
           <Textarea
+            id="komentar-isi"
+            name="komentar"
             rows={2}
             value={teks}
             maxLength={500}
             onChange={(e) => setTeks(e.target.value)}
-            placeholder="Tulis tanggapan atau info tambahan…"
-            aria-label="Tulis komentar"
+            placeholder="Tulis tanggapan atau info tambahan"
+            aria-describedby={`bantuan-komentar${pesan ? " galat-komentar" : ""}`}
+            className="min-w-0 flex-1"
           />
+          <p id="bantuan-komentar" className="sr-only">
+            Maksimal 500 karakter.
+          </p>
           <KacaPill
             type="submit"
             disabled={kirim || !teks.trim()}
@@ -196,7 +222,7 @@ export function KomentarSection({
             className={`${PILL_BIRU} min-w-[44px] px-0`}
           >
             <span className="inline-flex items-center">
-              <SendHorizonal size={16} />
+              <SendHorizonal size={16} aria-hidden />
             </span>
           </KacaPill>
         </form>

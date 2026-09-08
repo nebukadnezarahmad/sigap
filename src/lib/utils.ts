@@ -6,11 +6,15 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatTanggal(iso: string) {
-  return new Date(iso).toLocaleDateString("id-ID", {
+  return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
     month: "short",
     year: "numeric",
-  });
+  }).format(new Date(iso));
+}
+
+export function formatAngka(value: number) {
+  return new Intl.NumberFormat("id-ID").format(value);
 }
 
 export function waktuRelatif(iso: string) {

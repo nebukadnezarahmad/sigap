@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { Award, Calculator, CheckCircle2, TriangleAlert, XCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { Button, Label, Skeleton } from "@/components/ui";
+import { Button, Skeleton } from "@/components/ui";
 import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { IkonVektor, type NodeIkon } from "@/lib/ikon-vektor";
+import { formatAngka } from "@/lib/utils";
 
 type Soal = { tanya: string; opsi: string[]; benar: number };
 
@@ -26,7 +28,7 @@ export function GalatEdukasi() {
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
       <div className={`${KARTU_UTILITAS} p-8`}>
         <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-danger/10 text-danger">
-          <TriangleAlert size={26} strokeWidth={1.8} />
+          <TriangleAlert size={26} strokeWidth={1.8} aria-hidden />
         </span>
         <h1 className="font-display text-2xl font-bold">
           Edukasi belum bisa dimuat
@@ -115,13 +117,13 @@ function QuizSection({
   ikonHadiah: NodeIkon;
   selesai: () => void;
 }) {
-  const router = useRouter();
   const [mulai, setMulai] = useState(false);
   const [indeks, setIndeks] = useState(0);
   const [pilih, setPilih] = useState<number | null>(null);
   const [benar, setBenar] = useState(0);
   const [selesaiQuiz, setSelesaiQuiz] = useState(false);
   const [tersimpan, setTersimpan] = useState(false);
+  const [pesanSimpan, setPesanSimpan] = useState<string | null>(null);
 
   const skor = soal[indeks] && pilih !== null;
 
@@ -139,13 +141,17 @@ function QuizSection({
     setSelesaiQuiz(true);
     if (masuk) {
       const supabase = createClient();
-      await supabase.from("quiz_results").insert({
+      const { error } = await supabase.from("quiz_results").insert({
         user_id: (await supabase.auth.getUser()).data.user?.id,
         benar: benarBaru,
         total: soal.length,
       });
-      setTersimpan(true);
-      selesai();
+      if (error) {
+        setPesanSimpan("Skor belum tersimpan. Coba lagi nanti.");
+      } else {
+        setTersimpan(true);
+        selesai();
+      }
     }
   }
 
@@ -156,6 +162,7 @@ function QuizSection({
     setBenar(0);
     setSelesaiQuiz(false);
     setTersimpan(false);
+    setPesanSimpan(null);
   }
 
   if (soal.length === 0) {
@@ -164,7 +171,7 @@ function QuizSection({
         <div className={`${KARTU_UTILITAS} overflow-hidden p-0`}>
           <div className="p-8 text-center">
             <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
-              <Award size={26} strokeWidth={1.8} />
+              <Award size={26} strokeWidth={1.8} aria-hidden />
             </span>
             <h2 className="font-display text-xl font-bold">
               Soal quiz belum tersedia
@@ -185,11 +192,11 @@ function QuizSection({
       <div className={`${KARTU_UTILITAS} overflow-hidden p-0`}>
         <div className="border-b border-ap-hairline bg-ap-parchment/80 px-6 py-4 backdrop-blur dark:border-line dark:bg-panel-2">
           <h2 className="flex items-center gap-2 font-display text-xl font-bold">
-            <Award size={19} className="text-kunyit-500" /> Quiz: Seberapa Hijau
+            <Award size={19} aria-hidden className="text-kunyit-500" /> Quiz: Seberapa Hijau
             Kamu?
           </h2>
           <p className="mt-1 text-sm text-muted">
-            {soal.length} soal · lulus {soal.length - 1}/{soal.length} untuk
+            {formatAngka(soal.length)} soal · lulus {formatAngka(soal.length - 1)}/{formatAngka(soal.length)} untuk
             badge & +15 poin
           </p>
         </div>
@@ -201,12 +208,12 @@ function QuizSection({
                 Masuk dulu untuk mengikuti quiz. Skor lulus memberimu badge
                 Cerdas Lingkungan.
               </p>
-              <Button
-                className={`mt-4 ${TOMBOL_UTAMA_APPLE}`}
-                onClick={() => router.push("/masuk?next=/edukasi")}
+              <Link
+                href="/masuk?next=/edukasi"
+                className={`mt-4 inline-flex items-center justify-center rounded-full px-5 py-2.5 font-semibold ${TOMBOL_UTAMA_APPLE}`}
               >
                 Masuk sekarang
-              </Button>
+              </Link>
             </div>
           )}
 
@@ -229,7 +236,7 @@ function QuizSection({
                 {soal.map((_, i) => (
                   <span
                     key={i}
-                    className={`h-1.5 rounded-full transition-all ${
+                    className={`h-1.5 rounded-full transition-[width,background-color] ${
                       i < indeks
                         ? "w-8 bg-ap-blue"
                         : i === indeks
@@ -239,7 +246,7 @@ function QuizSection({
                   />
                 ))}
                 <span className="angka-tabular ml-auto text-xs font-semibold text-muted">
-                  {indeks + 1}/{soal.length}
+                  {formatAngka(indeks + 1)}/{formatAngka(soal.length)}
                 </span>
               </div>
               <h3 className="font-display text-lg font-bold leading-snug">
@@ -250,6 +257,7 @@ function QuizSection({
                   const dipilihKu = pilih === i;
                   return (
                     <button
+                      type="button"
                       key={i}
                       onClick={() => setPilih(i)}
                       className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-full border px-4 py-3 text-left text-sm font-medium transition ${FOKUS_APPLE} ${
@@ -260,7 +268,7 @@ function QuizSection({
                     >
                       {o}
                       {dipilihKu && (
-                        <CheckCircle2 size={16} className="shrink-0 text-ap-blue" />
+                        <CheckCircle2 size={16} aria-hidden className="shrink-0 text-ap-blue" />
                       )}
                     </button>
                   );
@@ -273,7 +281,7 @@ function QuizSection({
                 onClick={lanjut}
               >
                 {indeks < soal.length - 1
-                  ? `Lanjut ke soal ${indeks + 2}`
+                  ? `Lanjut ke soal ${formatAngka(indeks + 2)}`
                   : "Lihat hasil"}
               </Button>
             </div>
@@ -286,8 +294,8 @@ function QuizSection({
             >
               <KacaKartu className="p-6 text-center">
                 <p className="angka-tabular font-display text-5xl font-extrabold text-ap-ink dark:text-ink">
-                  {benar}
-                  <span className="text-2xl text-muted">/{soal.length}</span>
+                  {formatAngka(benar)}
+                  <span className="text-2xl text-muted">/{formatAngka(soal.length)}</span>
                 </p>
                 {benar >= soal.length - 1 ? (
                   <p className="mt-3 flex items-center justify-center gap-2 font-display text-lg font-bold">
@@ -300,12 +308,17 @@ function QuizSection({
                     ulang.
                   </p>
                 )}
-                <p className="mt-2 text-sm text-muted">
-                  {tersimpan
-                    ? benar >= soal.length - 1 && !lulusSebelumnya
-                      ? "+15 poin masuk ke akunmu."
-                      : "Skor tersimpan."
-                    : "Masuk untuk menyimpan skor."}
+                <p
+                  role={pesanSimpan ? "alert" : "status"}
+                  aria-live={pesanSimpan ? "assertive" : "polite"}
+                  className="mt-2 text-sm text-muted"
+                >
+                  {pesanSimpan ??
+                    (tersimpan
+                      ? benar >= soal.length - 1 && !lulusSebelumnya
+                        ? "+15 poin masuk ke akunmu."
+                        : "Skor tersimpan."
+                      : "Masuk untuk menyimpan skor.")}
                 </p>
                 <KacaPill
                   type="button"
@@ -367,10 +380,12 @@ function KalkulatorSection({
   const [jawaban, setJawaban] = useState<Record<string, number>>({});
   const [hasil, setHasil] = useState<number | null>(awal);
   const [proses, setProses] = useState(false);
+  const [pesan, setPesan] = useState<string | null>(null);
 
   const lengkap = PERTANYAAN_KALKULATOR.every((q) => jawaban[q.kunci] != null);
 
   async function hitung() {
+    setPesan(null);
     let total = 0;
     for (const q of PERTANYAAN_KALKULATOR) {
       total += q.bobot[jawaban[q.kunci] ?? 0];
@@ -384,12 +399,16 @@ function KalkulatorSection({
       data: { user },
     } = await supabase.auth.getUser();
     if (user) {
-      await supabase.from("kalkulator_hasil").upsert({
+      const { error } = await supabase.from("kalkulator_hasil").upsert({
         user_id: user.id,
         kg_tahun: kg,
         updated_at: new Date().toISOString(),
       });
-      router.refresh();
+      if (error) {
+        setPesan("Hasil belum tersimpan. Coba lagi nanti.");
+      } else {
+        router.refresh();
+      }
     }
     setProses(false);
   }
@@ -400,21 +419,24 @@ function KalkulatorSection({
     <section aria-label="Kalkulator jejak sampah">
       <div className={`${KARTU_UTILITAS} p-6`}>
         <h2 className="flex items-center gap-2 font-display text-xl font-bold">
-          <Calculator size={19} className="text-kunyit-500" /> Kalkulator Jejak
+          <Calculator size={19} aria-hidden className="text-kunyit-500" /> Kalkulator Jejak
           Sampah Pribadi
         </h2>
         <p className="mt-1 text-sm text-muted">
           Estimasi timbulan sampah rumahmu per tahun dibanding rata-rata nasional
-          ({rataRata} kg/orang/tahun).
+          ({formatAngka(rataRata)} kg/orang/tahun).
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {PERTANYAAN_KALKULATOR.map((q) => (
-            <div key={q.kunci}>
-              <Label>{q.tanya}</Label>
+            <fieldset key={q.kunci}>
+              <legend className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">
+                {q.tanya}
+              </legend>
               <div className="flex flex-wrap gap-1.5">
                 {q.opsi.map((o, i) => (
                   <button
+                    type="button"
                     key={o}
                     onClick={() =>
                       setJawaban((j) => ({ ...j, [q.kunci]: i }))
@@ -430,7 +452,7 @@ function KalkulatorSection({
                   </button>
                 ))}
               </div>
-            </div>
+            </fieldset>
           ))}
         </div>
 
@@ -440,14 +462,14 @@ function KalkulatorSection({
           disabled={!lengkap || proses}
           onClick={hitung}
         >
-          {proses ? "Menyimpan…" : hasil !== null ? "Hitung ulang" : "Hitung jejakku"}
+          {proses ? "Menyimpan" : hasil !== null ? "Hitung ulang" : "Hitung jejakku"}
         </Button>
 
         {hasil === null ? (
           <div className="mt-6">
             <KacaKartu className="p-6 text-center">
               <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
-                <Calculator size={26} strokeWidth={1.8} />
+                <Calculator size={26} strokeWidth={1.8} aria-hidden />
               </span>
               <h3 className="font-display text-lg font-bold">
                 Kamu belum menghitung jejakmu
@@ -467,9 +489,14 @@ function KalkulatorSection({
           >
             <KacaKartu className="p-5 text-center">
               <p className="angka-tabular font-serif text-4xl font-semibold text-ap-ink dark:text-ink">
-                {hasil.toLocaleString("id-ID")} kg
+                {formatAngka(hasil)} kg
               </p>
               <p className="mt-1 text-sm text-muted">per tahun untuk rumahmu</p>
+              {pesan && (
+                <p role="alert" aria-live="assertive" className="mt-3 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">
+                  {pesan}
+                </p>
+              )}
               <div className="mx-auto mt-4 max-w-sm">
                 <div className="rounded-full border border-ap-hairline bg-white/60 p-1.5 backdrop-blur dark:border-line dark:bg-panel-2">
                   <div className="relative h-3 overflow-hidden rounded-full bg-line">
@@ -491,12 +518,12 @@ function KalkulatorSection({
                 <p className="mt-2 text-xs text-muted">
                   {hasil <= rataRata
                     ? "Di bawah rata-rata nasional. Pertahankan!"
-                    : `Di atas rata-rata nasional (${rataRata} kg). Mulai dari memilah & mengurangi plastik.`}
+                    : `Di atas rata-rata nasional (${formatAngka(rataRata)} kg). Mulai dari memilah & mengurangi plastik.`}
                 </p>
               </div>
               {masuk && (
                 <p className="mt-3 text-xs text-muted">
-                  Hasil tersimpan di profilmu · +5 poin untuk perhitungan pertama.
+                  Hasil tersimpan di profilmu. +5 poin untuk perhitungan pertama.
                 </p>
               )}
             </KacaKartu>

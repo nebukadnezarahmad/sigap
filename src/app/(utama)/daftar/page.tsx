@@ -8,6 +8,8 @@ import { createClient } from "@/lib/supabase/client";
 import { isTujuanAman } from "@/lib/utils";
 import { Button, Card, Input, Label } from "@/components/ui";
 
+const STATUS_DAFTAR = "status-daftar";
+
 function FormulirDaftar() {
   const router = useRouter();
   const params = useSearchParams();
@@ -87,34 +89,36 @@ function FormulirDaftar() {
     <Card className="mx-auto w-full max-w-md p-7">
       <div className="mb-6 text-center">
         <span className="mx-auto mb-3 flex size-11 items-center justify-center rounded-2xl bg-daun-600 text-white">
-          <MapPin size={22} strokeWidth={2.5} />
+          <MapPin size={22} strokeWidth={2.5} aria-hidden />
         </span>
         <h1 className="font-display text-2xl font-bold">Gabung jadi warga SIGAP</h1>
         <p className="mt-1 text-sm text-muted">
-          Gratis — mulai laporkan dan dapatkan poin partisipasi.
+          Gratis, mulai laporkan dan dapatkan poin partisipasi.
         </p>
       </div>
 
-      <form onSubmit={daftar} className="space-y-4">
+      <form onSubmit={daftar} className="space-y-4" aria-describedby={pesan ? STATUS_DAFTAR : undefined}>
         <div>
           <Label htmlFor="nama">Nama lengkap</Label>
-          <Input id="nama" required value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Budi Santoso" />
+          <Input id="nama" name="name" autoComplete="name" required value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Nama lengkap" />
         </div>
         <div>
           <Label htmlFor="username">Username</Label>
-          <Input id="username" required value={username} onChange={(e) => setUsername(e.target.value.toLowerCase())} placeholder="budi_s" />
+          <Input id="username" name="username" autoComplete="username" required value={username} onChange={(e) => setUsername(e.target.value.toLowerCase())} placeholder="nama_pengguna" />
         </div>
         <div>
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nama@email.com" />
+          <Input id="email" name="email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nama@email.com" />
         </div>
         <div>
           <Label htmlFor="sandi">Kata sandi</Label>
-          <Input id="sandi" type="password" required minLength={8} autoComplete="new-password" value={sandi} onChange={(e) => setSandi(e.target.value)} placeholder="Minimal 8 karakter" />
+          <Input id="sandi" name="password" type="password" required minLength={8} autoComplete="new-password" value={sandi} onChange={(e) => setSandi(e.target.value)} placeholder="Minimal 8 karakter" />
         </div>
         {pesan && (
           <p
-            role="status"
+            id={STATUS_DAFTAR}
+            role={pesan.startsWith("ok:") ? "status" : "alert"}
+            aria-live={pesan.startsWith("ok:") ? "polite" : "assertive"}
             className={`rounded-xl px-3 py-2 text-sm ${
               pesan.startsWith("ok:")
                 ? "bg-daun-500/10 text-daun-700 dark:text-daun-300"
@@ -124,8 +128,8 @@ function FormulirDaftar() {
             {pesan.startsWith("ok:") ? pesan.slice(3) : pesan}
           </p>
         )}
-        <Button type="submit" disabled={proses} className="w-full" size="lg">
-          {proses ? "Memproses…" : "Buat akun"}
+        <Button type="submit" disabled={proses} aria-busy={proses} className="w-full" size="lg">
+          {proses ? "Memproses" : "Buat akun"}
         </Button>
       </form>
 

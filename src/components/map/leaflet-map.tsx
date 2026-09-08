@@ -72,6 +72,7 @@ export function LeafletMap({
   terpilih,
   onPilih,
   onKlikTitik,
+  describedBy,
   mode = "jelajah",
   pusat,
   zoom = 13,
@@ -82,6 +83,7 @@ export function LeafletMap({
   terpilih?: string | null;
   onPilih?: (lat: number, lng: number) => void;
   onKlikTitik?: (id: string) => void;
+  describedBy?: string;
   mode?: Mode;
   pusat?: [number, number];
   zoom?: number;
@@ -206,6 +208,11 @@ export function LeafletMap({
             offset: [0, -22],
           });
           const bukaLaporan = () => cbRef.current.onKlikTitik?.(t.id);
+          m.on("add", () => {
+            const element = m.getElement();
+            element?.setAttribute("role", "button");
+            element?.setAttribute("aria-label", `Buka laporan: ${t.judul}`);
+          });
           m.on("click", bukaLaporan);
           // Pengaman bila event keydown marker didukung: Space/Enter
           // membuka laporan yang sama seperti klik.
@@ -236,9 +243,9 @@ export function LeafletMap({
         const layer = L.layerGroup().addTo(peta);
         L.marker([t.lat, t.lng], {
           icon: buatIkon(L, t.warna, t.slug, true),
-          keyboard: true,
-          title: t.judul,
-          alt: `Pin laporan: ${t.judul}`,
+          keyboard: false,
+          interactive: false,
+          alt: "",
         }).addTo(layer);
         refLayer.current = layer;
         peta.setView([t.lat, t.lng], Math.max(peta.getZoom(), 15));
@@ -251,7 +258,7 @@ export function LeafletMap({
     return () => {
       batal = true;
     };
-  }, [titik, terpilih, mode, panas, pusat, zoom]);
+  }, [titik, terpilih, mode, panas, pusat, zoom, gelap]);
 
   useEffect(() => {
     if (refTile.current) {
@@ -295,7 +302,7 @@ export function LeafletMap({
       return;
     }
     setMencariLokasi(true);
-    setStatusLokasi("Mencari lokasimu…");
+    setStatusLokasi("Mencari lokasimu");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const lat = pos.coords.latitude;
@@ -344,7 +351,10 @@ export function LeafletMap({
       {/* Perbesar kontrol zoom bawaan Leaflet (30px) ke target 44px,
           plus cincin fokus yang jelas untuk marker keyboard. */}
       <style>{`.sigap-peta .leaflet-bar a{width:44px!important;height:44px!important;line-height:44px!important}
-.sigap-peta .leaflet-marker-icon:focus-visible{outline:3px solid var(--color-ap-blue-focus);outline-offset:3px;border-radius:12px}`}</style>
+.sigap-peta .leaflet-bottom.leaflet-right{right:calc(.75rem + env(safe-area-inset-right,0px));bottom:calc(3.5rem + env(safe-area-inset-bottom,0px))}
+.sigap-peta .leaflet-marker-icon:focus-visible{outline:3px solid var(--color-ap-blue-focus);outline-offset:3px;border-radius:12px}
+.sigap-peta .pin-hitbox{display:flex;width:44px;height:44px;align-items:flex-end;justify-content:center}
+.sigap-peta .pin-hitbox .pin-sigap{flex:none}`}</style>
       <div className="relative h-full w-full" onKeyDown={pilihTengah}>
         <div
           ref={refDiv}
@@ -354,17 +364,19 @@ export function LeafletMap({
             className
           )}
           role="region"
-          aria-label="Peta interaktif"
+          aria-label={mode === "pilih" ? "Peta untuk memilih lokasi" : "Peta interaktif laporan warga"}
+          aria-describedby={describedBy}
+          tabIndex={mode === "pilih" ? 0 : undefined}
         />
         {mode === "pilih" && (
-          <div className="pointer-events-none absolute left-3 top-3 z-[600] flex max-w-[calc(100%-1.5rem)] flex-col items-start gap-1.5">
+          <div className="pointer-events-none absolute left-[calc(.75rem+env(safe-area-inset-left,0px))] top-[calc(.75rem+env(safe-area-inset-top,0px))] z-[600] flex max-w-[calc(100%-1.5rem)] flex-col items-start gap-1.5">
             <button
               type="button"
               onClick={pakaiLokasiSaya}
               disabled={mencariLokasi}
               className="pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full border border-ap-hairline bg-white/85 px-4 text-sm font-semibold text-ap-ink shadow-none backdrop-blur transition hover:border-ap-blue/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! disabled:opacity-60 motion-reduce:transition-none dark:border-white/15 dark:bg-[#131d19]/80 dark:text-ink"
             >
-              {mencariLokasi ? "Mencari…" : "Pakai lokasi saya"}
+              {mencariLokasi ? "Mencari" : "Pakai lokasi saya"}
             </button>
             <p className="rounded-lg border border-ap-hairline bg-white/85 px-2.5 py-1 text-[11px] leading-snug text-muted shadow-none backdrop-blur dark:border-white/15 dark:bg-[#131d19]/80">
               Keyboard: geser dengan tombol panah, tekan Enter untuk menandai
@@ -390,7 +402,7 @@ export function LeafletMap({
             <button
               type="button"
               onClick={() => cbRef.current.onKlikTitik?.(t.id)}
-              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[2000] focus:min-h-11 focus:rounded-full focus:bg-ap-blue focus:px-5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-none focus:outline-ap-blue-focus"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-[calc(1rem+env(safe-area-inset-left,0px))] focus:top-[calc(1rem+env(safe-area-inset-top,0px))] focus:z-[2000] focus:min-h-11 focus:rounded-full focus:bg-ap-blue focus:px-5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-none focus:outline-ap-blue-focus"
             >
               Buka laporan: {t.judul}
             </button>
@@ -424,9 +436,9 @@ function buatIkon(
   const ikon = svgUriKategori(slug, PUTIH_PIN, 15);
   return L.divIcon({
     className: "",
-    html: `<span class="pin-sigap${aktif ? " pin-aktif" : ""}" style="--pin:${aman}"><img src="${ikon}" width="15" height="15" alt="" class="pin-ikon" /></span>`,
-    iconSize: [34, 34],
-    iconAnchor: [17, 34],
+    html: `<span class="pin-hitbox"><span class="pin-sigap${aktif ? " pin-aktif" : ""}" style="--pin:${aman}"><img src="${ikon}" width="15" height="15" alt="" class="pin-ikon" /></span></span>`,
+    iconSize: [44, 44],
+    iconAnchor: [22, 44],
     tooltipAnchor: [0, -26],
   });
 }
