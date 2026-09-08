@@ -51,31 +51,27 @@ function useReducedMotion() {
 type PitaGradientProps = {
   children: ReactNode;
   tone?: "gelap" | "terang";
+  animated?: boolean;
 };
 
-export function PitaGradient({ children, tone = "gelap" }: PitaGradientProps) {
+export function PitaGradient({
+  children,
+  tone = "gelap",
+  animated = false,
+}: PitaGradientProps) {
   const reducedMotion = useReducedMotion();
   const gelap = tone === "gelap";
+  const tampilkanShader = animated && !reducedMotion;
 
   return (
     <section
       className={
         gelap
-          ? "relative w-full overflow-hidden bg-[#1d1d1f] text-white"
-          : "relative w-full overflow-hidden bg-[#f5f5f7] text-[#1d1d1f]"
+          ? "relative w-full overflow-hidden bg-ap-tile1 text-white"
+          : "relative w-full overflow-hidden bg-ap-parchment text-ap-ink"
       }
     >
-      {reducedMotion ? (
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background: gelap
-              ? `linear-gradient(135deg, ${WARNA.arang} 0%, ${WARNA.biru} 55%, ${WARNA.kabut} 130%)`
-              : `linear-gradient(135deg, ${WARNA.kabut} 0%, ${WARNA.kabut} 45%, ${WARNA.biru} 160%)`,
-          }}
-        />
-      ) : (
+      {tampilkanShader && (
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <ShaderGradientCanvas pixelDensity={1} pointerEvents="none">
             <ShaderGradient
@@ -111,14 +107,16 @@ export function PitaGradient({ children, tone = "gelap" }: PitaGradientProps) {
       )}
 
       {/* Scrim agar isi pita selalu kontras di atas gradient. */}
-      <div
-        aria-hidden
-        className={
-          gelap
-            ? "pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-black/25"
-            : "pointer-events-none absolute inset-0 bg-gradient-to-t from-white/75 via-white/45 to-white/25"
-        }
-      />
+      {tampilkanShader && (
+        <div
+          aria-hidden
+          className={
+            gelap
+              ? "pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-black/25"
+              : "pointer-events-none absolute inset-0 bg-gradient-to-t from-white/75 via-white/45 to-white/25"
+          }
+        />
+      )}
 
       <div className="relative z-10 mx-auto flex min-h-[320px] w-full max-w-4xl flex-col justify-center px-4 py-12">
         {children}

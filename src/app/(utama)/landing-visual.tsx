@@ -13,6 +13,75 @@ import { ArrowRight, ExternalLink, MapPin, X } from "lucide-react";
 const FOKUS_APPLE =
   "focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!";
 
+const TAHAP_LAPORAN: StatusKey[] = [
+  "baru",
+  "diverifikasi",
+  "dikerjakan",
+  "menunggu_verifikasi",
+  "selesai",
+];
+
+function LajurSiklusLaporan() {
+  return (
+    <section
+      aria-labelledby="judul-siklus-laporan"
+      className="mt-5 rounded-[18px] border border-ap-hairline bg-ap-parchment p-5 sm:p-6"
+    >
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+        <div>
+          <p className="text-sm font-semibold text-ap-blue">Siklus laporan</p>
+          <h2
+            id="judul-siklus-laporan"
+            className="mt-1 font-serif text-2xl font-semibold leading-tight tracking-[-0.2px]"
+          >
+            Dari temuan ke penanganan
+          </h2>
+        </div>
+        <p className="max-w-sm text-sm leading-relaxed text-ap-ink-muted">
+          Urutan status yang dapat dilalui sebuah laporan.
+        </p>
+      </div>
+
+      <ol className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-0">
+        {TAHAP_LAPORAN.map((status, index) => {
+          const info = STATUS[status];
+          return (
+            <li
+              key={status}
+              className="flex min-w-0 flex-1 items-center gap-3 sm:flex-col sm:items-stretch sm:gap-2"
+            >
+              <div className="flex min-w-0 items-center gap-3 sm:w-full">
+                <span
+                  aria-hidden
+                  className="size-3 shrink-0 rounded-full ring-4 ring-ap-parchment"
+                  style={{ backgroundColor: info.warna }}
+                />
+                {index < TAHAP_LAPORAN.length - 1 && (
+                  <span
+                    aria-hidden
+                    className="hidden h-px flex-1 bg-ap-hairline sm:block"
+                  />
+                )}
+              </div>
+              <p className="min-w-0 break-words text-sm font-semibold text-ap-ink">
+                {info.label}
+              </p>
+            </li>
+          );
+        })}
+      </ol>
+
+      <p className="mt-5 text-xs leading-relaxed text-ap-ink-muted">
+        Jalur lain yang tersedia: {" "}
+        <span className={`font-semibold ${STATUS.ditolak.chip}`}>
+          {STATUS.ditolak.label}
+        </span>
+        .
+      </p>
+    </section>
+  );
+}
+
 export function AngkaHidup({ nilai }: { nilai: number }) {
   const [tampil, setTampil] = useState(nilai);
   const [prevNilai, setPrevNilai] = useState(nilai);
@@ -154,6 +223,9 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
     awalTitik && awalTitik.length > 0 ? awalTitik : FALLBACK_TITIK
   );
   const [terpilihId, setTerpilihId] = useState<string | null>(null);
+  const [pakaiFallback, setPakaiFallback] = useState(
+    !(awalTitik && awalTitik.length > 0)
+  );
 
   // Sinkronisasi realtime dari Supabase
   useEffect(() => {
@@ -193,6 +265,7 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
                 status: r.status,
               }));
               setTitik(hasil);
+              setPakaiFallback(false);
             }
           } catch {
             /* pertahankan data lokal */
@@ -209,33 +282,44 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
   const laporanTerpilih =
     titik.find((t) => t.id === terpilihId) ?? (terpilihId === null ? titik[0] : null);
 
-  const statusInfo = laporanTerpilih?.status
-    ? STATUS[laporanTerpilih.status as StatusKey]
-    : null;
+  const statusInfo =
+    laporanTerpilih?.status && laporanTerpilih.status in STATUS
+      ? STATUS[laporanTerpilih.status as StatusKey]
+      : null;
 
   return (
-    <div className="overflow-hidden rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-ap-shadow">
+    <>
+      <div className="overflow-hidden rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-ap-shadow">
       {/* Top Bar Status */}
-      <div className="flex min-h-[44px] items-center justify-between border-b border-ap-hairline bg-ap-parchment px-4 py-2.5 text-xs">
-        <div className="flex items-center gap-2">
+      <div className="flex min-h-[52px] flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-ap-hairline bg-ap-parchment px-3 py-2.5 text-xs sm:px-4">
+        <div className="flex min-w-0 items-center gap-2">
           <span className="relative flex size-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ap-blue opacity-75 motion-reduce:animate-none" />
             <span className="relative inline-flex size-2 rounded-full bg-ap-blue" />
           </span>
-          <span className="font-semibold tracking-tight text-ap-ink">
-            Peta Geospasial Wilayah
+          <span className="truncate font-semibold tracking-tight text-ap-ink">
+            Peta laporan warga
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="rounded-full bg-daun-500/10 px-2.5 py-0.5 text-[11px] font-bold tabular-nums angka-tabular text-daun-700 dark:text-daun-300">
-            {titik.length} laporan aktif
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
+          {pakaiFallback && (
+            <span className="inline-flex min-h-6 items-center rounded-full border border-ap-warning/40 px-2 py-0.5 text-[11px] font-semibold text-ap-warning">
+              Demo
+            </span>
+          )}
+          <span className="rounded-full bg-ap-blue/10 px-2.5 py-0.5 text-[11px] font-bold tabular-nums angka-tabular text-ap-blue">
+            {pakaiFallback
+              ? `${titik.length} contoh laporan`
+              : `${titik.length} laporan aktif`}
           </span>
-          <span className="hidden text-[11px] text-ap-ink/60 sm:inline">· Realtime</span>
+          <span className="hidden text-[11px] text-ap-ink-muted sm:inline">
+            Realtime
+          </span>
         </div>
       </div>
 
       {/* Area Peta Nyata Leaflet */}
-      <div className="relative h-[380px] w-full bg-ap-parchment">
+      <div className="relative h-[clamp(280px,48vw,380px)] w-full bg-ap-parchment">
         <LeafletMap
           titik={titik}
           terpilih={terpilihId}
@@ -260,7 +344,7 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
               transition={{ duration: 0.25, ease: "easeOut" }}
               className="absolute bottom-3 left-3 right-3 z-[1000] sm:left-auto sm:right-3 sm:w-80"
             >
-              <KacaKartu className="p-3.5">
+              <KacaKartu glass className="p-3.5">
                 <div className="flex items-start justify-between gap-2 border-b border-ap-hairline pb-2">
                   <div className="flex min-w-0 items-center gap-2">
                     <span
@@ -273,7 +357,7 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
                       <IkonKategori slug={laporanTerpilih.slug} ukuran={14} />
                     </span>
                     <div className="min-w-0">
-                      <p className="truncate text-xs font-bold text-ap-ink">
+                      <p className="break-words text-xs font-bold leading-snug text-ap-ink">
                         {laporanTerpilih.judul}
                       </p>
                       <p className="text-[10px] capitalize text-ap-ink/60">
@@ -292,24 +376,25 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
                   )}
                 </div>
 
-                <div className="mt-2.5 flex items-center justify-between">
-                  {statusInfo ? (
-                    <span
-                      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold"
-                      style={{
-                        backgroundColor: `${statusInfo.warna}18`,
-                        color: statusInfo.warna,
-                      }}
-                    >
+                <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+                  <span aria-live="polite">
+                    {statusInfo ? (
                       <span
-                        className="size-1.5 rounded-full"
-                        style={{ backgroundColor: statusInfo.warna }}
-                      />
-                      {statusInfo.label}
-                    </span>
-                  ) : (
-                    <span className="text-[10px] text-ap-ink/60">Terpantau</span>
-                  )}
+                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${statusInfo.chip}`}
+                      >
+                        <span
+                          aria-hidden
+                          className="size-1.5 rounded-full"
+                          style={{ backgroundColor: statusInfo.warna }}
+                        />
+                        {statusInfo.label}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-ap-ink-muted">
+                        Terpantau
+                      </span>
+                    )}
+                  </span>
 
                   <Link
                     href={`/laporan/${laporanTerpilih.id}`}
@@ -325,10 +410,12 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
       </div>
 
       {/* Bottom Bar Controls & Navigation */}
-      <div className="flex min-h-[44px] items-center justify-between gap-2 border-t border-ap-hairline bg-ap-parchment px-4 py-2.5 text-xs">
-        <span className="flex min-w-0 items-center gap-1.5 text-[11px] text-ap-ink/60">
+      <div className="flex min-h-[52px] flex-wrap items-center justify-between gap-2 border-t border-ap-hairline bg-ap-parchment px-3 py-2.5 text-xs sm:px-4">
+        <span className="flex min-w-0 flex-1 items-center gap-1.5 text-[11px] text-ap-ink-muted">
           <MapPin size={13} className="shrink-0 text-ap-blue" />
-          <span className="truncate">Pilih pin untuk melihat status laporan di sekitarmu</span>
+          <span className="min-w-0 break-words">
+            Pilih pin untuk melihat status laporan di sekitarmu
+          </span>
         </span>
         <Link
           href="/peta"
@@ -337,6 +424,8 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
           Lihat peta lengkap <ExternalLink size={12} />
         </Link>
       </div>
-    </div>
+      </div>
+      <LajurSiklusLaporan />
+    </>
   );
 }

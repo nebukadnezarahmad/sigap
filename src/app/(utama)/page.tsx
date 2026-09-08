@@ -1,56 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  BarChart3,
-  Building2,
-  CheckCircle2,
-  MapPin,
-  Megaphone,
-  Users,
-} from "lucide-react";
+import { ArrowRight, Building2, MapPin, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { AngkaHidup, PetaHeroVisual, Terungkap } from "./landing-visual";
-import { HeroPembungkus } from "@/components/eksperimen/hero-pembungkus";
+import { PetaHeroVisual, Terungkap } from "./landing-visual";
 
 export const dynamic = "force-dynamic";
 
-const LANGKAH = [
-  {
-    nomor: "01",
-    ikon: MapPin,
-    judul: "Tandai masalah dalam 30 detik",
-    isi: "Tandai titik di peta, sertakan foto, pilih kategori. Laporanmu langsung terlihat oleh dewan dan warga sekitar.",
-  },
-  {
-    nomor: "02",
-    ikon: Megaphone,
-    judul: "Warga serentak mendukung",
-    isi: "Dukungan dari warga lain, termasuk kamu, menaikkan prioritas penanganan dan mempercepat tindak lanjut di lapangan.",
-  },
-  {
-    nomor: "03",
-    ikon: CheckCircle2,
-    judul: "Penanganan yang bisa kamu cek",
-    isi: "Petugas menyertakan foto sesudah penanganan, dan laporan selesai setelah diverifikasi minimal 2 warga di lapangan.",
-  },
-];
-
 /* Grammar Apple DESIGN.md (FUSI): tile full-bleed bergantian
-   putih ↔ parchment ↔ gelap, radius 0, tanpa shadow kecuali foto produk.
+   putih, parchment, gelap, radius 0, tanpa shadow kecuali foto produk.
    Display tetap Fraunces/serif; headline tile 40px/600/tight; body 17px. */
 const H2_TILE =
   "mt-2 font-serif text-[40px] font-semibold leading-[1.1] tracking-[-0.28px]";
-const EYEBROW_LIGHT =
-  "text-xs font-semibold uppercase tracking-[0.2em] text-ap-blue";
+const EYEBROW_LIGHT = "text-sm font-semibold text-ap-blue";
 const BODY_TILE = "text-[17px] leading-[1.47] tracking-[-0.374px]";
 const FOKUS_APPLE =
   "focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!";
-const KARTU_UTILITAS =
-  "rounded-[18px] border border-ap-hairline bg-white shadow-none";
 
 export default async function Beranda() {
   let statistik = { total: 0, selesai: 0, warga: 0 };
@@ -125,94 +92,44 @@ export default async function Beranda() {
 
   return (
     <main>
-      <HeroPembungkus />
-      {/* Tile 1 — hero terang (canvas putih) */}
-      <section className="bg-white text-ap-ink">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="animate-muncul">
-            <h1 className="font-serif text-[40px] font-semibold leading-[1.1] tracking-[-0.28px]">
-              Masalah lingkungan di sekitarmu,{" "}
-              <span className="text-ap-blue">terpetakan.</span>{" "}
-              <em className="font-light italic text-ap-ink">
-                Diselesaikan.
-              </em>
+      <style>{`
+        /* R-03: use the compact navigation before the header's desktop row clips. */
+        @media (min-width: 768px) and (max-width: 833px) {
+          header nav[aria-label="Utama"] {
+            display: none;
+          }
+
+          header button[aria-controls="navigasi-seluler"] {
+            display: flex;
+          }
+        }
+      `}</style>
+      <section className="bg-white text-ap-ink" aria-labelledby="judul-utama">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:py-16 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16 lg:py-20">
+          <div className="max-w-xl">
+            <p className={EYEBROW_LIGHT}>Peta laporan warga</p>
+            <h1
+              id="judul-utama"
+              className="mt-3 max-w-lg font-serif text-[clamp(2.75rem,5vw,3.5rem)] font-semibold leading-[1.06] tracking-[-0.28px]"
+            >
+              Masalah lingkungan di sekitarmu, {" "}
+              <span className="text-ap-blue">terlihat di peta.</span>
             </h1>
-            <p
-              className={`mt-6 max-w-lg text-ap-ink/70 ${BODY_TILE}`}
-            >
-              SIGAP menghubungkan warga dan pemerintah desa/kota lewat peta
-              interaktif: laporkan sampah menumpuk, drainase macet, atau lampu
-              jalan mati — lalu pantau penanganannya secara transparan.
+            <p className={`mt-6 max-w-lg text-ap-ink/70 ${BODY_TILE}`}>
+              Pilih titik di sekitarmu untuk membaca kategori, status, dan
+              catatan penanganan yang tersedia.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href="/peta"
-                className={`group inline-flex min-h-[44px] items-center rounded-full ${FOKUS_APPLE}`}
-              >
-                <span className="inline-flex min-h-[44px] items-center gap-3 rounded-full bg-ap-blue py-[11px] pl-[22px] pr-[11px] text-[17px] font-semibold text-white transition active:scale-[0.95] hover:bg-ap-blue-focus">
-                  Buka peta interaktif
-                  <span className="flex size-8 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none">
-                    <ArrowRight size={16} strokeWidth={2.2} />
-                  </span>
-                </span>
-              </Link>
-              <Link
-                href="/daftar"
-                className={`inline-flex min-h-[44px] items-center rounded-full border border-ap-blue bg-white px-[22px] py-[11px] text-[17px] font-semibold text-ap-blue transition hover:bg-ap-blue/5 active:scale-[0.95] ${FOKUS_APPLE}`}
-              >
-                Gabung jadi warga SIGAP
-              </Link>
-            </div>
-
-            <dl className="mt-10 grid gap-5 sm:grid-cols-3">
-              {[
-                ["Laporan masuk", statistik.total],
-                ["Selesai ditangani", statistik.selesai],
-                ["Warga aktif", statistik.warga],
-              ].map(([label, nilai]) => (
-                <div
-                  key={label as string}
-                  className={`${KARTU_UTILITAS} p-6`}
-                >
-                  <dd className="font-serif text-3xl font-semibold tabular-nums angka-tabular text-ap-ink">
-                    {statistikGagal ? (
-                      <span aria-label={`${label as string} tidak tersedia`}>
-                        —
-                      </span>
-                    ) : (
-                      <AngkaHidup nilai={nilai as number} />
-                    )}
-                  </dd>
-                  <dt className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-ap-ink/60">
-                    {label}
-                  </dt>
-                </div>
-              ))}
-            </dl>
-
-            {/* Cuplikan Foto Lingkungan Nyata */}
-            <div
-              className={`mt-8 flex max-w-lg items-center gap-3.5 ${KARTU_UTILITAS} p-6`}
+            <Link
+              href="/peta"
+              className={`group mt-8 inline-flex min-h-[44px] items-center rounded-full ${FOKUS_APPLE}`}
             >
-              <div className="relative size-12 shrink-0 overflow-hidden rounded-lg shadow-ap-shadow">
-                <Image
-                  src="/images/lingkungan-permukiman.jpg"
-                  alt="Kawasan permukiman kota hijau"
-                  fill
-                  sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
-                  priority
-                  className="object-cover"
-                />
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-xs font-bold text-ap-ink">
-                  Kawasan Permukiman Berkelanjutan
-                </p>
-                <p className="truncate text-[11px] text-ap-ink/60">
-                  Kota Harapan · Terintegrasi Pos Ronda, DLH & Warga RT/RW
-                </p>
-              </div>
-            </div>
+              <span className="inline-flex min-h-[44px] items-center gap-3 rounded-full bg-ap-blue py-[11px] pl-[22px] pr-[11px] text-[17px] font-semibold text-white transition active:scale-[0.95] hover:bg-ap-blue-focus">
+                Buka peta laporan
+                <span className="flex size-8 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none">
+                  <ArrowRight size={16} strokeWidth={2.2} />
+                </span>
+              </span>
+            </Link>
           </div>
 
           <Terungkap tunda={0.15}>
@@ -221,338 +138,222 @@ export default async function Beranda() {
         </div>
       </section>
 
-      {/* Tile 2 — Cara Kerja & Gotong Royong (parchment) */}
       <section
         className="bg-ap-parchment text-ap-ink"
-        aria-label="Cara kerja"
+        aria-labelledby="judul-bukti"
       >
-        <div className="mx-auto max-w-6xl px-4 py-20">
-          <div className="grid items-center gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              <Terungkap>
-                <p className={EYEBROW_LIGHT}>Cara kerja</p>
-                <h2 className={`${H2_TILE} max-w-xl`}>
-                  Tiga Langkah Mudah Menjaga Lingkungan Bersama
-                </h2>
-              </Terungkap>
-              <div className="mt-10 space-y-8">
-                {LANGKAH.map((l, i) => (
-                  <Terungkap key={l.nomor} tunda={i * 0.08}>
-                    <div className="relative flex items-start gap-4 border-l-2 border-ap-blue/30 pl-6">
-                      <span
-                        aria-hidden
-                        className="absolute -left-[13px] top-1 flex size-6 items-center justify-center rounded-full bg-ap-blue font-display text-[10px] font-bold text-white"
-                      >
-                        {i + 1}
-                      </span>
-                      <div>
-                        <h3 className="flex items-center gap-2 font-display text-lg font-bold text-ap-ink">
-                          <span className="flex size-7 items-center justify-center rounded-lg bg-ap-blue/10 text-ap-blue">
-                            <l.ikon size={15} />
-                          </span>
-                          {l.judul}
-                        </h3>
-                        <p
-                          className={`mt-1.5 text-ap-ink/70 teks-pretty ${BODY_TILE}`}
-                        >
-                          {l.isi}
-                        </p>
-                      </div>
-                    </div>
-                  </Terungkap>
-                ))}
-              </div>
-            </div>
-
-            {/* Kartu Foto Gotong Royong Warga Lapangan */}
-            <div className="lg:col-span-5">
-              <Terungkap tunda={0.2}>
-                <div className={`${KARTU_UTILITAS} p-6`}>
-                  <div className="relative h-80 w-full overflow-hidden rounded-lg shadow-ap-shadow">
-                    <Image
-                      src="/images/gotong-royong.jpg"
-                      alt="Warga RT gotong royong dan verifikasi lingkungan"
-                      fill
-                      sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-                    <div className="absolute bottom-3 left-3 right-3 text-white">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-md">
-                        <Users size={11} /> Aksi lapangan warga
-                      </span>
-                      <p className="mt-1.5 text-sm font-bold">
-                        Gotong Royong & Verifikasi Warga
-                      </p>
-                      <p className="text-[11px] leading-relaxed text-white/80">
-                        RT 05 / RW 03 · Masalah selesai divalidasi langsung oleh 2 warga sekitar.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between px-1 pt-4 text-xs">
-                    <span className="text-ap-ink/60">Partisipasi aktif RT/RW</span>
-                    <span className="font-bold text-ap-blue">Terverifikasi lapangan</span>
-                  </div>
-                </div>
-              </Terungkap>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Tile 3 — Kategori laporan (gelap ap-tile1, kartu utilitas putih) */}
-      <section
-        className="bg-ap-tile1 text-white"
-        aria-label="Kategori laporan"
-      >
-        <div className="mx-auto max-w-6xl px-4 py-20">
-          <Terungkap className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ap-sky">
-                Standar Cakupan & SLA Resmi
-              </p>
-              <h2 className={H2_TILE}>
-                6 Kategori Permukiman dengan Target SLA Terikat
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
+          <div className="grid gap-12 lg:grid-cols-[0.86fr_1.14fr] lg:gap-20">
+            <Terungkap>
+              <p className={EYEBROW_LIGHT}>Laporan yang bisa diikuti</p>
+              <h2 id="judul-bukti" className={`${H2_TILE} max-w-xl`}>
+                Dari laporan ke bukti
               </h2>
-            </div>
-            <p className={`max-w-sm text-white/70 teks-pretty ${BODY_TILE}`}>
-              Setiap kategori memiliki target waktu penanganan (*Service Level Agreement*) resmi yang dipantau publik secara transparan.
-            </p>
-          </Terungkap>
-          <Terungkap tunda={0.1}>
-            <div className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
-              {KATEGORI.map((k) => (
-                <div
-                  key={k.slug}
-                  className={`flex flex-col justify-between ${KARTU_UTILITAS} p-6`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className="flex size-8 items-center justify-center rounded-lg"
-                      style={{ backgroundColor: `${k.warna}20`, color: k.warna }}
-                      role="img"
-                      aria-label={k.nama}
-                    >
-                      <IkonKategori slug={k.slug} ukuran={15} />
-                    </span>
-                    <span className="angka-tabular rounded-full bg-ap-parchment px-2 py-0.5 text-xs font-bold tabular-nums text-ap-ink">
-                      {statistikGagal ? "—" : (hitungKategori.get(k.slug) ?? 0)}
-                    </span>
-                  </div>
-                  <div className="mt-4 min-w-0">
-                    <p className="truncate text-sm font-bold text-ap-ink">
-                      {k.nama}
-                    </p>
-                    <p className="mt-1 text-[11px] font-semibold text-ap-blue">
-                      SLA: {k.slug === "sampah" ? "3 Hari" : k.slug === "jalan" ? "14 Hari" : k.slug === "ruang-hijau" ? "21 Hari" : "7 Hari"}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Terungkap>
-        </div>
-      </section>
-
-      {/* Tile 4 — Arsitektur Solusi (canvas putih, kartu utilitas) */}
-      <section
-        className="bg-white text-ap-ink"
-        aria-label="Pilar solusi SIGAP"
-      >
-        <div className="mx-auto max-w-6xl px-4 py-20">
-          <Terungkap>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-ap-blue">
-              <Building2 size={15} /> Pilar layanan SIGAP
-            </div>
-            <h2 className={`${H2_TILE} max-w-2xl`}>
-              Ekosistem civic-tech yang terhubung dan akuntabel
-            </h2>
-            <p className={`mt-3 max-w-2xl text-ap-ink/70 ${BODY_TILE}`}>
-              Bukan sekadar formulir aduan. SIGAP merawat setiap laporanmu dari pencatatan yang rapi hingga verifikasi bersama warga.
-            </p>
-          </Terungkap>
-
-          <div className="mt-12 grid gap-5 lg:grid-cols-12">
-            {/* Spotlight Kiri: Peta Spasial & Deduplikasi */}
-            <Terungkap className="flex lg:col-span-6">
-              <div className={`flex w-full flex-col justify-between ${KARTU_UTILITAS} p-6`}>
-                <div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-ap-parchment px-3 py-1 text-xs font-bold text-ap-blue">
-                    <MapPin size={13} /> Pilar 01 · Catatan warga yang rapi
-                  </span>
-                  <h3 className="mt-4 font-serif text-2xl font-semibold text-ap-ink">
-                    Satu titik untuk satu masalah dalam 100 meter
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-ap-ink/70 teks-pretty">
-                    Supaya tidak ada laporan ganda di titik yang sama. Saat kamu menandai pin, sistem memeriksa masalah serupa dalam radius 100 meter dan mengajakmu mendukung laporan yang sudah ada.
-                  </p>
-                  <div className="mt-6 space-y-2 rounded-lg border border-ap-hairline bg-ap-parchment p-4 text-xs">
-                    <div className="flex items-center justify-between text-ap-ink/60">
-                      <span>Basis data wilayah</span>
-                      <span className="font-mono font-semibold text-ap-ink">PostGIS GiST 4326</span>
-                    </div>
-                    <div className="flex items-center justify-between text-ap-ink/60">
-                      <span>Jarak pantau</span>
-                      <span className="font-semibold text-ap-blue">≤ 100 meter</span>
-                    </div>
-                  </div>
-                </div>
-
-                <Link
-                  href="/peta"
-                  className={`mt-8 inline-flex min-h-[44px] items-center gap-2 text-[17px] font-semibold text-ap-blue ${FOKUS_APPLE}`}
-                >
-                  Lihat peta dan coba melapor <ArrowRight size={15} />
-                </Link>
-              </div>
-            </Terungkap>
-
-            {/* 3 Blok Kanan: Dashboard, Verifikasi Warga, Transparansi */}
-            <div className="flex flex-col justify-between space-y-5 lg:col-span-6">
-              <Terungkap tunda={0.1}>
-                <div className={`${KARTU_UTILITAS} p-6`}>
-                  <div className="flex items-start gap-4">
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-ap-blue/10 text-ap-blue">
-                      <Building2 size={20} />
-                    </span>
-                    <div>
-                      <h3 className="font-display text-lg font-bold text-ap-ink">
-                        Dashboard Dewan dengan Target SLA
-                      </h3>
-                      <p className="mt-1 text-sm leading-relaxed text-ap-ink/70">
-                        Pemantauan target hari penanganan yang mengikat (3–21 hari), penugasan petugas teknis (DLH/PU), serta pemantauan sebaran kepadatan masalah via Heatmap.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Terungkap>
-
-              <Terungkap tunda={0.2}>
-                <div className={`${KARTU_UTILITAS} p-6`}>
-                  <div className="flex items-start gap-4">
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-ap-blue/10 text-ap-blue">
-                      <CheckCircle2 size={20} />
-                    </span>
-                    <div>
-                      <h3 className="font-display text-lg font-bold text-ap-ink">
-                        Verifikasi 2 Warga & Bukti Foto Wajib
-                      </h3>
-                      <p className="mt-1 text-sm leading-relaxed text-ap-ink/70">
-                        Menghapus praktik penutupan laporan sepihak. Dewan wajib melampirkan foto bukti fisik sesudah, dan status membutuhkan minimal 2 konfirmasi warga lapangan.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Terungkap>
-
-              <Terungkap tunda={0.3}>
-                <div className={`${KARTU_UTILITAS} p-6`}>
-                  <div className="flex items-start gap-4">
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-ap-blue/10 text-ap-blue">
-                      <BarChart3 size={20} />
-                    </span>
-                    <div>
-                      <h3 className="font-display text-lg font-bold text-ap-ink">
-                        Papan Keterlambatan Publik & Open Data
-                      </h3>
-                      <p className="mt-1 text-sm leading-relaxed text-ap-ink/70">
-                        Daftar laporan yang melewati SLA dipublikasikan terbuka (*Overdue Watchlist*), siap dicetak PDF untuk rapat RT/RW, dan tersedia via API lisensi CC-BY.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Terungkap>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Tile 5 — Lembar Fakta (parchment, kartu utilitas putih) */}
-      <section className="bg-ap-parchment text-ap-ink" aria-label="Mengapa penting">
-        <div className="mx-auto max-w-6xl px-4 py-20">
-          <div className="grid items-center gap-10 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              <p className={EYEBROW_LIGHT}>
-                Lembar Fakta Permukiman
+              <p className={`mt-4 max-w-xl text-ap-ink/70 ${BODY_TILE}`}>
+                Satu titik memberi konteks awal. Detail laporan menyatukan
+                lokasi, kategori, dan status agar penanganannya mudah diikuti.
               </p>
-              <h2 className={H2_TILE}>
-                Mengapa SIGAP Mendesak untuk Kota Kita?
-              </h2>
-              <p className={`mt-4 text-ap-ink/70 teks-pretty ${BODY_TILE}`}>
-                Data SIPSN Kementerian Lingkungan Hidup mencatat timbulan sampah nasional mencapai <b className="font-semibold text-ap-ink">±33,79 juta ton pada 2024</b>, dan hanya sekitar sepertiga yang berhasil dikelola dengan baik. Mayoritas sisanya menumpuk persis di lingkungan permukiman: drainase tersumbat, TPS liar di tikungan jalan, dan fasilitas publik terbengkalai.
-              </p>
-              <p className={`mt-3 text-ap-ink/70 teks-pretty ${BODY_TILE}`}>
-                Perubahan nyata dimulai dari lingkup terkecil: koordinasi RT/RW yang transparan dan terdata secara digital.
-              </p>
-              <p className="mt-6 text-xs text-ap-ink/60">
-                Sumber Resmi: SIPSN KLHK 2024–2025 · Publikasi Riset BRIN (2025)
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-5 lg:col-span-5">
-              <div className="relative h-48 w-full overflow-hidden rounded-lg shadow-ap-shadow">
+              <figure className="relative mt-8 aspect-[4/3] w-full overflow-hidden rounded-[18px] shadow-ap-shadow">
                 <Image
-                  src="/images/kota-sdg11.jpg"
-                  alt="Koridor transportasi dan ruang hijau perkotaan berkelanjutan SDG 11"
+                  src="/images/gotong-royong.jpg"
+                  alt="Warga bekerja bersama di lingkungan permukiman"
                   fill
-                  sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
+                  sizes="(max-width:1024px)100vw,40vw"
                   className="object-cover"
                 />
-                {/* Overlay dipertahankan: label putih di atas foto, penjamin kontras */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                <p className="absolute bottom-2.5 left-3.5 right-3.5 text-xs font-bold text-white">
-                  Target SDG 11: Kota & Permukiman Berkelanjutan
+              </figure>
+            </Terungkap>
+
+            <Terungkap tunda={0.1}>
+              <div className="border-t border-ap-hairline">
+                <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-ap-hairline py-4">
+                  <h3 className="font-display text-lg font-bold text-ap-ink">
+                    Kategori laporan
+                  </h3>
+                  <p className="text-sm text-ap-ink-muted">
+                    {statistikGagal
+                      ? "Data tidak tersedia"
+                      : `${statistik.total.toLocaleString("id-ID")} laporan tercatat`}
+                  </p>
+                </div>
+                <ul className="grid gap-x-8 sm:grid-cols-2">
+                  {KATEGORI.map((kategori) => (
+                    <li
+                      key={kategori.slug}
+                      className="flex min-w-0 items-center justify-between gap-4 border-b border-ap-hairline py-5"
+                    >
+                      <span className="flex min-w-0 items-center gap-3">
+                        <span
+                          aria-hidden
+                          className="flex size-8 shrink-0 items-center justify-center rounded-lg"
+                          style={{
+                            backgroundColor: `${kategori.warna}20`,
+                            color: kategori.warna,
+                          }}
+                        >
+                          <IkonKategori slug={kategori.slug} ukuran={15} />
+                        </span>
+                        <span className="min-w-0 break-words text-sm font-semibold text-ap-ink">
+                          {kategori.nama}
+                        </span>
+                      </span>
+                      <span className="shrink-0 font-serif text-2xl font-semibold tabular-nums text-ap-ink">
+                        {statistikGagal
+                          ? "-"
+                          : (hitungKategori.get(kategori.slug) ?? 0)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-5 text-xs leading-relaxed text-ap-ink-muted">
+                  Hitungan mengikuti laporan yang tersedia di SIGAP.
                 </p>
               </div>
-
-              {[
-                { angka: "33,79 Jt", unit: "Ton", label: "Timbulan sampah nasional tahun 2024" },
-                { angka: "~32%", unit: "Terkelola", label: "Sampah yang tertangani dengan baik" },
-                { angka: "56,7%", unit: "Rumah Tangga", label: "Berasal dari aktivitas permukiman warga" },
-              ].map((f) => (
-                <div
-                  key={f.label}
-                  className={`${KARTU_UTILITAS} p-6 text-left`}
-                >
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="font-serif text-2xl font-semibold text-ap-ink">
-                      {f.angka}
-                    </span>
-                    <span className="text-xs font-bold uppercase text-ap-blue">
-                      {f.unit}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 text-sm text-ap-ink/70">{f.label}</p>
-                </div>
-              ))}
-            </div>
+            </Terungkap>
           </div>
         </div>
       </section>
 
-      {/* Tile 6 — Call to Action (gelap ap-tile2) */}
-      <section className="bg-ap-tile2 text-white">
-        <div className="mx-auto max-w-6xl px-4 py-20 text-center">
+      <section className="bg-white text-ap-ink" aria-labelledby="judul-peran">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
           <Terungkap>
-            <h2 className="font-serif text-[40px] font-semibold leading-[1.1] tracking-[-0.28px]">
-              Lingkunganmu Menunggu Tindakan Nyata.
+            <p className={EYEBROW_LIGHT}>Ruang kerja SIGAP</p>
+            <h2 id="judul-peran" className={`${H2_TILE} max-w-2xl`}>
+              Satu laporan, dilihat dari peran yang berbeda
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-[17px] leading-[1.47] tracking-[-0.374px] text-white/70 teks-pretty">
-              Butuh 30 detik untuk menandai masalah di peta. Penanganannya tercatat dan dipantau bersama seluruh warga.
+            <p className={`mt-4 max-w-2xl text-ap-ink/70 ${BODY_TILE}`}>
+              Warga menemukan laporan. Pelapor mengikuti miliknya. Dewan
+              melihat antrean yang perlu ditindaklanjuti.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Link
-                href="/peta"
-                className={`group inline-flex min-h-[44px] items-center rounded-full ${FOKUS_APPLE}`}
-              >
-                <span className="inline-flex min-h-[44px] items-center gap-3 rounded-full bg-ap-blue py-[14px] pl-7 pr-[14px] text-[17px] font-semibold text-white transition active:scale-[0.95] hover:bg-ap-blue-focus">
-                  Buka Peta Interaktif
-                  <span className="flex size-8 items-center justify-center rounded-full bg-white/15 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none">
-                    <ArrowRight size={16} strokeWidth={2.2} />
-                  </span>
+          </Terungkap>
+
+          <div className="mt-12 space-y-6">
+            <Terungkap>
+              <article className="grid overflow-hidden rounded-[18px] border border-ap-hairline bg-ap-parchment lg:grid-cols-[1.08fr_0.92fr]">
+                <div className="relative min-h-64 lg:min-h-80">
+                  <Image
+                    src="/images/lingkungan-permukiman.jpg"
+                    alt="Kawasan permukiman kota hijau"
+                    fill
+                    sizes="(max-width:1024px)100vw,55vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-col justify-between gap-8 p-6 sm:p-8 lg:p-10">
+                  <div>
+                    <p className="flex items-center gap-2 text-sm font-semibold text-ap-blue">
+                      <MapPin size={15} aria-hidden /> Warga sekitar
+                    </p>
+                    <h3 className="mt-3 font-serif text-3xl font-semibold leading-tight tracking-[-0.2px]">
+                      Mulai dari lokasi yang kamu lihat
+                    </h3>
+                    <p className="mt-3 text-base leading-relaxed text-ap-ink/70">
+                      Buka peta untuk melihat laporan di sekitar dan membaca
+                      detail titik yang ingin kamu ikuti.
+                    </p>
+                  </div>
+                  <Link
+                    href="/peta"
+                    className={`inline-flex min-h-[44px] items-center gap-2 text-[17px] font-semibold text-ap-blue ${FOKUS_APPLE}`}
+                  >
+                    Lihat laporan di peta <ArrowRight size={15} />
+                  </Link>
+                </div>
+              </article>
+            </Terungkap>
+
+            <Terungkap tunda={0.1}>
+              <article className="grid overflow-hidden rounded-[18px] border border-ap-hairline bg-white lg:grid-cols-[0.92fr_1.08fr]">
+                <div className="order-2 relative min-h-64 lg:order-1 lg:min-h-80">
+                  <Image
+                    src="/images/gotong-royong.jpg"
+                    alt="Warga bekerja bersama di ruang terbuka"
+                    fill
+                    sizes="(max-width:1024px)100vw,48vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="order-1 flex flex-col justify-between gap-8 p-6 sm:p-8 lg:order-2 lg:p-10">
+                  <div>
+                    <p className="flex items-center gap-2 text-sm font-semibold text-ap-blue">
+                      <Users size={15} aria-hidden /> Pelapor
+                    </p>
+                    <h3 className="mt-3 max-w-xl font-serif text-3xl font-semibold leading-tight tracking-[-0.2px]">
+                      Simpan jejak laporanmu
+                    </h3>
+                    <p className="mt-3 max-w-xl text-base leading-relaxed text-ap-ink/70">
+                      Halaman laporan saya membantu kamu kembali ke titik yang
+                      pernah dibuat dan melihat status terakhirnya.
+                    </p>
+                  </div>
+                  <Link
+                    href="/laporan-saya"
+                    className={`inline-flex min-h-[44px] items-center gap-2 text-[17px] font-semibold text-ap-blue ${FOKUS_APPLE}`}
+                  >
+                    Buka laporan saya <ArrowRight size={15} />
+                  </Link>
+                </div>
+              </article>
+            </Terungkap>
+
+            <Terungkap tunda={0.2}>
+              <article className="grid overflow-hidden rounded-[18px] bg-ap-tile1 text-white lg:grid-cols-[1.02fr_0.98fr]">
+                <div className="flex flex-col justify-between gap-8 p-6 sm:p-8 lg:p-10">
+                  <div>
+                    <p className="flex items-center gap-2 text-sm font-semibold text-ap-sky">
+                      <Building2 size={15} aria-hidden /> Dewan
+                    </p>
+                    <h3 className="mt-3 font-serif text-3xl font-semibold leading-tight tracking-[-0.2px]">
+                      Pantau laporan dari satu ruang kerja
+                    </h3>
+                    <p className="mt-3 text-base leading-relaxed text-white/75">
+                      Dashboard dewan menampilkan laporan yang masuk beserta
+                      statusnya sesuai akses akun.
+                    </p>
+                  </div>
+                  <Link
+                    href="/dewan"
+                    className="inline-flex min-h-[44px] items-center gap-2 text-[17px] font-semibold text-ap-sky focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-sky"
+                  >
+                    Buka ruang dewan <ArrowRight size={15} />
+                  </Link>
+                </div>
+                <div className="relative min-h-64 lg:min-h-80">
+                  <Image
+                    src="/images/kota-sdg11.jpg"
+                    alt="Koridor transportasi dan ruang hijau perkotaan"
+                    fill
+                    sizes="(max-width:1024px)100vw,50vw"
+                    className="object-cover"
+                  />
+                </div>
+              </article>
+            </Terungkap>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-ap-tile2 text-white" aria-labelledby="judul-aksi">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
+          <Terungkap>
+            <p className="text-sm font-semibold text-ap-sky">Mulai di sekitar</p>
+            <h2 id="judul-aksi" className={`${H2_TILE} max-w-2xl`}>
+              Satu titik cukup untuk memulai.
+            </h2>
+            <p className={`mt-4 max-w-xl text-white/75 ${BODY_TILE}`}>
+              Buka peta dan pilih laporan yang ingin kamu pahami lebih jauh.
+            </p>
+            <Link
+              href="/peta"
+              className="group mt-8 inline-flex min-h-[44px] items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-sky"
+            >
+              <span className="inline-flex min-h-[44px] items-center gap-3 rounded-full bg-ap-blue py-[14px] pl-7 pr-[14px] text-[17px] font-semibold text-white transition active:scale-[0.95] hover:bg-ap-blue-focus">
+                Buka peta laporan
+                <span className="flex size-8 items-center justify-center rounded-full bg-white/15 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none">
+                  <ArrowRight size={16} strokeWidth={2.2} />
                 </span>
-              </Link>
-            </div>
+              </span>
+            </Link>
           </Terungkap>
         </div>
       </section>

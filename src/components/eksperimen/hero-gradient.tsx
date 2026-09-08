@@ -41,7 +41,7 @@ function useReducedMotion() {
 function IsiHero() {
   return (
     <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center px-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
+      <p className="text-xs font-semibold text-white/70">
         SIGAP · Lapor · Pantau · Tuntas
       </p>
       <h1 className="mt-3 max-w-2xl font-serif text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">
@@ -69,6 +69,7 @@ function IsiHero() {
   );
 }
 
+// Opt-in visual fallback. It is not part of the homepage product opening.
 export function HeroGradient() {
   const reducedMotion = useReducedMotion();
 
