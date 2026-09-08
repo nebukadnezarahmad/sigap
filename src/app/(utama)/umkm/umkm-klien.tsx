@@ -218,26 +218,6 @@ function FormAjukanUsaha({
   );
 }
 
-export function GalatUmkm() {
-  const router = useRouter();
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
-        <h1 className="font-display text-2xl font-bold">
-          UMKM Warga belum bisa dimuat
-        </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
-        </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
-          Coba lagi
-        </Button>
-      </Card>
-    </main>
-  );
-}
-
 export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
   const router = useRouter();
   const [daftar, setDaftar] = useState(awal);

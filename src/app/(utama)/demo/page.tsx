@@ -53,7 +53,7 @@ export default function HalamanDemo() {
         <p className="inline-flex items-center gap-1.5 rounded-full border border-action/30 bg-action-soft px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-action">
           <Sparkles size={13} /> Khusus Dewan Juri & Penguji
         </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
           Panduan Demo Cepat SIGAP
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-muted teks-pretty">

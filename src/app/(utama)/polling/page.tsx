@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { GalatPolling, PollingKlien } from "./polling-klien";
+import { PollingKlien } from "./polling-klien";
+import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Polling Warga" };
 export const dynamic = "force-dynamic";
@@ -19,7 +20,11 @@ export default async function HalamanPolling() {
   const supabase = await createClient();
 
   if (!supabase) {
-    return <GalatPolling />;
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Polling Warga belum bisa dimuat" />
+      </KontenUtama>
+    );
   }
 
   const {
@@ -66,7 +71,7 @@ export default async function HalamanPolling() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
           Suara warga
         </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
           Polling Partisipatif
         </h1>
         <p className="mt-3 max-w-xl text-muted teks-pretty">

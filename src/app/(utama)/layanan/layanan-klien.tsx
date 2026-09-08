@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import {
   Ambulance,
@@ -13,7 +12,7 @@ import {
   Search,
   Shield,
 } from "lucide-react";
-import { Button, Card } from "@/components/ui";
+import { Card } from "@/components/ui";
 
 type Layanan = {
   id: string;
@@ -38,26 +37,6 @@ function nomorWa(telepon: string) {
   if (digit.startsWith("62")) return digit;
   if (digit.startsWith("0")) return `62${digit.slice(1)}`;
   return null;
-}
-
-export function GalatLayanan() {
-  const router = useRouter();
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
-        <h1 className="font-display text-2xl font-bold">
-          Direktori Layanan belum bisa dimuat
-        </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
-        </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
-          Coba lagi
-        </Button>
-      </Card>
-    </main>
-  );
 }
 
 export function LayananKlien({ awal }: { awal: Layanan[] }) {

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui";
 import { NODE_LAIN } from "@/lib/ikon-vektor";
-import { EdukasiKlien, GalatEdukasi } from "./edukasi-klien";
+import { EdukasiKlien } from "./edukasi-klien";
+import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Edukasi" };
 export const dynamic = "force-dynamic";
@@ -101,7 +102,11 @@ const SOAL = [
 export default async function HalamanEdukasi() {
   const supabase = await createClient();
   if (!supabase) {
-    return <GalatEdukasi />;
+    return (
+      <KontenUtama lebar="lebar">
+        <GalatMuatUlang judul="Edukasi belum bisa dimuat" />
+      </KontenUtama>
+    );
   }
   const {
     data: { user },
@@ -133,7 +138,7 @@ export default async function HalamanEdukasi() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
           Sekolah lingkungan
         </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
           Edukasi Permukiman
         </h1>
         <p className="mt-3 max-w-xl text-muted teks-pretty">

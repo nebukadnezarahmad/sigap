@@ -307,7 +307,7 @@ export function DewanClient({
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
           Panel dewan
         </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
           Dashboard Dewan
         </h1>
         <p className="mt-3 max-w-xl text-muted teks-pretty">

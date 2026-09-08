@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { AksiKlien, GalatAksi } from "./aksi-klien";
+import { AksiKlien } from "./aksi-klien";
+import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Aksi Bersama" };
 export const dynamic = "force-dynamic";
@@ -24,7 +25,11 @@ function batasLewat() {
 export default async function HalamanAksi() {
   const supabase = await createClient();
   if (!supabase) {
-    return <GalatAksi />;
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Aksi Bersama belum bisa dimuat" />
+      </KontenUtama>
+    );
   }
 
   const {
@@ -64,7 +69,7 @@ export default async function HalamanAksi() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
           Gerakan bersama
         </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
           Aksi Bersama
         </h1>
         <p className="mt-3 max-w-xl text-muted teks-pretty">

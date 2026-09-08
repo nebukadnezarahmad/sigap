@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { GalatPasar, PasarKlien } from "./pasar-klien";
+import { PasarKlien } from "./pasar-klien";
+import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Pasar ReUse" };
 export const dynamic = "force-dynamic";
@@ -22,7 +23,11 @@ export default async function HalamanPasar() {
   const supabase = await createClient();
 
   if (!supabase) {
-    return <GalatPasar />;
+    return (
+      <KontenUtama lebar="lebar">
+        <GalatMuatUlang judul="Pasar ReUse belum bisa dimuat" />
+      </KontenUtama>
+    );
   }
 
   const {
@@ -64,7 +69,7 @@ export default async function HalamanPasar() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
           Ekonomi sirkular warga
         </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
           Pasar ReUse
         </h1>
         <p className="mt-3 max-w-xl text-muted teks-pretty">

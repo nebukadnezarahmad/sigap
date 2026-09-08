@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { GalatLayanan, LayananKlien } from "./layanan-klien";
+import { LayananKlien } from "./layanan-klien";
+import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Direktori Layanan" };
 export const dynamic = "force-dynamic";
@@ -9,7 +10,11 @@ export default async function HalamanLayanan() {
   const supabase = await createClient();
 
   if (!supabase) {
-    return <GalatLayanan />;
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Direktori Layanan belum bisa dimuat" />
+      </KontenUtama>
+    );
   }
 
   const { data: layanan } = await supabase
@@ -23,7 +28,7 @@ export default async function HalamanLayanan() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
           Nomor yang wajib dihafal
         </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
+        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
           Direktori Layanan
         </h1>
         <p className="mt-3 max-w-xl text-muted teks-pretty">

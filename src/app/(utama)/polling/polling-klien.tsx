@@ -9,26 +9,6 @@ import { useUser } from "@/lib/use-user";
 import type { Poll } from "./page";
 import { Button, Card, Input, Label } from "@/components/ui";
 
-export function GalatPolling() {
-  const router = useRouter();
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
-        <h1 className="font-display text-2xl font-bold">
-          Polling Warga belum bisa dimuat
-        </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
-        </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
-          Coba lagi
-        </Button>
-      </Card>
-    </main>
-  );
-}
-
 function PersenBar({  persen,
   terpilih,
   label,
