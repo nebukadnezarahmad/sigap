@@ -250,27 +250,6 @@ export default async function HalamanTransparansi() {
 
       <div className="mx-auto max-w-6xl px-4 pt-10">
 
-      {total === 0 && (
-        <KacaKartu className="mb-6 p-8 text-center">
-          <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
-            <FileSpreadsheet size={26} strokeWidth={1.8} />
-          </span>
-          <h2 className="font-display text-xl font-bold">
-            Belum ada laporan untuk ditampilkan
-          </h2>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
-            Kamu bisa jadi yang pertama melaporkan. Data transparansi akan
-            terisi otomatis setelah ada laporan masuk.
-          </p>
-          <Link
-            href="/peta?lapor=1"
-            className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
-          >
-            Buat laporan pertama
-          </Link>
-        </KacaKartu>
-      )}
-
       {/* Papan Keterlambatan Publik (Overdue Watchlist) */}
       <section className="mb-6 rounded-[18px] border border-danger/30 bg-white p-6 text-ap-ink shadow-none dark:border-danger/40 dark:bg-ap-tile1 dark:text-white">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ap-hairline pb-3 dark:border-white/15">
@@ -352,6 +331,27 @@ export default async function HalamanTransparansi() {
           </div>
         )}
       </section>
+
+      {total === 0 && (
+        <KacaKartu className="mb-6 p-8 text-center">
+          <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+            <FileSpreadsheet size={26} strokeWidth={1.8} />
+          </span>
+          <h2 className="font-display text-xl font-bold">
+            Belum ada laporan untuk ditampilkan
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+            Kamu bisa jadi yang pertama melaporkan. Data transparansi akan
+            terisi otomatis setelah ada laporan masuk.
+          </p>
+          <Link
+            href="/peta?lapor=1"
+            className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
+          >
+            Buat laporan pertama
+          </Link>
+        </KacaKartu>
+      )}
 
       {/* Ringkasan Metrik Utama */}
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">

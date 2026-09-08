@@ -417,6 +417,219 @@ export function DewanClient({
       <section className="bg-white text-ap-ink dark:bg-black dark:text-white">
         <div className="mx-auto max-w-7xl px-4 py-8 pb-12">
           <div className="flex flex-col">
+          <div className="order-1 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
+            <div className={`${KARTU_UTILITAS} overflow-hidden p-0`}>
+              {dipilih.size > 0 && (
+                <div className="flex flex-wrap items-center gap-3 border-b border-ap-hairline bg-ap-parchment/80 px-5 py-3 backdrop-blur dark:border-white/15 dark:bg-ap-tile2">
+                  <span className="angka-tabular text-sm font-bold text-ap-blue dark:text-ap-sky">
+                    {dipilih.size} dipilih
+                  </span>
+                  <Select
+                    aria-label="Status massal"
+                    className={`w-44 ${SELECT_APPLE}`}
+                    value={bulkStatus}
+                    onChange={(e) => setBulkStatus(e.target.value as StatusKey)}
+                  >
+                    {(Object.keys(STATUS) as StatusKey[]).map((st) => (
+                      <option key={st} value={st}>
+                        {STATUS[st].label}
+                      </option>
+                    ))}
+                  </Select>
+                  <Button size="sm" className={TOMBOL_UTAMA_APPLE} onClick={terapkanBulk} disabled={bulkProses}>
+                    {bulkProses
+                      ? "Menerapkan…"
+                      : `Terapkan ke ${dipilih.size} laporan`}
+                  </Button>
+                  <Button
+                    variant="hantu"
+                    size="sm"
+                    className={TOMBOL_SEKUNDER_APPLE}
+                    onClick={() => setDipilih(new Set())}
+                  >
+                    Bersihkan pilihan
+                  </Button>
+                </div>
+              )}
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ap-hairline px-5 py-3.5 dark:border-white/15">
+                <h2 className="font-display font-bold">Kelola laporan</h2>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="sekunder"
+                    size="sm"
+                    onClick={eksporCsv}
+                    className={`!px-3 !py-1.5 text-xs ${TOMBOL_SEKUNDER_APPLE}`}
+                  >
+                    <Download size={14} /> Ekspor CSV
+                  </Button>
+                  <Select
+                    aria-label="Filter status"
+                    className={`w-40 ${SELECT_APPLE}`}
+                    value={filterStatus}
+                    onChange={(e) =>
+                      setFilterStatus(e.target.value as "semua" | StatusKey)
+                    }
+                  >
+                    <option value="semua">Semua status</option>
+                    {(Object.keys(STATUS) as StatusKey[]).map((s) => (
+                      <option key={s} value={s}>
+                        {STATUS[s].label}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+              <div className="max-h-[520px] divide-y divide-ap-hairline overflow-y-auto dark:divide-white/15">
+                {daftar
+                  .filter((r) => filterStatus === "semua" || r.status === filterStatus)
+                  .map((r) => {
+                    const sla = hitungSla(r.categories?.slug, r.created_at);
+                    const telat =
+                      sla.lewatSla && !["selesai", "ditolak"].includes(r.status);
+                    return (
+                    <div key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
+                      <label className="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center">
+                        <input
+                          type="checkbox"
+                          checked={dipilih.has(r.id)}
+                          onChange={() => togglePilih(r.id)}
+                          aria-label={`Pilih ${r.judul}`}
+                          className={`size-4 accent-ap-blue ${FOKUS_APPLE}`}
+                        />
+                      </label>
+                      <div className="min-w-0 flex-1 basis-56">
+                        <p className="truncate text-sm font-semibold">{r.judul}</p>
+                        <p className="flex items-center gap-1 truncate text-xs text-muted">
+                          <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={12} />
+                          {r.categories?.nama ?? "Lainnya"} · {waktuRelatif(r.created_at)} ·
+                          <ThumbsUp size={11} className="shrink-0" />
+                          <span className="angka-tabular">{r.vote_count}</span>
+                        </p>
+                      </div>
+                      {telat && (
+                        <span className="rounded-full bg-danger/10 px-2 py-1 text-[11px] font-bold text-danger">
+                          <AlarmClock size={11} className="inline align-[-1px]" />{" "}
+                          +{sla.hariTerlambat} hr lewat SLA ({sla.targetHari} hr)
+                        </span>
+                      )}
+                      <StatusChip status={r.status} />
+                      <div className="flex min-w-36 flex-col items-start gap-1">
+                        <input
+                          defaultValue={r.petugas ?? ""}
+                          placeholder="Petugas…"
+                          aria-label={`Petugas untuk ${r.judul}`}
+                          onBlur={(e) => {
+                            if (e.target.value !== (r.petugas ?? ""))
+                              tugaskan(r.id, e.target.value);
+                          }}
+                          className={`min-h-[44px] w-full rounded-lg border border-ap-hairline bg-white px-2.5 py-1.5 text-xs outline-none transition focus:border-ap-blue dark:border-white/15 dark:bg-ap-tile2 ${FOKUS_APPLE}`}
+                        />
+                        <span
+                          role="status"
+                          aria-live="polite"
+                          className={`min-h-4 text-[11px] ${
+                            statusTugas[r.id] === "gagal"
+                              ? "text-danger"
+                              : "text-muted"
+                          }`}
+                        >
+                          {statusTugas[r.id] === "menyimpan"
+                            ? "Menyimpan…"
+                            : statusTugas[r.id] === "tersimpan"
+                              ? "Tersimpan"
+                              : statusTugas[r.id] === "gagal"
+                                ? "Gagal menyimpan"
+                                : ""}
+                        </span>
+                      </div>
+                      <Select
+                        aria-label={`Ubah status ${r.judul}`}
+                        className={`w-36 ${SELECT_APPLE}`}
+                        value={r.status}
+                        onChange={(e) => ubahStatus(r.id, e.target.value as StatusKey)}
+                      >
+                        {(Object.keys(STATUS) as StatusKey[]).map((s) => (
+                          <option key={s} value={s}>
+                            {STATUS[s].label}
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
+                    );
+                  })}
+                {daftar.length === 0 ? (
+                  <div className="px-5 py-10 text-center">
+                    <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+                      <Inbox size={26} strokeWidth={1.8} />
+                    </span>
+                    <h3 className="font-display text-lg font-bold">
+                      Belum ada laporan masuk
+                    </h3>
+                    <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+                      Antrean kamu kosong. Laporan baru dari warga akan muncul di
+                      sini lengkap dengan status dan lokasinya.
+                    </p>
+                  </div>
+                ) : (
+                  daftar.filter(
+                    (r) => filterStatus === "semua" || r.status === filterStatus
+                  ).length === 0 && (
+                    <div className="px-5 py-10 text-center">
+                      <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+                        <Inbox size={26} strokeWidth={1.8} />
+                      </span>
+                      <h3 className="font-display text-lg font-bold">
+                        Tidak ada laporan pada filter ini
+                      </h3>
+                      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+                        Kamu bisa ubah filter ke Semua status untuk melihat seluruh
+                        antrean.
+                      </p>
+                      <Button
+                        variant="sekunder"
+                        size="sm"
+                        className={`mt-5 ${TOMBOL_SEKUNDER_APPLE}`}
+                        onClick={() => setFilterStatus("semua")}
+                      >
+                        Tampilkan semua status
+                      </Button>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+
+            <div className={`${KARTU_UTILITAS} flex flex-col overflow-hidden p-0`}>
+              <div className="flex items-center justify-between border-b border-ap-hairline px-5 py-3.5 dark:border-white/15">
+                <h2 className="font-display font-bold">Peta kepadatan (heatmap)</h2>
+                <button
+                  onClick={() => setHeatAktif((v) => !v)}
+                  role="switch"
+                  aria-checked={heatAktif}
+                  aria-label="Tampilkan heatmap kepadatan laporan"
+                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full ${FOKUS_APPLE}`}
+                >
+                  <span
+                    className={`relative h-6 w-11 rounded-full transition ${
+                      heatAktif ? "bg-ap-blue" : "bg-ap-hairline dark:bg-white/20"
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 size-5 rounded-full bg-white shadow-none transition-[background-color,border-color,box-shadow,color] ${
+                        heatAktif ? "left-[22px]" : "left-0.5"
+                      }`}
+                    />
+                  </span>
+                </button>
+              </div>
+              <div className="h-[480px] flex-1">
+                <LeafletMap
+                  titik={titikPeta}
+                  panas={heatAktif ? panasLive : undefined}
+                />
+              </div>
+            </div>
+          </div>
           <div className="order-2 mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
             {kartu.map((k) => (
               <motion.div
@@ -491,219 +704,6 @@ export function DewanClient({
         </div>
       </div>
 
-      <div className="order-1 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
-        <div className={`${KARTU_UTILITAS} overflow-hidden p-0`}>
-          {dipilih.size > 0 && (
-            <div className="flex flex-wrap items-center gap-3 border-b border-ap-hairline bg-ap-parchment/80 px-5 py-3 backdrop-blur dark:border-white/15 dark:bg-ap-tile2">
-              <span className="angka-tabular text-sm font-bold text-ap-blue dark:text-ap-sky">
-                {dipilih.size} dipilih
-              </span>
-              <Select
-                aria-label="Status massal"
-                className={`w-44 ${SELECT_APPLE}`}
-                value={bulkStatus}
-                onChange={(e) => setBulkStatus(e.target.value as StatusKey)}
-              >
-                {(Object.keys(STATUS) as StatusKey[]).map((st) => (
-                  <option key={st} value={st}>
-                    {STATUS[st].label}
-                  </option>
-                ))}
-              </Select>
-              <Button size="sm" className={TOMBOL_UTAMA_APPLE} onClick={terapkanBulk} disabled={bulkProses}>
-                {bulkProses
-                  ? "Menerapkan…"
-                  : `Terapkan ke ${dipilih.size} laporan`}
-              </Button>
-              <Button
-                variant="hantu"
-                size="sm"
-                className={TOMBOL_SEKUNDER_APPLE}
-                onClick={() => setDipilih(new Set())}
-              >
-                Bersihkan pilihan
-              </Button>
-            </div>
-          )}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ap-hairline px-5 py-3.5 dark:border-white/15">
-            <h2 className="font-display font-bold">Kelola laporan</h2>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="sekunder"
-                size="sm"
-                onClick={eksporCsv}
-                className={`!px-3 !py-1.5 text-xs ${TOMBOL_SEKUNDER_APPLE}`}
-              >
-                <Download size={14} /> Ekspor CSV
-              </Button>
-              <Select
-                aria-label="Filter status"
-                className={`w-40 ${SELECT_APPLE}`}
-                value={filterStatus}
-                onChange={(e) =>
-                  setFilterStatus(e.target.value as "semua" | StatusKey)
-                }
-              >
-                <option value="semua">Semua status</option>
-                {(Object.keys(STATUS) as StatusKey[]).map((s) => (
-                  <option key={s} value={s}>
-                    {STATUS[s].label}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          </div>
-          <div className="max-h-[520px] divide-y divide-ap-hairline overflow-y-auto dark:divide-white/15">
-            {daftar
-              .filter((r) => filterStatus === "semua" || r.status === filterStatus)
-              .map((r) => {
-                const sla = hitungSla(r.categories?.slug, r.created_at);
-                const telat =
-                  sla.lewatSla && !["selesai", "ditolak"].includes(r.status);
-                return (
-                <div key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
-                  <label className="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center">
-                    <input
-                      type="checkbox"
-                      checked={dipilih.has(r.id)}
-                      onChange={() => togglePilih(r.id)}
-                      aria-label={`Pilih ${r.judul}`}
-                      className={`size-4 accent-ap-blue ${FOKUS_APPLE}`}
-                    />
-                  </label>
-                  <div className="min-w-0 flex-1 basis-56">
-                    <p className="truncate text-sm font-semibold">{r.judul}</p>
-                    <p className="flex items-center gap-1 truncate text-xs text-muted">
-                      <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={12} />
-                      {r.categories?.nama ?? "Lainnya"} · {waktuRelatif(r.created_at)} ·
-                      <ThumbsUp size={11} className="shrink-0" />
-                      <span className="angka-tabular">{r.vote_count}</span>
-                    </p>
-                  </div>
-                  {telat && (
-                    <span className="rounded-full bg-danger/10 px-2 py-1 text-[11px] font-bold text-danger">
-                      <AlarmClock size={11} className="inline align-[-1px]" />{" "}
-                      +{sla.hariTerlambat} hr lewat SLA ({sla.targetHari} hr)
-                    </span>
-                  )}
-                  <StatusChip status={r.status} />
-                   <div className="flex min-w-36 flex-col items-start gap-1">
-                     <input
-                       defaultValue={r.petugas ?? ""}
-                       placeholder="Petugas…"
-                       aria-label={`Petugas untuk ${r.judul}`}
-                       onBlur={(e) => {
-                         if (e.target.value !== (r.petugas ?? ""))
-                           tugaskan(r.id, e.target.value);
-                       }}
-                       className={`min-h-[44px] w-full rounded-lg border border-ap-hairline bg-white px-2.5 py-1.5 text-xs outline-none transition focus:border-ap-blue dark:border-white/15 dark:bg-ap-tile2 ${FOKUS_APPLE}`}
-                     />
-                     <span
-                       role="status"
-                       aria-live="polite"
-                       className={`min-h-4 text-[11px] ${
-                         statusTugas[r.id] === "gagal"
-                           ? "text-danger"
-                           : "text-muted"
-                       }`}
-                     >
-                       {statusTugas[r.id] === "menyimpan"
-                         ? "Menyimpan…"
-                         : statusTugas[r.id] === "tersimpan"
-                           ? "Tersimpan"
-                           : statusTugas[r.id] === "gagal"
-                             ? "Gagal menyimpan"
-                             : ""}
-                     </span>
-                   </div>
-                  <Select
-                    aria-label={`Ubah status ${r.judul}`}
-                    className={`w-36 ${SELECT_APPLE}`}
-                    value={r.status}
-                    onChange={(e) => ubahStatus(r.id, e.target.value as StatusKey)}
-                  >
-                    {(Object.keys(STATUS) as StatusKey[]).map((s) => (
-                      <option key={s} value={s}>
-                        {STATUS[s].label}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                );
-              })}
-            {daftar.length === 0 ? (
-              <div className="px-5 py-10 text-center">
-                <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
-                  <Inbox size={26} strokeWidth={1.8} />
-                </span>
-                <h3 className="font-display text-lg font-bold">
-                  Belum ada laporan masuk
-                </h3>
-                <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
-                  Antrean kamu kosong. Laporan baru dari warga akan muncul di
-                  sini lengkap dengan status dan lokasinya.
-                </p>
-              </div>
-            ) : (
-              daftar.filter(
-                (r) => filterStatus === "semua" || r.status === filterStatus
-              ).length === 0 && (
-                <div className="px-5 py-10 text-center">
-                  <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
-                    <Inbox size={26} strokeWidth={1.8} />
-                  </span>
-                  <h3 className="font-display text-lg font-bold">
-                    Tidak ada laporan pada filter ini
-                  </h3>
-                  <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
-                    Kamu bisa ubah filter ke Semua status untuk melihat seluruh
-                    antrean.
-                  </p>
-                  <Button
-                    variant="sekunder"
-                    size="sm"
-                    className={`mt-5 ${TOMBOL_SEKUNDER_APPLE}`}
-                    onClick={() => setFilterStatus("semua")}
-                  >
-                    Tampilkan semua status
-                  </Button>
-                </div>
-              )
-            )}
-          </div>
-        </div>
-
-        <div className={`${KARTU_UTILITAS} flex flex-col overflow-hidden p-0`}>
-          <div className="flex items-center justify-between border-b border-ap-hairline px-5 py-3.5 dark:border-white/15">
-            <h2 className="font-display font-bold">Peta kepadatan (heatmap)</h2>
-             <button
-               onClick={() => setHeatAktif((v) => !v)}
-               role="switch"
-               aria-checked={heatAktif}
-               aria-label="Tampilkan heatmap kepadatan laporan"
-               className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full ${FOKUS_APPLE}`}
-            >
-              <span
-                className={`relative h-6 w-11 rounded-full transition ${
-                  heatAktif ? "bg-ap-blue" : "bg-ap-hairline dark:bg-white/20"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 size-5 rounded-full bg-white shadow-none transition-[background-color,border-color,box-shadow,color] ${
-                    heatAktif ? "left-[22px]" : "left-0.5"
-                  }`}
-                />
-              </span>
-            </button>
-          </div>
-          <div className="h-[480px] flex-1">
-            <LeafletMap
-              titik={titikPeta}
-              panas={heatAktif ? panasLive : undefined}
-            />
-          </div>
-         </div>
-        </div>
         </div>
         </div>
       </section>

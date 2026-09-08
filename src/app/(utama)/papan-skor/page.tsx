@@ -197,8 +197,8 @@ export default async function HalamanPapanSkor() {
               </span>
               <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={34} />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{p.nama_lengkap}</p>
-                <p className="truncate text-xs text-muted dark:text-white/70">@{p.username}</p>
+                <p className="break-words text-sm font-semibold">{p.nama_lengkap}</p>
+                <p className="break-words text-xs text-muted dark:text-white/70">@{p.username}</p>
               </div>
               <span className="angka-tabular text-sm font-bold tabular-nums">{p.poin}</span>
             </div>
