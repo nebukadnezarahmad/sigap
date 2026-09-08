@@ -32,6 +32,7 @@ import {
 import { waktuRelatif } from "@/lib/utils";
 import { StatusChip, Button, Card } from "@/components/ui";
 import { KacaBar, KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
+import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { Modal } from "@/components/modal";
 import { createClient } from "@/lib/supabase/client";
 import { BuatLaporanFormulir } from "./buat-laporan";
@@ -274,39 +275,43 @@ export function Jelajah({
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 pb-10 pt-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-bold">
+    <main className="pb-10">
+      {/* Fusi header: pita gelap + teks putih + CTA pil biru, pola
+          papan-skor/demo; judul, hitungan, status realtime, dan rute CTA
+          tidak diubah, hanya warna agar kontras di atas pita. */}
+      <PitaGradient tone="gelap">
+        <header className="text-center">
+          <h1 className="font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px] text-white">
             Peta Masalah Permukiman
           </h1>
-          <p className="text-sm text-muted">
+          <p className="mx-auto mt-2 max-w-xl text-sm text-white/85">
             <span className="angka-tabular tabular-nums">
               {tersaring.length}
             </span>{" "}
             laporan ditampilkan ·{" "}
-            <span
-              className={`inline-flex items-center gap-1 ${
-                realtimeAktif ? "text-daun-600 dark:text-daun-400" : ""
-              }`}
-            >
+            <span className="inline-flex items-center gap-1">
               <span
+                aria-hidden
                 className={`size-1.5 rounded-full ${
-                  realtimeAktif ? "animate-pulse bg-daun-500" : "bg-muted"
+                  realtimeAktif ? "animate-pulse bg-daun-500" : "bg-white/40"
                 }`}
               />
               {realtimeAktif ? "Realtime aktif" : "Menyambungkan…"}
             </span>
           </p>
-        </div>
-        <Button
-          size="lg"
-          onClick={() => setModalBuka(true)}
-          className="min-h-[44px] border-transparent bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus! dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus"
-        >
-          <Plus size={18} strokeWidth={3} /> Laporkan Masalah
-        </Button>
-      </div>
+          <div className="mt-5 flex justify-center">
+            <Button
+              size="lg"
+              onClick={() => setModalBuka(true)}
+              className="min-h-[44px] border-transparent bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus! dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus"
+            >
+              <Plus size={18} strokeWidth={3} /> Laporkan Masalah
+            </Button>
+          </div>
+        </header>
+      </PitaGradient>
+
+      <div className="mx-auto max-w-7xl px-4 pt-6">
 
       {!dbAktif && (
         <div className="mb-4 flex items-center gap-2 rounded-[18px] border border-kunyit-500/40 bg-white px-4 py-3 text-sm text-kunyit-600 shadow-none dark:bg-panel dark:text-kunyit-300">
@@ -870,6 +875,7 @@ export function Jelajah({
       </Modal>
 
       <TurPeta />
+      </div>
     </main>
   );
 }

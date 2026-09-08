@@ -15,6 +15,7 @@ import { KATEGORI, STATUS, SLA_KATEGORI, hitungSla, type StatusKey } from "@/lib
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { StatusChip, Button, Skeleton } from "@/components/ui";
 import { KacaKartu } from "@/components/eksperimen/kaca";
+import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { formatTanggal } from "@/lib/utils";
 import { GrafikBulanan, GrafikKategori } from "./grafik";
 import { TombolCetak } from "./tombol-cetak";
@@ -220,28 +221,34 @@ export default async function HalamanTransparansi() {
       (statusCount[r.status as StatusKey] ?? 0) + 1;
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-ap-blue dark:text-ap-sky">
-            <ShieldCheck size={16} /> Rapor Akuntabilitas Publik
+    <main className="pb-10">
+      <PitaGradient tone="gelap">
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+              <ShieldCheck size={16} /> Rapor Akuntabilitas Publik
+            </div>
+            <h1 className="mt-3 font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px] text-white">
+              Transparansi & Kepatuhan SLA Dewan
+            </h1>
+            <p className="mt-2 max-w-2xl text-white/85">
+              Data kinerja penanganan masalah lingkungan dari warga secara terbuka. Setiap kategori memiliki target waktu penanganan (*Service Level Agreement*) yang mengikat.
+            </p>
           </div>
-          <h1 className="mt-1 font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px]">
-            Transparansi & Kepatuhan SLA Dewan
-          </h1>
-          <p className="mt-2 max-w-2xl text-muted">
-            Data kinerja penanganan masalah lingkungan dari warga secara terbuka. Setiap kategori memiliki target waktu penanganan (*Service Level Agreement*) yang mengikat.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link href="/api/open-data" target="_blank">
-              <Button variant="sekunder" size="sm" className="hidden min-h-[44px] sm:inline-flex gap-1.5 focus-visible:outline-ap-blue-focus">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/api/open-data"
+              target="_blank"
+              className="hidden min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus sm:inline-flex"
+            >
               <FileSpreadsheet size={15} /> Open Data (JSON)
-            </Button>
-          </Link>
-          <TombolCetak />
-        </div>
-      </header>
+            </Link>
+            <TombolCetak />
+          </div>
+        </header>
+      </PitaGradient>
+
+      <div className="mx-auto max-w-6xl px-4 pt-10">
 
       {total === 0 && (
         <KacaKartu className="mb-6 p-8 text-center">
@@ -500,6 +507,7 @@ export default async function HalamanTransparansi() {
             </Button>
           </Link>
         </section>
+        </div>
       </div>
     </main>
   );

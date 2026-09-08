@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { Crown, ArrowLeft, UserRound } from "lucide-react";
 import { KacaKartu } from "@/components/eksperimen/kaca";
+import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
-/* Bahasa eksperimen: tile header terang + konten parchment; KacaKartu 18px
-   tanpa shadow; link pill 44px Action Blue + :focus-visible; tabular untuk
-   email demo; Fraunces tetap. Kunci kunyit identitas gerbang + teks, rute,
-   dan logika TETAP. Copy civic kamu, tanpa emoji. */
+/* Bahasa eksperimen: header pita gelap + teks putih, konten parchment;
+   KacaKartu 18px tanpa shadow; link pill 44px Action Blue + :focus-visible;
+   tabular untuk email demo; Fraunces tetap. Kunci kunyit identitas gerbang
+   + teks, rute, dan logika TETAP. Copy civic kamu, tanpa emoji. */
 const LINK_PILL_APPLE =
   "inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-ap-blue hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky dark:hover:bg-ap-sky/10";
 
@@ -19,22 +20,21 @@ export function GerbangDewan({
 }) {
   return (
     <main>
-      {/* Tile header terang (canvas putih) */}
-      <section className="bg-white text-ap-ink dark:bg-panel dark:text-ink">
-        <div className="mx-auto max-w-lg px-4 py-12 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-kunyit-700 dark:text-kunyit-400">
+      <PitaGradient tone="gelap">
+        <header className="mx-auto max-w-lg text-center">
+          <p className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
             Panel dewan
           </p>
-          <h1 className="mt-3 font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px]">
+          <h1 className="mt-3 font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px] text-white">
             Akses Khusus Dewan
           </h1>
-          <p className="mt-3 text-[17px] leading-[1.47] tracking-[-0.374px] text-muted teks-pretty">
+          <p className="mt-3 text-[17px] leading-[1.47] tracking-[-0.374px] text-white/85 teks-pretty">
             {alasan === "bukan_admin"
               ? "Kamu masuk sebagai Warga. Dashboard ini khusus untuk peran Dewan. Gunakan tombol demo di bawah untuk beralih ke akun Dewan."
               : "Kamu belum masuk. Dashboard Dewan dipakai untuk memeriksa laporan masuk, menugaskan petugas, dan memantau kecepatan penanganan."}
           </p>
-        </div>
-      </section>
+        </header>
+      </PitaGradient>
 
       {/* Konten parchment */}
       <section className="bg-ap-parchment text-ap-ink dark:bg-paper dark:text-ink">

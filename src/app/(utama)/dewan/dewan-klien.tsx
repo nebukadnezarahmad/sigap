@@ -56,6 +56,7 @@ import { createClient } from "@/lib/supabase/client";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { Button, Select, Skeleton, StatusChip } from "@/components/ui";
 import { KacaKartu } from "@/components/eksperimen/kaca";
+import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { waktuRelatif } from "@/lib/utils";
 
 const LeafletMap = dynamic(
@@ -384,20 +385,19 @@ export function DewanClient({
 
   return (
     <main>
-      {/* Tile header terang (canvas putih) */}
-      <section className="bg-white text-ap-ink dark:bg-panel dark:text-ink">
-        <div className="mx-auto max-w-7xl px-4 py-12">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ap-blue dark:text-ap-sky">
+      <PitaGradient tone="gelap">
+        <header>
+          <p className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
             Panel dewan
           </p>
-          <h1 className="mt-3 font-serif text-[40px] font-semibold leading-[1.1] tracking-[-0.28px]">
+          <h1 className="mt-3 font-serif text-[40px] font-semibold leading-[1.1] tracking-[-0.28px] text-white">
             Dashboard Dewan
           </h1>
-          <p className="mt-3 max-w-xl text-[17px] leading-[1.47] tracking-[-0.374px] text-muted teks-pretty">
+          <p className="mt-3 max-w-xl text-[17px] leading-[1.47] tracking-[-0.374px] text-white/85 teks-pretty">
             Pantau & kelola penanganan laporan permukiman secara realtime.
           </p>
-        </div>
-      </section>
+        </header>
+      </PitaGradient>
 
       {/* Konten parchment */}
       <section className="bg-ap-parchment text-ap-ink dark:bg-paper dark:text-ink">

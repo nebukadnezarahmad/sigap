@@ -8,11 +8,12 @@ import { createClient } from "@/lib/supabase/client";
 import { isTujuanAman } from "@/lib/utils";
 import { Input, Label } from "@/components/ui";
 import { KacaKartu } from "@/components/eksperimen/kaca";
+import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
-/* Bahasa eksperimen: tile terang parchment, KacaKartu 18px, ikon ap-blue,
-   pill 44px Action Blue + :focus-visible, tabular untuk email.
-   Rute, logika, dan auth TETAP. Fraunces tetap. */
+/* Bahasa eksperimen: header pita gelap + teks putih, form di atas parchment,
+   KacaKartu 18px, CTA pil biru 44px Action Blue + :focus-visible, tabular
+   untuk email. Rute, logika, dan auth TETAP. Fraunces tetap. */
 
 const INPUT_APPLE =
   "min-h-[44px] tabular-nums focus:border-ap-blue focus:ring-ap-blue/15 focus-visible:outline-ap-blue-focus";
@@ -76,16 +77,6 @@ function FormulirMasuk() {
       )}
 
       <KacaKartu className="bg-white/60 p-7 text-ap-ink dark:bg-white/10 dark:text-ink">
-        <div className="mb-6 text-center">
-          <span className="mx-auto mb-3 flex size-11 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
-            <MapPin size={22} strokeWidth={2} />
-          </span>
-          <h1 className="font-display text-2xl font-bold">Selamat datang kembali</h1>
-          <p className="mt-1 text-sm text-muted">
-            Masuk untuk mengirim laporan dan mendukung laporan warga lain.
-          </p>
-        </div>
-
         <div className="mb-6 rounded-[18px] border border-ap-hairline bg-ap-pearl p-4 dark:border-line dark:bg-panel-2">
           <div className="mb-3 flex items-center justify-between gap-2">
             <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ap-blue dark:text-ap-sky">
@@ -170,10 +161,23 @@ function FormulirMasuk() {
 
 export default function HalamanMasuk() {
   return (
-    <main className="bg-ap-parchment px-4 py-14 text-ap-ink dark:bg-paper dark:text-ink">
-      <Suspense fallback={null}>
-        <FormulirMasuk />
-      </Suspense>
+    <main>
+      <PitaGradient tone="gelap">
+        <header className="mx-auto w-full max-w-md text-center">
+          <span className="mx-auto mb-3 flex size-11 items-center justify-center rounded-[18px] border border-white/30 bg-white/10 text-white">
+            <MapPin size={22} strokeWidth={2} />
+          </span>
+          <h1 className="font-display text-2xl font-bold text-white">Selamat datang kembali</h1>
+          <p className="mt-1 text-sm text-white/85">
+            Masuk untuk mengirim laporan dan mendukung laporan warga lain.
+          </p>
+        </header>
+      </PitaGradient>
+      <div className="bg-ap-parchment px-4 pb-14 pt-8 text-ap-ink dark:bg-paper dark:text-ink">
+        <Suspense fallback={null}>
+          <FormulirMasuk />
+        </Suspense>
+      </div>
     </main>
   );
 }

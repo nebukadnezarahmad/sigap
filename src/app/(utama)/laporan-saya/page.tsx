@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { Card, Skeleton, StatusChip } from "@/components/ui";
+import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { ClipboardList, TriangleAlert } from "lucide-react";
 import { AksiLaporanSaya } from "./aksi";
 import { HapusAreaKlien } from "./hapus-area";
@@ -116,15 +117,21 @@ export default async function HalamanLaporanSaya() {
   const area = areaRaw ?? [];
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8 rounded-[18px] border border-ap-hairline bg-ap-pearl p-6 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
-        <h1 className="font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px]">Laporan Saya</h1>
-        <p className="mt-2 text-muted">
-          Sunting laporan selama statusnya masih{" "}
-          <b className="text-ink">Baru</b>. Setelah diverifikasi dewan, isinya
-          terkunci demi akuntabilitas.
-        </p>
-      </header>
+    <main className="pb-10">
+      {/* Fusi header: pita gelap + teks putih, pola papan-skor/demo; judul,
+          copy, dan Fraunces tidak diubah, hanya warna agar kontras. */}
+      <PitaGradient tone="gelap">
+        <header className="text-center">
+          <h1 className="font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px] text-white">Laporan Saya</h1>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-white/85">
+            Sunting laporan selama statusnya masih{" "}
+            <b className="font-bold text-white">Baru</b>. Setelah diverifikasi dewan, isinya
+            terkunci demi akuntabilitas.
+          </p>
+        </header>
+      </PitaGradient>
+
+      <div className="mx-auto max-w-3xl px-4 pt-8">
 
       {daftar.length === 0 ? (
         <Card className={`${KARTU} p-8 text-center`}>
@@ -239,6 +246,7 @@ export default async function HalamanLaporanSaya() {
           </Card>
         </section>
       )}
+      </div>
     </main>
   );
 }
