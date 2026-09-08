@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Crown, Medal, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { Crown, Medal, ShieldCheck, TriangleAlert } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { BADGES } from "@/lib/constants";
 import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
-import { Avatar } from "@/components/ui";
+import { Avatar, Skeleton } from "@/components/ui";
 import { KacaKartu } from "@/components/eksperimen/kaca";
 import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { BadgeSaya } from "./badge-saya";
@@ -13,6 +14,31 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
+
+/* State papan skor: ikon medali relevan dengan juara, segitiga relevan
+   dengan gangguan. Skeleton tanpa shimmer mengikuti MOTION 1. */
+export function MuatPapanSkor() {
+  return (
+    <div aria-busy="true" className="mx-auto max-w-4xl px-4 pt-10">
+      <p role="status" className="sr-only">
+        Memuat papan skor
+      </p>
+      <div className="mb-10 grid grid-cols-3 items-end gap-3 sm:gap-5">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="flex flex-col items-center rounded-[18px] border border-white/40 bg-white/60 px-3 py-6 dark:border-white/15 dark:bg-white/10"
+          >
+            <Skeleton className="size-14 rounded-full" />
+            <Skeleton className="mt-3 h-4 w-2/3" />
+            <Skeleton className="mt-2 h-6 w-20 rounded-full" />
+          </div>
+        ))}
+      </div>
+      <Skeleton className="h-40 w-full rounded-[18px]" />
+    </div>
+  );
+}
 
 export default async function HalamanPapanSkor() {
   let pemimpin: {
@@ -63,8 +89,49 @@ export default async function HalamanPapanSkor() {
       <div className="mx-auto max-w-4xl px-4 pt-10">
 
       {!dbAktif && (
-        <KacaKartu className="mb-6 p-6 text-center text-sm text-muted">
-          Database belum tersambung — papan skor akan tampil setelah Supabase diatur.
+        <KacaKartu className="mb-6 p-8 text-center">
+          <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-danger/10 text-danger">
+            <TriangleAlert size={26} strokeWidth={1.8} />
+          </span>
+          <h2 className="font-display text-xl font-bold">
+            Papan skor belum bisa dimuat
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+            Poinmu tetap tercatat. Data gagal dimuat karena database belum
+            tersambung.
+          </p>
+          <ol className="mx-auto mt-4 max-w-md space-y-1 text-left text-sm text-muted">
+            <li>1. Pastikan env Supabase sudah terisi.</li>
+            <li>2. Jalankan schema.sql sesuai README.</li>
+            <li>3. Muat ulang halaman ini.</li>
+          </ol>
+          <Link
+            href="/papan-skor"
+            className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
+          >
+            Muat ulang halaman
+          </Link>
+        </KacaKartu>
+      )}
+
+      {dbAktif && pemimpin.length === 0 && (
+        <KacaKartu className="mb-10 p-8 text-center">
+          <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+            <Medal size={26} strokeWidth={1.8} />
+          </span>
+          <h2 className="font-display text-xl font-bold">
+            Belum ada warga di papan skor
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+            Kamu bisa jadi yang pertama. Laporkan masalah, beri komentar
+            solusi, atau dukung laporan tetanggamu untuk mengumpulkan poin.
+          </p>
+          <Link
+            href="/peta?lapor=1"
+            className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
+          >
+            Buat laporan pertamamu
+          </Link>
         </KacaKartu>
       )}
 

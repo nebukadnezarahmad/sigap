@@ -204,7 +204,7 @@ export function CommandPalette() {
         aria-label="Buka palet perintah"
         aria-haspopup="dialog"
         aria-expanded={buka}
-        className="fixed bottom-4 right-4 z-[1100] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border garis-halus bg-panel text-muted shadow-xl transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+        className="fixed bottom-4 right-4 z-[1100] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-ap-hairline bg-white/85 text-muted shadow-none backdrop-blur transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none dark:border-white/15 dark:bg-[#131d19]/80 dark:text-ink"
       >
         <Search size={18} />
       </button>
@@ -217,21 +217,21 @@ export function CommandPalette() {
           className="fixed inset-0 z-[1200] flex items-start justify-center pt-[14vh]"
         >
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40"
             onClick={() => setBuka(false)}
           />
           <motion.div
             initial={{ y: -14, scale: 0.98 }}
             animate={{ y: 0, scale: 1 }}
             exit={{ y: -10, opacity: 0 }}
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl border garis-halus bg-panel shadow-2xl"
+            className="relative w-full max-w-lg overflow-hidden rounded-[18px] border border-ap-hairline bg-white/85 shadow-none backdrop-blur-xl backdrop-saturate-150 dark:border-white/15 dark:bg-[#131d19]/85"
             role="dialog"
             aria-modal="true"
             aria-label="Command palette"
             ref={refDialog}
             onKeyDown={onTrapTab}
           >
-            <div className="flex items-center gap-2 border-b garis-halus px-4">
+            <div className="flex items-center gap-2 border-b border-ap-hairline px-4 dark:border-white/10">
               <Plus size={15} className="text-muted" />
               <input
                 ref={refInput}
@@ -255,7 +255,7 @@ export function CommandPalette() {
                   }
                 }}
                 placeholder="Ketik perintah atau tujuan…"
-                className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:text-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+                className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:text-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
                 aria-label="Cari perintah"
                 role="combobox"
                 aria-expanded={buka}
@@ -265,7 +265,7 @@ export function CommandPalette() {
                   hasil[kursor] ? `cmd-opt-${hasil[kursor].id}` : undefined
                 }
               />
-              <kbd className="rounded-md border garis-halus px-1.5 py-0.5 text-[10px] text-muted">
+              <kbd className="rounded-md border border-ap-hairline px-1.5 py-0.5 text-[10px] text-muted dark:border-white/15">
                 ESC
               </kbd>
             </div>
@@ -293,9 +293,9 @@ export function CommandPalette() {
                     onMouseEnter={() => setKursor(i)}
                     onFocus={() => setKursor(i)}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                      "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none",
                       i === kursor
-                        ? "bg-daun-600/10 text-daun-800 dark:text-daun-200"
+                        ? "bg-ap-blue/10 text-ap-blue dark:text-ap-sky"
                         : "text-ink"
                     )}
                   >

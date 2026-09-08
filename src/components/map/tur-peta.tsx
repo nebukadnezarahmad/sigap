@@ -122,7 +122,7 @@ export function TurPeta() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
-            className="fixed bottom-5 left-5 z-[1100] w-80 rounded-[18px] border border-ap-hairline bg-white p-5 text-ap-ink shadow-none outline-none dark:border-line dark:bg-panel dark:text-ink"
+            className="fixed bottom-5 left-5 z-[1100] w-80 rounded-[18px] border border-ap-hairline bg-white/85 p-5 text-ap-ink shadow-none backdrop-blur-xl backdrop-saturate-150 outline-none dark:border-white/15 dark:bg-[#131d19]/85 dark:text-ink"
             role="dialog"
             aria-modal="true"
             aria-labelledby="tur-peta-judul"

@@ -6,7 +6,6 @@ import {
   Map,
   Scale,
   ShieldCheck,
-  Sparkles,
   Trophy,
 } from "lucide-react";
 import { KacaKartu } from "@/components/eksperimen/kaca";
@@ -53,7 +52,7 @@ export default function HalamanDemo() {
       <PitaGradient tone="gelap">
         <header className="text-center">
           <p className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-white">
-            <Sparkles size={13} /> Khusus Dewan Juri & Penguji
+            <ShieldCheck size={13} /> Khusus Dewan Juri & Penguji
           </p>
           <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-white">
             Panduan Demo Cepat SIGAP

@@ -3,7 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
-import { Card, StatusChip } from "@/components/ui";
+import { Card, Skeleton, StatusChip } from "@/components/ui";
+import { ClipboardList, TriangleAlert } from "lucide-react";
 import { AksiLaporanSaya } from "./aksi";
 import { HapusAreaKlien } from "./hapus-area";
 import { GerbangLaporanSaya } from "./gerbang-laporan-saya";
@@ -12,9 +13,67 @@ export const metadata: Metadata = { title: "Laporan Saya" };
 export const dynamic = "force-dynamic";
 
 /* Fusi visual-fusion: kartu utilitas putih hairline 18px tanpa shadow;
-   link CTA Action Blue; Fraunces + StatusChip tetap. */
+   link CTA Action Blue; Fraunces + StatusChip tetap.
+   Alasan state: satu ikon kecil per state (relevan, bukan dekorasi);
+   skeleton tanpa shimmer agar tenang mengikuti MOTION 1. */
 const KARTU =
   "rounded-[18px] border border-ap-hairline bg-white text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink";
+
+/* Skeleton muat: dipakai sebagai fallback Suspense/loading agar daftar
+   tidak melompat saat data diambil. Tanpa ilustrasi karena ini muat. */
+export function MuatLaporanSaya() {
+  return (
+    <div aria-busy="true" className="space-y-3">
+      <p role="status" className="sr-only">
+        Memuat laporanmu
+      </p>
+      {[0, 1, 2].map((i) => (
+        <div key={i} className={`${KARTU} p-5`}>
+          <Skeleton className="h-5 w-2/3" />
+          <Skeleton className="mt-2 h-4 w-full" />
+          <Skeleton className="mt-1.5 h-4 w-1/2" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Galat muat: ilustrasi segitiga relevan dengan gangguan koneksi. */
+function GalatLaporanSaya() {
+  return (
+    <Card className={`${KARTU} p-8 text-center`}>
+      <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-danger/10 text-danger">
+        <TriangleAlert size={26} strokeWidth={1.8} />
+      </span>
+      <h2 className="font-display text-xl font-bold">
+        Laporanmu belum bisa dimuat
+      </h2>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+        Kamu tidak ketinggalan apa pun. Data gagal dimuat karena koneksi ke
+        database terputus.
+      </p>
+      <ol className="mx-auto mt-4 max-w-md space-y-1 text-left text-sm text-muted">
+        <li>1. Periksa koneksi internet kamu.</li>
+        <li>2. Muat ulang halaman ini.</li>
+        <li>3. Kalau masih gagal, coba lagi beberapa menit lagi.</li>
+      </ol>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+        <Link
+          href="/laporan-saya"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
+        >
+          Muat ulang halaman
+        </Link>
+        <Link
+          href="/peta"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full px-5 text-sm font-semibold text-ap-blue transition hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky"
+        >
+          Buka peta
+        </Link>
+      </div>
+    </Card>
+  );
+}
 
 export default async function HalamanLaporanSaya() {
   const supabase = await createClient();
@@ -25,7 +84,7 @@ export default async function HalamanLaporanSaya() {
   } = await supabase.auth.getUser();
   if (!user) return <GerbangLaporanSaya />;
 
-  const { data: milik } = await supabase
+  const { data: milik, error: galatLaporan } = await supabase
     .from("reports")
     .select(
       `*, lat, lng, categories(slug,nama,warna),
@@ -35,13 +94,21 @@ export default async function HalamanLaporanSaya() {
     .order("created_at", { ascending: false })
     .limit(100);
 
+  if (galatLaporan) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-10">
+        <GalatLaporanSaya />
+      </main>
+    );
+  }
+
   const daftar = (milik ?? []).map((r) => ({
     ...r,
     vote_count: r.votes?.[0]?.count ?? 0,
     comment_count: r.comments?.[0]?.count ?? 0,
   })) as unknown as LaporanDenganRelasi[];
 
-  const { data: areaRaw } = await supabase
+  const { data: areaRaw, error: galatArea } = await supabase
     .from("area_follows")
     .select("id, label, radius_m, created_at")
     .eq("user_id", user.id)
@@ -60,14 +127,23 @@ export default async function HalamanLaporanSaya() {
       </header>
 
       {daftar.length === 0 ? (
-        <Card className={`${KARTU} p-10 text-center`}>
-          <p className="text-muted">
-            Kamu belum membuat laporan.{" "}
-            <Link href="/peta?lapor=1" className="inline-flex min-h-[44px] items-center rounded-full px-3 font-semibold text-ap-blue hover:bg-ap-blue/10 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky">
-              Buat laporan pertamamu
-            </Link>
-            .
+        <Card className={`${KARTU} p-8 text-center`}>
+          <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+            <ClipboardList size={26} strokeWidth={1.8} />
+          </span>
+          <h2 className="font-display text-xl font-bold">
+            Kamu belum punya laporan
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+            Laporan yang kamu buat akan tercatat di sini lengkap dengan status
+            dan dukungannya. Mulai dari masalah kecil di dekat rumahmu.
           </p>
+          <Link
+            href="/peta?lapor=1"
+            className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
+          >
+            Buat laporan pertamamu
+          </Link>
         </Card>
       ) : (
         <div className="space-y-3">
@@ -113,7 +189,16 @@ export default async function HalamanLaporanSaya() {
         </div>
       )}
 
-      {area.length > 0 && (
+      {galatArea ? (
+        <section aria-label="Area yang diikuti" className="mt-10">
+          <Card className={`${KARTU} p-6 text-center`}>
+            <p role="alert" className="text-sm text-muted">
+              Area yang kamu ikuti belum bisa dimuat. Muat ulang halaman untuk
+              mencoba lagi.
+            </p>
+          </Card>
+        </section>
+      ) : area.length > 0 ? (
         <section aria-label="Area yang diikuti" className="mt-10">
           <h2 className="mb-3 font-display text-xl font-bold">
             Area yang kamu ikuti
@@ -134,6 +219,24 @@ export default async function HalamanLaporanSaya() {
               </Card>
             ))}
           </div>
+        </section>
+      ) : (
+        <section aria-label="Area yang diikuti" className="mt-10">
+          <Card className={`${KARTU} p-6 text-center`}>
+            <h2 className="font-display text-base font-bold">
+              Kamu belum mengikuti area
+            </h2>
+            <p className="mx-auto mt-1.5 max-w-md text-sm text-muted">
+              Pilih area di peta agar kamu dapat kabar setiap ada laporan baru
+              di sekitarmu.
+            </p>
+            <Link
+              href="/peta"
+              className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full px-5 text-sm font-semibold text-ap-blue transition hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky"
+            >
+              Pilih area di peta
+            </Link>
+          </Card>
         </section>
       )}
     </main>

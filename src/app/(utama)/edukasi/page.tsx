@@ -15,7 +15,7 @@ const MATERI = [
     poin: [
       "Sediakan 3 wadah: organik, anorganik, residu",
       "Bilas kemasan sebelum dibuang agar tidak menarik lalat",
-      "Kardus dan botol punya nilai jual — kumpulkan terpisah",
+      "Kardus dan botol punya nilai jual. Kumpulkan terpisah",
     ],
   },
   {
@@ -33,7 +33,7 @@ const MATERI = [
     slug: "tiga-r",
     judul: "Reduce, Reuse, Recycle",
     ringkas:
-      "Urutannya penting: kurangi dulu, pakai ulang, baru daur ulang — bukan sebaliknya.",
+      "Urutannya penting: kurangi dulu, pakai ulang, baru daur ulang. Bukan sebaliknya.",
     poin: [
       "Reduce: bawa tas belanja & tumbler sendiri",
       "Reuse: toples selai jadi wadah bumbu",
@@ -138,7 +138,7 @@ export default async function HalamanEdukasi() {
             Edukasi Permukiman
           </h1>
           <p className="mt-3 max-w-xl text-[17px] leading-[1.47] tracking-[-0.374px] text-muted teks-pretty">
-            Materi ringkas untuk memulai perubahan dari rumah — lengkap dengan quiz
+            Materi ringkas untuk memulai perubahan dari rumah, lengkap dengan quiz
             dan kalkulator jejak sampah pribadi.
           </p>
         </div>

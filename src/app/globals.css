@@ -195,6 +195,8 @@ img.foto-laporan {
 }
 
 .bg-pola-grid {
+  /* R-07: tekstur topografi samar = motif identitas permukiman/peta SIGAP,
+     bukan dekorasi generik. Opacity ≤8% agar tak bersaing dengan konten. */
   background-image: 
     radial-gradient(circle at 50% 0%, rgba(46, 158, 87, 0.08) 0%, transparent 65%),
     linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
@@ -203,6 +205,7 @@ img.foto-laporan {
 }
 
 .dark .bg-pola-grid {
+  /* R-07: sama seperti di atas, versi gelap. */
   background-image: 
     radial-gradient(circle at 50% 0%, rgba(46, 158, 87, 0.15) 0%, transparent 65%),
     linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
@@ -284,4 +287,22 @@ img.foto-laporan {
   .animate-pulse {
     animation: none !important;
   }
+}
+
+/* Safe-area poni (R-03, misi R-21): layout memakai viewport-fit=cover
+   sehingga viewport membentang ke bawah poni. env() bernilai 0 di perangkat
+   tanpa poni, jadi aturan ini tanpa efek di desktop. Atas ditangani bar
+   lengket header, kiri/kanan/bawah ditangani di sini. color-scheme: light
+   dark sudah dideklarasikan di :root di atas dan dipertahankan. */
+body {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Daftar geser seluler di /peta (R-03): gulir di dalam daftar tak boleh
+   merantai ke halaman (overscroll contain) dan tetap mulus di iOS. */
+.lembar-geser {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }

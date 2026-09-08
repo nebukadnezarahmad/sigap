@@ -99,7 +99,7 @@ export function Modal({
       {terbuka && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
           <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -112,7 +112,7 @@ export function Modal({
             ref={refDialog}
             tabIndex={-1}
             className={cn(
-              "relative z-10 my-auto w-full max-h-[88vh] overflow-y-auto rounded-3xl border garis-halus bg-panel p-6 focus:outline-none",
+              "relative z-10 my-auto w-full max-h-[88vh] overflow-y-auto rounded-[18px] border border-ap-hairline bg-white/85 p-6 shadow-none backdrop-blur-xl backdrop-saturate-150 focus:outline-none dark:border-white/15 dark:bg-[#131d19]/85",
               lebar
             )}
             initial={{ y: 24, opacity: 0, scale: 0.96 }}
@@ -120,12 +120,12 @@ export function Modal({
             exit={{ y: 16, opacity: 0, scale: 0.96 }}
             transition={{ type: "spring", damping: 28, stiffness: 340 }}
           >
-            <div className="mb-4 flex items-start justify-between gap-4 border-b garis-halus pb-3">
+            <div className="mb-4 flex items-start justify-between gap-4 border-b border-ap-hairline pb-3 dark:border-white/10">
               <h2 className="font-display text-lg sm:text-xl font-semibold">{judul}</h2>
               <button
                 onClick={tutup}
                 aria-label="Tutup modal"
-                className="rounded-full p-1.5 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:ring-2 focus-visible:ring-daun-500"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
               >
                 <X size={18} />
               </button>

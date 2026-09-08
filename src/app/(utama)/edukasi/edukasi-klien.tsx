@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import { Award, Calculator, CheckCircle2, XCircle } from "lucide-react";
+import { Award, Calculator, CheckCircle2, TriangleAlert, XCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { Button, Label } from "@/components/ui";
+import { Button, Label, Skeleton } from "@/components/ui";
 import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { IkonVektor, type NodeIkon } from "@/lib/ikon-vektor";
 
@@ -25,18 +25,51 @@ export function GalatEdukasi() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
       <div className={`${KARTU_UTILITAS} p-8`}>
+        <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-danger/10 text-danger">
+          <TriangleAlert size={26} strokeWidth={1.8} />
+        </span>
         <h1 className="font-display text-2xl font-bold">
           Edukasi belum bisa dimuat
         </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
+        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+          Kamu tidak ketinggalan materi apa pun. Quiz dan kalkulator gagal
+          dimuat karena koneksi terputus.
         </p>
-        <Button className={`mt-5 ${TOMBOL_UTAMA_APPLE}`} onClick={() => router.refresh()}>
+        <ol className="mx-auto mt-4 max-w-md space-y-1 text-left text-sm text-muted">
+          <li>1. Periksa koneksi internet kamu.</li>
+          <li>2. Pilih Coba lagi di bawah.</li>
+          <li>3. Kalau masih gagal, kembali lagi beberapa menit lagi.</li>
+        </ol>
+        <Button className={`mt-6 ${TOMBOL_UTAMA_APPLE}`} onClick={() => router.refresh()}>
           Coba lagi
         </Button>
       </div>
     </main>
+  );
+}
+
+/* Skeleton muat edukasi: tanpa ilustrasi karena ini muat. */
+export function MuatEdukasi() {
+  return (
+    <div aria-busy="true" className="space-y-12">
+      <p role="status" className="sr-only">
+        Memuat materi edukasi
+      </p>
+      <div className={`${KARTU_UTILITAS} p-6`}>
+        <Skeleton className="h-6 w-1/2" />
+        <Skeleton className="mt-2 h-4 w-3/4" />
+        <Skeleton className="mt-4 h-11 w-full rounded-full" />
+      </div>
+      <div className={`${KARTU_UTILITAS} p-6`}>
+        <Skeleton className="h-6 w-2/3" />
+        <Skeleton className="mt-2 h-4 w-full" />
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          {[0, 1].map((i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-[18px]" />
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -125,6 +158,28 @@ function QuizSection({
     setTersimpan(false);
   }
 
+  if (soal.length === 0) {
+    return (
+      <section aria-label="Quiz edukasi">
+        <div className={`${KARTU_UTILITAS} overflow-hidden p-0`}>
+          <div className="p-8 text-center">
+            <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+              <Award size={26} strokeWidth={1.8} />
+            </span>
+            <h2 className="font-display text-xl font-bold">
+              Soal quiz belum tersedia
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+              Kamu belum ketinggalan apa pun. Soal sedang disiapkan pengurus.
+              Sambil menunggu, kamu bisa mencoba kalkulator jejak sampah di
+              bawah.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section aria-label="Quiz edukasi">
       <div className={`${KARTU_UTILITAS} overflow-hidden p-0`}>
@@ -143,7 +198,7 @@ function QuizSection({
           {!masuk && (
             <div className="text-center">
               <p className="text-sm text-muted">
-                Masuk dulu untuk mengikuti quiz — skor lulus memberimu badge
+                Masuk dulu untuk mengikuti quiz. Skor lulus memberimu badge
                 Cerdas Lingkungan.
               </p>
               <Button
@@ -236,12 +291,12 @@ function QuizSection({
                 </p>
                 {benar >= soal.length - 1 ? (
                   <p className="mt-3 flex items-center justify-center gap-2 font-display text-lg font-bold">
-                    <IkonVektor node={ikonHadiah} ukuran={20} /> Lulus — badge
+                    <IkonVektor node={ikonHadiah} ukuran={20} /> Lulus: badge
                     Cerdas Lingkungan
                   </p>
                 ) : (
                   <p className="mt-3 flex items-center justify-center gap-2 font-display text-lg font-bold text-muted">
-                    <XCircle size={19} /> Belum lulus — baca materi lagi lalu coba
+                    <XCircle size={19} /> Belum lulus. Baca materi lagi lalu coba
                     ulang.
                   </p>
                 )}
@@ -388,7 +443,22 @@ function KalkulatorSection({
           {proses ? "Menyimpan…" : hasil !== null ? "Hitung ulang" : "Hitung jejakku"}
         </Button>
 
-        {hasil !== null && (
+        {hasil === null ? (
+          <div className="mt-6">
+            <KacaKartu className="p-6 text-center">
+              <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+                <Calculator size={26} strokeWidth={1.8} />
+              </span>
+              <h3 className="font-display text-lg font-bold">
+                Kamu belum menghitung jejakmu
+              </h3>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+                Jawab lima pertanyaan singkat di atas, lalu pilih Hitung
+                jejakku. Hasilnya tersimpan di profilmu kalau kamu masuk.
+              </p>
+            </KacaKartu>
+          </div>
+        ) : (
           <motion.div
             key={hasil}
             initial={{ opacity: 0, y: 8 }}
@@ -420,8 +490,8 @@ function KalkulatorSection({
                 </div>
                 <p className="mt-2 text-xs text-muted">
                   {hasil <= rataRata
-                    ? "Di bawah rata-rata nasional — pertahankan!"
-                    : `Di atas rata-rata nasional (${rataRata} kg) — mulai dari memilah & mengurangi plastik.`}
+                    ? "Di bawah rata-rata nasional. Pertahankan!"
+                    : `Di atas rata-rata nasional (${rataRata} kg). Mulai dari memilah & mengurangi plastik.`}
                 </p>
               </div>
               {masuk && (

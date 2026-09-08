@@ -12,8 +12,9 @@ import {
   Recycle,
   Search,
   Shield,
+  TriangleAlert,
 } from "lucide-react";
-import { Button, Card } from "@/components/ui";
+import { Button, Card, Skeleton } from "@/components/ui";
 import { KacaKartu } from "@/components/eksperimen/kaca";
 
 type Layanan = {
@@ -41,19 +42,49 @@ function nomorWa(telepon: string) {
   return null;
 }
 
+/* State layanan: ikon pencarian relevan dengan direktori, segitiga
+   relevan dengan gangguan. Skeleton daftar tanpa shimmer. */
+export function MuatLayanan() {
+  return (
+    <div aria-busy="true" className="space-y-3">
+      <p role="status" className="sr-only">
+        Memuat direktori layanan
+      </p>
+      <Skeleton className="h-[44px] w-full rounded-full" />
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          className="rounded-[18px] border border-ap-hairline bg-white p-4 shadow-none dark:border-line dark:bg-panel"
+        >
+          <Skeleton className="h-5 w-1/2" />
+          <Skeleton className="mt-2 h-3.5 w-3/4" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function GalatLayanan() {
   const router = useRouter();
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
       <Card className="rounded-[18px] border-ap-hairline bg-white p-8 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+        <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-danger/10 text-danger">
+          <TriangleAlert size={26} strokeWidth={1.8} />
+        </span>
         <h1 className="font-display text-2xl font-bold tracking-[-0.224px]">
           Direktori Layanan belum bisa dimuat
         </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
+        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+          Kamu tidak kehilangan kontak penting. Daftar layanan gagal dimuat
+          karena koneksi terputus.
         </p>
-        <Button className="mt-5 min-h-[44px] focus-visible:outline-ap-blue-focus" onClick={() => router.refresh()}>
+        <ol className="mx-auto mt-4 max-w-md space-y-1 text-left text-sm text-muted">
+          <li>1. Periksa koneksi internet kamu.</li>
+          <li>2. Pilih Coba lagi di bawah.</li>
+          <li>3. Untuk keadaan darurat, hubungi 112 langsung.</li>
+        </ol>
+        <Button className="mt-6 min-h-[44px] focus-visible:outline-ap-blue-focus" onClick={() => router.refresh()}>
           Coba lagi
         </Button>
       </Card>
@@ -150,8 +181,29 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
           );
         })}
         {grup.length === 0 && (
-          <KacaKartu className="p-10 text-center text-sm text-muted">
-            Tidak ada layanan yang cocok dengan pencarianmu.
+          <KacaKartu className="p-8 text-center">
+            <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+              <Search size={26} strokeWidth={1.8} />
+            </span>
+            <h2 className="font-display text-lg font-bold">
+              {kueri.trim()
+                ? "Tidak ada layanan yang cocok"
+                : "Belum ada layanan terdaftar"}
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+              {kueri.trim()
+                ? "Coba kata kunci lain seperti damkar, PLN, atau sampah. Kamu juga bisa menghapus pencarian untuk melihat semua layanan."
+                : "Kamu bisa memberi tahu pengurus kontak penting di lingkunganmu agar didaftarkan di sini."}
+            </p>
+            {kueri.trim() && (
+              <Button
+                variant="sekunder"
+                onClick={() => setKueri("")}
+                className="mt-5 min-h-[44px] focus-visible:outline-ap-blue-focus"
+              >
+                Hapus pencarian
+              </Button>
+            )}
           </KacaKartu>
         )}
       </div>

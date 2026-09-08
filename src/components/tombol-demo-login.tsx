@@ -2,35 +2,41 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Crown, UserRound, Loader2, ArrowRight } from "lucide-react";
+import { Crown, UserRound, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isTujuanAman } from "@/lib/utils";
 import { Modal } from "@/components/modal";
+
+/* Bahasa eksperimen: tile terang hairline 18px, pill 44px Action Blue,
+   tabular untuk email, :focus-visible ap-blue-focus. Rute dan auth TETAP. */
 
 export const AKUN_DEMO = [
   {
     peran: "Dewan (Admin)",
     email: "dewan@sigap.demo",
-    deskripsi: "Dashboard statistik, kelola status laporan, dan heatmap",
+    deskripsi: "Lihat statistik, kelola status laporan, dan pantau heatmap",
     admin: true,
-    warna: "border-kunyit-500/30 bg-kunyit-500/5 hover:border-kunyit-500/60",
-    badge: "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400",
+    warna:
+      "border-ap-hairline bg-white hover:border-ap-blue/60 dark:border-line dark:bg-panel",
+    badge: "bg-kunyit-500/15 text-kunyit-700 dark:text-kunyit-400",
   },
   {
     peran: "Budi (Warga Aktif)",
     email: "budi@sigap.demo",
-    deskripsi: "Warga dengan poin, riwayat laporan, dan badge",
+    deskripsi: "Punya poin, riwayat laporan, dan badge yang bisa kamu jelajahi",
     admin: false,
-    warna: "border-daun-500/30 bg-daun-500/5 hover:border-daun-500/60",
-    badge: "bg-daun-500/15 text-daun-700 dark:text-daun-300",
+    warna:
+      "border-ap-hairline bg-white hover:border-ap-blue/60 dark:border-line dark:bg-panel",
+    badge: "bg-ap-blue/10 text-ap-blue dark:text-ap-sky",
   },
   {
     peran: "Rafa (Warga Baru)",
     email: "rafa@sigap.demo",
-    deskripsi: "Akun baru untuk mencoba alur pelaporan dari awal",
+    deskripsi: "Akun baru untuk mencoba alur lapor dari awal sampai terkirim",
     admin: false,
-    warna: "border-daun-500/30 bg-daun-500/5 hover:border-daun-500/60",
-    badge: "bg-daun-500/15 text-daun-700 dark:text-daun-300",
+    warna:
+      "border-ap-hairline bg-white hover:border-ap-blue/60 dark:border-line dark:bg-panel",
+    badge: "bg-ap-blue/10 text-ap-blue dark:text-ap-sky",
   },
 ];
 
@@ -86,7 +92,7 @@ export function PilihanAkunDemo({
     return (
       <div className="space-y-2">
         {pesanGalat && (
-          <p className="rounded-xl bg-danger/10 p-2 text-xs text-danger">
+          <p role="alert" className="rounded-xl bg-danger/10 p-2 text-xs text-danger">
             {pesanGalat}
           </p>
         )}
@@ -100,12 +106,12 @@ export function PilihanAkunDemo({
                 disabled={loadingEmail !== null}
                 aria-busy={loadingEmail !== null}
                 onClick={() => handleLogin(a.email)}
-                className={`flex flex-col items-start rounded-xl border p-3 text-left transition ${a.warna} ${
+                className={`flex min-h-[44px] flex-col items-start rounded-[18px] border p-3 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus ${a.warna} ${
                   isLoading ? "opacity-75" : ""
                 }`}
               >
                 <div className="flex w-full items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-xs font-bold">
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-ap-ink dark:text-ink">
                     {a.admin ? <Crown size={13} /> : <UserRound size={13} />}
                     {a.peran.split(" ")[0]}
                   </span>
@@ -114,12 +120,12 @@ export function PilihanAkunDemo({
                       <Loader2 size={13} className="animate-spin" /> Masuk…
                     </span>
                   ) : (
-                    <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${a.badge}`}>
+                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${a.badge}`}>
                       1-Klik
                     </span>
                   )}
                 </div>
-                <span className="mt-1 text-[11px] text-muted">
+                <span className="mt-1 text-[11px] text-muted tabular-nums">
                   {a.email}
                 </span>
               </button>
@@ -133,7 +139,7 @@ export function PilihanAkunDemo({
   return (
     <div className="space-y-3">
       {pesanGalat && (
-        <p className="rounded-xl bg-danger/10 p-3 text-sm text-danger">
+        <p role="alert" className="rounded-xl bg-danger/10 p-3 text-sm text-danger">
           {pesanGalat}
         </p>
       )}
@@ -147,7 +153,7 @@ export function PilihanAkunDemo({
               disabled={loadingEmail !== null}
               aria-busy={loadingEmail !== null}
               onClick={() => handleLogin(a.email)}
-              className={`flex w-full items-center justify-between rounded-2xl border p-4 text-left transition ${a.warna} ${
+              className={`flex min-h-[44px] w-full items-center justify-between rounded-[18px] border p-4 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus ${a.warna} ${
                 isLoading ? "opacity-75" : ""
               }`}
             >
@@ -155,15 +161,15 @@ export function PilihanAkunDemo({
                 <span
                   className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl ${
                     a.admin
-                      ? "bg-kunyit-500/15 text-kunyit-600"
-                      : "bg-daun-600/10 text-daun-700 dark:text-daun-300"
+                      ? "bg-kunyit-500/15 text-kunyit-700 dark:text-kunyit-400"
+                      : "bg-ap-blue/10 text-ap-blue dark:text-ap-sky"
                   }`}
                 >
                   {a.admin ? <Crown size={17} /> : <UserRound size={17} />}
                 </span>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="font-display font-bold text-sm sm:text-base">
+                    <p className="font-display font-bold text-sm text-ap-ink sm:text-base dark:text-ink">
                       {a.peran}
                     </p>
                     <span
@@ -175,6 +181,9 @@ export function PilihanAkunDemo({
                   <p className="mt-0.5 text-xs text-muted line-clamp-1">
                     {a.deskripsi}
                   </p>
+                  <p className="mt-0.5 text-[11px] text-muted tabular-nums">
+                    {a.email}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5 pl-2 shrink-0">
@@ -183,8 +192,8 @@ export function PilihanAkunDemo({
                     <Loader2 size={14} className="animate-spin" /> Masuk…
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-xl bg-panel px-2.5 py-1.5 text-xs font-semibold shadow-sm transition group-hover:bg-panel-2">
-                    Masuk <ArrowRight size={12} />
+                  <span className="inline-flex min-h-[44px] items-center rounded-full bg-ap-blue px-4 text-xs font-semibold text-white">
+                    Masuk
                   </span>
                 )}
               </div>
@@ -226,7 +235,7 @@ export function DemoAuthModal({
                 tutup();
                 router.push(`/masuk${tujuanAman ? `?next=${encodeURIComponent(tujuanAman)}` : ""}`);
               }}
-              className="font-semibold text-daun-700 hover:underline dark:text-daun-300"
+              className="inline-flex min-h-[44px] items-center rounded-full px-3 font-semibold text-ap-blue hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:text-ap-sky"
             >
               Masuk manual
             </button>

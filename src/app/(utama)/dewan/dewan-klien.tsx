@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
   Activity,
@@ -8,7 +9,9 @@ import {
   CheckCircle2,
   Download,
   Flame,
+  Inbox,
   ThumbsUp,
+  TriangleAlert,
   Users,
 } from "lucide-react";
 const Area = dynamic(
@@ -51,7 +54,7 @@ import { STATUS, hitungSla, type StatusKey } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { Button, Select, StatusChip } from "@/components/ui";
+import { Button, Select, Skeleton, StatusChip } from "@/components/ui";
 import { KacaKartu } from "@/components/eksperimen/kaca";
 import { waktuRelatif } from "@/lib/utils";
 
@@ -81,6 +84,61 @@ const GAYA_TOOLTIP_APPLE = {
   padding: "10px 14px",
   fontSize: 12,
 } as const;
+
+/* State dewan: ikon arsip relevan dengan antrean laporan, segitiga relevan
+   dengan gangguan. Skeleton tanpa shimmer mengikuti MOTION 1. */
+export function MuatDewan() {
+  return (
+    <div aria-busy="true" className="mx-auto max-w-7xl px-4 py-8">
+      <p role="status" className="sr-only">
+        Memuat dashboard dewan
+      </p>
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="rounded-[18px] border border-ap-hairline bg-white p-4 shadow-none dark:border-line dark:bg-panel"
+          >
+            <Skeleton className="h-8 w-16" />
+            <Skeleton className="mt-2 h-3.5 w-24" />
+          </div>
+        ))}
+      </div>
+      <Skeleton className="h-64 w-full rounded-[18px]" />
+    </div>
+  );
+}
+
+export function GalatDewan() {
+  const router = useRouter();
+  return (
+    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+      <div className={`${KARTU_UTILITAS} p-8`}>
+        <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-danger/10 text-danger">
+          <TriangleAlert size={26} strokeWidth={1.8} />
+        </span>
+        <h1 className="font-display text-2xl font-bold">
+          Dashboard Dewan belum bisa dimuat
+        </h1>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+          Antrean laporan kamu tetap aman. Data gagal dimuat karena koneksi
+          terputus.
+        </p>
+        <ol className="mx-auto mt-4 max-w-md space-y-1 text-left text-sm text-muted">
+          <li>1. Periksa koneksi internet kamu.</li>
+          <li>2. Pilih Coba lagi di bawah.</li>
+          <li>3. Kalau masih gagal, kembali lagi beberapa menit lagi.</li>
+        </ol>
+        <Button
+          className={`mt-6 ${TOMBOL_UTAMA_APPLE}`}
+          onClick={() => router.refresh()}
+        >
+          Coba lagi
+        </Button>
+      </div>
+    </main>
+  );
+}
 
 export function DewanClient({
   daftar: awal,
@@ -539,10 +597,44 @@ export function DewanClient({
                 </div>
                 );
               })}
-            {daftar.length === 0 && (
-              <p className="px-5 py-10 text-center text-sm text-muted">
-                Belum ada laporan masuk.
-              </p>
+            {daftar.length === 0 ? (
+              <div className="px-5 py-10 text-center">
+                <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+                  <Inbox size={26} strokeWidth={1.8} />
+                </span>
+                <h3 className="font-display text-lg font-bold">
+                  Belum ada laporan masuk
+                </h3>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+                  Antrean kamu kosong. Laporan baru dari warga akan muncul di
+                  sini lengkap dengan status dan lokasinya.
+                </p>
+              </div>
+            ) : (
+              daftar.filter(
+                (r) => filterStatus === "semua" || r.status === filterStatus
+              ).length === 0 && (
+                <div className="px-5 py-10 text-center">
+                  <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+                    <Inbox size={26} strokeWidth={1.8} />
+                  </span>
+                  <h3 className="font-display text-lg font-bold">
+                    Tidak ada laporan pada filter ini
+                  </h3>
+                  <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+                    Kamu bisa ubah filter ke Semua status untuk melihat seluruh
+                    antrean.
+                  </p>
+                  <Button
+                    variant="sekunder"
+                    size="sm"
+                    className={`mt-5 ${TOMBOL_SEKUNDER_APPLE}`}
+                    onClick={() => setFilterStatus("semua")}
+                  >
+                    Tampilkan semua status
+                  </Button>
+                </div>
+              )
             )}
           </div>
         </div>

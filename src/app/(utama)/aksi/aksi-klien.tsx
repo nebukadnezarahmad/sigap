@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { CalendarDays, MapPin, Plus, Users } from "lucide-react";
+import { CalendarDays, MapPin, Plus, TriangleAlert, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import type { EventAksi } from "./page";
-import { Button, Input, Label, Textarea } from "@/components/ui";
+import { Button, Input, Label, Skeleton, Textarea } from "@/components/ui";
 import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { formatTanggal } from "@/lib/utils";
 
@@ -33,18 +33,49 @@ export function GalatAksi() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
       <div className={`${KARTU_UTILITAS} p-8`}>
+        <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-danger/10 text-danger">
+          <TriangleAlert size={26} strokeWidth={1.8} />
+        </span>
         <h1 className="font-display text-2xl font-bold">
           Aksi Bersama belum bisa dimuat
         </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
+        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+          Kamu tidak ketinggalan ajakan apa pun. Daftar aksi gagal dimuat
+          karena koneksi terputus.
         </p>
-        <Button className={`mt-5 ${TOMBOL_UTAMA_APPLE}`} onClick={() => router.refresh()}>
+        <ol className="mx-auto mt-4 max-w-md space-y-1 text-left text-sm text-muted">
+          <li>1. Periksa koneksi internet kamu.</li>
+          <li>2. Pilih Coba lagi di bawah.</li>
+          <li>3. Kalau masih gagal, kembali lagi beberapa menit lagi.</li>
+        </ol>
+        <Button className={`mt-6 ${TOMBOL_UTAMA_APPLE}`} onClick={() => router.refresh()}>
           Coba lagi
         </Button>
       </div>
     </main>
+  );
+}
+
+/* Skeleton muat aksi: tanpa ilustrasi karena ini muat. */
+export function MuatAksi() {
+  return (
+    <div aria-busy="true" className="space-y-4">
+      <p role="status" className="sr-only">
+        Memuat aksi bersama
+      </p>
+      {[0, 1, 2].map((i) => (
+        <div key={i} className={`${KARTU_UTILITAS} p-5`}>
+          <div className="flex gap-4">
+            <Skeleton className="h-16 w-16 shrink-0 rounded-2xl" />
+            <div className="flex-1">
+              <Skeleton className="h-5 w-2/3" />
+              <Skeleton className="mt-2 h-4 w-full" />
+              <Skeleton className="mt-2 h-9 w-36 rounded-full" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -371,8 +402,28 @@ export function AksiKlien({
           ))}
         </AnimatePresence>
         {events.length === 0 && (
-          <div className={`${KARTU_UTILITAS} p-10 text-center text-sm text-muted`}>
-            Belum ada aksi mendatang. Jadilah pemrakarsa yang pertama!
+          <div className={`${KARTU_UTILITAS} p-8 text-center`}>
+            <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+              <CalendarDays size={26} strokeWidth={1.8} />
+            </span>
+            <h2 className="font-display text-lg font-bold">
+              Belum ada aksi mendatang
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+              Kamu bisa jadi pemrakarsa pertama. Buat aksi bersih lingkungan
+              dan ajak tetanggamu ikut.
+            </p>
+            {masuk && !formBuka && (
+              <KacaPill
+                type="button"
+                onClick={() => setFormBuka(true)}
+                className={`mt-5 min-h-[44px] ${FOKUS_APPLE}`}
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  <Plus size={15} /> Buat aksi bersama
+                </span>
+              </KacaPill>
+            )}
           </div>
         )}
       </div>

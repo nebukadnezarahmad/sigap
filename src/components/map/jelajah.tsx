@@ -356,7 +356,9 @@ export function Jelajah({
               </span>
             </KacaPill>
             {pop === "kategori" && (
-              <KacaKartu className="absolute right-0 top-full z-30 mt-2 w-64 p-2">
+              /* R-34: kaca gelap dirapatkan di atas ubin peta yang terang agar
+                 teks terang tetap kontras; blur kaca dipertahankan. */
+              <KacaKartu className="absolute right-0 top-full z-30 mt-2 w-64 max-w-[calc(100vw-2rem)] p-2 dark:bg-[#131d19]/90">
                 {KATEGORI.map((k) => {
                   const aktif = fKategori.includes(k.slug);
                   return (
@@ -429,7 +431,7 @@ export function Jelajah({
               </span>
             </KacaPill>
             {pop === "status" && (
-              <KacaKartu className="absolute right-0 top-full z-30 mt-2 w-52 p-2">
+              <KacaKartu className="absolute right-0 top-full z-30 mt-2 w-52 max-w-[calc(100vw-2rem)] p-2 dark:bg-[#131d19]/90">
                 {(Object.keys(STATUS) as StatusKey[]).map((st) => {
                   const aktif = fStatus.includes(st);
                   return (
@@ -583,7 +585,9 @@ export function Jelajah({
         />
       )}
 
-      <div className="grid h-[64dvh] min-h-[460px] grid-rows-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_360px]">
+      {/* R-03: di ponsel peta dipadatkan agar cuplikan daftar terlihat di
+          bawahnya; desktop tidak berubah. */}
+      <div className="grid h-[56dvh] min-h-[400px] grid-rows-[minmax(0,1fr)] gap-4 lg:h-[64dvh] lg:min-h-[460px] lg:grid-cols-[1fr_360px]">
         <Card className="relative min-h-0 overflow-hidden rounded-[18px] border-ap-hairline bg-white p-0 shadow-none dark:border-line dark:bg-panel">
           <LeafletMap
             pusat={
@@ -603,7 +607,7 @@ export function Jelajah({
             }}
           />
           {periodeIdx !== null && (
-            <KacaBar className="pointer-events-none absolute left-3 top-3 z-[500] rounded-lg border px-3 py-1.5 font-display text-sm font-bold">
+            <KacaBar className="pointer-events-none absolute left-3 top-3 z-[500] rounded-lg border px-3 py-1.5 font-display text-sm font-bold dark:bg-[#0c1310]/85">
               <History size={13} className="inline align-[-2px]" /> s.d.{" "}
               {BULAN[periodeIdx].label}
             </KacaBar>
@@ -687,6 +691,75 @@ export function Jelajah({
           )}
         </aside>
       </div>
+
+      {/* R-03: daftar laporan versi seluler. Bukan duplikat kartu desktop:
+          baris ringkas satu ketuk (tombol asli 44px) yang membuka modal yang
+          sama dengan desktop; judul Fraunces dipertahankan, tanpa emoji. */}
+      <section
+        aria-label="Daftar laporan"
+        className="mt-4 overflow-hidden rounded-[18px] border border-ap-hairline bg-white shadow-none lg:hidden dark:border-line dark:bg-panel"
+      >
+        <div
+          aria-hidden
+          className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-line"
+        />
+        <div className="flex items-baseline justify-between gap-2 px-4 pb-1 pt-2">
+          <h2 className="font-display text-lg font-bold">Daftar laporan</h2>
+          <p className="angka-tabular shrink-0 text-xs tabular-nums text-muted">
+            {tersaring.length} laporan
+          </p>
+        </div>
+        {tersaring.length > 0 ? (
+          <>
+            <ul className="lembar-geser max-h-80 divide-y divide-line overflow-y-auto px-2 pb-2">
+              {tersaring.slice(0, 20).map((r) => (
+                <li key={r.id}>
+                  <button
+                    onClick={() => setTerpilihId(r.id)}
+                    aria-label={`Buka laporan ${r.judul}`}
+                    className={`flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-panel-2 motion-reduce:transition-none ${FOKUS_KACA} ${
+                      terpilihId === r.id ? "ring-2 ring-ap-blue" : ""
+                    }`}
+                  >
+                    <span
+                      aria-hidden
+                      className="size-2.5 shrink-0 rounded-full"
+                      style={{
+                        backgroundColor:
+                          r.categories?.warna ??
+                          STATUS[r.status as StatusKey]?.warna ??
+                          "#64748b",
+                      }}
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold">
+                        {r.judul}
+                      </span>
+                      <span className="mt-0.5 block truncate text-xs text-muted">
+                        {r.categories?.nama ?? "Lainnya"} ·{" "}
+                        <span suppressHydrationWarning>
+                          {waktuRelatif(r.created_at)}
+                        </span>{" "}
+                        · {STATUS[r.status as StatusKey]?.label ?? r.status}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <p className="angka-tabular border-t garis-halus px-4 py-2 text-center text-xs tabular-nums text-muted">
+              menampilkan {Math.min(20, tersaring.length)} dari{" "}
+              {tersaring.length} laporan
+            </p>
+          </>
+        ) : (
+          <p className="px-4 pb-4 pt-1 text-center text-sm text-muted">
+            {periodeIdx !== null
+              ? `Belum ada laporan hingga ${BULAN[periodeIdx].label}.`
+              : "Belum ada laporan yang cocok. Jadilah yang pertama melapor!"}
+          </p>
+        )}
+      </section>
 
       <Modal
         terbuka={!!terpilih}

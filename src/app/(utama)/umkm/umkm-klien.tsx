@@ -10,10 +10,11 @@ import {
   MessageCircle,
   Plus,
   ShoppingBag,
-  Sparkles,
+  BadgeCheck,
+  TriangleAlert,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { Button, Card, Input, Label, Select, Skeleton, Textarea } from "@/components/ui";
 import { KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
 import { Modal } from "@/components/modal";
 
@@ -61,7 +62,7 @@ function KartuUsaha({ usaha }: { usaha: Usaha }) {
         </div>
         {usaha.verified && (
           <span className="flex shrink-0 items-center gap-1 rounded-full bg-daun-500/15 px-2.5 py-1 text-xs font-semibold text-daun-700 dark:text-daun-300">
-            <Sparkles size={11} /> Terverifikasi
+            <BadgeCheck size={11} /> Terverifikasi
           </span>
         )}
       </div>
@@ -219,19 +220,55 @@ function FormAjukanUsaha({
   );
 }
 
+/* State UMKM: ikon tas belanja relevan dengan etalase usaha, segitiga
+   relevan dengan gangguan. Skeleton tanpa shimmer. */
+export function MuatUmkm() {
+  return (
+    <div aria-busy="true" className="grid gap-4 sm:grid-cols-2">
+      <p role="status" className="sr-only">
+        Memuat usaha warga
+      </p>
+      {[0, 1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="rounded-[18px] border border-ap-hairline bg-white p-5 shadow-none dark:border-line dark:bg-panel"
+        >
+          <div className="flex gap-3">
+            <Skeleton className="size-11 shrink-0 rounded-2xl" />
+            <div className="flex-1">
+              <Skeleton className="h-5 w-2/3" />
+              <Skeleton className="mt-2 h-3.5 w-1/3" />
+            </div>
+          </div>
+          <Skeleton className="mt-4 h-4 w-full" />
+          <Skeleton className="mt-4 h-11 w-full rounded-full" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function GalatUmkm() {
   const router = useRouter();
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
       <Card className="rounded-[18px] border-ap-hairline bg-white p-8 text-ap-ink shadow-none dark:border-line dark:bg-panel dark:text-ink">
+        <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-danger/10 text-danger">
+          <TriangleAlert size={26} strokeWidth={1.8} />
+        </span>
         <h1 className="font-display text-2xl font-bold tracking-[-0.224px]">
           UMKM Warga belum bisa dimuat
         </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
+        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+          Kamu tidak ketinggalan info usaha tetanggamu. Daftar usaha gagal
+          dimuat karena koneksi terputus.
         </p>
-        <Button className="mt-5 min-h-[44px] focus-visible:outline-ap-blue-focus" onClick={() => router.refresh()}>
+        <ol className="mx-auto mt-4 max-w-md space-y-1 text-left text-sm text-muted">
+          <li>1. Periksa koneksi internet kamu.</li>
+          <li>2. Pilih Coba lagi di bawah.</li>
+          <li>3. Kalau masih gagal, kembali lagi beberapa menit lagi.</li>
+        </ol>
+        <Button className="mt-6 min-h-[44px] focus-visible:outline-ap-blue-focus" onClick={() => router.refresh()}>
           Coba lagi
         </Button>
       </Card>
@@ -280,8 +317,27 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
         </motion.div>
       </AnimatePresence>
       {tampil.length === 0 && (
-        <KacaKartu className="p-10 text-center text-sm text-muted">
-          Belum ada usaha terdaftar. Jadilah yang pertama!
+        <KacaKartu className="p-8 text-center">
+          <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+            <ShoppingBag size={26} strokeWidth={1.8} />
+          </span>
+          <h2 className="font-display text-lg font-bold">
+            Belum ada usaha terdaftar
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+            Kamu bisa jadi yang pertama. Daftarkan usahamu agar tetanggamu
+            mudah menemukan dan membeli darimu.
+          </p>
+          {masuk && (
+            <KacaPill
+              onClick={() => setFormBuka(true)}
+              className="mt-5 min-h-[44px] focus-visible:outline-ap-blue-focus"
+            >
+              <span className="inline-flex items-center gap-2">
+                <Plus size={15} /> Daftarkan usahamu
+              </span>
+            </KacaPill>
+          )}
         </KacaKartu>
       )}
 

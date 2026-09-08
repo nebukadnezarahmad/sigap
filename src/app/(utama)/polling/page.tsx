@@ -73,7 +73,7 @@ export default async function HalamanPolling() {
           </h1>
           <p className="mt-3 max-w-xl text-[17px] leading-[1.47] tracking-[-0.374px] text-muted teks-pretty">
             Pendapatmu menentukan arah kebijakan lingkungan. Satu warga, satu
-            suara per polling — hasilnya terbuka dan berjalan realtime.
+            suara per polling. Hasilnya terbuka dan berjalan realtime.
           </p>
         </div>
       </section>

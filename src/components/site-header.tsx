@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   BookOpen,
   FileText,
@@ -11,7 +11,6 @@ import {
   Menu,
   Moon,
   ShieldCheck,
-  Sparkles,
   Sun,
   Trophy,
   UserRound,
@@ -37,7 +36,7 @@ function ToggleTema() {
     <button
       onClick={ubah}
       aria-label={gelap ? "Mode terang" : "Mode gelap"}
-      className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+      className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
     >
       <span className="hidden dark:block">
         <Sun size={18} />
@@ -56,6 +55,44 @@ export function SiteHeader() {
   const [modalDemoBuka, setModalDemoBuka] = useState(false);
   const [menuBuka, setMenuBuka] = useState(false);
   const [akunBuka, setAkunBuka] = useState(false);
+  const tombolMenuRef = useRef<HTMLButtonElement>(null);
+  const tombolAkunRef = useRef<HTMLButtonElement>(null);
+
+  /* R-03/R-32: lapisan header tak boleh bertumpuk di 390px. Membuka satu
+     menutup yang lain; ESC menutup lalu mengembalikan fokus ke pemicu;
+     pindah rute menutup keduanya. */
+  function alihMenu() {
+    setAkunBuka(false);
+    setMenuBuka((v) => !v);
+  }
+
+  function alihAkun() {
+    setMenuBuka(false);
+    setAkunBuka((v) => !v);
+  }
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "Escape") return;
+      if (menuBuka) {
+        setMenuBuka(false);
+        tombolMenuRef.current?.focus();
+      } else if (akunBuka) {
+        setAkunBuka(false);
+        tombolAkunRef.current?.focus();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuBuka, akunBuka]);
+
+  /* Pindah rute menutup keduanya (pola yang sama dengan jelajah.tsx). */
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setMenuBuka(false);
+    setAkunBuka(false);
+  }
 
   const tautan = [
     { href: "/peta", label: "Peta" },
@@ -73,11 +110,16 @@ export function SiteHeader() {
   }
 
   return (
-    <KacaBar as="header" className="print:hidden">
+    <KacaBar
+      as="header"
+      /* R-03: viewport-fit=cover membentangkan bar ke bawah poni; padding ini
+         menjaga isi bar di bawah safe-area (bernilai 0 di desktop). */
+      className="pt-[env(safe-area-inset-top)] print:hidden"
+    >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
         <Link
           href="/"
-          className="flex items-center gap-2 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+          className="flex items-center gap-2 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
         >
           <span className="flex size-8 items-center justify-center rounded-xl bg-daun-600 text-white">
             <MapPin size={17} strokeWidth={2.5} />
@@ -93,7 +135,7 @@ export function SiteHeader() {
               key={t.href}
               href={t.href}
               className={cn(
-                "inline-flex min-h-[44px] items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                "inline-flex min-h-[44px] items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!",
                 pathname.startsWith(t.href)
                   ? "bg-daun-600/10 text-daun-700 dark:text-daun-300 font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
@@ -106,7 +148,7 @@ export function SiteHeader() {
             <Link
               href="/dewan"
               className={cn(
-                "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!",
                 pathname.startsWith("/dewan")
                   ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
@@ -117,13 +159,15 @@ export function SiteHeader() {
           )}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <ToggleTema />
           <button
-            onClick={() => setMenuBuka((v) => !v)}
+            ref={tombolMenuRef}
+            onClick={alihMenu}
             aria-expanded={menuBuka}
+            aria-controls="navigasi-seluler"
             aria-label={menuBuka ? "Tutup menu navigasi" : "Buka menu navigasi"}
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 md:hidden"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! md:hidden"
           >
             {menuBuka ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -131,10 +175,12 @@ export function SiteHeader() {
           {user ? (
             <div className="group relative">
               <button
+                ref={tombolAkunRef}
                 aria-label="Menu akun"
                 aria-expanded={akunBuka}
                 aria-haspopup="menu"
-                onClick={() => setAkunBuka((v) => !v)}
+                aria-controls="menu-akun"
+                onClick={alihAkun}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
@@ -142,14 +188,15 @@ export function SiteHeader() {
                   }
                   if (e.key === "Escape") setAkunBuka(false);
                 }}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition hover:ring-4 hover:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition hover:ring-4 hover:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
               >
                 <Avatar nama={profil?.nama_lengkap ?? "?"} url={profil?.avatar_url} ukuran={34} />
               </button>
               <div
                 role="menu"
+                id="menu-akun"
                 className={cn(
-                  "invisible absolute right-0 top-full z-20 w-56 translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100",
+                  "invisible absolute right-0 top-full z-20 w-56 max-w-[calc(100vw-2rem)] translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100",
                   akunBuka && "visible translate-y-0 opacity-100"
                 )}
               >
@@ -168,39 +215,39 @@ export function SiteHeader() {
                 </div>
                 <Link
                   href={`/warga/${profil?.username ?? ""}`}
-                  className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
+                  className="mt-1 flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
                 >
                   <UserRound size={15} /> Profil saya
                 </Link>
                 <Link
                   href="/laporan-saya"
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
+                  className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
                 >
                   <FileText size={15} /> Laporan saya
                 </Link>
                 <Link
                   href="/papan-skor"
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
+                  className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
                 >
                   <Trophy size={15} /> Papan skor
                 </Link>
                 {profil?.role === "admin" && (
                   <Link
                     href="/dewan"
-                    className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-kunyit-600 transition hover:bg-kunyit-500/10 dark:text-kunyit-400"
+                    className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-kunyit-600 transition hover:bg-kunyit-500/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! dark:text-kunyit-400"
                   >
                     <ShieldCheck size={15} /> Dashboard dewan
                   </Link>
                 )}
                 <Link
                   href="/demo"
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
+                  className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
                 >
                   <BookOpen size={15} /> Panduan demo
                 </Link>
                 <button
                   onClick={keluar}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-danger transition hover:bg-danger/10"
+                  className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-danger transition hover:bg-danger/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
                 >
                   <LogOut size={15} /> Keluar
                 </button>
@@ -214,12 +261,12 @@ export function SiteHeader() {
                 onClick={() => setModalDemoBuka(true)}
                 className="hidden sm:inline-flex min-h-[44px] items-center gap-1.5 border-daun-500/30 text-daun-700 hover:bg-daun-500/10 dark:text-daun-300"
               >
-                <Sparkles size={14} className="text-daun-600 dark:text-daun-400" />
+                <UserRound size={14} className="text-daun-600 dark:text-daun-400" />
                 Akun Demo
               </Button>
               <Link
                 href="/masuk"
-                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 active:scale-[0.97] bg-daun-600 text-white shadow-[0_1px_2px_rgb(23_67_42/0.2),0_6px_16px_-6px_rgb(23_67_42/0.35)] hover:bg-daun-700 hover:shadow-[0_2px_4px_rgb(23_67_42/0.2),0_10px_24px_-6px_rgb(23_67_42/0.4)]"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! active:scale-[0.97] bg-daun-600 text-white shadow-[0_1px_2px_rgb(23_67_42/0.2),0_6px_16px_-6px_rgb(23_67_42/0.35)] hover:bg-daun-700 hover:shadow-[0_2px_4px_rgb(23_67_42/0.2),0_10px_24px_-6px_rgb(23_67_42/0.4)]"
               >
                 Masuk
               </Link>
@@ -230,7 +277,10 @@ export function SiteHeader() {
 
       {menuBuka && (
         <nav
-          className="border-t garis-halus px-4 py-3 md:hidden"
+          id="navigasi-seluler"
+          /* R-03: menu tak boleh menutupi konten di layar pendek; tinggi
+             dibatasi viewport dinamis + safe-area bawah, sisanya menggeser. */
+          className="max-h-[calc(100dvh-4rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto border-t garis-halus px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 md:hidden"
           aria-label="Navigasi seluler"
         >
           <ul className="flex flex-col gap-1">
@@ -240,7 +290,7 @@ export function SiteHeader() {
                   href={t.href}
                   onClick={() => setMenuBuka(false)}
                   className={cn(
-                    "flex min-h-[44px] items-center rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                    "flex min-h-[44px] items-center rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!",
                     pathname.startsWith(t.href)
                       ? "bg-daun-600/10 text-daun-700 dark:text-daun-300 font-semibold"
                       : "text-muted hover:bg-panel-2 hover:text-ink"
@@ -256,7 +306,7 @@ export function SiteHeader() {
                   href="/dewan"
                   onClick={() => setMenuBuka(false)}
                   className={cn(
-                    "flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                    "flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!",
                     pathname.startsWith("/dewan")
                       ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
                       : "text-muted hover:bg-panel-2 hover:text-ink"

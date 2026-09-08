@@ -308,6 +308,10 @@ Pemetaan token eksperimen (`@theme`, prefix `ap-`, di `src/app/globals.css`):
 
 Catatan shadow: satu-satunya shadow yang diizinkan adalah shadow produk di atas (`ap-shadow`), dipakai hanya untuk render/produk yang bertumpu pada permukaan — tidak untuk kartu, tombol, atau teks.
 
+Dial antislop (Part 3): ENERGY 1 / RHYTHM 2 / MOTION 1 — layanan sipil yang tenang (E1), ritme tile konsisten dengan beberapa jeda (R2: hero gradient, tile gelap, kartu kaca), gerak utilitarian (M1: hover + reveal, hormat reduced-motion).
+
+Design Read: halaman layanan publik untuk warga (semua umur, mobile-first), dalam bahasa tile tenang Apple + civic Fraunces SIGAP, dial ENERGY 1 / RHYTHM 2 / MOTION 1.
+
 ---
 
 Bagian di bawah ini adalah salinan isi sumber Apple DESIGN.md (Overview hingga Known Gaps), dipertahankan penuh sebagai referensi. Jika bertentangan dengan bagian FUSI di atas, bagian FUSI yang menang.

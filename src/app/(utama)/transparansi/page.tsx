@@ -13,7 +13,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI, STATUS, SLA_KATEGORI, hitungSla, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { StatusChip, Button } from "@/components/ui";
+import { StatusChip, Button, Skeleton } from "@/components/ui";
 import { KacaKartu } from "@/components/eksperimen/kaca";
 import { formatTanggal } from "@/lib/utils";
 import { GrafikBulanan, GrafikKategori } from "./grafik";
@@ -21,6 +21,57 @@ import { TombolCetak } from "./tombol-cetak";
 
 export const metadata: Metadata = { title: "Transparansi" };
 export const dynamic = "force-dynamic";
+
+/* Skeleton muat transparansi: tanpa ilustrasi karena ini muat. */
+export function MuatTransparansi() {
+  return (
+    <div aria-busy="true" className="mx-auto max-w-6xl px-4 py-10">
+      <p role="status" className="sr-only">
+        Memuat data transparansi
+      </p>
+      <Skeleton className="h-9 w-2/3" />
+      <Skeleton className="mt-2 h-4 w-1/2" />
+      <div className="mb-6 mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-28 w-full rounded-[18px]" />
+        ))}
+      </div>
+      <Skeleton className="h-64 w-full rounded-[18px]" />
+    </div>
+  );
+}
+
+/* Galat transparansi: ikon segitiga relevan dengan gangguan data. */
+function GalatTransparansi({ mode }: { mode: "sambung" | "muat" }) {
+  return (
+    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+      <KacaKartu className="p-8">
+        <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-danger/10 text-danger">
+          <AlertTriangle size={26} strokeWidth={1.8} />
+        </span>
+        <h1 className="font-display text-2xl font-bold">
+          Data transparansi belum bisa dimuat
+        </h1>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+          {mode === "sambung"
+            ? "Kamu tidak ketinggalan info apa pun. Database belum tersambung sehingga angka kinerja belum bisa ditampilkan."
+            : "Kamu tidak ketinggalan info apa pun. Data gagal dimuat karena koneksi terputus."}
+        </p>
+        <ol className="mx-auto mt-4 max-w-md space-y-1 text-left text-sm text-muted">
+          <li>1. Periksa koneksi internet kamu.</li>
+          <li>2. Muat ulang halaman ini.</li>
+          <li>3. Kalau masih gagal, kembali lagi beberapa menit lagi.</li>
+        </ol>
+        <Link
+          href="/transparansi"
+          className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
+        >
+          Muat ulang halaman
+        </Link>
+      </KacaKartu>
+    </main>
+  );
+}
 
 function median(arr: number[]) {
   if (arr.length === 0) return 0;
@@ -56,16 +107,10 @@ function pisahMinggu(daftar: BarisLaporan[]) {
 export default async function HalamanTransparansi() {
   const supabase = await createClient();
   if (!supabase) {
-    return (
-      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-bold">
-          Database belum tersambung
-        </h1>
-      </main>
-    );
+    return <GalatTransparansi mode="sambung" />;
   }
 
-  const { data: semua } = await supabase
+  const { data: semua, error: galat } = await supabase
     .from("reports")
     .select(
       `id, judul, status, created_at, lat, lng, alamat_teks, categories(slug,nama,warna),
@@ -73,6 +118,10 @@ export default async function HalamanTransparansi() {
     )
     .order("created_at", { ascending: false })
     .limit(1000);
+
+  if (galat) {
+    return <GalatTransparansi mode="muat" />;
+  }
 
   const daftar = (semua ?? []) as unknown as BarisLaporan[];
 
@@ -194,6 +243,27 @@ export default async function HalamanTransparansi() {
         </div>
       </header>
 
+      {total === 0 && (
+        <KacaKartu className="mb-6 p-8 text-center">
+          <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
+            <FileSpreadsheet size={26} strokeWidth={1.8} />
+          </span>
+          <h2 className="font-display text-xl font-bold">
+            Belum ada laporan untuk ditampilkan
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+            Kamu bisa jadi yang pertama melaporkan. Data transparansi akan
+            terisi otomatis setelah ada laporan masuk.
+          </p>
+          <Link
+            href="/peta?lapor=1"
+            className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
+          >
+            Buat laporan pertama
+          </Link>
+        </KacaKartu>
+      )}
+
       {/* Ringkasan Metrik Utama */}
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
@@ -283,8 +353,17 @@ export default async function HalamanTransparansi() {
         </div>
 
         {laporanLewatSla.length === 0 ? (
-          <div className="py-8 text-center text-sm text-muted">
-            ✓ Luar biasa! Tidak ada laporan warga yang melewati batas waktu SLA saat ini.
+          <div className="py-8 text-center">
+            <span className="mx-auto mb-3 flex size-12 items-center justify-center rounded-[18px] bg-daun-500/10 text-daun-700 dark:text-daun-300">
+              <CheckCircle2 size={24} strokeWidth={1.8} />
+            </span>
+            <h3 className="font-display text-base font-bold">
+              Tidak ada laporan yang melewati batas
+            </h3>
+            <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-muted">
+              Kabar baik untuk kamu. Semua laporan tertangani dalam target
+              waktu. Pantau terus agar tetap seperti ini.
+            </p>
           </div>
         ) : (
           <div className="mt-3 overflow-x-auto">

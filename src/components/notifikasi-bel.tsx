@@ -122,7 +122,7 @@ export function NotifikasiBel() {
         aria-label={`Notifikasi${belum ? `, ${belum} belum dibaca` : ""}`}
         aria-expanded={buka}
         aria-haspopup="dialog"
-        className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+        className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
       >
         <Bell size={18} />
         {belum > 0 && (
@@ -130,7 +130,7 @@ export function NotifikasiBel() {
             key={belum}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -right-0.5 -top-0.5 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold text-white"
+            className="angka-tabular absolute -right-0.5 -top-0.5 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold text-white"
           >
             {belum}
           </motion.span>
@@ -153,14 +153,14 @@ export function NotifikasiBel() {
               initial={{ opacity: 0, y: 6, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 6, scale: 0.98 }}
-              className="absolute right-0 top-full z-40 mt-2 w-80 overflow-hidden rounded-2xl border garis-halus bg-panel shadow-xl"
+              className="absolute right-0 top-full z-40 mt-2 w-80 overflow-hidden rounded-[18px] border border-ap-hairline bg-white/85 shadow-none backdrop-blur-xl backdrop-saturate-150 dark:border-white/15 dark:bg-[#131d19]/85"
             >
-              <div className="flex items-center justify-between border-b garis-halus px-4 py-2.5">
+              <div className="flex items-center justify-between border-b border-ap-hairline px-4 py-2.5 dark:border-white/10">
                 <p className="font-display text-sm font-bold">Notifikasi</p>
                 {belum > 0 && (
                   <button
                     onClick={tandaiSemua}
-                    className="flex items-center gap-1 text-xs font-semibold text-daun-700 hover:underline dark:text-daun-300"
+                    className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-ap-blue hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! dark:text-ap-sky"
                   >
                     <CheckCheck size={13} /> Tandai dibaca
                   </button>
@@ -180,8 +180,8 @@ export function NotifikasiBel() {
                       if (n.report_id) router.push(`/laporan/${n.report_id}`);
                     }}
                     className={cn(
-                      "flex w-full items-start gap-2.5 border-b garis-halus px-4 py-3 text-left transition last:border-0 hover:bg-panel-2",
-                      !n.dibaca && "bg-daun-500/5"
+                      "flex w-full items-start gap-2.5 border-b border-ap-hairline px-4 py-3 text-left transition last:border-0 hover:bg-panel-2 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-ap-blue-focus! dark:border-white/10",
+                      !n.dibaca && "bg-ap-blue/5"
                     )}
                   >
                     <span
@@ -189,7 +189,7 @@ export function NotifikasiBel() {
                         "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full",
                         n.dibaca
                           ? "bg-panel-2 text-muted"
-                          : "bg-daun-600 text-white"
+                          : "bg-ap-blue text-white"
                       )}
                     >
                       {IKON[n.jenis] ?? <Bell size={13} />}
@@ -203,7 +203,7 @@ export function NotifikasiBel() {
                           {n.isi}
                         </span>
                       )}
-                      <span className="mt-0.5 block text-[11px] text-muted" suppressHydrationWarning>
+                      <span className="angka-tabular mt-0.5 block text-[11px] text-muted" suppressHydrationWarning>
                         {waktuRelatif(n.created_at)}
                       </span>
                     </span>
