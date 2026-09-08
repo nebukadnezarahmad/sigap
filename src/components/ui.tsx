@@ -56,7 +56,7 @@ export function Input({
   return (
     <input
       className={cn(
-        "min-h-[44px] w-full rounded-xl border border-ap-hairline bg-ap-canvas px-3.5 py-2.5 text-sm text-ap-ink outline-none transition-[background-color,border-color,box-shadow,color] duration-200 ease-out placeholder:text-ap-ink-muted/70 focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus motion-reduce:transition-none",
+        "min-h-[44px] w-full rounded-xl border border-ap-hairline bg-ap-canvas px-3.5 py-2.5 text-sm text-ap-ink outline-none transition-[background-color,border-color,box-shadow,color] duration-200 ease-out placeholder:text-ap-ink-muted focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus motion-reduce:transition-none",
         className
       )}
       {...props}
@@ -71,7 +71,7 @@ export function Textarea({
   return (
     <textarea
       className={cn(
-        "min-h-[44px] w-full rounded-xl border border-ap-hairline bg-ap-canvas px-3.5 py-2.5 text-sm text-ap-ink outline-none transition-[background-color,border-color,box-shadow,color] duration-200 ease-out placeholder:text-ap-ink-muted/70 focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus motion-reduce:transition-none",
+        "min-h-[44px] w-full rounded-xl border border-ap-hairline bg-ap-canvas px-3.5 py-2.5 text-sm text-ap-ink outline-none transition-[background-color,border-color,box-shadow,color] duration-200 ease-out placeholder:text-ap-ink-muted focus:border-ap-blue focus:ring-4 focus:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus motion-reduce:transition-none",
         className
       )}
       {...props}

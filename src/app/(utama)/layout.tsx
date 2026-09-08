@@ -40,7 +40,7 @@ export default function LayoutUtama({
                   <Link
                     key={t.href}
                     href={t.href}
-                    className="inline-flex min-h-[44px] items-center text-[17px] leading-[2.41] transition-[color,background-color] duration-200 hover:text-ap-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus motion-reduce:transition-none"
+                    className="inline-flex min-h-[44px] items-center text-[17px] leading-[2.41] text-ap-ink-muted transition-[color,background-color] duration-200 hover:text-ap-blue focus-visible:text-ap-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:hover:text-ap-sky dark:focus-visible:text-ap-sky motion-reduce:transition-none"
                   >
                     {t.label}
                   </Link>
