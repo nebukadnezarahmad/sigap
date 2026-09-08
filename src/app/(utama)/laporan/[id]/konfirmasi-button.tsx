@@ -158,7 +158,7 @@ export function KonfirmasiButton({
                   disabled={proses}
                   aria-pressed={sudah}
                   aria-busy={proses}
-                  className="bg-daun-600 hover:bg-daun-700 text-white"
+                  className="bg-action hover:bg-action-hover text-white"
                 >
                   <CheckCircle2 size={16} />
                   {sudah ? "Sudah Kamu Verifikasi" : "Ya, Masalah Sudah Selesai"}

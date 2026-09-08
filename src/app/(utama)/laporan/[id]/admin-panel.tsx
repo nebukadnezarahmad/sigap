@@ -185,9 +185,9 @@ export function AdminPanel({
         <div className="mt-3 space-y-2">
           <label
             htmlFor="foto-sesudah"
-            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-daun-500/50 bg-daun-500/5 px-3.5 py-3 text-sm text-ink transition hover:border-daun-500 hover:bg-daun-500/10"
+            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-action/50 bg-action/5 px-3.5 py-3 text-sm text-ink transition hover:border-action hover:bg-action/10"
           >
-            <ImagePlus size={17} className="text-daun-600 dark:text-daun-400" />
+            <ImagePlus size={17} className="text-action" />
             <span className="font-semibold">
               {file ? file.name : "Unggah foto bukti fisik sesudah (Wajib)*"}
             </span>

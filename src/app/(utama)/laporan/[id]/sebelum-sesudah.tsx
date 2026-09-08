@@ -13,7 +13,7 @@ export function SebelumSesudah({
   const [posisi, setPosisi] = useState(50);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border garis-halus select-none focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-daun-600 has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-daun-600">
+    <div className="relative overflow-hidden rounded-2xl border garis-halus select-none focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-action has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-action">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={sesudah}
@@ -46,7 +46,7 @@ export function SebelumSesudah({
         className="pointer-events-none absolute inset-y-0 w-0.5 bg-white shadow-[0_0_8px_rgba(0,0,0,0.4)]"
         style={{ left: `${posisi}%` }}
       >
-        <span className="absolute left-1/2 top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-daun-600 text-white shadow-lg">
+        <span className="absolute left-1/2 top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-action text-white shadow-lg">
           <MoveHorizontal size={16} />
         </span>
       </span>
@@ -58,7 +58,7 @@ export function SebelumSesudah({
         value={posisi}
         onChange={(e) => setPosisi(Number(e.target.value))}
         aria-label="Geser perbandingan sebelum dan sesudah"
-        className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+        className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
       />
 
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">

@@ -58,7 +58,7 @@ export default async function HalamanLaporanSaya() {
         <Card className="p-10 text-center">
           <p className="text-muted">
             Kamu belum membuat laporan.{" "}
-            <Link href="/peta?lapor=1" className="font-semibold text-daun-700 hover:underline dark:text-daun-300">
+            <Link href="/peta?lapor=1" className="font-semibold text-action hover:underline">
               Buat laporan pertamamu
             </Link>
             .

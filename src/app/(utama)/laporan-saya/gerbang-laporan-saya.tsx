@@ -9,7 +9,7 @@ export function GerbangLaporanSaya() {
   return (
     <main className="mx-auto max-w-lg px-4 py-16">
       <Card className="p-8 text-center">
-        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-action/10 text-action">
           <FileText size={28} />
         </div>
 
@@ -21,8 +21,8 @@ export function GerbangLaporanSaya() {
           Anda belum masuk. Halaman ini menampilkan seluruh laporan yang pernah Anda buat dan perkembangan status penanganannya. Silakan masuk untuk melihat daftar laporan Anda.
         </p>
 
-        <div className="mt-6 rounded-2xl border border-daun-500/30 bg-daun-500/5 p-4 text-left">
-          <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-daun-700 dark:text-daun-300">
+        <div className="mt-6 rounded-2xl border border-action/30 bg-action/5 p-4 text-left">
+          <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-action">
             <Sparkles size={14} /> Coba Akun Demo dengan Data Laporan (1-Klik)
           </p>
           <PilihanAkunDemo tujuan="/laporan-saya" />
@@ -31,7 +31,7 @@ export function GerbangLaporanSaya() {
         <div className="mt-6 flex flex-col items-center gap-2 text-sm">
           <Link
             href="/masuk?next=/laporan-saya"
-            className="font-semibold text-daun-700 hover:underline dark:text-daun-300"
+            className="font-semibold text-action hover:underline"
           >
             Masuk manual
           </Link>

@@ -186,7 +186,7 @@ export function KomentarSection({
           </Button>
         </form>
       ) : (
-        <div className="mt-5 rounded-2xl border border-daun-500/25 bg-daun-500/5 p-4">
+        <div className="mt-5 rounded-2xl border border-action/25 bg-action/5 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold">Ingin ikut berdiskusi?</p>
@@ -198,7 +198,7 @@ export function KomentarSection({
               size="sm"
               variant="sekunder"
               onClick={() => setModalAuth(true)}
-              className="border-daun-500/30 text-daun-700 hover:bg-daun-500/10 dark:text-daun-300"
+              className="border-action/30 text-action hover:bg-action/10"
             >
               Masuk 1-Klik Demo
             </Button>

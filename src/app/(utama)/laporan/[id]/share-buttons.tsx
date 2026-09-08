@@ -18,7 +18,7 @@ export function ShareButtons({ judul }: { judul: string }) {
           buka(`https://wa.me/?text=${encodeURIComponent(`${teks}\n${location.href}`)}`)
         }
         aria-label="Bagikan ke WhatsApp"
-        className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 text-muted transition hover:bg-daun-500/10 hover:text-daun-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 dark:hover:text-daun-300"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 text-muted transition hover:bg-action/10 hover:text-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
       >
         <MessageCircle size={17} />
       </button>
@@ -29,7 +29,7 @@ export function ShareButtons({ judul }: { judul: string }) {
           )
         }
         aria-label="Bagikan ke X"
-        className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
       >
         <Share2 size={17} />
       </button>
@@ -40,7 +40,7 @@ export function ShareButtons({ judul }: { judul: string }) {
           setTimeout(() => setTersalin(false), 1600);
         }}
         aria-label="Salin tautan"
-        className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-full p-2 text-xs text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-full p-2 text-xs text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
       >
         {tersalin ? <Check size={15} className="text-daun-600" /> : <Link2 size={15} />}
         {tersalin ? "Tersalin!" : ""}
