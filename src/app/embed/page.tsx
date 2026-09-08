@@ -46,7 +46,7 @@ export default async function HalamanEmbed() {
     <main className="relative h-dvh w-full overflow-hidden">
       <PetaEmbedKlien titik={titik} />
       <div className="absolute left-3 top-3 z-[600] flex items-center gap-2 rounded-full border garis-halus bg-panel/90 py-1.5 pl-2 pr-3 shadow backdrop-blur">
-        <span className="flex size-6 items-center justify-center rounded-full bg-daun-600 text-white">
+        <span className="flex size-6 items-center justify-center rounded-full bg-action text-white">
           <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
             <circle cx="12" cy="10" r="3" />
@@ -60,7 +60,7 @@ export default async function HalamanEmbed() {
           href="/peta"
           target="_blank"
           rel="noopener"
-          className="ml-1 flex items-center gap-1 rounded-full bg-daun-600 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-daun-700"
+          className="ml-1 flex items-center gap-1 rounded-full bg-action px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-action-hover"
         >
           Buka penuh <ExternalLink size={10} />
         </Link>

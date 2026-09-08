@@ -21,16 +21,16 @@ export const AKUN_DEMO = [
     email: "budi@sigap.demo",
     deskripsi: "Warga dengan poin, riwayat laporan, dan badge",
     admin: false,
-    warna: "border-daun-500/30 bg-daun-500/5 hover:border-daun-500/60",
-    badge: "bg-daun-500/15 text-daun-700 dark:text-daun-300",
+    warna: "border-action/30 bg-action/5 hover:border-action/60",
+    badge: "bg-action/15 text-action",
   },
   {
     peran: "Rafa (Warga Baru)",
     email: "rafa@sigap.demo",
     deskripsi: "Akun baru untuk mencoba alur pelaporan dari awal",
     admin: false,
-    warna: "border-daun-500/30 bg-daun-500/5 hover:border-daun-500/60",
-    badge: "bg-daun-500/15 text-daun-700 dark:text-daun-300",
+    warna: "border-action/30 bg-action/5 hover:border-action/60",
+    badge: "bg-action/15 text-action",
   },
 ];
 
@@ -156,7 +156,7 @@ export function PilihanAkunDemo({
                   className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl ${
                     a.admin
                       ? "bg-kunyit-500/15 text-kunyit-600"
-                      : "bg-daun-600/10 text-daun-700 dark:text-daun-300"
+                      : "bg-action/10 text-action"
                   }`}
                 >
                   {a.admin ? <Crown size={17} /> : <UserRound size={17} />}
@@ -226,7 +226,7 @@ export function DemoAuthModal({
                 tutup();
                 router.push(`/masuk${tujuanAman ? `?next=${encodeURIComponent(tujuanAman)}` : ""}`);
               }}
-              className="font-semibold text-daun-700 hover:underline dark:text-daun-300"
+              className="font-semibold text-action hover:underline"
             >
               Masuk manual
             </button>

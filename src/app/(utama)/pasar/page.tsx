@@ -61,7 +61,7 @@ export default async function HalamanPasar() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
           Ekonomi sirkular warga
         </p>
         <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">

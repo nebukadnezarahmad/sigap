@@ -200,7 +200,7 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
                 key={i}
                 onClick={() => pilih(i)}
                 disabled={proses}
-                className="w-full rounded-xl border garis-halus bg-panel-2 px-4 py-2.5 text-left text-sm font-medium transition hover:border-daun-400 hover:bg-daun-500/5 disabled:opacity-50"
+                className="w-full rounded-xl border garis-halus bg-panel-2 px-4 py-2.5 text-left text-sm font-medium transition hover:border-action hover:bg-action-soft disabled:opacity-50"
               >
                 {o}
               </button>

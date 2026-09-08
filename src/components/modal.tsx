@@ -125,7 +125,7 @@ export function Modal({
               <button
                 onClick={tutup}
                 aria-label="Tutup modal"
-                className="rounded-full p-1.5 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:ring-2 focus-visible:ring-daun-500"
+                className="rounded-full p-1.5 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:ring-2 focus-visible:ring-action"
               >
                 <X size={18} />
               </button>

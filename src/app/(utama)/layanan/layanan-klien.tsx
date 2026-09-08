@@ -97,7 +97,7 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
           onChange={(e) => setKueri(e.target.value)}
           placeholder="Cari layanan… (mis. damkar, PLN, sampah)"
           aria-label="Cari layanan"
-          className="w-full rounded-full border garis-halus bg-panel py-3 pl-11 pr-4 text-sm outline-none transition focus:border-daun-400"
+          className="w-full rounded-full border garis-halus bg-panel py-3 pl-11 pr-4 text-sm outline-none transition focus:border-action"
         />
       </div>
 
@@ -127,7 +127,7 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
                       </div>
                       <a
                         href={`tel:${l.telepon.replace(/[^+\d]/g, "")}`}
-                        className="flex items-center gap-1.5 rounded-full bg-daun-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-daun-700"
+                        className="flex items-center gap-1.5 rounded-full bg-action px-4 py-2 text-sm font-semibold text-white transition hover:bg-action-hover"
                       >
                         <Phone size={14} /> Telepon
                       </a>

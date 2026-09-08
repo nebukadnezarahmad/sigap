@@ -75,7 +75,7 @@ export default async function HalamanWarga({
       <Card className="relative overflow-hidden p-0">
         <div
           aria-hidden
-          className="h-28 bg-daun-600"
+          className="h-28 bg-action"
           style={{
             backgroundImage:
               "repeating-linear-gradient(115deg, rgba(255,255,255,0.08) 0 2px, transparent 2px 26px)",
@@ -192,7 +192,7 @@ export default async function HalamanWarga({
           )}
           {laporanTerakhir.map((r) => (
             <Link key={r.id} href={`/laporan/${r.id}`} className="block">
-              <Card className="flex items-center gap-3 p-4 transition hover:border-daun-400">
+              <Card className="flex items-center gap-3 p-4 transition hover:border-action">
                 <span style={{ color: r.categories?.warna }}>
                   <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={18} />
                 </span>

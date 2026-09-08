@@ -122,7 +122,7 @@ export function NotifikasiBel() {
         aria-label={`Notifikasi${belum ? `, ${belum} belum dibaca` : ""}`}
         aria-expanded={buka}
         aria-haspopup="dialog"
-        className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+        className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
       >
         <Bell size={18} />
         {belum > 0 && (
@@ -160,7 +160,7 @@ export function NotifikasiBel() {
                 {belum > 0 && (
                   <button
                     onClick={tandaiSemua}
-                    className="flex items-center gap-1 text-xs font-semibold text-daun-700 hover:underline dark:text-daun-300"
+                    className="flex items-center gap-1 text-xs font-semibold text-action hover:underline"
                   >
                     <CheckCheck size={13} /> Tandai dibaca
                   </button>
@@ -181,7 +181,7 @@ export function NotifikasiBel() {
                     }}
                     className={cn(
                       "flex w-full items-start gap-2.5 border-b garis-halus px-4 py-3 text-left transition last:border-0 hover:bg-panel-2",
-                      !n.dibaca && "bg-daun-500/5"
+                      !n.dibaca && "bg-action/5"
                     )}
                   >
                     <span
@@ -189,7 +189,7 @@ export function NotifikasiBel() {
                         "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full",
                         n.dibaca
                           ? "bg-panel-2 text-muted"
-                          : "bg-daun-600 text-white"
+                          : "bg-action text-white"
                       )}
                     >
                       {IKON[n.jenis] ?? <Bell size={13} />}

@@ -166,9 +166,9 @@ function QuizSection({
                     key={i}
                     className={`h-1.5 rounded-full transition-all ${
                       i < indeks
-                        ? "w-8 bg-daun-500"
+                        ? "w-8 bg-action"
                         : i === indeks
-                          ? "w-8 bg-daun-600"
+                          ? "w-8 bg-action"
                           : "w-4 bg-line"
                     }`}
                   />
@@ -189,8 +189,8 @@ function QuizSection({
                       onClick={() => setPilih(i)}
                       className={`flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm font-medium transition ${
                         dipilihKu
-                          ? "border-daun-500 bg-daun-500/10"
-                          : "garis-halus hover:border-daun-400"
+                          ? "border-action bg-action-soft"
+                          : "garis-halus hover:border-action"
                       }`}
                     >
                       {o}
@@ -352,7 +352,7 @@ function KalkulatorSection({
                     aria-pressed={jawaban[q.kunci] === i}
                     className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                       jawaban[q.kunci] === i
-                        ? "border-transparent bg-daun-600 text-white"
+                        ? "border-transparent bg-action text-white"
                         : "garis-halus text-muted hover:text-ink"
                     }`}
                   >

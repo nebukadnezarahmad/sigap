@@ -344,7 +344,7 @@ export function LeafletMap({
       {/* Perbesar kontrol zoom bawaan Leaflet (30px) ke target 44px,
           plus cincin fokus yang jelas untuk marker keyboard. */}
       <style>{`.sigap-peta .leaflet-bar a{width:44px!important;height:44px!important;line-height:44px!important}
-.sigap-peta .leaflet-marker-icon:focus-visible{outline:3px solid var(--color-daun-600);outline-offset:3px;border-radius:12px}`}</style>
+.sigap-peta .leaflet-marker-icon:focus-visible{outline:3px solid var(--action);outline-offset:3px;border-radius:12px}`}</style>
       <div className="relative h-full w-full" onKeyDown={pilihTengah}>
         <div
           ref={refDiv}
@@ -362,7 +362,7 @@ export function LeafletMap({
               type="button"
               onClick={pakaiLokasiSaya}
               disabled={mencariLokasi}
-              className="pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full border garis-halus bg-panel/95 px-4 text-sm font-semibold shadow-lg backdrop-blur transition hover:border-daun-400 disabled:opacity-60"
+              className="pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full border garis-halus bg-panel/95 px-4 text-sm font-semibold shadow-lg backdrop-blur transition hover:border-action disabled:opacity-60"
             >
               {mencariLokasi ? "Mencari…" : "Pakai lokasi saya"}
             </button>
@@ -390,7 +390,7 @@ export function LeafletMap({
             <button
               type="button"
               onClick={() => cbRef.current.onKlikTitik?.(t.id)}
-              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[2000] focus:min-h-11 focus:rounded-full focus:bg-daun-700 focus:px-5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-xl"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[2000] focus:min-h-11 focus:rounded-full focus:bg-action focus:px-5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-xl"
             >
               Buka laporan: {t.judul}
             </button>

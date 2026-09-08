@@ -86,7 +86,7 @@ function FormulirDaftar() {
   return (
     <Card className="mx-auto w-full max-w-md p-7">
       <div className="mb-6 text-center">
-        <span className="mx-auto mb-3 flex size-11 items-center justify-center rounded-2xl bg-daun-600 text-white">
+        <span className="mx-auto mb-3 flex size-11 items-center justify-center rounded-2xl bg-action text-white">
           <MapPin size={22} strokeWidth={2.5} />
         </span>
         <h1 className="font-display text-2xl font-bold">Gabung jadi warga SIGAP</h1>
@@ -131,7 +131,7 @@ function FormulirDaftar() {
 
       <p className="mt-6 text-center text-sm text-muted">
         Sudah punya akun?{" "}
-        <Link href="/masuk" className="font-semibold text-daun-700 hover:underline dark:text-daun-300">
+        <Link href="/masuk" className="font-semibold text-action hover:underline">
           Masuk
         </Link>
       </p>

@@ -20,7 +20,7 @@ export default async function HalamanLayanan() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
           Nomor yang wajib dihafal
         </p>
         <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">

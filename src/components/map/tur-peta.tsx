@@ -109,7 +109,7 @@ export function TurPeta() {
           ref={refPemicu}
           type="button"
           onClick={() => setLangkah(0)}
-          className="fixed bottom-5 left-5 z-[1100] inline-flex min-h-11 items-center gap-2 rounded-full border garis-halus bg-panel/95 px-4 text-sm font-semibold shadow-xl backdrop-blur transition hover:border-daun-400"
+          className="fixed bottom-5 left-5 z-[1100] inline-flex min-h-11 items-center gap-2 rounded-full border garis-halus bg-panel/95 px-4 text-sm font-semibold shadow-xl backdrop-blur transition hover:border-action"
         >
           <Compass size={16} aria-hidden /> Pemandu peta
         </button>
@@ -133,12 +133,12 @@ export function TurPeta() {
                 <span
                   key={i}
                   className={`h-1.5 rounded-full transition-[width,background-color] ${
-                    i === langkah ? "w-6 bg-daun-600" : "w-1.5 bg-line"
+                    i === langkah ? "w-6 bg-action" : "w-1.5 bg-line"
                   }`}
                 />
               ))}
             </div>
-            <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+            <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-action/10 text-action">
               {(() => {
                 const Ikon = LANGKAH[langkah].Ikon;
                 return <Ikon size={20} strokeWidth={1.8} aria-hidden />;

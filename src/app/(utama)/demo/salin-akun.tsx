@@ -16,7 +16,7 @@ export function SalinAkun({ email, sandi }: { email?: string; sandi?: boolean })
     <button
       onClick={salin}
       aria-label={sandi ? "Salin kata sandi" : `Salin email ${email}`}
-      className="flex size-8 items-center justify-center rounded-lg border garis-halus text-muted transition hover:border-daun-400 hover:text-ink"
+      className="flex size-8 items-center justify-center rounded-lg border garis-halus text-muted transition hover:border-action hover:text-ink"
     >
       {tersalin ? (
         <Check size={14} className="text-daun-600" />

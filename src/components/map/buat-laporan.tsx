@@ -193,8 +193,8 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-daun-500/30 bg-daun-500/5 p-4">
-          <p className="mb-2.5 text-xs font-bold uppercase tracking-wider text-daun-700 dark:text-daun-300">
+        <div className="rounded-2xl border border-action/30 bg-action/5 p-4">
+          <p className="mb-2.5 text-xs font-bold uppercase tracking-wider text-action">
             Masuk Cepat Mode Demo (1-Klik untuk Juri)
           </p>
           <PilihanAkunDemo ringkas />
@@ -397,7 +397,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           <Label htmlFor="foto">Foto kondisi (maks. 4, opsional)</Label>
           <label
             htmlFor="foto"
-            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed garis-halus px-3.5 py-3 text-sm text-muted transition hover:border-daun-400 hover:text-ink"
+            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed garis-halus px-3.5 py-3 text-sm text-muted transition hover:border-action hover:text-ink"
           >
             <ImagePlus size={18} />
             {files.length > 0
@@ -497,7 +497,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
                     size="sm"
                     type="button"
                     onClick={() => handleDukungLaporanMirip(laporanMirip[0].id)}
-                    className="bg-daun-600 hover:bg-daun-700 text-white"
+                    className="bg-action hover:bg-action-hover text-white"
                   >
                     <ThumbsUp size={12} /> Dukung laporan ini
                   </Button>

@@ -127,7 +127,7 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
   return (
     <Card className="overflow-hidden p-0">
       <div className="flex items-stretch">
-        <div className="flex w-20 shrink-0 flex-col items-center justify-center bg-daun-600/10 py-4 text-daun-800 dark:text-daun-200">
+        <div className="flex w-20 shrink-0 flex-col items-center justify-center bg-action-soft py-4 text-action">
           <span className="angka-tabular font-display text-2xl font-extrabold leading-none">
             {new Date(data.tanggal).getDate()}
           </span>

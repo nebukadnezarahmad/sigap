@@ -4,7 +4,7 @@ import { Button } from "@/components/ui";
 export default function TidakDitemukan() {
   return (
     <main className="mx-auto flex min-h-[60dvh] max-w-2xl flex-col items-center justify-center px-4 py-20 text-center">
-      <p className="font-display text-[88px] font-extrabold leading-none text-daun-600/15 dark:text-daun-300/15">
+      <p className="font-display text-[88px] font-extrabold leading-none text-action/15">
         404
       </p>
       <h1 className="-mt-8 font-display text-3xl font-bold">

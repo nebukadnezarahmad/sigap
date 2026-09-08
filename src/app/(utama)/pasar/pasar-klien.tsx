@@ -36,7 +36,7 @@ const KONDISI_LABEL: Record<string, string> = {
 function IkonKategori({ kategori }: { kategori: string }) {
   const found = KATEGORI.find((k) => k.id === kategori) ?? KATEGORI[4];
   return (
-    <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-daun-500/10 text-daun-700 dark:text-daun-300">
+    <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-action-soft text-action">
       <found.Ikon size={20} />
     </span>
   );
@@ -368,7 +368,7 @@ export function PasarKlien({
           onClick={() => setFilter("semua")}
           className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
             filter === "semua"
-              ? "bg-daun-600 text-white"
+              ? "bg-action text-white"
               : "border garis-halus text-muted hover:bg-panel-2 hover:text-ink"
           }`}
         >
@@ -380,7 +380,7 @@ export function PasarKlien({
             onClick={() => setFilter(k.id)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
               filter === k.id
-                ? "bg-daun-600 text-white"
+                ? "bg-action text-white"
                 : "border garis-halus text-muted hover:bg-panel-2 hover:text-ink"
             }`}
           >

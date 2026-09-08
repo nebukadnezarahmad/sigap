@@ -36,7 +36,7 @@ export default function LayoutUtama({
                 <Link
                   key={t.href}
                   href={t.href}
-                  className="inline-flex min-h-[44px] items-center transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+                  className="inline-flex min-h-[44px] items-center transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
                 >
                   {t.label}
                 </Link>

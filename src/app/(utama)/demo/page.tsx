@@ -50,7 +50,7 @@ export default function HalamanDemo() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-12">
       <header className="mb-10 text-center">
-        <p className="inline-flex items-center gap-1.5 rounded-full border border-daun-500/30 bg-daun-500/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-daun-700 dark:text-daun-300">
+        <p className="inline-flex items-center gap-1.5 rounded-full border border-action/30 bg-action-soft px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-action">
           <Sparkles size={13} /> Khusus Dewan Juri & Penguji
         </p>
         <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
@@ -75,7 +75,7 @@ export default function HalamanDemo() {
         <div className="grid gap-4 sm:grid-cols-2">
           {TUR.map((t) => (
             <Card key={t.judul} className="flex flex-col p-5">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+              <span className="flex size-10 items-center justify-center rounded-xl bg-action-soft text-action">
                 <t.ikon size={18} strokeWidth={1.8} />
               </span>
               <h3 className="mt-3 font-display font-bold">{t.judul}</h3>
@@ -84,7 +84,7 @@ export default function HalamanDemo() {
               </p>
               <Link
                 href={t.href}
-                className="group mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-daun-700 dark:text-daun-300"
+                className="group mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-action"
               >
                 {t.label}
                 <ArrowRight

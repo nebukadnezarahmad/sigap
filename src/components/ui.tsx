@@ -13,14 +13,14 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
+        "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
         size === "sm" && "px-3.5 py-1.5 text-sm",
         size === "md" && "px-5 py-2.5 text-sm",
         size === "lg" && "px-7 py-3 text-base",
         variant === "utama" &&
-          "bg-daun-600 text-white shadow-[0_1px_2px_rgb(23_67_42/0.2),0_6px_16px_-6px_rgb(23_67_42/0.35)] hover:bg-daun-700 hover:shadow-[0_2px_4px_rgb(23_67_42/0.2),0_10px_24px_-6px_rgb(23_67_42/0.4)]",
+          "bg-action text-white shadow-[0_1px_2px_rgb(0_102_204/0.25),0_6px_16px_-6px_rgb(0_102_204/0.4)] hover:bg-action-hover hover:shadow-[0_2px_4px_rgb(0_102_204/0.25),0_10px_24px_-6px_rgb(0_102_204/0.45)]",
         variant === "sekunder" &&
-          "border garis-halus bg-panel text-ink hover:border-daun-400 hover:text-daun-700 dark:hover:text-daun-300",
+          "border garis-halus bg-panel text-ink hover:border-action hover:text-action",
         variant === "hantu" && "text-muted hover:bg-panel-2 hover:text-ink",
         variant === "bahaya" &&
           "bg-danger/10 text-danger hover:bg-danger hover:text-white",
@@ -55,7 +55,7 @@ export function Input({
   return (
     <input
       className={cn(
-        "w-full rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+        "w-full rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-action focus:ring-4 focus:ring-action/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
         className
       )}
       {...props}
@@ -70,7 +70,7 @@ export function Textarea({
   return (
     <textarea
       className={cn(
-        "w-full rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+        "w-full rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-action focus:ring-4 focus:ring-action/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
         className
       )}
       {...props}
@@ -86,7 +86,7 @@ export function Select({
   return (
     <select
       className={cn(
-        "w-full appearance-none rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+        "w-full appearance-none rounded-xl border garis-halus bg-panel px-3.5 py-2.5 text-sm outline-none transition focus:border-action focus:ring-4 focus:ring-action/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
         className
       )}
       {...props}
@@ -151,7 +151,7 @@ export function Avatar({
   return (
     <span
       aria-hidden
-      className="flex shrink-0 items-center justify-center rounded-full bg-daun-600 font-display font-bold text-white"
+      className="flex shrink-0 items-center justify-center rounded-full bg-action font-display font-bold text-white"
       style={{ width: ukuran, height: ukuran, fontSize: ukuran * 0.38 }}
     >
       {inisial(nama || "?")}

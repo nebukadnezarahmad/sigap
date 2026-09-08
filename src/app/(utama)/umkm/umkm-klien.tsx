@@ -76,7 +76,7 @@ function KartuUsaha({ usaha }: { usaha: Usaha }) {
           href={`https://wa.me/${wa}`}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 flex items-center justify-center gap-1.5 rounded-full bg-daun-600 py-2.5 text-sm font-semibold text-white transition hover:bg-daun-700"
+          className="mt-4 flex items-center justify-center gap-1.5 rounded-full bg-action py-2.5 text-sm font-semibold text-white transition hover:bg-action-hover"
         >
           <MessageCircle size={15} /> Hubungi via WhatsApp
         </a>

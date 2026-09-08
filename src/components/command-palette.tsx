@@ -204,7 +204,7 @@ export function CommandPalette() {
         aria-label="Buka palet perintah"
         aria-haspopup="dialog"
         aria-expanded={buka}
-        className="fixed bottom-4 right-4 z-[1100] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border garis-halus bg-panel text-muted shadow-xl transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+        className="fixed bottom-4 right-4 z-[1100] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border garis-halus bg-panel text-muted shadow-xl transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
       >
         <Search size={18} />
       </button>
@@ -255,7 +255,7 @@ export function CommandPalette() {
                   }
                 }}
                 placeholder="Ketik perintah atau tujuan…"
-                className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:text-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+                className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:text-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
                 aria-label="Cari perintah"
                 role="combobox"
                 aria-expanded={buka}
@@ -293,9 +293,9 @@ export function CommandPalette() {
                     onMouseEnter={() => setKursor(i)}
                     onFocus={() => setKursor(i)}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                      "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
                       i === kursor
-                        ? "bg-daun-600/10 text-daun-800 dark:text-daun-200"
+                        ? "bg-action/10 text-action"
                         : "text-ink"
                     )}
                   >

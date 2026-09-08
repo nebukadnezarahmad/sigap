@@ -313,7 +313,7 @@ export function Jelajah({
               onChange={(e) => setKueri(e.target.value)}
               placeholder="Cari judul atau isi laporan…"
               aria-label="Cari laporan"
-              className="h-10 w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15"
+              className="h-10 w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-action focus:ring-4 focus:ring-action/15"
             />
           </label>
 
@@ -323,7 +323,7 @@ export function Jelajah({
               aria-expanded={pop === "kategori"}
               className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
                 pop === "kategori" || fKategori.length > 0
-                  ? "border-daun-500/50 bg-daun-500/5 text-daun-700 dark:text-daun-300"
+                  ? "border-action/50 bg-action/5 text-action"
                   : "text-muted hover:text-ink"
               }`}
               style={
@@ -335,7 +335,7 @@ export function Jelajah({
               <SlidersHorizontal size={15} />
               Kategori
               {fKategori.length > 0 && (
-                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-daun-600 text-[11px] font-bold text-white">
+                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-action text-[11px] font-bold text-white">
                   {fKategori.length}
                 </span>
               )}
@@ -364,7 +364,7 @@ export function Jelajah({
                       <span
                         className={`flex size-4 items-center justify-center rounded border transition ${
                           aktif
-                            ? "border-daun-600 bg-daun-600 text-white"
+                            ? "border-action bg-action text-white"
                             : "border-line"
                         }`}
                       >
@@ -395,7 +395,7 @@ export function Jelajah({
               aria-expanded={pop === "status"}
               className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
                 pop === "status" || fStatus.length > 0
-                  ? "border-daun-500/50 bg-daun-500/5 text-daun-700 dark:text-daun-300"
+                  ? "border-action/50 bg-action/5 text-action"
                   : "text-muted hover:text-ink"
               }`}
               style={
@@ -411,7 +411,7 @@ export function Jelajah({
               </span>
               Status
               {fStatus.length > 0 && (
-                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-daun-600 text-[11px] font-bold text-white">
+                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-action text-[11px] font-bold text-white">
                   {fStatus.length}
                 </span>
               )}
@@ -440,7 +440,7 @@ export function Jelajah({
                       <span
                         className={`flex size-4 items-center justify-center rounded border transition ${
                           aktif
-                            ? "border-daun-600 bg-daun-600 text-white"
+                            ? "border-action bg-action text-white"
                             : "border-line"
                         }`}
                       >
@@ -473,7 +473,7 @@ export function Jelajah({
             aria-pressed={!!pusatSaya}
             className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
               pusatSaya
-                ? "border-transparent bg-daun-600 text-white"
+                ? "border-transparent bg-action text-white"
                 : "text-muted hover:text-ink"
             }`}
             style={
@@ -527,7 +527,7 @@ export function Jelajah({
             aria-pressed={periodeIdx !== null}
             className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
               periodeIdx !== null
-                ? "border-transparent bg-daun-600 text-white"
+                ? "border-transparent bg-action text-white"
                 : "text-muted hover:text-ink"
             }`}
             style={
@@ -544,7 +544,7 @@ export function Jelajah({
             <button
               onClick={() => setMainkan((v) => !v)}
               aria-label={mainkan ? "Jeda" : "Putar"}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-daun-600 text-white transition hover:bg-daun-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-action text-white transition hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
             >
               {mainkan ? (
                 <span className="text-[10px] leading-none">■</span>
@@ -558,7 +558,7 @@ export function Jelajah({
               max={BULAN.length - 1}
               value={periodeIdx}
               onChange={(e) => setPeriodeIdx(Number(e.target.value))}
-              className="w-52 accent-daun-600"
+              className="w-52 accent-action"
               aria-label="Pilih periode waktu"
             />
             <span className="text-xs font-semibold text-muted">
@@ -630,8 +630,8 @@ export function Jelajah({
                   tabIndex={0}
                   role="button"
                   aria-label={`Buka laporan ${r.judul}`}
-                  className={`cursor-pointer p-4 transition hover:border-daun-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 ${
-                    terpilihId === r.id ? "ring-2 ring-daun-500" : ""
+                  className={`cursor-pointer p-4 transition hover:border-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action ${
+                    terpilihId === r.id ? "ring-2 ring-action" : ""
                   }`}
                 >
                   <div className="mb-1.5 flex items-center justify-between gap-2">
