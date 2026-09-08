@@ -3,7 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui";
 import { NODE_LAIN } from "@/lib/ikon-vektor";
 import { EdukasiKlien } from "./edukasi-klien";
-import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
+import {
+  GalatMuatUlang,
+  KontenUtama,
+  PageHeader,
+} from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Edukasi" };
 export const dynamic = "force-dynamic";
@@ -134,18 +138,11 @@ export default async function HalamanEdukasi() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <header className="mb-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
-          Sekolah lingkungan
-        </p>
-        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
-          Edukasi Permukiman
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Materi ringkas untuk memulai perubahan dari rumah — lengkap dengan quiz
-          dan kalkulator jejak sampah pribadi.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Sekolah lingkungan"
+        judul="Edukasi Permukiman"
+        deskripsi="Materi ringkas untuk memulai perubahan dari rumah — lengkap dengan quiz dan kalkulator jejak sampah pribadi."
+      />
 
       <section aria-label="Materi" className="mb-12 grid gap-4 sm:grid-cols-2">
         {MATERI.map((m, i) => (

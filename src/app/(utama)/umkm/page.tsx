@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { UmkmKlien } from "./umkm-klien";
-import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
+import {
+  GalatMuatUlang,
+  KontenUtama,
+  PageHeader,
+} from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "UMKM Warga" };
 export const dynamic = "force-dynamic";
@@ -42,19 +46,11 @@ export default async function HalamanUmkm() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
-          Ekonomi lingkunganmu
-        </p>
-        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
-          UMKM Warga
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Usaha tetanggamu lebih dekat daripada yang kamu kira. Belanja di
-          warga berarti memperkuat ekonomi lingkungan sekaligus memangkas
-          jejak transportasi.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Ekonomi lingkunganmu"
+        judul="UMKM Warga"
+        deskripsi="Usaha tetanggamu lebih dekat daripada yang kamu kira. Belanja di warga berarti memperkuat ekonomi lingkungan sekaligus memangkas jejak transportasi."
+      />
 
       <UmkmKlien awal={umkm} masuk={!!user} />
     </main>

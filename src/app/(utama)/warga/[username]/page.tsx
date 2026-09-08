@@ -73,14 +73,7 @@ export default async function HalamanWarga({
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <Card className="relative overflow-hidden p-0">
-        <div
-          aria-hidden
-          className="h-28 bg-action"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(115deg, rgba(255,255,255,0.08) 0 2px, transparent 2px 26px)",
-          }}
-        />
+        <div aria-hidden className="h-28 bg-action sm:h-32" />
         <div className="-mt-10 px-6 pb-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex items-end gap-4">

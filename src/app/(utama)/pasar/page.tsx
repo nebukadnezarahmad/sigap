@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { PasarKlien } from "./pasar-klien";
-import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
+import {
+  GalatMuatUlang,
+  KontenUtama,
+  PageHeader,
+} from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Pasar ReUse" };
 export const dynamic = "force-dynamic";
@@ -65,19 +69,11 @@ export default async function HalamanPasar() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
-          Ekonomi sirkular warga
-        </p>
-        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
-          Pasar ReUse
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Barang bekas layak pakai dipindahtangankan gratis antar-warga. Kurangi
-          tumpukan sampah, perpanjang usia barang. Pasang barangmu dan dapatkan
-          poin.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Ekonomi sirkular warga"
+        judul="Pasar ReUse"
+        deskripsi="Barang bekas layak pakai dipindahtangankan gratis antar-warga. Kurangi tumpukan sampah, perpanjang usia barang. Pasang barangmu dan dapatkan poin."
+      />
 
       <PasarKlien awal={barang} masuk={!!user} />
     </main>

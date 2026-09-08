@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { PollingKlien } from "./polling-klien";
-import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
+import {
+  GalatMuatUlang,
+  KontenUtama,
+  PageHeader,
+} from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Polling Warga" };
 export const dynamic = "force-dynamic";
@@ -66,19 +70,12 @@ export default async function HalamanPolling() {
     : { data: null };
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
-          Suara warga
-        </p>
-        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
-          Polling Partisipatif
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Pendapatmu menentukan arah kebijakan lingkungan. Satu warga, satu
-          suara per polling — hasilnya terbuka dan berjalan realtime.
-        </p>
-      </header>
+    <main className="mx-auto max-w-4xl px-4 py-10">
+      <PageHeader
+        eyebrow="Suara warga"
+        judul="Polling Partisipatif"
+        deskripsi="Pendapatmu menentukan arah kebijakan lingkungan. Satu warga, satu suara per polling — hasilnya terbuka dan berjalan realtime."
+      />
 
       <PollingKlien
         awal={polls}

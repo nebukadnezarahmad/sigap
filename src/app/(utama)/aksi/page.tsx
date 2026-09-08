@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { AksiKlien } from "./aksi-klien";
-import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
+import {
+  GalatMuatUlang,
+  KontenUtama,
+  PageHeader,
+} from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Aksi Bersama" };
 export const dynamic = "force-dynamic";
@@ -64,19 +68,12 @@ export default async function HalamanAksi() {
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
-          Gerakan bersama
-        </p>
-        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
-          Aksi Bersama
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Dari laporan menjadi aksi nyata. Ikut satu aksi = +5 poin; ikut dua
-          aksi membuka badge Relawan.
-        </p>
-      </header>
+    <main className="mx-auto max-w-4xl px-4 py-10">
+      <PageHeader
+        eyebrow="Gerakan bersama"
+        judul="Aksi Bersama"
+        deskripsi="Dari laporan menjadi aksi nyata. Ikut satu aksi = +5 poin; ikut dua aksi membuka badge Relawan."
+      />
 
       <AksiKlien awal={daftar} masuk={!!user} />
     </main>
