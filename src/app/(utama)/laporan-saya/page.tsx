@@ -4,12 +4,22 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { Card, StatusChip } from "@/components/ui";
+import { STATUS, type StatusKey } from "@/lib/constants";
 import { AksiLaporanSaya } from "./aksi";
 import { HapusAreaKlien } from "./hapus-area";
 import { GerbangLaporanSaya } from "./gerbang-laporan-saya";
 
 export const metadata: Metadata = { title: "Laporan Saya" };
 export const dynamic = "force-dynamic";
+
+const PROGRES_STATUS: Record<string, number> = {
+  baru: 20,
+  diverifikasi: 40,
+  dikerjakan: 60,
+  menunggu_verifikasi: 80,
+  selesai: 100,
+  ditolak: 100,
+};
 
 export default async function HalamanLaporanSaya() {
   const supabase = await createClient();
@@ -45,24 +55,38 @@ export default async function HalamanLaporanSaya() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <h1 className="font-display text-3xl font-bold">Laporan Saya</h1>
-        <p className="mt-2 text-muted">
-          Sunting laporan selama statusnya masih{" "}
-          <b className="text-ink">Baru</b>. Setelah diverifikasi dewan, isinya
-          terkunci demi akuntabilitas.
-        </p>
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-bold">Laporan Saya</h1>
+          <p className="mt-2 max-w-xl text-muted">
+            Sunting laporan selama statusnya masih{" "}
+            <b className="text-ink">Baru</b>. Setelah diverifikasi dewan, isinya
+            terkunci demi akuntabilitas.
+          </p>
+        </div>
+        <Link
+          href="/peta?lapor=1"
+          className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-action px-6 text-sm font-semibold text-white transition hover:bg-action-hover active:scale-[0.97]"
+        >
+          + Buat laporan
+        </Link>
       </header>
 
       {daftar.length === 0 ? (
         <Card className="p-10 text-center">
-          <p className="text-muted">
-            Kamu belum membuat laporan.{" "}
-            <Link href="/peta?lapor=1" className="font-semibold text-action hover:underline">
-              Buat laporan pertamamu
-            </Link>
-            .
+          <p className="font-display text-xl font-bold">
+            Belum ada laporan darimu
           </p>
+          <p className="mx-auto mt-2 max-w-sm text-sm text-muted">
+            Mulai dari satu titik di sekitarmu. Laporan pertama hanya butuh
+            foto dan dua menit.
+          </p>
+          <Link
+            href="/peta?lapor=1"
+            className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-action px-7 text-sm font-semibold text-white transition hover:bg-action-hover active:scale-[0.97]"
+          >
+            Buat laporan pertama
+          </Link>
         </Card>
       ) : (
         <div className="space-y-3">
@@ -92,6 +116,23 @@ export default async function HalamanLaporanSaya() {
                     {r.vote_count ?? 0} dukungan · {r.comment_count ?? 0}{" "}
                     komentar
                   </p>
+                  <div
+                    className="mt-3 h-1.5 overflow-hidden rounded-full bg-panel-2"
+                    role="progressbar"
+                    aria-valuenow={PROGRES_STATUS[r.status] ?? 0}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Progres: ${STATUS[r.status as StatusKey]?.label ?? r.status}`}
+                  >
+                    <div
+                      className="h-full rounded-full transition-[width]"
+                      style={{
+                        width: `${PROGRES_STATUS[r.status] ?? 0}%`,
+                        backgroundColor:
+                          STATUS[r.status as StatusKey]?.warna ?? "#94a3b8",
+                      }}
+                    />
+                  </div>
                 </div>
                 <AksiLaporanSaya
                   laporan={{

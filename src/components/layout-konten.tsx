@@ -65,16 +65,19 @@ export function PageHeader({
   );
 }
 
-export function GalatMuatUlang({ judul }: { judul: string }) {
+export function GalatMuatUlang({
+  judul,
+  pesan = "Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba lagi.",
+}: {
+  judul: string;
+  pesan?: string;
+}) {
   const router = useRouter();
   return (
     <div className="text-center">
       <Card className="p-8">
         <h1 className="font-display text-2xl font-bold">{judul}</h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
-        </p>
+        <p className="mt-2 text-sm text-muted">{pesan}</p>
         <Button className="mt-5" onClick={() => router.refresh()}>
           Coba lagi
         </Button>

@@ -2,10 +2,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, AlertTriangle, CheckCircle2, MapPin, Timer, Wrench } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { STATUS, kategoriBySlug, hitungSla, type StatusKey } from "@/lib/constants";
+import { STATUS, hitungSla, type StatusKey } from "@/lib/constants";
 import type { FotoLaporan } from "@/types/database";
 import { formatTanggal, waktuRelatif } from "@/lib/utils";
 import { Avatar, Card, StatusChip } from "@/components/ui";
+import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { LeafletMap } from "@/components/map/leaflet-map";
 import { VoteButton } from "./vote-button";
@@ -27,12 +28,12 @@ export default async function HalamanLaporan({
   const supabase = await createClient();
   if (!supabase) {
     return (
-      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-bold">Database belum tersambung</h1>
-        <p className="mt-2 text-sm text-muted">
-          Atur env Supabase lalu jalankan schema.sql (lihat README).
-        </p>
-      </main>
+      <KontenUtama>
+        <GalatMuatUlang
+          judul="Database belum tersambung"
+          pesan="Atur env Supabase lalu jalankan schema.sql (lihat README)."
+        />
+      </KontenUtama>
     );
   }
 
@@ -112,6 +113,8 @@ export default async function HalamanLaporan({
                 <IkonKategori slug={kat?.slug ?? "lainnya"} ukuran={13} />{" "}
                 {kat?.nama ?? "Lainnya"}
               </span>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
               {r.petugas && (
                 <span className="flex items-center gap-1 rounded-full bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300">
                   <Wrench size={12} /> {r.petugas}
@@ -136,7 +139,7 @@ export default async function HalamanLaporan({
                   ) : (
                     <>
                       <Timer size={12} className="text-muted shrink-0" />
-                      <span>SLA: sisa {sla.sisaHari} hr (target {sla.targetHari} hr)</span>
+                      <span>Sisa {sla.sisaHari} hr</span>
                     </>
                   )}
                 </span>
@@ -200,8 +203,13 @@ export default async function HalamanLaporan({
             )}
           </Card>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <VoteButton reportId={r.id} jumlahAwal={r.votes?.[0]?.count ?? 0} />
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <div className="w-full sm:w-auto sm:min-w-56 [&_button]:w-full">
+              <VoteButton
+                reportId={r.id}
+                jumlahAwal={r.votes?.[0]?.count ?? 0}
+              />
+            </div>
             <KonfirmasiButton
               reportId={r.id}
               jumlahAwal={r.confirmations?.[0]?.count ?? 0}
@@ -326,14 +334,6 @@ export default async function HalamanLaporan({
             </ol>
           </Card>
 
-          <Card className="bg-panel-2 p-5 text-center">
-            <p className="font-display text-lg font-bold">
-              {kategoriBySlug(kat?.slug ?? "").nama}
-            </p>
-            <p className="mt-1 text-sm text-muted">
-              Dilaporkan lewat SIGAP — platform partisipasi permukiman.
-            </p>
-          </Card>
         </aside>
       </div>
     </main>
