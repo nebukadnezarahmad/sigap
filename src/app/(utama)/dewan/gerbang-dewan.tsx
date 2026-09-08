@@ -41,7 +41,7 @@ export function GerbangDewan({
       {/* Konten putih dominan light, hitam netral dark */}
       <section className="bg-white text-ap-ink dark:bg-black dark:text-white">
         <div className="mx-auto max-w-lg px-4 pb-16">
-          <KacaKartu className="bg-white/70 p-8 text-center text-ap-ink dark:border-white/15 dark:bg-ap-tile1/80 dark:text-white">
+           <KacaKartu className="bg-ap-canvas p-8 text-center text-ap-ink dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
             <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-kunyit-500/15 text-kunyit-700 dark:text-kunyit-400">
               <Crown size={28} strokeWidth={1.8} />
             </div>
@@ -54,8 +54,12 @@ export function GerbangDewan({
             </div>
 
             <div className="mt-6 flex flex-col items-center gap-2 text-sm">
-              <Link href="/masuk?next=/dewan" className={LINK_PILL_APPLE}>
-                Masuk manual sebagai admin
+               <Link
+                 href="/masuk?next=/dewan"
+                 aria-label="Masuk untuk melanjutkan ke Dashboard Dewan"
+                 className={LINK_PILL_APPLE}
+               >
+                 Masuk ke Dashboard Dewan
               </Link>
               <Link href="/demo" className={LINK_PILL_APPLE}>
                 Lihat panduan demo

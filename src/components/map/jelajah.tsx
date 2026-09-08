@@ -32,7 +32,6 @@ import {
 import { waktuRelatif } from "@/lib/utils";
 import { StatusChip, Button, Card } from "@/components/ui";
 import { KacaBar, KacaKartu, KacaPill } from "@/components/eksperimen/kaca";
-import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { Modal } from "@/components/modal";
 import { createClient } from "@/lib/supabase/client";
 import { BuatLaporanFormulir } from "./buat-laporan";
@@ -275,54 +274,51 @@ export function Jelajah({
   }
 
   return (
-    <main className="pb-10">
-      {/* Fusi header: pita gelap + teks putih + CTA pil biru, pola
-          papan-skor/demo; judul, hitungan, status realtime, dan rute CTA
-          tidak diubah, hanya warna agar kontras di atas pita. */}
-      <PitaGradient tone="gelap">
-        <header className="text-center">
-          <h1 className="font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px] text-white">
-            Peta Masalah Permukiman
-          </h1>
-          <p className="mx-auto mt-2 max-w-xl text-sm text-white/85">
-            <span className="angka-tabular tabular-nums">
-              {tersaring.length}
-            </span>{" "}
-            laporan ditampilkan ·{" "}
-            <span className="inline-flex items-center gap-1">
-              <span
-                aria-hidden
-                className={`size-1.5 rounded-full ${
-                  realtimeAktif ? "animate-pulse bg-daun-500" : "bg-white/40"
-                }`}
-              />
-              {realtimeAktif ? "Realtime aktif" : "Menyambungkan…"}
-            </span>
-          </p>
-          <div className="mt-5 flex justify-center">
-            <Button
-              size="lg"
-              onClick={() => setModalBuka(true)}
-              className="min-h-[44px] border-transparent bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus! dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus"
-            >
-              <Plus size={18} strokeWidth={3} /> Laporkan Masalah
-            </Button>
+    <main className="pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
+      <div className="mx-auto max-w-7xl px-4 pt-5 sm:pt-7">
+        <header className="mb-5 flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="font-display text-2xl font-bold leading-[1.1] tracking-[-0.28px] text-ap-ink dark:text-white sm:text-3xl">
+              Peta Masalah Permukiman
+            </h1>
+            <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
+              <span className="angka-tabular tabular-nums">
+                {tersaring.length}
+              </span>{" "}
+              laporan ditampilkan
+              <span aria-hidden className="text-ap-ink-muted">
+                ·
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span
+                  aria-hidden
+                  className={`size-1.5 rounded-full ${
+                    realtimeAktif ? "animate-pulse bg-daun-500" : "bg-ap-ink-muted/50"
+                  }`}
+                />
+                {realtimeAktif ? "Realtime aktif" : "Menyambungkan…"}
+              </span>
+            </p>
           </div>
+          <Button
+            size="sm"
+            onClick={() => setModalBuka(true)}
+            className="min-h-[44px] shrink-0 border-transparent bg-ap-blue text-white shadow-none hover:bg-ap-blue-focus hover:shadow-none focus-visible:outline-ap-blue-focus! dark:border-transparent dark:bg-ap-blue dark:text-white dark:hover:bg-ap-blue-focus"
+          >
+            <Plus size={17} strokeWidth={3} /> Laporkan Masalah
+          </Button>
         </header>
-      </PitaGradient>
-
-      <div className="mx-auto max-w-7xl px-4 pt-6">
 
       {!dbAktif && (
-        <div className="mb-4 flex items-center gap-2 rounded-[18px] border border-kunyit-500/40 bg-white px-4 py-3 text-sm text-kunyit-600 shadow-none dark:border-kunyit-500/40 dark:bg-ap-tile1 dark:text-white">
+        <div className="mb-4 flex min-w-0 items-start gap-2 rounded-[18px] border border-kunyit-500/40 bg-white px-4 py-3 text-sm text-kunyit-600 shadow-none dark:border-kunyit-500/40 dark:bg-ap-tile1 dark:text-white">
           <WifiOff size={16} /> Database belum tersambung — atur env Supabase lalu
           jalankan schema.sql (lihat README).
         </div>
       )}
 
-      <div className="mb-4 rounded-[18px] border border-ap-hairline bg-white p-2.5 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="relative min-w-48 flex-1">
+      <KacaKartu className="mb-4 min-w-0 p-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] text-ap-ink dark:text-white">
+        <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2">
+          <label className="relative min-w-0 basis-full flex-1 sm:min-w-48 sm:basis-auto">
             <Search
               size={15}
               className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
@@ -579,7 +575,7 @@ export function Jelajah({
             </span>
           </div>
         )}
-      </div>
+      </KacaKartu>
 
       {pop && (
         <button
@@ -592,7 +588,7 @@ export function Jelajah({
 
       {/* R-03: di ponsel peta dipadatkan agar cuplikan daftar terlihat di
           bawahnya; desktop tidak berubah. */}
-      <div className="grid h-[56dvh] min-h-[400px] grid-rows-[minmax(0,1fr)] gap-4 lg:h-[64dvh] lg:min-h-[460px] lg:grid-cols-[1fr_360px]">
+      <div className="grid min-w-0 h-[56dvh] min-h-[400px] grid-rows-[minmax(0,1fr)] gap-4 lg:h-[64dvh] lg:min-h-[460px] lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card className="relative min-h-0 overflow-hidden rounded-[18px] border-ap-hairline bg-white p-0 shadow-none dark:border-white/15 dark:bg-ap-tile1">
           <LeafletMap
             pusat={
@@ -643,8 +639,11 @@ export function Jelajah({
                   tabIndex={0}
                   role="button"
                   aria-label={`Buka laporan ${r.judul}`}
-                  className={`cursor-pointer bg-white/60 p-4 transition hover:border-ap-blue/50 motion-reduce:transition-none dark:border-white/15 dark:bg-ap-tile2/80 dark:text-white ${FOKUS_KACA} ${
-                    terpilihId === r.id ? "ring-2 ring-ap-blue" : ""
+                  aria-pressed={terpilihId === r.id}
+                  className={`min-w-0 cursor-pointer bg-white/60 p-4 transition hover:border-ap-blue/50 motion-reduce:transition-none dark:border-white/15 dark:bg-ap-tile2/80 dark:text-white ${FOKUS_KACA} focus-visible:ring-2 focus-visible:ring-ap-blue-focus ${
+                    terpilihId === r.id
+                      ? "ring-2 ring-ap-blue ring-offset-2 ring-offset-ap-canvas dark:ring-offset-ap-tile1"
+                      : ""
                   }`}
                 >
                   <div className="mb-1.5 flex items-center justify-between gap-2">
@@ -722,9 +721,12 @@ export function Jelajah({
                   <button
                     onClick={() => setTerpilihId(r.id)}
                     aria-label={`Buka laporan ${r.judul}`}
-                    className={`flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-ap-parchment motion-reduce:transition-none dark:hover:bg-white/10 ${FOKUS_KACA} ${
-                      terpilihId === r.id ? "ring-2 ring-ap-blue" : ""
-                    }`}
+                     aria-pressed={terpilihId === r.id}
+                     className={`flex min-h-[44px] w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-ap-parchment motion-reduce:transition-none dark:hover:bg-white/10 ${FOKUS_KACA} focus-visible:ring-2 focus-visible:ring-ap-blue-focus ${
+                       terpilihId === r.id
+                         ? "ring-2 ring-ap-blue ring-offset-2 ring-offset-ap-canvas dark:ring-offset-ap-tile1"
+                         : ""
+                     }`}
                   >
                     <span
                       aria-hidden

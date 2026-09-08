@@ -236,10 +236,10 @@ export default async function HalamanTransparansi() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Link
-              href="/api/open-data"
-              target="_blank"
-              className="hidden min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus sm:inline-flex"
+             <Link
+               href="/api/open-data"
+               target="_blank"
+              className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-ap-blue px-5 text-sm font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus"
             >
               <FileSpreadsheet size={15} /> Open Data (JSON)
             </Link>
@@ -270,80 +270,6 @@ export default async function HalamanTransparansi() {
           </Link>
         </KacaKartu>
       )}
-
-      {/* Ringkasan Metrik Utama */}
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {[
-          {
-            label: "Total laporan warga",
-            nilai: total,
-            ikon: <CheckCircle2 size={20} />,
-            warna: "text-ap-blue dark:text-ap-sky bg-ap-blue/10",
-          },
-          {
-            label: "Tingkat tuntas",
-            nilai: `${persenSelesai}%`,
-            ikon: <CheckCircle2 size={20} />,
-            warna: "text-daun-700 dark:text-daun-300 bg-daun-500/10",
-          },
-          {
-            label: "Median waktu beres",
-            nilai: medianHari ? `${medianHari} hari` : "<1 hari",
-            ikon: <Timer size={20} />,
-            warna: "text-kunyit-600 dark:text-kunyit-400 bg-kunyit-500/10",
-          },
-          {
-            label: "Melewati batas SLA",
-            nilai: laporanLewatSla.length,
-            ikon: <AlertTriangle size={20} />,
-            warna:
-              laporanLewatSla.length > 0
-                ? "text-danger bg-danger/10"
-                : "text-daun-700 dark:text-daun-300 bg-daun-500/10",
-          },
-        ].map((k) => (
-          <KacaKartu
-            key={k.label}
-            className="flex items-center gap-3.5 p-6"
-          >
-            <span
-              className={`flex size-11 items-center justify-center rounded-lg ${k.warna}`}
-            >
-              {k.ikon}
-            </span>
-            <div>
-              <p className="angka-tabular text-2xl font-extrabold leading-none tabular-nums">
-                {k.nilai}
-              </p>
-              <p className="mt-1 text-xs text-muted">{k.label}</p>
-            </div>
-          </KacaKartu>
-        ))}
-      </div>
-
-      {/* Standar SLA Kategori */}
-      <section className="mb-6 rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
-        <h2 className="font-display text-base font-bold tracking-[-0.224px]">
-          Standar Target Waktu Penanganan (SLA Resmi per Kategori)
-        </h2>
-        <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-          {KATEGORI.filter((k) => k.slug !== "lainnya").map((k) => (
-            <div
-              key={k.slug}
-              className="rounded-lg border border-ap-hairline bg-ap-pearl p-3 text-left dark:border-white/15 dark:bg-ap-tile2"
-            >
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted">
-                <IkonKategori slug={k.slug} ukuran={13} />
-                <span className="truncate">{k.nama}</span>
-              </div>
-              <p className="angka-tabular mt-1 text-xl font-black tabular-nums text-ap-ink dark:text-white">
-                {SLA_KATEGORI[k.slug] ?? 7} Hari
-              </p>
-              <p className="text-[11px] text-muted">Target respon & beres</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* Papan Keterlambatan Publik (Overdue Watchlist) */}
       <section className="mb-6 rounded-[18px] border border-danger/30 bg-white p-6 text-ap-ink shadow-none dark:border-danger/40 dark:bg-ap-tile1 dark:text-white">
@@ -425,6 +351,80 @@ export default async function HalamanTransparansi() {
             </table>
           </div>
         )}
+      </section>
+
+      {/* Ringkasan Metrik Utama */}
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {[
+          {
+            label: "Total laporan warga",
+            nilai: total,
+            ikon: <CheckCircle2 size={20} />,
+            warna: "text-ap-blue dark:text-ap-sky bg-ap-blue/10",
+          },
+          {
+            label: "Tingkat tuntas",
+            nilai: `${persenSelesai}%`,
+            ikon: <CheckCircle2 size={20} />,
+            warna: "text-daun-700 dark:text-daun-300 bg-daun-500/10",
+          },
+          {
+            label: "Median waktu beres",
+            nilai: medianHari ? `${medianHari} hari` : "<1 hari",
+            ikon: <Timer size={20} />,
+            warna: "text-kunyit-600 dark:text-kunyit-400 bg-kunyit-500/10",
+          },
+          {
+            label: "Melewati batas SLA",
+            nilai: laporanLewatSla.length,
+            ikon: <AlertTriangle size={20} />,
+            warna:
+              laporanLewatSla.length > 0
+                ? "text-danger bg-danger/10"
+                : "text-daun-700 dark:text-daun-300 bg-daun-500/10",
+          },
+        ].map((k) => (
+          <KacaKartu
+            key={k.label}
+            className="flex items-center gap-3.5 p-6"
+          >
+            <span
+              className={`flex size-11 items-center justify-center rounded-lg ${k.warna}`}
+            >
+              {k.ikon}
+            </span>
+            <div>
+              <p className="angka-tabular text-2xl font-extrabold leading-none tabular-nums">
+                {k.nilai}
+              </p>
+              <p className="mt-1 text-xs text-muted">{k.label}</p>
+            </div>
+          </KacaKartu>
+        ))}
+      </div>
+
+      {/* Standar SLA Kategori */}
+      <section className="mb-6 rounded-[18px] border border-ap-hairline bg-white p-6 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
+        <h2 className="font-display text-base font-bold tracking-[-0.224px]">
+          Standar Target Waktu Penanganan (SLA Resmi per Kategori)
+        </h2>
+        <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+          {KATEGORI.filter((k) => k.slug !== "lainnya").map((k) => (
+            <div
+              key={k.slug}
+              className="rounded-lg border border-ap-hairline bg-ap-pearl p-3 text-left dark:border-white/15 dark:bg-ap-tile2"
+            >
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted">
+                <IkonKategori slug={k.slug} ukuran={13} />
+                <span className="truncate">{k.nama}</span>
+              </div>
+              <p className="angka-tabular mt-1 text-xl font-black tabular-nums text-ap-ink dark:text-white">
+                {SLA_KATEGORI[k.slug] ?? 7} Hari
+              </p>
+              <p className="text-[11px] text-muted">Target respon & beres</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Insight Otomatis */}

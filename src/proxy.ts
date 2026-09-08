@@ -1,6 +1,18 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+function tujuanSetelahMasuk(request: NextRequest) {
+  return `${request.nextUrl.pathname}${request.nextUrl.search}`;
+}
+
+function urlMasuk(request: NextRequest) {
+  const redirectUrl = request.nextUrl.clone();
+  redirectUrl.pathname = "/masuk";
+  redirectUrl.search = "";
+  redirectUrl.searchParams.set("next", tujuanSetelahMasuk(request));
+  return redirectUrl;
+}
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -13,13 +25,7 @@ export async function proxy(request: NextRequest) {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) {
     if (rutePrivat) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = "/masuk";
-      redirectUrl.searchParams.set(
-        "next",
-        pathname + request.nextUrl.search
-      );
-      return NextResponse.redirect(redirectUrl);
+      return NextResponse.redirect(urlMasuk(request));
     }
     return response;
   }
@@ -50,9 +56,7 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (rutePrivat && !user) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/masuk";
-    redirectUrl.searchParams.set("next", pathname + request.nextUrl.search);
+    const redirectUrl = urlMasuk(request);
     const redirect = NextResponse.redirect(redirectUrl);
     cookiesToSet.forEach(({ name, value, options }) =>
       redirect.cookies.set(name, value, options)

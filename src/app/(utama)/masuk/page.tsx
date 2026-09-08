@@ -8,7 +8,6 @@ import { createClient } from "@/lib/supabase/client";
 import { isTujuanAman } from "@/lib/utils";
 import { Input, Label } from "@/components/ui";
 import { KacaKartu } from "@/components/eksperimen/kaca";
-import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
 /* Bahasa eksperimen: header pita gelap + teks putih, form kartu putih bersih
@@ -27,6 +26,11 @@ function FormulirMasuk() {
   const tujuanMentah = params.get("next") ?? "/peta";
   const tujuan = isTujuanAman(tujuanMentah) ? tujuanMentah : "/peta";
   const butuhAdmin = tujuan.startsWith("/dewan");
+  const konteksTujuan = tujuan.startsWith("/dewan")
+    ? "Dashboard Dewan"
+    : tujuan.startsWith("/laporan-saya")
+      ? "Laporan Saya"
+      : null;
   const [email, setEmail] = useState("");
   const [sandi, setSandi] = useState("");
   const [pesan, setPesan] = useState<string | null>(null);
@@ -78,28 +82,21 @@ function FormulirMasuk() {
       )}
 
       <KacaKartu className="border-ap-hairline bg-white p-7 text-ap-ink shadow-none dark:border-white/15 dark:bg-ap-tile1 dark:text-white">
-        <div className="mb-6 rounded-[18px] border border-ap-hairline bg-ap-pearl p-4 dark:border-white/15 dark:bg-ap-tile2">
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ap-blue dark:text-ap-sky">
-              <UserRound size={14} /> Coba dulu dengan akun demo
-            </p>
-            <Link href="/demo" className={`${LINK_PILL_APPLE} min-w-[44px] px-3 py-1 text-[11px]`}>
-              Lihat panduan
-            </Link>
-          </div>
-          <PilihanAkunDemo tujuan={tujuan} ringkas />
-        </div>
-
-        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wide text-muted dark:text-white/70">
-          <span className="h-px flex-1 bg-ap-hairline dark:bg-white/15" /> atau masuk manual{" "}
-          <span className="h-px flex-1 bg-ap-hairline dark:bg-white/15" />
-        </div>
-
+        {konteksTujuan && (
+          <p
+            role="status"
+            className="mb-5 rounded-xl border border-ap-blue/25 bg-ap-blue/5 px-3.5 py-3 text-sm text-ap-ink dark:border-ap-sky/30 dark:bg-ap-sky/10 dark:text-white"
+          >
+            Setelah masuk, kamu akan lanjut ke{" "}
+            <strong className="font-semibold">{konteksTujuan}</strong>.
+          </p>
+        )}
         <form onSubmit={masuk} className="space-y-4">
           <div>
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
+              name="email"
               type="email"
               required
               autoComplete="email"
@@ -113,6 +110,7 @@ function FormulirMasuk() {
             <Label htmlFor="sandi">Kata sandi</Label>
             <Input
               id="sandi"
+              name="password"
               type="password"
               required
               autoComplete="current-password"
@@ -149,6 +147,23 @@ function FormulirMasuk() {
           Lanjut dengan Google
         </button>
 
+        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wide text-muted dark:text-white/70">
+          <span className="h-px flex-1 bg-ap-hairline dark:bg-white/15" /> atau akun demo{" "}
+          <span className="h-px flex-1 bg-ap-hairline dark:bg-white/15" />
+        </div>
+
+        <div className="rounded-[18px] border border-ap-hairline bg-ap-pearl p-4 dark:border-white/15 dark:bg-ap-tile2">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ap-blue dark:text-ap-sky">
+              <UserRound size={14} /> Coba dulu dengan akun demo
+            </p>
+            <Link href="/demo" className={`${LINK_PILL_APPLE} min-w-[44px] px-3 py-1 text-[11px]`}>
+              Lihat panduan
+            </Link>
+          </div>
+          <PilihanAkunDemo tujuan={tujuan} ringkas />
+        </div>
+
         <p className="mt-6 text-center text-sm text-muted">
           Belum punya akun?{" "}
           <Link href="/daftar" className={LINK_PILL_APPLE}>
@@ -163,8 +178,8 @@ function FormulirMasuk() {
 export default function HalamanMasuk() {
   return (
     <main>
-      <PitaGradient tone="gelap">
-        <header className="mx-auto w-full max-w-md text-center">
+      <section className="bg-ap-tile1 text-white">
+        <header className="mx-auto w-full max-w-md px-4 py-8 text-center sm:py-10">
           <span className="mx-auto mb-3 flex size-11 items-center justify-center rounded-[18px] border border-white/30 bg-white/10 text-white">
             <MapPin size={22} strokeWidth={2} />
           </span>
@@ -173,7 +188,7 @@ export default function HalamanMasuk() {
             Masuk untuk mengirim laporan dan mendukung laporan warga lain.
           </p>
         </header>
-      </PitaGradient>
+      </section>
       <div className="bg-ap-parchment px-4 pb-14 pt-8 text-ap-ink dark:bg-black dark:text-white">
         <Suspense fallback={null}>
           <FormulirMasuk />

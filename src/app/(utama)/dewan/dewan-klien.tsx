@@ -160,6 +160,9 @@ export function DewanClient({
   const [dipilih, setDipilih] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<StatusKey>("diverifikasi");
   const [bulkProses, setBulkProses] = useState(false);
+  const [statusTugas, setStatusTugas] = useState<
+    Record<string, "menyimpan" | "tersimpan" | "gagal">
+  >({});
 
   useEffect(() => {
     const supabase = createClient();
@@ -211,14 +214,23 @@ export function DewanClient({
   }
 
   async function tugaskan(id: string, petugas: string) {
+    setStatusTugas((s) => ({ ...s, [id]: "menyimpan" }));
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("reports")
       .update({
         petugas: petugas || null,
         assigned_at: petugas ? new Date().toISOString() : null,
       })
       .eq("id", id);
+    if (error) {
+      setStatusTugas((s) => ({ ...s, [id]: "gagal" }));
+      return;
+    }
+    setDaftar((s) =>
+      s.map((r) => (r.id === id ? { ...r, petugas: petugas || null } : r))
+    );
+    setStatusTugas((s) => ({ ...s, [id]: "tersimpan" }));
   }
 
   function togglePilih(id: string) {
@@ -404,7 +416,8 @@ export function DewanClient({
       {/* Konten putih dominan light, hitam netral dark (R-31: ritme tile Apple) */}
       <section className="bg-white text-ap-ink dark:bg-black dark:text-white">
         <div className="mx-auto max-w-7xl px-4 py-8 pb-12">
-          <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+          <div className="flex flex-col">
+          <div className="order-2 mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
             {kartu.map((k) => (
               <motion.div
                 key={k.label}
@@ -424,7 +437,7 @@ export function DewanClient({
             ))}
           </div>
 
-      <div className="mb-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
+      <div className="order-3 mb-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
         <KacaKartu className="p-5">
           <h2 className="mb-4 font-display font-bold">Tren laporan 14 hari</h2>
           <div className="h-56">
@@ -478,7 +491,7 @@ export function DewanClient({
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1fr_420px]">
+      <div className="order-1 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className={`${KARTU_UTILITAS} overflow-hidden p-0`}>
           {dipilih.size > 0 && (
             <div className="flex flex-wrap items-center gap-3 border-b border-ap-hairline bg-ap-parchment/80 px-5 py-3 backdrop-blur dark:border-white/15 dark:bg-ap-tile2">
@@ -574,16 +587,35 @@ export function DewanClient({
                     </span>
                   )}
                   <StatusChip status={r.status} />
-                  <input
-                    defaultValue={r.petugas ?? ""}
-                    placeholder="Petugas…"
-                    aria-label={`Petugas untuk ${r.judul}`}
-                    onBlur={(e) => {
-                      if (e.target.value !== (r.petugas ?? ""))
-                        tugaskan(r.id, e.target.value);
-                    }}
-                    className={`w-36 min-h-[44px] rounded-lg border border-ap-hairline bg-white px-2.5 py-1.5 text-xs outline-none transition focus:border-ap-blue dark:border-white/15 dark:bg-ap-tile2 ${FOKUS_APPLE}`}
-                  />
+                   <div className="flex min-w-36 flex-col items-start gap-1">
+                     <input
+                       defaultValue={r.petugas ?? ""}
+                       placeholder="Petugas…"
+                       aria-label={`Petugas untuk ${r.judul}`}
+                       onBlur={(e) => {
+                         if (e.target.value !== (r.petugas ?? ""))
+                           tugaskan(r.id, e.target.value);
+                       }}
+                       className={`min-h-[44px] w-full rounded-lg border border-ap-hairline bg-white px-2.5 py-1.5 text-xs outline-none transition focus:border-ap-blue dark:border-white/15 dark:bg-ap-tile2 ${FOKUS_APPLE}`}
+                     />
+                     <span
+                       role="status"
+                       aria-live="polite"
+                       className={`min-h-4 text-[11px] ${
+                         statusTugas[r.id] === "gagal"
+                           ? "text-danger"
+                           : "text-muted"
+                       }`}
+                     >
+                       {statusTugas[r.id] === "menyimpan"
+                         ? "Menyimpan…"
+                         : statusTugas[r.id] === "tersimpan"
+                           ? "Tersimpan"
+                           : statusTugas[r.id] === "gagal"
+                             ? "Gagal menyimpan"
+                             : ""}
+                     </span>
+                   </div>
                   <Select
                     aria-label={`Ubah status ${r.judul}`}
                     className={`w-36 ${SELECT_APPLE}`}
@@ -644,11 +676,12 @@ export function DewanClient({
         <div className={`${KARTU_UTILITAS} flex flex-col overflow-hidden p-0`}>
           <div className="flex items-center justify-between border-b border-ap-hairline px-5 py-3.5 dark:border-white/15">
             <h2 className="font-display font-bold">Peta kepadatan (heatmap)</h2>
-            <button
-              onClick={() => setHeatAktif((v) => !v)}
-              role="switch"
-              aria-checked={heatAktif}
-              className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full ${FOKUS_APPLE}`}
+             <button
+               onClick={() => setHeatAktif((v) => !v)}
+               role="switch"
+               aria-checked={heatAktif}
+               aria-label="Tampilkan heatmap kepadatan laporan"
+               className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full ${FOKUS_APPLE}`}
             >
               <span
                 className={`relative h-6 w-11 rounded-full transition ${
@@ -669,6 +702,7 @@ export function DewanClient({
               panas={heatAktif ? panasLive : undefined}
             />
           </div>
+         </div>
         </div>
         </div>
         </div>

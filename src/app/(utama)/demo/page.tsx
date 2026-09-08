@@ -67,20 +67,23 @@ export default function HalamanDemo() {
 
       <div className="mx-auto max-w-4xl px-4 pt-10">
 
-      <section aria-label="Akun demo instan" className="mb-12">
+      <section aria-label="Pilih persona demo" className="mb-12">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-lg font-bold">Akun Demo Siap Pakai</h2>
+          <h2 className="font-display text-lg font-bold">Pilih persona</h2>
           <span className="text-xs text-muted dark:text-white/70">Tanpa perlu mendaftar</span>
         </div>
+        <p className="mb-4 max-w-2xl text-sm leading-relaxed text-muted dark:text-white/70">
+          Masuk sebagai warga atau dewan untuk mengikuti alur yang sesuai.
+          Angka dan contoh pada panduan ini hanya berasal dari akun demo.
+        </p>
         <PilihanAkunDemo />
       </section>
 
-      <section aria-label="Tur fitur" className="mb-12">
-        <h2 className="mb-4 font-display text-lg font-bold">Alur Pengujian Utama</h2>
+      <section aria-label="Urutan tugas demo" className="mb-12">
+        <h2 className="mb-4 font-display text-lg font-bold">Urutan tugas</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {TUR.map((t) => (
-            /* R-31: kartu utility putih frosted hairline di light, tile netral ap-tile2 di dark; ikon tetap pill biru. */
-            <KacaKartu key={t.judul} className="flex flex-col border-ap-hairline bg-white/80 p-5 dark:border-white/15 dark:bg-ap-tile2/80 dark:text-white">
+            <KacaKartu key={t.judul} className="flex min-w-0 flex-col border-ap-hairline bg-ap-canvas p-5 dark:border-white/15 dark:bg-ap-tile2 dark:text-white">
               <span className="flex size-10 items-center justify-center rounded-lg bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
                 <t.ikon size={18} strokeWidth={1.8} />
               </span>
@@ -90,7 +93,7 @@ export default function HalamanDemo() {
               </p>
               <Link
                 href={t.href}
-                className="group mt-4 inline-flex min-h-[44px] items-center gap-1.5 self-start rounded-full border border-ap-hairline bg-white/70 px-5 text-sm font-semibold text-ink backdrop-blur-[20px] transition-colors duration-300 hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+                  className="group mt-4 inline-flex min-h-[44px] items-center gap-1.5 self-start rounded-full border border-ap-hairline bg-ap-canvas px-5 text-sm font-semibold text-ink transition-colors duration-300 hover:border-ap-blue hover:bg-ap-pearl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus dark:border-white/15 dark:bg-ap-tile1 dark:text-white dark:hover:bg-ap-tile2"
               >
                 {t.label}
                 <ArrowRight
@@ -108,9 +111,13 @@ export default function HalamanDemo() {
         </div>
       </section>
 
-      <section aria-label="Checklist fitur">
-        <KacaKartu className="border-ap-hairline bg-white/80 p-6 dark:border-white/15 dark:bg-ap-tile2/80 dark:text-white">
-          <h2 className="font-display font-bold text-base">Checklist Fungsional & Keamanan (SDG 11)</h2>
+      <section aria-label="Bukti dan hasil demo">
+        <KacaKartu className="border-ap-hairline bg-ap-canvas p-6 dark:border-white/15 dark:bg-ap-tile2 dark:text-white">
+          <h2 className="font-display font-bold text-base">Bukti dan hasil yang dapat diperiksa</h2>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted dark:text-white/70">
+            Gunakan checklist ini untuk mencatat bagian yang sudah kamu buka.
+            Ini adalah daftar kemampuan pada lingkungan demo, bukan laporan produksi.
+          </p>
           <ul className="mt-4 grid gap-x-6 gap-y-2 text-sm tabular-nums text-muted dark:text-white/70 sm:grid-cols-2">
             {[
               "Peta spasial PostGIS + Marker Cluster + Heatmap",

@@ -32,7 +32,7 @@ export function GerbangLaporanSaya() {
       </PitaGradient>
 
       <div className="mx-auto max-w-lg px-4 pt-8">
-        <KacaKartu className="bg-white/60 p-8 text-center text-ap-ink dark:bg-white/10 dark:text-ink">
+         <KacaKartu className="bg-ap-canvas p-8 text-center text-ap-ink dark:bg-ap-tile1 dark:text-ink">
           <div className="rounded-[18px] border border-ap-hairline bg-ap-pearl p-4 text-left tabular-nums dark:border-line dark:bg-panel-2">
             <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ap-blue dark:text-ap-sky">
               <UserRound size={14} /> Masuk cepat dengan akun demo
@@ -41,11 +41,12 @@ export function GerbangLaporanSaya() {
           </div>
 
           <div className="mt-6 flex flex-col items-center gap-2 text-sm">
-            <Link
-              href="/masuk?next=/laporan-saya"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-ap-blue px-5 font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus active:scale-[0.97]"
-            >
-              Masuk
+             <Link
+               href="/masuk?next=/laporan-saya"
+               aria-label="Masuk untuk melanjutkan ke Laporan Saya"
+               className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-ap-blue px-5 font-semibold text-white transition hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus active:scale-[0.97]"
+             >
+               Masuk ke Laporan Saya
             </Link>
             <Link
               href="/demo"

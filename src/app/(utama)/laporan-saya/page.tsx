@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { Card, Skeleton, StatusChip } from "@/components/ui";
-import { PitaGradient } from "@/components/eksperimen/pita-gradient";
 import { ClipboardList, TriangleAlert } from "lucide-react";
 import { AksiLaporanSaya } from "./aksi";
 import { HapusAreaKlien } from "./hapus-area";
@@ -118,22 +117,20 @@ export default async function HalamanLaporanSaya() {
   const area = areaRaw ?? [];
 
   return (
-    <main className="pb-10">
-      {/* Fusi header: pita gelap + teks putih, pola papan-skor/demo; judul,
-          copy, dan Fraunces tidak diubah, hanya warna agar kontras. */}
-      <PitaGradient tone="gelap">
-        <header className="text-center">
-          <h1 className="font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px] text-white">Laporan Saya</h1>
-          <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-white/85">
-            Sunting laporan selama statusnya masih{" "}
-            <b className="font-bold text-white">Baru</b>. Setelah diverifikasi dewan, isinya
-            terkunci demi akuntabilitas.
+    <main className="pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
+      <div className="mx-auto max-w-3xl px-4 pt-6 sm:pt-8">
+        <header className="mb-7 max-w-2xl">
+          <h1 className="font-display text-3xl font-bold leading-[1.1] tracking-[-0.28px]">
+            Laporan Saya
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-muted">
+            Sunting laporan selama statusnya masih <b className="font-bold text-ap-ink dark:text-white">Baru</b>.
+            Setelah diverifikasi dewan, isinya terkunci demi akuntabilitas.
           </p>
         </header>
-      </PitaGradient>
 
-      <div className="mx-auto max-w-3xl px-4 pt-8">
-
+      <section aria-label="Timeline laporan">
+        <h2 className="mb-3 font-display text-xl font-bold">Timeline laporan</h2>
       {daftar.length === 0 ? (
         <Card className={`${KARTU} p-8 text-center`}>
           <span className="mx-auto mb-4 flex size-14 items-center justify-center rounded-[18px] bg-ap-blue/10 text-ap-blue dark:text-ap-sky">
@@ -196,6 +193,7 @@ export default async function HalamanLaporanSaya() {
           ))}
         </div>
       )}
+      </section>
 
       {galatArea ? (
         <section aria-label="Area yang diikuti" className="mt-10">
@@ -215,8 +213,8 @@ export default async function HalamanLaporanSaya() {
             Kamu mendapat notifikasi setiap ada laporan baru dalam radius ini.
           </p>
           <div className="space-y-2">
-            {area.map((a) => (
-              <Card key={a.id} className={`${KARTU} flex items-center justify-between gap-3 p-4`}>
+             {area.map((a) => (
+              <Card key={a.id} className={`${KARTU} flex min-w-0 items-center justify-between gap-3 p-4`}>
                 <div>
                   <p className="text-sm font-semibold">{a.label}</p>
                   <p className="angka-tabular text-xs tabular-nums text-muted">
@@ -251,5 +249,4 @@ export default async function HalamanLaporanSaya() {
     </main>
   );
 }
-
 

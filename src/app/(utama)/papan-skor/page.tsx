@@ -68,7 +68,48 @@ export default async function HalamanPapanSkor() {
 
   const podium = pemimpin.slice(0, 3);
   const sisanya = pemimpin.slice(3);
-  const urutanPodium = [podium[1], podium[0], podium[2]].filter(Boolean);
+  const renderPodium = (p: (typeof podium)[number]) => {
+    const juara = podium.indexOf(p) + 1;
+    return (
+      <KacaKartu
+        key={p.id}
+        className={`min-w-0 flex flex-col items-center border-ap-hairline bg-white/80 px-3 py-6 text-center dark:border-white/15 dark:bg-ap-tile2/80 dark:text-white ${
+          juara === 1
+            ? "sm:col-start-2"
+            : juara === 2
+              ? "sm:col-start-1"
+              : "sm:col-start-3"
+        } ${
+          juara === 1 ? "ring-2 ring-kunyit-500" : ""
+        }`}
+      >
+        <span className="mb-2" aria-hidden>
+          {juara === 1 ? (
+            <Crown size={26} className="text-kunyit-500" />
+          ) : (
+            <Medal
+              size={22}
+              className={
+                juara === 2
+                  ? "text-slate-500 dark:text-slate-300"
+                  : "text-amber-700 dark:text-amber-400"
+              }
+            />
+          )}
+        </span>
+        <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={juara === 1 ? 64 : 52} />
+        <p className="mt-2 min-w-0 max-w-full break-words font-display font-bold">
+          {p.nama_lengkap}
+        </p>
+        <p className="min-w-0 max-w-full break-words text-xs text-muted dark:text-white/70">
+          @{p.username}
+        </p>
+        <p className="angka-tabular mt-1.5 rounded-full bg-daun-600/10 px-3 py-0.5 text-sm font-bold tabular-nums text-daun-700 dark:text-daun-300">
+          {p.poin} poin
+        </p>
+      </KacaKartu>
+    );
+  };
 
   return (
     /* R-31: canvas putih Apple dominan di light dan tile netral ap-tile1 di dark agar tak muram-hijau; hero PitaGradient tetap sebagai identitas. */
@@ -138,34 +179,11 @@ export default async function HalamanPapanSkor() {
       )}
 
       {pemimpin.length > 0 && (
-        <div className="mb-10 grid grid-cols-3 items-end gap-3 sm:gap-5">
-          {urutanPodium.map((p) => {
-            const juara = podium.indexOf(p) + 1;
-            return (
-              <KacaKartu
-                key={p.id}
-                className={`flex flex-col items-center border-ap-hairline bg-white/80 px-3 py-6 text-center dark:border-white/15 dark:bg-ap-tile2/80 dark:text-white ${
-                  juara === 1 ? "ring-2 ring-kunyit-500" : ""
-                }`}
-              >
-                <span className="mb-2">
-                  {juara === 1 ? (
-                    <Crown size={26} className="text-kunyit-500" />
-                  ) : (
-                    <Medal size={22} className={juara === 2 ? "text-slate-400" : "text-amber-700"} />
-                  )}
-                </span>
-                <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={juara === 1 ? 64 : 52} />
-                <p className="mt-2 truncate font-display font-bold">
-                  {p.nama_lengkap}
-                </p>
-                <p className="truncate text-xs text-muted dark:text-white/70">@{p.username}</p>
-                <p className="angka-tabular mt-1.5 rounded-full bg-daun-600/10 px-3 py-0.5 text-sm font-bold tabular-nums text-daun-700 dark:text-daun-300">
-                  {p.poin} poin
-                </p>
-              </KacaKartu>
-            );
-          })}
+        <div className="mb-10 grid min-w-0 gap-3 sm:grid-cols-3 sm:items-end sm:gap-5">
+          {podium[0] && renderPodium(podium[0])}
+          <div className="grid min-w-0 grid-cols-2 gap-3 sm:contents">
+            {podium.slice(1, 3).map(renderPodium)}
+          </div>
         </div>
       )}
 

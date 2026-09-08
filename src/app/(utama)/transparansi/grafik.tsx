@@ -122,16 +122,60 @@ const IsiGrafikKategori = dynamic<{ data: DataKategori[] }>(
 
 export function GrafikBulanan({ data }: { data: DataBulanan[] }) {
   return (
-    <div className="angka-tabular h-60 tabular-nums [--chart-masuk:var(--muted)] [--chart-selesai:var(--color-daun-500)] dark:[--chart-selesai:var(--color-daun-400)]">
-      <IsiGrafikBulanan data={data} />
+    <div className="angka-tabular tabular-nums [--chart-masuk:var(--muted)] [--chart-selesai:var(--color-daun-500)] dark:[--chart-selesai:var(--color-daun-400)]">
+      <div className="h-60" aria-hidden="true">
+        <IsiGrafikBulanan data={data} />
+      </div>
+      <div className="mt-4 overflow-x-auto border-t border-ap-hairline pt-3 dark:border-white/15">
+        <table className="w-full min-w-[18rem] text-left text-xs">
+          <caption className="sr-only">Data laporan masuk dan selesai per bulan</caption>
+          <thead className="text-muted">
+            <tr>
+              <th scope="col" className="pb-2 pr-4 font-semibold">Bulan</th>
+              <th scope="col" className="pb-2 pr-4 font-semibold">Masuk</th>
+              <th scope="col" className="pb-2 font-semibold">Selesai</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-ap-hairline dark:divide-white/10">
+            {data.map((baris) => (
+              <tr key={baris.label}>
+                <th scope="row" className="py-2 pr-4 font-semibold">{baris.label}</th>
+                <td className="py-2 pr-4">{baris.masuk}</td>
+                <td className="py-2">{baris.tuntas}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
 
 export function GrafikKategori({ data }: { data: DataKategori[] }) {
   return (
-    <div className="angka-tabular h-60 tabular-nums">
-      <IsiGrafikKategori data={data} />
+    <div className="angka-tabular tabular-nums">
+      <div className="h-60" aria-hidden="true">
+        <IsiGrafikKategori data={data} />
+      </div>
+      <div className="mt-4 overflow-x-auto border-t border-ap-hairline pt-3 dark:border-white/15">
+        <table className="w-full min-w-[18rem] text-left text-xs">
+          <caption className="sr-only">Persentase laporan selesai per kategori</caption>
+          <thead className="text-muted">
+            <tr>
+              <th scope="col" className="pb-2 pr-4 font-semibold">Kategori</th>
+              <th scope="col" className="pb-2 font-semibold">Selesai</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-ap-hairline dark:divide-white/10">
+            {data.map((baris) => (
+              <tr key={baris.nama}>
+                <th scope="row" className="py-2 pr-4 font-semibold">{baris.nama}</th>
+                <td className="py-2">{baris.persen}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
