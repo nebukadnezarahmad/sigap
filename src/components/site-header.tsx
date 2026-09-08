@@ -124,7 +124,7 @@ export function SiteHeader() {
          menjaga isi bar di bawah safe-area (bernilai 0 di desktop). */
       className="pt-[env(safe-area-inset-top)] print:hidden"
     >
-      <div className="mx-auto flex h-11 max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4">
+      <div className="mx-auto flex h-11 max-w-6xl items-center justify-between gap-2 pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] sm:gap-4">
         <Link
           href="/"
           className="flex items-center gap-1 rounded-xl text-ap-blue transition-colors hover:text-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! sm:gap-2"
@@ -137,7 +137,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Utama">
+        <nav className="hidden items-center gap-0.5 min-[834px]:flex" aria-label="Utama">
           {tautan.map((t) => (
             <Link
               key={t.href}
@@ -178,7 +178,7 @@ export function SiteHeader() {
             aria-expanded={menuBuka}
             aria-controls="navigasi-seluler"
             aria-label={menuBuka ? "Tutup menu navigasi" : "Buka menu navigasi"}
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-lg px-1 text-xs font-semibold text-ap-blue transition hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! sm:gap-1.5 sm:px-2 sm:text-sm lg:hidden"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-lg px-1 text-xs font-semibold text-ap-blue transition hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! sm:gap-1.5 sm:px-2 sm:text-sm min-[834px]:hidden"
           >
             {menuBuka ? <X size={20} /> : <Menu size={20} />}
             <span>{menuBuka ? "Tutup" : "Menu"}</span>
@@ -306,7 +306,7 @@ export function SiteHeader() {
           id="navigasi-seluler"
           /* R-03: menu tak boleh menutupi konten di layar pendek; tinggi
              dibatasi viewport dinamis + safe-area bawah, sisanya menggeser. */
-          className="max-h-[calc(100dvh-2.75rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto overscroll-contain border-t garis-halus px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 lg:hidden"
+          className="max-h-[calc(100dvh-2.75rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto overscroll-contain border-t garis-halus pb-[calc(0.75rem+env(safe-area-inset-bottom))] pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] pt-3 min-[834px]:hidden"
           aria-label="Navigasi seluler"
         >
           <ul className="flex flex-col gap-1">

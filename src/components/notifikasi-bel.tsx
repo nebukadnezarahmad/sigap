@@ -194,7 +194,7 @@ export function NotifikasiBel() {
               initial={{ opacity: 0, y: 6, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 6, scale: 0.98 }}
-              className="absolute right-0 top-full z-40 mt-2 max-h-[calc(100dvh-4rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] w-[min(20rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-[18px] border border-ap-hairline bg-white/85 shadow-none backdrop-blur-xl backdrop-saturate-150 dark:border-white/15 dark:bg-[#131d19]/85"
+              className="absolute right-[env(safe-area-inset-right,0px)] top-full z-40 mt-2 max-h-[calc(100dvh-4rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] w-[min(20rem,calc(100vw-2rem-env(safe-area-inset-left,0px)-env(safe-area-inset-right,0px)))] overflow-y-auto overscroll-contain rounded-[18px] border border-ap-hairline bg-white/85 shadow-none backdrop-blur-xl backdrop-saturate-150 dark:border-white/15 dark:bg-[#131d19]/85"
             >
               <div className="flex items-center justify-between border-b border-ap-hairline px-4 py-2.5 dark:border-white/10">
                 <p id="notifikasi-judul" className="font-display text-sm font-bold">
@@ -210,7 +210,7 @@ export function NotifikasiBel() {
                   </button>
                 )}
               </div>
-              <div className="max-h-80 overflow-y-auto">
+              <div className="max-h-80 overflow-y-auto overscroll-contain">
                 {daftar.length === 0 && (
                   <p className="px-4 py-8 text-center text-sm text-muted">
                     Belum ada notifikasi. Lapor atau dukung sesuatu!

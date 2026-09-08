@@ -114,7 +114,7 @@ export function Modal({
   return createPortal(
     <AnimatePresence>
       {terbuka && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto overscroll-contain p-[calc(1rem+env(safe-area-inset-top,0px))] pb-[calc(1rem+env(safe-area-inset-bottom,0px))] pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] sm:p-6">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto overscroll-contain p-[calc(1rem+env(safe-area-inset-top,0px))] pb-[calc(1rem+env(safe-area-inset-bottom,0px))] pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] sm:pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:pl-[calc(1.5rem+env(safe-area-inset-left,0px))] sm:pr-[calc(1.5rem+env(safe-area-inset-right,0px))] sm:pt-[calc(1.5rem+env(safe-area-inset-top,0px))]">
           <motion.button
             className="fixed inset-0 bg-black/60"
             initial={{ opacity: 0 }}

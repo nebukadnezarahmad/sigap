@@ -147,7 +147,7 @@ export function CommandPalette() {
         setKueri("");
         setKursor(0);
       }
-      if (e.key === "Escape" && buka) setBuka(false);
+      if (e.key === "Escape" && buka) tutupPalet();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
