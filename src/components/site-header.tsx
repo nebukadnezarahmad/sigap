@@ -71,15 +71,23 @@ export function SiteHeader() {
     setAkunBuka((v) => !v);
   }
 
+  function tutupMenuKePemicu() {
+    setMenuBuka(false);
+    tombolMenuRef.current?.focus();
+  }
+
+  function tutupAkunKePemicu() {
+    setAkunBuka(false);
+    tombolAkunRef.current?.focus();
+  }
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key !== "Escape") return;
       if (menuBuka) {
-        setMenuBuka(false);
-        tombolMenuRef.current?.focus();
+        tutupMenuKePemicu();
       } else if (akunBuka) {
-        setAkunBuka(false);
-        tombolAkunRef.current?.focus();
+        tutupAkunKePemicu();
       }
     }
     window.addEventListener("keydown", onKey);
@@ -116,28 +124,29 @@ export function SiteHeader() {
          menjaga isi bar di bawah safe-area (bernilai 0 di desktop). */
       className="pt-[env(safe-area-inset-top)] print:hidden"
     >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
+      <div className="mx-auto flex h-11 max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4">
         <Link
           href="/"
-          className="flex items-center gap-2 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
+          className="flex items-center gap-1 rounded-xl text-ap-blue transition-colors hover:text-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! sm:gap-2"
         >
-          <span className="flex size-8 items-center justify-center rounded-xl bg-daun-600 text-white">
+          <span className="flex size-7 items-center justify-center rounded-xl bg-ap-blue text-white sm:size-8">
             <MapPin size={17} strokeWidth={2.5} />
           </span>
-          <span className="font-display text-lg font-bold tracking-tight">
+          <span className="font-display text-base font-bold tracking-tight sm:text-lg">
             SIGAP
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-0.5 md:flex" aria-label="Utama">
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Utama">
           {tautan.map((t) => (
             <Link
               key={t.href}
               href={t.href}
+              aria-current={pathname.startsWith(t.href) ? "page" : undefined}
               className={cn(
                 "inline-flex min-h-[44px] items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!",
                 pathname.startsWith(t.href)
-                  ? "bg-daun-600/10 text-daun-700 dark:text-daun-300 font-semibold"
+                  ? "bg-ap-blue/10 font-semibold text-ap-blue dark:text-ap-sky"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
               )}
             >
@@ -147,10 +156,11 @@ export function SiteHeader() {
           {profil?.role === "admin" && (
             <Link
               href="/dewan"
+              aria-current={pathname.startsWith("/dewan") ? "page" : undefined}
               className={cn(
                 "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!",
                 pathname.startsWith("/dewan")
-                  ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
+                  ? "bg-ap-blue/10 font-semibold text-ap-blue dark:text-ap-sky"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
               )}
             >
@@ -163,95 +173,111 @@ export function SiteHeader() {
           <ToggleTema />
           <button
             ref={tombolMenuRef}
+            type="button"
             onClick={alihMenu}
             aria-expanded={menuBuka}
             aria-controls="navigasi-seluler"
             aria-label={menuBuka ? "Tutup menu navigasi" : "Buka menu navigasi"}
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! md:hidden"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-lg px-1 text-xs font-semibold text-ap-blue transition hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! sm:gap-1.5 sm:px-2 sm:text-sm lg:hidden"
           >
             {menuBuka ? <X size={20} /> : <Menu size={20} />}
+            <span>{menuBuka ? "Tutup" : "Menu"}</span>
           </button>
           {user && <NotifikasiBel />}
           {user ? (
-            <div className="group relative">
+            <div className="relative">
               <button
                 ref={tombolAkunRef}
+                type="button"
                 aria-label="Menu akun"
                 aria-expanded={akunBuka}
-                aria-haspopup="menu"
                 aria-controls="menu-akun"
                 onClick={alihAkun}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setAkunBuka((v) => !v);
-                  }
-                  if (e.key === "Escape") setAkunBuka(false);
-                }}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition hover:ring-4 hover:ring-daun-500/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition hover:ring-4 hover:ring-ap-blue/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
               >
                 <Avatar nama={profil?.nama_lengkap ?? "?"} url={profil?.avatar_url} ukuran={34} />
               </button>
-              <div
-                role="menu"
-                id="menu-akun"
-                className={cn(
-                  "invisible absolute right-0 top-full z-20 w-56 max-w-[calc(100vw-2rem)] translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100",
-                  akunBuka && "visible translate-y-0 opacity-100"
-                )}
-              >
-                <div className="border-b garis-halus px-3 pb-2 pt-1.5">
-                  <p className="truncate text-sm font-semibold">
-                    {profil?.nama_lengkap ?? user.email}
-                  </p>
-                  <p className="truncate text-xs text-muted">
-                    @{profil?.username ?? "warga"}{" "}
+              {akunBuka && (
+                <div
+                  id="menu-akun"
+                  className="absolute right-0 top-full z-20 w-56 max-w-[calc(100vw-2rem)] translate-y-1 rounded-2xl border garis-halus bg-panel p-2 shadow-none"
+                >
+                  <ul aria-label="Pilihan akun" className="space-y-0.5">
+                    <li className="border-b garis-halus px-3 pb-2 pt-1.5">
+                      <p className="truncate text-sm font-semibold">
+                        {profil?.nama_lengkap ?? user.email}
+                      </p>
+                      <p className="truncate text-xs text-muted">
+                        @{profil?.username ?? "warga"}{" "}
+                        {profil?.role === "admin" && (
+                          <span className="rounded bg-kunyit-500/15 px-1.5 py-0.5 text-[10px] font-bold text-kunyit-600">
+                            Admin
+                          </span>
+                        )}
+                      </p>
+                    </li>
+                    <li>
+                      <Link
+                        href={`/warga/${profil?.username ?? ""}`}
+                        onClick={tutupAkunKePemicu}
+                        className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
+                      >
+                        <UserRound size={15} /> Profil saya
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/laporan-saya"
+                        onClick={tutupAkunKePemicu}
+                        className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
+                      >
+                        <FileText size={15} /> Laporan saya
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/papan-skor"
+                        onClick={tutupAkunKePemicu}
+                        className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
+                      >
+                        <Trophy size={15} /> Papan skor
+                      </Link>
+                    </li>
                     {profil?.role === "admin" && (
-                      <span className="rounded bg-kunyit-500/15 px-1.5 py-0.5 text-[10px] font-bold text-kunyit-600">
-                        Admin
-                      </span>
+                      <li>
+                        <Link
+                          href="/dewan"
+                          onClick={tutupAkunKePemicu}
+                          className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-ap-blue transition hover:bg-ap-blue/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! dark:text-ap-sky"
+                        >
+                          <ShieldCheck size={15} /> Dashboard dewan
+                        </Link>
+                      </li>
                     )}
-                  </p>
+                    <li>
+                      <Link
+                        href="/demo"
+                        onClick={tutupAkunKePemicu}
+                        className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
+                      >
+                        <BookOpen size={15} /> Panduan demo
+                      </Link>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          tutupAkunKePemicu();
+                          void keluar();
+                        }}
+                        className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-danger transition hover:bg-danger/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
+                      >
+                        <LogOut size={15} /> Keluar
+                      </button>
+                    </li>
+                  </ul>
                 </div>
-                <Link
-                  href={`/warga/${profil?.username ?? ""}`}
-                  className="mt-1 flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
-                >
-                  <UserRound size={15} /> Profil saya
-                </Link>
-                <Link
-                  href="/laporan-saya"
-                  className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
-                >
-                  <FileText size={15} /> Laporan saya
-                </Link>
-                <Link
-                  href="/papan-skor"
-                  className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
-                >
-                  <Trophy size={15} /> Papan skor
-                </Link>
-                {profil?.role === "admin" && (
-                  <Link
-                    href="/dewan"
-                    className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-kunyit-600 transition hover:bg-kunyit-500/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! dark:text-kunyit-400"
-                  >
-                    <ShieldCheck size={15} /> Dashboard dewan
-                  </Link>
-                )}
-                <Link
-                  href="/demo"
-                  className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
-                >
-                  <BookOpen size={15} /> Panduan demo
-                </Link>
-                <button
-                  onClick={keluar}
-                  className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-danger transition hover:bg-danger/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!"
-                >
-                  <LogOut size={15} /> Keluar
-                </button>
-              </div>
+              )}
             </div>
           ) : (
             <div className="flex items-center gap-2">
@@ -259,14 +285,14 @@ export function SiteHeader() {
                 variant="sekunder"
                 size="sm"
                 onClick={() => setModalDemoBuka(true)}
-                className="hidden sm:inline-flex min-h-[44px] items-center gap-1.5 border-daun-500/30 text-daun-700 hover:bg-daun-500/10 dark:text-daun-300"
+                className="hidden min-h-[44px] items-center gap-1.5 border-ap-blue/40 text-ap-blue hover:bg-ap-blue/10 sm:inline-flex dark:text-ap-sky"
               >
-                <UserRound size={14} className="text-daun-600 dark:text-daun-400" />
+                <UserRound size={14} />
                 Akun Demo
               </Button>
               <Link
                 href="/masuk"
-                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! active:scale-[0.97] bg-daun-600 text-white shadow-[0_1px_2px_rgb(23_67_42/0.2),0_6px_16px_-6px_rgb(23_67_42/0.35)] hover:bg-daun-700 hover:shadow-[0_2px_4px_rgb(23_67_42/0.2),0_10px_24px_-6px_rgb(23_67_42/0.4)]"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-ap-blue px-3.5 py-1.5 text-sm font-semibold text-white transition-[transform,background-color,border-color,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-ap-blue-focus focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! active:scale-[0.97]"
               >
                 Masuk
               </Link>
@@ -280,7 +306,7 @@ export function SiteHeader() {
           id="navigasi-seluler"
           /* R-03: menu tak boleh menutupi konten di layar pendek; tinggi
              dibatasi viewport dinamis + safe-area bawah, sisanya menggeser. */
-          className="max-h-[calc(100dvh-4rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto border-t garis-halus px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 md:hidden"
+          className="max-h-[calc(100dvh-2.75rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto overscroll-contain border-t garis-halus px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 lg:hidden"
           aria-label="Navigasi seluler"
         >
           <ul className="flex flex-col gap-1">
@@ -288,11 +314,12 @@ export function SiteHeader() {
               <li key={t.href}>
                 <Link
                   href={t.href}
-                  onClick={() => setMenuBuka(false)}
+                  onClick={tutupMenuKePemicu}
+                  aria-current={pathname.startsWith(t.href) ? "page" : undefined}
                   className={cn(
                     "flex min-h-[44px] items-center rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!",
                     pathname.startsWith(t.href)
-                      ? "bg-daun-600/10 text-daun-700 dark:text-daun-300 font-semibold"
+                      ? "bg-ap-blue/10 font-semibold text-ap-blue dark:text-ap-sky"
                       : "text-muted hover:bg-panel-2 hover:text-ink"
                   )}
                 >
@@ -304,11 +331,12 @@ export function SiteHeader() {
               <li>
                 <Link
                   href="/dewan"
-                  onClick={() => setMenuBuka(false)}
+                  onClick={tutupMenuKePemicu}
+                  aria-current={pathname.startsWith("/dewan") ? "page" : undefined}
                   className={cn(
                     "flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus!",
                     pathname.startsWith("/dewan")
-                      ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
+                      ? "bg-ap-blue/10 font-semibold text-ap-blue dark:text-ap-sky"
                       : "text-muted hover:bg-panel-2 hover:text-ink"
                   )}
                 >

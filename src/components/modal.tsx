@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
@@ -32,12 +32,19 @@ export function Modal({
 
   const refDialog = useRef<HTMLDivElement>(null);
   const refPemicu = useRef<Element | null>(null);
+  const idJudul = useId();
+  const refTutup = useRef(tutup);
+
+  useEffect(() => {
+    refTutup.current = tutup;
+  }, [tutup]);
 
   useEffect(() => {
     if (!terbuka) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        tutup();
+        e.preventDefault();
+        refTutup.current();
         return;
       }
       if (e.key === "Tab") {
@@ -53,7 +60,10 @@ export function Modal({
         }
         const pertama = daftar[0];
         const terakhir = daftar[daftar.length - 1];
-        if (e.shiftKey && document.activeElement === pertama) {
+        if (!dialog.contains(document.activeElement)) {
+          e.preventDefault();
+          (e.shiftKey ? terakhir : pertama).focus();
+        } else if (e.shiftKey && document.activeElement === pertama) {
           e.preventDefault();
           terakhir.focus();
         } else if (!e.shiftKey && document.activeElement === terakhir) {
@@ -64,7 +74,7 @@ export function Modal({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [terbuka, tutup]);
+  }, [terbuka]);
 
   useEffect(() => {
     if (!terbuka) return;
@@ -80,7 +90,9 @@ export function Modal({
     const t = window.setTimeout(() => {
       const dialog = refDialog.current;
       if (!dialog) return;
-      const target = dialog.querySelector<HTMLElement>(FOKUS_SELECTOR);
+      const target = Array.from(
+        dialog.querySelectorAll<HTMLElement>(FOKUS_SELECTOR)
+      ).find((el) => el.getClientRects().length > 0);
       (target ?? dialog).focus();
     }, 0);
     return () => {
@@ -88,31 +100,39 @@ export function Modal({
       document.body.style.overflow = asalOverflow;
       document.body.style.paddingRight = asalPadding;
       const pemicu = refPemicu.current as HTMLElement | null;
-      pemicu?.focus?.();
+      if (pemicu?.isConnected) pemicu.focus();
+      refPemicu.current = null;
     };
   }, [terbuka]);
+
+  function tutupModal() {
+    refTutup.current();
+  }
 
   if (!isClient) return null;
 
   return createPortal(
     <AnimatePresence>
       {terbuka && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
-          <motion.div
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto overscroll-contain p-[calc(1rem+env(safe-area-inset-top,0px))] pb-[calc(1rem+env(safe-area-inset-bottom,0px))] pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] sm:p-6">
+          <motion.button
             className="fixed inset-0 bg-black/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={tutup}
+            type="button"
+            tabIndex={-1}
+            aria-label="Tutup modal"
+            onClick={tutupModal}
           />
           <motion.div
             role="dialog"
             aria-modal="true"
-            aria-label={judul}
+            aria-labelledby={idJudul}
             ref={refDialog}
             tabIndex={-1}
             className={cn(
-              "relative z-10 my-auto w-full max-h-[88vh] overflow-y-auto rounded-[18px] border border-ap-hairline bg-white/85 p-6 shadow-none backdrop-blur-xl backdrop-saturate-150 focus:outline-none dark:border-white/15 dark:bg-[#131d19]/85",
+              "relative z-10 my-auto w-full max-h-[calc(100dvh-2rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] overflow-y-auto overscroll-contain rounded-[18px] border border-ap-hairline bg-white/85 p-6 shadow-none backdrop-blur-xl backdrop-saturate-150 focus:outline-none dark:border-white/15 dark:bg-[#131d19]/85",
               lebar
             )}
             initial={{ y: 24, opacity: 0, scale: 0.96 }}
@@ -121,9 +141,12 @@ export function Modal({
             transition={{ type: "spring", damping: 28, stiffness: 340 }}
           >
             <div className="mb-4 flex items-start justify-between gap-4 border-b border-ap-hairline pb-3 dark:border-white/10">
-              <h2 className="font-display text-lg sm:text-xl font-semibold">{judul}</h2>
+              <h2 id={idJudul} className="font-display text-lg font-semibold sm:text-xl">
+                {judul}
+              </h2>
               <button
-                onClick={tutup}
+                type="button"
+                onClick={tutupModal}
                 aria-label="Tutup modal"
                 className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none"
               >
@@ -138,4 +161,3 @@ export function Modal({
     document.body
   );
 }
-

@@ -45,6 +45,7 @@ export function CommandPalette() {
   const refDialog = useRef<HTMLDivElement>(null);
   const refInput = useRef<HTMLInputElement>(null);
   const refFokusTerakhir = useRef<Element | null>(null);
+  const refTimerPulih = useRef<number | null>(null);
 
   const aksi: Aksi[] = useMemo(() => {
     const dasar: Aksi[] = [
@@ -146,24 +147,29 @@ export function CommandPalette() {
         setKueri("");
         setKursor(0);
       }
-      if (e.key === "Escape") setBuka(false);
+      if (e.key === "Escape" && buka) setBuka(false);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [buka]);
 
   useEffect(() => {
-    if (buka) {
-      refFokusTerakhir.current = document.activeElement;
-      const t = window.setTimeout(() => refInput.current?.focus(), 0);
-      return () => window.clearTimeout(t);
+    if (!buka) return;
+    if (refTimerPulih.current !== null) {
+      window.clearTimeout(refTimerPulih.current);
+      refTimerPulih.current = null;
     }
-    const pemicu = refFokusTerakhir.current as HTMLElement | null;
-    if (refFokusTerakhir.current) {
-      pemicu?.focus?.();
-      refFokusTerakhir.current = null;
-    }
-    return undefined;
+    refFokusTerakhir.current = document.activeElement ?? refPemicu.current;
+    const t = window.setTimeout(() => refInput.current?.focus(), 0);
+    return () => {
+      window.clearTimeout(t);
+      refTimerPulih.current = window.setTimeout(() => {
+        const pemicu = refFokusTerakhir.current as HTMLElement | null;
+        if (pemicu?.isConnected) pemicu.focus();
+        refFokusTerakhir.current = null;
+        refTimerPulih.current = null;
+      }, 0);
+    };
   }, [buka]);
 
   function onTrapTab(e: React.KeyboardEvent) {
@@ -180,7 +186,10 @@ export function CommandPalette() {
     }
     const pertama = daftar[0];
     const terakhir = daftar[daftar.length - 1];
-    if (e.shiftKey && document.activeElement === pertama) {
+    if (!dialog.contains(document.activeElement)) {
+      e.preventDefault();
+      (e.shiftKey ? terakhir : pertama).focus();
+    } else if (e.shiftKey && document.activeElement === pertama) {
       e.preventDefault();
       terakhir.focus();
     } else if (!e.shiftKey && document.activeElement === terakhir) {
@@ -195,6 +204,15 @@ export function CommandPalette() {
     setBuka(true);
   }
 
+  function tutupPalet() {
+    setBuka(false);
+  }
+
+  function jalankanAksi(a: Aksi) {
+    tutupPalet();
+    a.jalankan();
+  }
+
   return (
     <>
       <button
@@ -204,7 +222,7 @@ export function CommandPalette() {
         aria-label="Buka palet perintah"
         aria-haspopup="dialog"
         aria-expanded={buka}
-        className="fixed bottom-4 right-4 z-[1100] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-ap-hairline bg-white/85 text-muted shadow-none backdrop-blur transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none dark:border-white/15 dark:bg-[#131d19]/80 dark:text-ink"
+        className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] right-[calc(1rem+env(safe-area-inset-right,0px))] z-[1100] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-ap-hairline bg-white/85 text-muted shadow-none backdrop-blur transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none dark:border-white/15 dark:bg-[#131d19]/80 dark:text-ink"
       >
         <Search size={18} />
       </button>
@@ -214,17 +232,20 @@ export function CommandPalette() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[1200] flex items-start justify-center pt-[14vh]"
+          className="fixed inset-0 z-[1200] flex items-start justify-center overflow-y-auto overscroll-contain pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] pt-[calc(14vh+env(safe-area-inset-top,0px))] pb-[calc(1rem+env(safe-area-inset-bottom,0px))]"
         >
-          <div
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-label="Tutup palet perintah"
             className="absolute inset-0 bg-black/40"
-            onClick={() => setBuka(false)}
+            onClick={tutupPalet}
           />
           <motion.div
             initial={{ y: -14, scale: 0.98 }}
             animate={{ y: 0, scale: 1 }}
             exit={{ y: -10, opacity: 0 }}
-            className="relative w-full max-w-lg overflow-hidden rounded-[18px] border border-ap-hairline bg-white/85 shadow-none backdrop-blur-xl backdrop-saturate-150 dark:border-white/15 dark:bg-[#131d19]/85"
+            className="relative max-h-[calc(100dvh-2rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] w-full max-w-lg overflow-y-auto overscroll-contain rounded-[18px] border border-ap-hairline bg-white/85 shadow-none backdrop-blur-xl backdrop-saturate-150 dark:border-white/15 dark:bg-[#131d19]/85"
             role="dialog"
             aria-modal="true"
             aria-label="Command palette"
@@ -250,8 +271,7 @@ export function CommandPalette() {
                     setKursor((k) => Math.max(0, k - 1));
                   }
                   if (e.key === "Enter" && hasil[kursor]) {
-                    setBuka(false);
-                    hasil[kursor].jalankan();
+                    jalankanAksi(hasil[kursor]);
                   }
                 }}
                 placeholder="Ketik perintah atau tujuan…"
@@ -273,7 +293,7 @@ export function CommandPalette() {
               id="command-palette-listbox"
               role="listbox"
               aria-label="Hasil perintah"
-              className="max-h-72 overflow-y-auto p-2"
+              className="max-h-72 overflow-y-auto overscroll-contain p-2"
             >
               {hasil.length === 0 && (
                 <li className="px-3 py-6 text-center text-sm text-muted">
@@ -286,14 +306,11 @@ export function CommandPalette() {
                     id={`cmd-opt-${a.id}`}
                     role="option"
                     aria-selected={i === kursor}
-                    onClick={() => {
-                      setBuka(false);
-                      a.jalankan();
-                    }}
+                    onClick={() => jalankanAksi(a)}
                     onMouseEnter={() => setKursor(i)}
                     onFocus={() => setKursor(i)}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none",
+                      "flex min-h-[44px] w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue-focus! motion-reduce:transition-none",
                       i === kursor
                         ? "bg-ap-blue/10 text-ap-blue dark:text-ap-sky"
                         : "text-ink"
