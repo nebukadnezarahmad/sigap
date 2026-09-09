@@ -18,7 +18,7 @@ export function Button({
         size === "md" && "px-5 py-2.5 text-sm",
         size === "lg" && "px-7 py-3 text-base",
         variant === "utama" &&
-          "bg-action text-white shadow-[0_1px_2px_rgb(0_102_204/0.25),0_6px_16px_-6px_rgb(0_102_204/0.4)] hover:bg-action-hover hover:shadow-[0_2px_4px_rgb(0_102_204/0.25),0_10px_24px_-6px_rgb(0_102_204/0.45)]",
+          "bg-action text-[var(--on-action)] shadow-[0_1px_2px_rgb(0_102_204/0.25),0_6px_16px_-6px_rgb(0_102_204/0.4)] hover:bg-action-hover hover:shadow-[0_2px_4px_rgb(0_102_204/0.25),0_10px_24px_-6px_rgb(0_102_204/0.45)]",
         variant === "sekunder" &&
           "border garis-halus bg-panel text-ink hover:border-action hover:text-action",
         variant === "hantu" && "text-muted hover:bg-panel-2 hover:text-ink",
@@ -151,7 +151,7 @@ export function Avatar({
   return (
     <span
       aria-hidden
-      className="flex shrink-0 items-center justify-center rounded-full bg-action font-display font-bold text-white"
+      className="flex shrink-0 items-center justify-center rounded-full bg-action font-display font-bold text-[var(--on-action)]"
       style={{ width: ukuran, height: ukuran, fontSize: ukuran * 0.38 }}
     >
       {inisial(nama || "?")}

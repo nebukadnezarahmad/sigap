@@ -9,8 +9,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Platform pelaporan masalah permukiman berbasis peta interaktif untuk kota dan desa berkelanjutan.",
     start_url: "/",
     display: "standalone",
-    background_color: "#f6f4ef",
-    theme_color: "#237f45",
+    background_color: "#f5f5f7",
+    theme_color: "#0066cc",
     lang: "id",
     icons: [
       {
