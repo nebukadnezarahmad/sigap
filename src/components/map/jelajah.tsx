@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { harusKurangiGerak, transisiCepat } from "@/lib/motion";
 import {
   Crosshair,
   MapPinOff,
@@ -132,6 +133,9 @@ export function Jelajah({
 
   useEffect(() => {
     if (!mainkan || periodeIdx === null) return;
+    // Reduced motion: garis waktu tidak autoplay; pengguna tetap bisa
+    // menggeser manual lewat slider/tombol putar (maju satu langkah per klik).
+    if (harusKurangiGerak()) return;
     const t = setInterval(() => {
       setPeriodeIdx((i) => {
         if (i === null || i >= BULAN.length - 1) {
@@ -572,7 +576,17 @@ export function Jelajah({
         {periodeIdx !== null && (
           <div className="mt-2.5 flex flex-wrap items-center gap-3 border-t garis-halus px-1 pt-2.5">
             <button
-              onClick={() => setMainkan((v) => !v)}
+              onClick={() => {
+                // Reduced motion: tanpa autoplay, tiap klik maju satu
+                // periode secara manual.
+                if (!mainkan && harusKurangiGerak()) {
+                  setPeriodeIdx((i) =>
+                    i === null || i >= BULAN.length - 1 ? i : i + 1
+                  );
+                  return;
+                }
+                setMainkan((v) => !v);
+              }}
               aria-label={mainkan ? "Jeda" : "Putar"}
               className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-action text-white transition hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
             >
@@ -672,6 +686,7 @@ export function Jelajah({
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
+                transition={transisiCepat}
               >
                 <Card
                   onClick={() => setTerpilihId(r.id)}

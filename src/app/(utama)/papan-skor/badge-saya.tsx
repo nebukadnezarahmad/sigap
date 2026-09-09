@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import { BADGES } from "@/lib/constants";
 import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
 import { Lock } from "lucide-react";
@@ -45,6 +46,7 @@ export function BadgeSaya() {
             key={poin}
             initial={{ scale: 1.25 }}
             animate={{ scale: 1 }}
+            transition={transisiCepat}
             className="angka-tabular text-2xl font-extrabold tabular-nums text-daun-700 dark:text-daun-300"
           >
             {poin} poin

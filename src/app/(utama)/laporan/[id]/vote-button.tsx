@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import { ThumbsUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
@@ -96,7 +97,14 @@ export function VoteButton({
             title={user ? "" : "Masuk untuk mendukung laporan ini"}
           >
             <ThumbsUp size={16} className={sudahVote ? "fill-current" : ""} />
-            <motion.span key={jumlah}>{jumlah}</motion.span>
+            <motion.span
+              key={jumlah}
+              initial={{ opacity: 0.4 }}
+              animate={{ opacity: 1 }}
+              transition={transisiCepat}
+            >
+              {jumlah}
+            </motion.span>
             <span>{sudahVote ? "Didukung" : "Dukung laporan ini"}</span>
           </Button>
           {!user && (

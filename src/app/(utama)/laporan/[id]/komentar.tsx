@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import { MessageSquare, SendHorizonal } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
@@ -145,6 +146,7 @@ export function KomentarSection({
               layout
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={transisiCepat}
               className="flex gap-3"
             >
               <Avatar

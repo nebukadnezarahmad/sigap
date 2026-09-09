@@ -47,6 +47,7 @@ const YAxis = dynamic(() => import("recharts").then((m) => m.YAxis), {
   ssr: false,
 });
 import { motion } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import { STATUS, hitungSla, type StatusKey } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
@@ -321,6 +322,7 @@ export function DewanClient({
             key={k.label}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={transisiCepat}
           >
             <Card className="flex items-center gap-3.5 p-4">
               <span className={`flex size-11 items-center justify-center rounded-xl ${k.warna}`}>

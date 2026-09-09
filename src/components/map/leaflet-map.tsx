@@ -98,11 +98,15 @@ export function LeafletMap({
   const refSudahFit = useRef(false);
   const gelap = useTheme();
   const cbRef = useRef({ onPilih, onKlikTitik });
+  // `gelap` dibaca lewat ref di efek init agar ganti tema tidak me-recreate
+  // seluruh peta; URL tile diperbarui oleh efek khusus di bawah.
+  const gelapRef = useRef(gelap);
   const [mencariLokasi, setMencariLokasi] = useState(false);
   const [statusLokasi, setStatusLokasi] = useState<string | null>(null);
 
   useEffect(() => {
     cbRef.current = { onPilih, onKlikTitik };
+    gelapRef.current = gelap;
   });
 
   useEffect(() => {
@@ -124,7 +128,7 @@ export function LeafletMap({
       });
       L.control.zoom({ position: "bottomright" }).addTo(peta);
 
-      refTile.current = L.tileLayer(urlTile(gelap), {
+      refTile.current = L.tileLayer(urlTile(gelapRef.current), {
         attribution: atribusiTile(),
         maxZoom: 19,
       }).addTo(peta);

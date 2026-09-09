@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import {
   CookingPot,
   Flower2,
@@ -249,6 +250,7 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
+              transition={transisiCepat}
               className="h-full"
             >
               <KartuUsaha usaha={u} />

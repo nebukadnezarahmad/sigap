@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import { Award, Calculator, CheckCircle2, XCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Card, Label } from "@/components/ui";
@@ -198,6 +199,7 @@ function QuizSection({
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
+              transition={transisiCepat}
               className="text-center"
             >
               <p className="angka-tabular font-display text-5xl font-extrabold text-daun-700 dark:text-daun-300">
@@ -358,6 +360,7 @@ function KalkulatorSection({
             key={hasil}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={transisiCepat}
             className="mt-6 rounded-2xl border garis-halus bg-panel-2/60 p-5 text-center"
           >
             <p className="angka-tabular font-serif text-4xl font-semibold text-daun-700 dark:text-daun-300">

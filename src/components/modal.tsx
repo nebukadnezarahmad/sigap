@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { animasiModal, transisiCepat, transisiModal } from "@/lib/motion";
 
 const emptySubscribe = () => () => {};
 
@@ -103,6 +104,7 @@ export function Modal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={transisiCepat}
             onClick={tutup}
           />
           <motion.div
@@ -115,10 +117,10 @@ export function Modal({
               "relative z-10 my-auto w-full max-h-[88vh] overflow-y-auto rounded-3xl border garis-halus bg-panel p-6 focus:outline-none",
               lebar
             )}
-            initial={{ y: 24, opacity: 0, scale: 0.96 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 16, opacity: 0, scale: 0.96 }}
-            transition={{ type: "spring", damping: 28, stiffness: 340 }}
+            initial={animasiModal.initial}
+            animate={animasiModal.animate}
+            exit={animasiModal.exit}
+            transition={transisiModal}
           >
             <div className="mb-4 flex items-start justify-between gap-4 border-b garis-halus pb-3">
               <h2 className="font-display text-lg sm:text-xl font-semibold">{judul}</h2>

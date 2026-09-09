@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { fadeNaik } from "@/lib/motion";
 import { createClient } from "@/lib/supabase/client";
 import { kategoriBySlug, STATUS, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
@@ -29,9 +30,11 @@ export function Terungkap({
     <motion.div
       className={className}
       initial={false}
-      whileInView={kurangiGerak ? undefined : { y: [12, 0] }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: 0.65, delay: tunda, ease: [0.22, 1, 0.36, 1] }}
+      whileInView={
+        kurangiGerak ? undefined : { y: [fadeNaik.initial.y, 0], opacity: [0, 1] }
+      }
+      viewport={fadeNaik.viewport}
+      transition={{ ...fadeNaik.transition, delay: tunda }}
     >
       {children}
     </motion.div>

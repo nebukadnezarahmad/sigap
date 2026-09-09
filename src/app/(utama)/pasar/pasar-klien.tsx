@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import {
   Armchair,
   BookOpen,
@@ -383,6 +384,7 @@ export function PasarKlien({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
+              transition={transisiCepat}
             >
               <KartuBarang barang={b} masuk={masuk} />
             </motion.div>

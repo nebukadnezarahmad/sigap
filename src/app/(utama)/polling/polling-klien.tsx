@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { transisiCepat, transisiReveal } from "@/lib/motion";
 import { BarChart3, Check, Plus, Users, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
@@ -25,14 +26,14 @@ function PersenBar({  persen,
         className="absolute inset-y-0 left-0 bg-daun-500/15"
         initial={{ width: 0 }}
         animate={{ width: `${persen}%` }}
-        transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
+        transition={transisiReveal}
       />
       {terpilih && (
         <motion.div
           className="absolute inset-y-0 left-0 bg-daun-600/25"
           initial={{ width: 0 }}
           animate={{ width: `${persen}%` }}
-          transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
+          transition={transisiReveal}
         />
       )}
       <div className="relative flex items-center justify-between gap-3 text-sm">
@@ -367,6 +368,7 @@ export function PollingKlien({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
+              transition={transisiCepat}
             >
               <KartuPolling poll={p} masuk={masuk} />
             </motion.div>

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { animasiModal, transisiCepat, transisiModal } from "@/lib/motion";
 import {
   ArrowRight,
   LogOut,
@@ -214,6 +215,7 @@ export function CommandPalette() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={transisiCepat}
           className="fixed inset-0 z-[1200] flex items-start justify-center pt-[14vh]"
         >
           <div
@@ -221,9 +223,10 @@ export function CommandPalette() {
             onClick={() => setBuka(false)}
           />
           <motion.div
-            initial={{ y: -14, scale: 0.98 }}
-            animate={{ y: 0, scale: 1 }}
-            exit={{ y: -10, opacity: 0 }}
+            initial={animasiModal.initial}
+            animate={animasiModal.animate}
+            exit={animasiModal.exit}
+            transition={transisiModal}
             className="relative w-full max-w-lg overflow-hidden rounded-2xl border garis-halus bg-panel shadow-2xl"
             role="dialog"
             aria-modal="true"

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { animasiPopover, transisiCepat } from "@/lib/motion";
 import { Bell, CheckCheck, Eye, Flag, Star, Wrench } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
@@ -130,6 +131,7 @@ export function NotifikasiBel() {
             key={belum}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
+            transition={transisiCepat}
             className="absolute -right-0.5 -top-0.5 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold text-white"
           >
             {belum}
@@ -150,9 +152,10 @@ export function NotifikasiBel() {
               ref={refPanel}
               role="dialog"
               aria-label="Notifikasi"
-              initial={{ opacity: 0, y: 6, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 6, scale: 0.98 }}
+              initial={animasiPopover.initial}
+              animate={animasiPopover.animate}
+              exit={animasiPopover.exit}
+              transition={transisiCepat}
               className="absolute right-0 top-full z-40 mt-2 w-80 overflow-hidden rounded-2xl border garis-halus bg-panel shadow-xl"
             >
               <div className="flex items-center justify-between border-b garis-halus px-4 py-2.5">

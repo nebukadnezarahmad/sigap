@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { Compass, History, MapPin, Map as IkonPeta } from "lucide-react";
 import { Button } from "@/components/ui";
+import { transisiSedang } from "@/lib/motion";
 
 const LANGKAH = [
   {
@@ -119,9 +120,10 @@ export function TurPeta() {
           <motion.div
             ref={refDialog}
             tabIndex={-1}
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 24 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={transisiSedang}
             className="fixed bottom-5 left-5 z-[1100] w-80 rounded-2xl border garis-halus bg-panel p-5 shadow-2xl outline-none"
             role="dialog"
             aria-modal="true"

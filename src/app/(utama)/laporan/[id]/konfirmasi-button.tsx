@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Eye, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { motion } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
@@ -202,7 +203,14 @@ export function KonfirmasiButton({
           title={masuk ? "" : "Masuk untuk konfirmasi"}
         >
           <Eye size={16} className={sudah ? "fill-current" : ""} />
-          <motion.span key={jumlah}>{jumlah}</motion.span>
+          <motion.span
+            key={jumlah}
+            initial={{ opacity: 0.4 }}
+            animate={{ opacity: 1 }}
+            transition={transisiCepat}
+          >
+            {jumlah}
+          </motion.span>
           <span>
             {status === "selesai"
               ? "Diverifikasi Warga"
