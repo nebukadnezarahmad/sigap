@@ -17,7 +17,7 @@ SIGAP adalah portal pelaporan masalah permukiman berbasis peta untuk warga dan p
 
 ## Setup
 
-Prasyarat: **Node 20+** dan **npm**.
+Prasyarat: **Node 20.19+** dan **npm**.
 
 1. Buat proyek gratis di [supabase.com](https://supabase.com).
 2. Isi `.env.local` dari Project Settings → API (contoh format ada di `.env.local.example`):
