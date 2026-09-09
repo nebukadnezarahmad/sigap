@@ -15,10 +15,14 @@ function FormulirMasuk() {
   const tujuanMentah = params.get("next") ?? "/peta";
   const tujuan = isTujuanAman(tujuanMentah) ? tujuanMentah : "/peta";
   const butuhAdmin = tujuan.startsWith("/dewan");
+  const galat = params.get("galat");
   const [email, setEmail] = useState("");
   const [sandi, setSandi] = useState("");
-  const [pesan, setPesan] = useState<string | null>(null);
+  const [pesan, setPesan] = useState<string | null>(
+    galat ? "Sesi masuk gagal. Coba lagi atau pakai cara lain." : null
+  );
   const [proses, setProses] = useState(false);
+  const [prosesGoogle, setProsesGoogle] = useState(false);
 
   async function masuk(e: React.FormEvent) {
     e.preventDefault();
@@ -39,11 +43,20 @@ function FormulirMasuk() {
   }
 
   async function masukGoogle() {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(tujuan)}` },
-    });
+    setProsesGoogle(true);
+    setPesan(null);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(tujuan)}` },
+      });
+      if (error) throw error;
+    } catch (e) {
+      console.error("Gagal masuk dengan Google:", e);
+      setPesan("Masuk dengan Google belum berhasil. Periksa koneksi lalu coba lagi.");
+      setProsesGoogle(false);
+    }
   }
 
   return (
@@ -57,7 +70,7 @@ function FormulirMasuk() {
                 Akses Khusus Dashboard Dewan
               </p>
               <p className="mt-1 text-xs text-muted leading-relaxed">
-                Halaman yang Anda tuju memerlukan peran <b>Admin/Dewan</b>. Silakan gunakan tombol 1-Klik <b>Dewan (Admin)</b> di bawah.
+                Halaman yang kamu tuju memerlukan peran <b>Admin/Dewan</b>. Silakan gunakan tombol 1-klik <b>Dewan (Admin)</b> di bawah.
               </p>
             </div>
           </div>
@@ -136,7 +149,14 @@ function FormulirMasuk() {
           <span className="h-px flex-1 bg-line" />
         </div>
 
-        <Button variant="sekunder" onClick={masukGoogle} className="w-full">
+        <Button
+          variant="sekunder"
+          onClick={masukGoogle}
+          disabled={prosesGoogle}
+          loading={prosesGoogle}
+          loadingLabel="Menghubungkan…"
+          className="w-full"
+        >
           Lanjut dengan Google
         </Button>
 

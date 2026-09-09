@@ -4,10 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { animasiPopover, transisiCepat } from "@/lib/motion";
-import { Bell, CheckCheck, Eye, Flag, Star, Wrench } from "lucide-react";
+import { Bell, BellOff, CheckCheck, Eye, Flag, Star, Wrench } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import { cn, waktuRelatif } from "@/lib/utils";
+import { FeedbackState } from "@/components/feedback-state";
 
 type Notif = {
   id: string;
@@ -31,6 +32,7 @@ export function NotifikasiBel() {
   const router = useRouter();
   const [buka, setBuka] = useState(false);
   const [daftar, setDaftar] = useState<Notif[]>([]);
+  const [galat, setGalat] = useState<string | null>(null);
   const refPemicu = useRef<HTMLButtonElement>(null);
   const refPanel = useRef<HTMLDivElement>(null);
   const pernahBuka = useRef(false);
@@ -114,13 +116,20 @@ export function NotifikasiBel() {
 
   async function tandaiSemua() {
     if (!user) return;
+    const sebelumnya = daftar;
     setDaftar((s) => s.map((n) => ({ ...n, dibaca: true })));
+    setGalat(null);
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("notifications")
       .update({ dibaca: true })
       .eq("user_id", user.id)
       .eq("dibaca", false);
+    if (error) {
+      console.error("Gagal menandai notifikasi dibaca:", error);
+      setDaftar(sebelumnya);
+      setGalat("Belum bisa menandai dibaca. Periksa koneksi lalu coba lagi.");
+    }
   }
 
   return (
@@ -173,53 +182,87 @@ export function NotifikasiBel() {
                     onClick={tandaiSemua}
                     className="flex items-center gap-1 text-xs font-semibold text-action hover:underline"
                   >
-                    <CheckCheck size={13} /> Tandai dibaca
+                    <CheckCheck size={13} /> Tandai semua dibaca
                   </button>
                 )}
               </div>
+              {galat && (
+                <p role="alert" className="border-b garis-halus bg-danger/10 px-4 py-2 text-xs font-semibold text-danger">
+                  {galat}
+                </p>
+              )}
               <div className="max-h-80 overflow-y-auto">
                 {daftar.length === 0 && (
-                  <p className="px-4 py-8 text-center text-sm text-muted">
-                    Belum ada notifikasi. Lapor atau dukung sesuatu!
-                  </p>
+                  <FeedbackState
+                    jenis="kosong"
+                    ikon={BellOff}
+                    judul="Belum ada notifikasi"
+                    deskripsi="Laporkan masalah atau dukung laporan warga agar kabar terbaru muncul di sini."
+                    aksi={
+                      <button
+                        onClick={() => {
+                          setBuka(false);
+                          router.push("/peta");
+                        }}
+                        className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-action px-5 text-sm font-semibold text-white transition hover:bg-action-hover"
+                      >
+                        Jelajahi peta
+                      </button>
+                    }
+                  />
                 )}
-                {daftar.map((n) => (
-                  <button
-                    key={n.id}
-                    onClick={() => {
-                      setBuka(false);
-                      if (n.report_id) router.push(`/laporan/${n.report_id}`);
-                    }}
-                    className={cn(
-                      "flex w-full items-start gap-2.5 border-b garis-halus px-4 py-3 text-left transition last:border-0 hover:bg-panel-2",
-                      !n.dibaca && "bg-action/5"
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full",
-                        n.dibaca
-                          ? "bg-panel-2 text-muted"
-                          : "bg-action text-white"
-                      )}
-                    >
-                      {IKON[n.jenis] ?? <Bell size={13} />}
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-semibold">
-                        {n.judul}
+                {daftar.map((n) => {
+                  const isi = (
+                    <>
+                      <span
+                        className={cn(
+                          "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full",
+                          n.dibaca
+                            ? "bg-panel-2 text-muted"
+                            : "bg-action text-white"
+                        )}
+                      >
+                        {IKON[n.jenis] ?? <Bell size={13} />}
                       </span>
-                      {n.isi && (
-                        <span className="mt-0.5 block truncate text-xs text-muted">
-                          {n.isi}
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-semibold">
+                          {n.judul}
                         </span>
-                      )}
-                      <span className="mt-0.5 block text-[11px] text-muted" suppressHydrationWarning>
-                        {waktuRelatif(n.created_at)}
+                        {n.isi && (
+                          <span className="mt-0.5 block truncate text-xs text-muted">
+                            {n.isi}
+                          </span>
+                        )}
+                        <span className="mt-0.5 block text-[11px] text-muted" suppressHydrationWarning>
+                          {waktuRelatif(n.created_at)}
+                        </span>
                       </span>
-                    </span>
-                  </button>
-                ))}
+                    </>
+                  );
+                  const kelas = cn(
+                    "flex w-full items-start gap-2.5 border-b garis-halus px-4 py-3 text-left transition last:border-0 hover:bg-panel-2",
+                    !n.dibaca && "bg-action/5"
+                  );
+                  if (!n.report_id) {
+                    return (
+                      <div key={n.id} className={kelas} aria-label={n.judul}>
+                        {isi}
+                      </div>
+                    );
+                  }
+                  return (
+                    <button
+                      key={n.id}
+                      onClick={() => {
+                        setBuka(false);
+                        if (n.report_id) router.push(`/laporan/${n.report_id}`);
+                      }}
+                      className={kelas}
+                    >
+                      {isi}
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
           </>

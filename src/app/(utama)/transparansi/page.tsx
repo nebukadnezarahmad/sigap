@@ -8,12 +8,14 @@ import {
   AlertTriangle,
   FileSpreadsheet,
   ExternalLink,
+  Inbox,
   ShieldCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI, STATUS, SLA_KATEGORI, hitungSla, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { Card, StatusChip, Button } from "@/components/ui";
+import { Card, StatusChip } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
 import { GalatMuatUlang, KontenUtama } from "@/components/layout-konten";
 import { formatTanggal } from "@/lib/utils";
 import { GrafikBulanan, GrafikKategori } from "./grafik";
@@ -184,23 +186,33 @@ export default async function HalamanTransparansi() {
             <ShieldCheck size={16} /> Rapor Akuntabilitas Publik
           </div>
           <h1 className="mt-1 font-display text-3xl font-bold tracking-tight">
-            Transparansi & Kepatuhan SLA Dewan
+            Transparansi & Kepatuhan Batas Waktu Layanan Dewan
           </h1>
           <p className="mt-2 max-w-2xl text-muted">
-            Data kinerja penanganan masalah lingkungan dari warga secara terbuka. Setiap kategori memiliki target waktu penanganan (*Service Level Agreement*) yang mengikat.
+            Data kinerja penanganan masalah lingkungan dari warga secara terbuka. Setiap kategori memiliki target waktu penanganan (batas waktu layanan/SLA) yang mengikat.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/api/open-data" target="_blank">
-            <Button variant="sekunder" size="sm" className="inline-flex gap-1.5">
-              <FileSpreadsheet size={15} /> Open Data (JSON)
-            </Button>
+          <Link
+            href="/api/open-data"
+            target="_blank"
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border garis-halus px-4 text-sm font-semibold transition hover:border-action hover:text-action"
+          >
+            <FileSpreadsheet size={15} /> Open Data (JSON)
           </Link>
           <TombolCetak />
         </div>
       </header>
 
       {/* Papan Keterlambatan Publik (Overdue Watchlist) */}
+      {total === 0 && (
+        <FeedbackState
+          jenis="kosong"
+          ikon={Inbox}
+          judul="Data belum tersedia"
+          deskripsi="Belum ada laporan yang bisa dihitung. Metrik kinerja akan muncul setelah warga mulai melapor."
+        />
+      )}
       <Card className="mb-6 border-danger/30 p-5">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b garis-halus pb-3">
           <div className="flex items-center gap-2">
@@ -366,9 +378,9 @@ export default async function HalamanTransparansi() {
                 <span className="truncate">{k.nama}</span>
               </div>
               <p className="mt-1 text-xl font-black tabular-nums text-ink">
-                {SLA_KATEGORI[k.slug] ?? 7} Hari
+                {SLA_KATEGORI[k.slug] ?? 7} hari
               </p>
-              <p className="text-[11px] text-muted">Target respon & beres</p>
+              <p className="text-[11px] text-muted">Target respons & penyelesaian</p>
             </div>
           ))}
         </div>
@@ -448,10 +460,12 @@ export default async function HalamanTransparansi() {
               Seluruh data laporan dapat diakses secara publik dan gratis di bawah lisensi CC-BY untuk kepentingan riset akademis, jurnalisme warga, dan integrasi sistem kota.
             </p>
           </div>
-          <Link href="/api/open-data" target="_blank" className="mt-4">
-            <Button variant="sekunder" size="sm" className="w-full gap-1.5 text-xs">
-              <ExternalLink size={13} /> Akses /api/open-data
-            </Button>
+          <Link
+            href="/api/open-data"
+            target="_blank"
+            className="mt-4 inline-flex min-h-[36px] w-full items-center justify-center gap-1.5 rounded-full border garis-halus px-4 text-xs font-semibold transition hover:border-action hover:text-action"
+          >
+            <ExternalLink size={13} /> Akses /api/open-data
           </Link>
         </Card>
       </div>

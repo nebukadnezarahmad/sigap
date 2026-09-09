@@ -31,6 +31,7 @@ export function KonfirmasiButton({
   const [proses, setProses] = useState(false);
   const [modalAuth, setModalAuth] = useState(false);
   const [pesan, setPesan] = useState<string | null>(null);
+  const [gagal, setGagal] = useState(false);
 
   async function toggleKonfirmasi() {
     if (!user) {
@@ -40,6 +41,7 @@ export function KonfirmasiButton({
     if (proses) return;
     setProses(true);
     setPesan(null);
+    setGagal(false);
     const supabase = createClient();
 
     try {
@@ -90,9 +92,10 @@ export function KonfirmasiButton({
           router.refresh();
         }
       }
-    } catch (e) {
-      const inti = e instanceof Error ? e.message : "Gagal menyimpan konfirmasi.";
-      setPesan(`${inti} Periksa koneksi lalu coba lagi.`);
+    } catch {
+      console.error("Gagal menyimpan konfirmasi laporan:", reportId);
+      setGagal(true);
+      setPesan("Konfirmasi belum bisa disimpan. Periksa koneksi lalu coba lagi.");
     } finally {
       setProses(false);
     }
@@ -105,6 +108,8 @@ export function KonfirmasiButton({
     }
     if (proses) return;
     setProses(true);
+    setPesan(null);
+    setGagal(false);
     try {
       const supabase = createClient();
       // Jalur resmi: RPC sistem (guard owner menolak update langsung
@@ -116,8 +121,10 @@ export function KonfirmasiButton({
 
       setPesan("Laporan dikembalikan ke status 'Dikerjakan' untuk ditindaklanjuti ulang.");
       router.refresh();
-    } catch (e) {
-      setPesan(e instanceof Error ? e.message : "Penolakan gagal, coba lagi.");
+    } catch {
+      console.error("Gagal menolak verifikasi laporan:", reportId);
+      setGagal(true);
+      setPesan("Penolakan belum bisa disimpan. Periksa koneksi lalu coba lagi.");
     } finally {
       setProses(false);
     }
@@ -140,13 +147,17 @@ export function KonfirmasiButton({
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted leading-relaxed">
-                Petugas telah mengajukan bukti perbaikan. Apakah Anda mengonfirmasi bahwa masalah di lokasi ini sudah benar-benar beres?
+                Petugas telah mengajukan bukti perbaikan. Apakah kamu mengonfirmasi bahwa masalah di lokasi ini sudah benar-benar beres?
               </p>
 
               {pesan && (
                 <p
-                  role={pesan.includes("Gagal") ? "alert" : "status"}
-                  className="mt-2 text-xs font-semibold text-daun-700 dark:text-daun-300"
+                  role={gagal ? "alert" : "status"}
+                  className={
+                    gagal
+                      ? "mt-2 text-xs font-semibold text-danger"
+                      : "mt-2 text-xs font-semibold text-daun-700 dark:text-daun-300"
+                  }
                 >
                   {pesan}
                 </p>
@@ -157,22 +168,26 @@ export function KonfirmasiButton({
                   type="button"
                   onClick={toggleKonfirmasi}
                   disabled={proses}
+                  loading={proses}
+                  loadingLabel="Menyimpan…"
                   aria-pressed={sudah}
                   aria-busy={proses}
                   className="bg-action hover:bg-action-hover text-white"
                 >
                   <CheckCircle2 size={16} />
-                  {sudah ? "Sudah Kamu Verifikasi" : "Ya, Masalah Sudah Selesai"}
+                  {sudah ? "Sudah kamu verifikasi" : "Ya, masalah sudah selesai"}
                 </Button>
                 <Button
                   type="button"
                   variant="sekunder"
                   onClick={tolakVerifikasi}
                   disabled={proses}
+                  loading={proses}
+                  loadingLabel="Menyimpan…"
                   aria-busy={proses}
                   className="border-danger/30 text-danger hover:bg-danger/10"
                 >
-                  <XCircle size={16} /> Masalah Belum Beres
+                  <XCircle size={16} /> Masalah belum beres
                 </Button>
               </div>
             </div>
@@ -198,6 +213,8 @@ export function KonfirmasiButton({
           variant={sudah ? "utama" : "sekunder"}
           onClick={toggleKonfirmasi}
           disabled={proses}
+          loading={proses}
+          loadingLabel="Menyimpan…"
           aria-pressed={sudah}
           aria-busy={proses}
           title={masuk ? "" : "Masuk untuk konfirmasi"}
@@ -213,16 +230,22 @@ export function KonfirmasiButton({
           </motion.span>
           <span>
             {status === "selesai"
-              ? "Diverifikasi Warga"
+              ? sudah
+                ? "Sudah kamu verifikasi — pilih lagi untuk melepas konfirmasi"
+                : "Diverifikasi warga"
               : sudah
-              ? "Kukonfirmasi Ada"
+              ? "Kukonfirmasi ada — pilih lagi untuk membatalkan"
               : "Saya juga melihat ini"}
           </span>
         </Button>
         {pesan && (
           <p
-            role={pesan.includes("Gagal") ? "alert" : "status"}
-            className="text-xs font-semibold text-danger"
+            role={gagal ? "alert" : "status"}
+            className={
+              gagal
+                ? "text-xs font-semibold text-danger"
+                : "text-xs font-semibold text-daun-700 dark:text-daun-300"
+            }
           >
             {pesan}
           </p>

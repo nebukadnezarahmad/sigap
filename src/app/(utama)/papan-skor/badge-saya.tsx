@@ -10,7 +10,7 @@ import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
 
 export function BadgeSaya() {
-  const { user } = useUser();
+  const { user, muat } = useUser();
   const [dimiliki, setDimiliki] = useState<string[]>([]);
   const [poin, setPoin] = useState<number | null>(null);
 
@@ -30,10 +30,24 @@ export function BadgeSaya() {
       .then(({ data }) => setPoin(data?.poin ?? null));
   }, [user]);
 
+  if (muat)
+    return (
+      <div role="status" aria-label="Memuat progres lencanamu" className="mt-6 rounded-2xl border garis-halus p-5">
+        <div aria-hidden="true" className="space-y-2">
+          <div className="h-4 w-32 animate-pulse rounded-lg bg-line/60" />
+          <div className="flex gap-2">
+            <div className="h-7 w-24 animate-pulse rounded-full bg-line/60" />
+            <div className="h-7 w-24 animate-pulse rounded-full bg-line/60" />
+            <div className="h-7 w-24 animate-pulse rounded-full bg-line/60" />
+          </div>
+        </div>
+      </div>
+    );
+
   if (!user)
     return (
       <p className="mt-4 text-sm text-muted">
-        Masuk untuk melihat progres badge dan poinmu.
+        Masuk untuk melihat progres lencana dan poinmu.
       </p>
     );
 

@@ -61,7 +61,7 @@ describe("Modal", () => {
     pemicu.focus();
     fireEvent.click(pemicu);
     await screen.findByRole("dialog", { name: "Contoh Modal" });
-    fireEvent.click(screen.getByRole("button", { name: "Tutup modal" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tutup" }));
     await waitFor(() => expect(pemicu).toHaveFocus());
   });
 });

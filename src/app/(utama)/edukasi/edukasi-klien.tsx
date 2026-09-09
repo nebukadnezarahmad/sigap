@@ -60,6 +60,8 @@ function QuizSection({
   const [benar, setBenar] = useState(0);
   const [selesaiQuiz, setSelesaiQuiz] = useState(false);
   const [tersimpan, setTersimpan] = useState(false);
+  const [pesanSimpan, setPesanSimpan] = useState<string | null>(null);
+  const [prosesSimpan, setProsesSimpan] = useState(false);
 
   const skor = soal[indeks] && pilih !== null;
 
@@ -76,14 +78,27 @@ function QuizSection({
 
     setSelesaiQuiz(true);
     if (masuk) {
-      const supabase = createClient();
-      await supabase.from("quiz_results").insert({
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        benar: benarBaru,
-        total: soal.length,
-      });
-      setTersimpan(true);
-      selesai();
+      setProsesSimpan(true);
+      setPesanSimpan(null);
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        const { error } = await supabase.from("quiz_results").insert({
+          user_id: user?.id,
+          benar: benarBaru,
+          total: soal.length,
+        });
+        if (error) throw error;
+        setTersimpan(true);
+        selesai();
+      } catch (e) {
+        console.error("Gagal menyimpan skor kuis:", e);
+        setPesanSimpan("Skor belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+      } finally {
+        setProsesSimpan(false);
+      }
     }
   }
 
@@ -94,19 +109,20 @@ function QuizSection({
     setBenar(0);
     setSelesaiQuiz(false);
     setTersimpan(false);
+    setPesanSimpan(null);
   }
 
   return (
-    <section aria-label="Quiz edukasi">
+    <section aria-label="Kuis edukasi">
       <Card className="overflow-hidden p-0">
         <div className="border-b garis-halus bg-panel-2/60 px-6 py-4">
           <h2 className="flex items-center gap-2 font-display text-xl font-bold">
-            <Award size={19} className="text-kunyit-500" /> Quiz: Seberapa Hijau
+            <Award size={19} className="text-kunyit-500" /> Kuis: Seberapa Hijau
             Kamu?
           </h2>
           <p className="mt-1 text-sm text-muted">
             {soal.length} soal · lulus {soal.length - 1}/{soal.length} untuk
-            badge & +15 poin
+            lencana & +15 poin
           </p>
         </div>
 
@@ -114,7 +130,7 @@ function QuizSection({
           {!masuk && (
             <div className="text-center">
               <p className="text-sm text-muted">
-                Masuk dulu untuk mengikuti quiz — skor lulus memberimu badge
+                Masuk dulu untuk mengikuti kuis — skor lulus memberimu lencana
                 Cerdas Lingkungan.
               </p>
               <Button
@@ -134,7 +150,7 @@ function QuizSection({
                   : "Jawab 5 pertanyaan singkat tentang pengelolaan sampah."}
               </p>
               <Button className="mt-4" size="lg" onClick={() => setMulai(true)}>
-                Mulai quiz
+                Mulai kuis
               </Button>
             </div>
           )}
@@ -208,7 +224,7 @@ function QuizSection({
               </p>
               {benar >= soal.length - 1 ? (
                 <p className="mt-3 flex items-center justify-center gap-2 font-display text-lg font-bold">
-                  <IkonVektor node={ikonHadiah} ukuran={20} /> Lulus — badge
+                  <IkonVektor node={ikonHadiah} ukuran={20} /> Lulus — lencana
                   Cerdas Lingkungan
                 </p>
               ) : (
@@ -217,15 +233,17 @@ function QuizSection({
                   ulang.
                 </p>
               )}
-              <p className="mt-2 text-sm text-muted">
+              <p className="mt-2 text-sm text-muted" aria-live="polite">
                 {tersimpan
                   ? benar >= soal.length - 1 && !lulusSebelumnya
                     ? "+15 poin masuk ke akunmu."
                     : "Skor tersimpan."
-                  : "Masuk untuk menyimpan skor."}
+                  : prosesSimpan
+                    ? "Menyimpan skormu…"
+                    : (pesanSimpan ?? "Skor belum tersimpan.")}
               </p>
               <Button variant="sekunder" className="mt-5" onClick={ulang}>
-                Ulangi quiz
+                Ulangi kuis
               </Button>
             </motion.div>
           )}
@@ -279,6 +297,8 @@ function KalkulatorSection({
   const [jawaban, setJawaban] = useState<Record<string, number>>({});
   const [hasil, setHasil] = useState<number | null>(awal);
   const [proses, setProses] = useState(false);
+  const [pesanHitung, setPesanHitung] = useState<string | null>(null);
+  const [tersimpanKalk, setTersimpanKalk] = useState(false);
 
   const lengkap = PERTANYAAN_KALKULATOR.every((q) => jawaban[q.kunci] != null);
 
@@ -289,21 +309,30 @@ function KalkulatorSection({
     }
     const kg = Math.round(total * 10) / 10;
     setHasil(kg);
+    setPesanHitung(null);
     if (!masuk) return;
     setProses(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (user) {
-      await supabase.from("kalkulator_hasil").upsert({
-        user_id: user.id,
-        kg_tahun: kg,
-        updated_at: new Date().toISOString(),
-      });
-      router.refresh();
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        const { error } = await supabase.from("kalkulator_hasil").upsert({
+          user_id: user.id,
+          kg_tahun: kg,
+          updated_at: new Date().toISOString(),
+        });
+        if (error) throw error;
+        setTersimpanKalk(true);
+        router.refresh();
+      }
+    } catch (e) {
+      console.error("Gagal menyimpan hasil kalkulator:", e);
+      setPesanHitung("Hasil belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+    } finally {
+      setProses(false);
     }
-    setProses(false);
   }
 
   const rataRata = 255;
@@ -350,10 +379,17 @@ function KalkulatorSection({
           className="mt-5"
           size="lg"
           disabled={!lengkap || proses}
+          loading={proses}
+          loadingLabel="Menghitung…"
           onClick={hitung}
         >
-          {proses ? "Menyimpan…" : hasil !== null ? "Hitung ulang" : "Hitung jejakku"}
+          {proses ? "Menghitung…" : hasil !== null ? "Hitung ulang" : "Hitung jejakku"}
         </Button>
+        {pesanHitung && (
+          <p role="alert" className="mt-3 text-sm font-semibold text-danger">
+            {pesanHitung}
+          </p>
+        )}
 
         {hasil !== null && (
           <motion.div
@@ -389,7 +425,7 @@ function KalkulatorSection({
                   : `Di atas rata-rata nasional (${rataRata} kg) — mulai dari memilah & mengurangi plastik.`}
               </p>
             </div>
-            {masuk && (
+            {masuk && tersimpanKalk && (
               <p className="mt-3 text-xs text-muted">
                 Hasil tersimpan di profilmu · +5 poin untuk perhitungan pertama.
               </p>

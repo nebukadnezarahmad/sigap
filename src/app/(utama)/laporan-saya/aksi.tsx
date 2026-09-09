@@ -45,7 +45,8 @@ export function AksiLaporanSaya({
       .eq("id", laporan.id);
     setProses(false);
     if (error) {
-      setPesan(`${error.message} Periksa koneksi lalu coba lagi.`);
+      console.error("Gagal menyimpan laporan:", error);
+      setPesan("Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
       return;
     }
     setBukaEdit(false);
@@ -62,7 +63,8 @@ export function AksiLaporanSaya({
       setMintaHapus(false);
       router.refresh();
     } catch (e) {
-      setPesan(e instanceof Error ? `${e.message} Periksa koneksi lalu coba lagi.` : "Gagal menghapus laporan. Periksa koneksi lalu coba lagi.");
+      console.error("Gagal menghapus laporan:", e);
+      setPesan("Laporan belum bisa dihapus. Periksa koneksi lalu coba lagi.");
     } finally {
       setProses(false);
     }

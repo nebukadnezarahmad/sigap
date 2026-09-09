@@ -1,14 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { transisiCepat } from "@/lib/motion";
-import { CalendarDays, MapPin, Plus, Users } from "lucide-react";
+import { CalendarDays, CalendarX, Check, MapPin, Plus, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import type { EventAksi } from "./page";
 import { Button, Card, Input, Label, Textarea } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
 import { formatTanggal } from "@/lib/utils";
 
 function apakahLewat(tanggal: string) {
@@ -25,6 +27,7 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
     setData(event);
   }
   const [proses, setProses] = useState(false);
+  const [pesan, setPesan] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -71,6 +74,7 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
   async function toggle() {
     if (!masuk || proses) return;
     setProses(true);
+    setPesan(null);
     const supabase = createClient();
     const {
       data: { user },
@@ -84,7 +88,10 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
         .from("event_rsvp")
         .delete()
         .match({ event_id: data.id, user_id: user.id });
-      if (!error) {
+      if (error) {
+        console.error("Gagal membatalkan kehadiran:", error);
+        setPesan("Kehadiran belum bisa diubah. Periksa koneksi lalu coba lagi.");
+      } else {
         setData((d) => ({
           ...d,
           akuIkut: false,
@@ -95,7 +102,10 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
       const { error } = await supabase
         .from("event_rsvp")
         .insert({ event_id: data.id, user_id: user.id });
-      if (!error) {
+      if (error) {
+        console.error("Gagal menyimpan kehadiran:", error);
+        setPesan("Kehadiran belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+      } else {
         setData((d) => ({ ...d, akuIkut: true, totalRsvp: d.totalRsvp + 1 }));
       }
       router.refresh();
@@ -138,23 +148,44 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
             </span>
           </div>
           <div className="mt-3 flex items-center gap-3">
-            <Button
-              variant={data.akuIkut ? "utama" : "sekunder"}
-              size="sm"
-              onClick={toggle}
-              disabled={!masuk || proses || dekat}
-            >
-              {dekat
-                ? "Sudah lewat"
-                : data.akuIkut
-                  ? "Kamu ikut ✓"
-                  : "Ikut aksi ini"}
-            </Button>
+            {masuk ? (
+              <Button
+                variant={data.akuIkut ? "utama" : "sekunder"}
+                size="sm"
+                onClick={toggle}
+                disabled={proses || dekat}
+                loading={proses}
+                loadingLabel="Menyimpan…"
+                aria-live="polite"
+              >
+                {dekat
+                  ? "Sudah lewat"
+                  : data.akuIkut
+                    ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        Kamu ikut <Check size={13} strokeWidth={2.5} />
+                      </span>
+                    )
+                    : "Ikut aksi ini"}
+              </Button>
+            ) : (
+              <Link
+                href="/masuk?next=/aksi"
+                className="inline-flex min-h-[36px] items-center justify-center rounded-full border garis-halus px-4 text-sm font-semibold text-ink transition hover:border-action hover:text-action"
+              >
+                Masuk untuk ikut
+              </Link>
+            )}
             <span className="flex items-center gap-1.5 text-xs font-semibold text-muted">
               <Users size={13} />
               <span className="angka-tabular">{data.totalRsvp}</span> warga ikut
             </span>
           </div>
+          {pesan && (
+            <p role="alert" className="mt-2 text-xs font-semibold text-danger">
+              {pesan}
+            </p>
+          )}
         </div>
       </div>
     </Card>
@@ -190,7 +221,8 @@ function FormAksi({ tutup, selesai }: { tutup: () => void; selesai: (baru?: Even
       .single();
     setProses(false);
     if (error) {
-      setPesan(error.message);
+      console.error("Gagal membuat aksi:", error);
+      setPesan("Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
       return;
     }
     selesai({
@@ -262,8 +294,8 @@ function FormAksi({ tutup, selesai }: { tutup: () => void; selesai: (baru?: Even
         <Button type="button" variant="sekunder" onClick={tutup}>
           Batal
         </Button>
-        <Button type="submit" disabled={proses}>
-          {proses ? "Menyimpan…" : "Buat aksi"}
+        <Button type="submit" disabled={proses} loading={proses} loadingLabel="Menerbitkan…">
+          {proses ? "Menerbitkan…" : "Buat aksi"}
         </Button>
       </div>
     </form>
@@ -328,9 +360,12 @@ export function AksiKlien({
           ))}
         </AnimatePresence>
         {events.length === 0 && (
-          <Card className="p-10 text-center text-sm text-muted">
-            Belum ada aksi mendatang. Jadilah pemrakarsa yang pertama!
-          </Card>
+          <FeedbackState
+            jenis="kosong"
+            ikon={CalendarX}
+            judul="Belum ada aksi mendatang"
+            deskripsi="Jadilah pemrakarsa yang pertama mengajak warga bergerak."
+          />
         )}
       </div>
     </div>

@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
+import { Store } from "lucide-react";
 import { Modal } from "@/components/modal";
 
 type Usaha = {
@@ -79,7 +81,7 @@ function KartuUsaha({ usaha }: { usaha: Usaha }) {
           rel="noreferrer"
           className="mt-4 flex items-center justify-center gap-1.5 rounded-full bg-action py-2.5 text-sm font-semibold text-white transition hover:bg-action-hover"
         >
-          <MessageCircle size={15} /> Hubungi via WhatsApp
+          <MessageCircle size={15} /> Hubungi lewat WhatsApp
         </a>
       )}
     </Card>
@@ -125,7 +127,8 @@ function FormAjukanUsaha({
       .single();
     setProses(false);
     if (error) {
-      setPesan(error.message);
+      console.error("Gagal mengajukan usaha:", error);
+      setPesan("Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
       return;
     }
     selesai({
@@ -211,8 +214,8 @@ function FormAjukanUsaha({
         <Button type="button" variant="sekunder" onClick={tutup}>
           Batal
         </Button>
-        <Button type="submit" disabled={proses}>
-          {proses ? "Menyimpan…" : "Ajukan usaha"}
+        <Button type="submit" disabled={proses} loading={proses} loadingLabel="Menerbitkan…">
+          {proses ? "Menerbitkan…" : "Ajukan usaha"}
         </Button>
       </div>
     </form>
@@ -259,9 +262,12 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
         </motion.div>
       </AnimatePresence>
       {tampil.length === 0 && (
-        <Card className="p-10 text-center text-sm text-muted">
-          Belum ada usaha terdaftar. Jadilah yang pertama!
-        </Card>
+        <FeedbackState
+          jenis="kosong"
+          ikon={Store}
+          judul="Belum ada usaha terdaftar"
+          deskripsi="Jadilah yang pertama mendaftarkan usaha warga di sini."
+        />
       )}
 
       <Modal terbuka={formBuka} tutup={() => setFormBuka(false)} judul="Daftarkan usaha">

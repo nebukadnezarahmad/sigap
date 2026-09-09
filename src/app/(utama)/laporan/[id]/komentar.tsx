@@ -24,6 +24,7 @@ export function KomentarSection({
   const [kirim, setKirim] = useState(false);
   const [terisi, setTerisi] = useState(false);
   const [modalAuth, setModalAuth] = useState(false);
+  const [pesan, setPesan] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -108,6 +109,7 @@ export function KomentarSection({
     e.preventDefault();
     if (!user || !teks.trim() || kirim) return;
     setKirim(true);
+    setPesan(null);
     const supabase = createClient();
     const { data, error } = await supabase
       .from("comments")
@@ -117,6 +119,9 @@ export function KomentarSection({
     if (!error && data) {
       setDaftar((s) => [...s, data]);
       setTeks("");
+    } else {
+      console.error("Gagal mengirim komentar:", error);
+      setPesan("Komentar belum bisa dikirim. Periksa koneksi lalu coba lagi.");
     }
     setKirim(false);
   }
@@ -174,18 +179,31 @@ export function KomentarSection({
       </div>
 
       {user ? (
-        <form onSubmit={kirimKomentar} className="mt-5 flex items-end gap-3">
-          <Textarea
-            rows={2}
-            value={teks}
-            maxLength={500}
-            onChange={(e) => setTeks(e.target.value)}
-            placeholder="Tulis tanggapan atau info tambahan…"
-            aria-label="Tulis komentar"
-          />
-          <Button type="submit" disabled={kirim || !teks.trim()} aria-label="Kirim komentar">
-            <SendHorizonal size={16} />
-          </Button>
+        <form onSubmit={kirimKomentar} className="mt-5">
+          <div className="flex items-end gap-3">
+            <Textarea
+              rows={2}
+              value={teks}
+              maxLength={500}
+              onChange={(e) => setTeks(e.target.value)}
+              placeholder="Tulis tanggapan atau info tambahan…"
+              aria-label="Tulis komentar"
+            />
+            <Button
+              type="submit"
+              disabled={kirim || !teks.trim()}
+              loading={kirim}
+              loadingLabel="Mengirim…"
+              aria-label="Kirim komentar"
+            >
+              <SendHorizonal size={16} />
+            </Button>
+          </div>
+          {pesan && (
+            <p role="alert" className="mt-2 text-xs font-semibold text-danger">
+              {pesan}
+            </p>
+          )}
         </form>
       ) : (
         <div className="mt-5 rounded-2xl border border-action/25 bg-action/5 p-4">

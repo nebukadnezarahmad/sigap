@@ -120,9 +120,18 @@ const IsiGrafikKategori = dynamic<{ data: DataKategori[] }>(
 );
 
 export function GrafikBulanan({ data }: { data: DataBulanan[] }) {
+  const totalMasuk = data.reduce((a, b) => a + b.masuk, 0);
+  const totalTuntas = data.reduce((a, b) => a + b.tuntas, 0);
   return (
     <div className="h-60 [--chart-masuk:var(--muted)] [--chart-selesai:var(--color-daun-500)] dark:[--chart-selesai:var(--color-daun-400)]">
-      <IsiGrafikBulanan data={data} />
+      <p className="sr-only">
+        {data.length === 0
+          ? "Belum ada data bulanan."
+          : `Enam bulan terakhir: ${totalMasuk} laporan masuk, ${totalTuntas} tuntas. Rincian per bulan: ${data.map((d) => `${d.label}: ${d.masuk} masuk, ${d.tuntas} tuntas`).join("; ")}.`}
+      </p>
+      <div className="h-full" role="img" aria-label="Grafik laporan masuk versus tuntas enam bulan terakhir">
+        <IsiGrafikBulanan data={data} />
+      </div>
     </div>
   );
 }
@@ -130,7 +139,14 @@ export function GrafikBulanan({ data }: { data: DataBulanan[] }) {
 export function GrafikKategori({ data }: { data: DataKategori[] }) {
   return (
     <div className="h-60">
-      <IsiGrafikKategori data={data} />
+      <p className="sr-only">
+        {data.length === 0
+          ? "Belum ada data ketuntasan kategori."
+          : `Ketuntasan per kategori: ${data.map((d) => `${d.nama} ${d.persen} persen`).join("; ")}.`}
+      </p>
+      <div className="h-full" role="img" aria-label="Grafik ketuntasan per kategori">
+        <IsiGrafikKategori data={data} />
+      </div>
     </div>
   );
 }

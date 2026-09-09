@@ -126,7 +126,13 @@ export function LeafletMap({
         zoom,
         zoomControl: false,
       });
-      L.control.zoom({ position: "bottomright" }).addTo(peta);
+      L.control.zoom({
+        position: "bottomright",
+        zoomInText: "+",
+        zoomInTitle: "Perbesar peta",
+        zoomOutText: "−",
+        zoomOutTitle: "Perkecil peta",
+      }).addTo(peta);
 
       refTile.current = L.tileLayer(urlTile(gelapRef.current), {
         attribution: atribusiTile(),
@@ -198,13 +204,16 @@ export function LeafletMap({
           maxClusterRadius: 42,
         });
         titik.forEach((t) => {
+          const adalahFasilitas =
+            t.id.startsWith("fas:") || t.slug.startsWith("fasilitas:");
+          const labelMarker = adalahFasilitas ? t.judul : `Pin laporan: ${t.judul}`;
           const m = L.marker([t.lat, t.lng], {
             icon: buatIkon(L, t.warna, t.slug, t.id === terpilih),
             // Marker Leaflet bisa difokus (Tab) dan diklik via Enter secara
             // bawaan; title/alt memberi nama yang terbaca pembaca layar.
             keyboard: true,
-            title: t.judul,
-            alt: `Pin laporan: ${t.judul}`,
+            title: labelMarker,
+            alt: labelMarker,
           }).bindTooltip(escapeHtml(t.judul), {
             direction: "top",
             offset: [0, -22],
@@ -238,11 +247,15 @@ export function LeafletMap({
       } else if (titik.length > 0) {
         const t = titik[titik.length - 1];
         const layer = L.layerGroup().addTo(peta);
+        const labelSatu =
+          t.id.startsWith("fas:") || t.slug.startsWith("fasilitas:")
+            ? t.judul
+            : `Pin laporan: ${t.judul}`;
         L.marker([t.lat, t.lng], {
           icon: buatIkon(L, t.warna, t.slug, true),
           keyboard: true,
-          title: t.judul,
-          alt: `Pin laporan: ${t.judul}`,
+          title: labelSatu,
+          alt: labelSatu,
         }).addTo(layer);
         refLayer.current = layer;
         peta.setView([t.lat, t.lng], Math.max(peta.getZoom(), 15));
@@ -316,11 +329,21 @@ export function LeafletMap({
         }
         cbRef.current.onPilih?.(lat, lng);
       },
-      () => {
+      (err) => {
         setMencariLokasi(false);
-        setStatusLokasi(
-          "Lokasi tidak ditemukan. Geser peta lalu tekan Enter."
-        );
+        if (err.code === err.PERMISSION_DENIED) {
+          setStatusLokasi(
+            "Akses lokasi ditolak. Izinkan akses lokasi di peramban, atau geser peta lalu tekan Enter."
+          );
+        } else if (err.code === err.TIMEOUT) {
+          setStatusLokasi(
+            "Pengambilan lokasi kehabisan waktu. Periksa koneksi lalu coba lagi."
+          );
+        } else {
+          setStatusLokasi(
+            "Lokasi tidak tersedia. Geser peta lalu tekan Enter."
+          );
+        }
       },
       { timeout: 8000 }
     );
@@ -385,10 +408,10 @@ export function LeafletMap({
           </div>
         )}
       </div>
-      {/* Jalan pintas keyboard: setiap tombol membuka laporan yang sama
+      {/* Pintasan keyboard: setiap tombol membuka laporan yang sama
           seperti klik marker. Tersembunyi visual hingga difokus (pola
           skip-link) agar tidak membebani navigasi Tab pengguna awas. */}
-      <ul aria-label="Jalan pintas keyboard daftar laporan">
+      <ul aria-label="Pintasan keyboard daftar laporan">
         {titik.slice(0, 30).map((t) => (
           <li key={t.id}>
             <button

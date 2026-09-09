@@ -53,6 +53,8 @@ import type { LaporanDenganRelasi } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { Button, Card, Select, StatusChip } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
+import { Inbox } from "lucide-react";
 import { waktuRelatif } from "@/lib/utils";
 
 const LeafletMap = dynamic(
@@ -77,6 +79,7 @@ export function DewanClient({
   const [dipilih, setDipilih] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<StatusKey>("diverifikasi");
   const [bulkProses, setBulkProses] = useState(false);
+  const [pesanStatus, setPesanStatus] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -122,20 +125,33 @@ export function DewanClient({
   }, []);
 
   async function ubahStatus(id: string, status: StatusKey) {
+    const sebelumnya = daftar.find((r) => r.id === id)?.status;
     setDaftar((s) => s.map((r) => (r.id === id ? { ...r, status } : r)));
+    setPesanStatus(null);
     const supabase = createClient();
-    await supabase.from("reports").update({ status }).eq("id", id);
+    const { error } = await supabase.from("reports").update({ status }).eq("id", id);
+    if (error) {
+      console.error("Gagal mengubah status:", error);
+      if (sebelumnya) {
+        setDaftar((s) => s.map((r) => (r.id === id ? { ...r, status: sebelumnya } : r)));
+      }
+      setPesanStatus("Status belum bisa diubah. Periksa koneksi lalu coba lagi.");
+    }
   }
 
   async function tugaskan(id: string, petugas: string) {
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("reports")
       .update({
         petugas: petugas || null,
         assigned_at: petugas ? new Date().toISOString() : null,
       })
       .eq("id", id);
+    if (error) {
+      console.error("Gagal menugaskan petugas:", error);
+      setPesanStatus("Petugas belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+    }
   }
 
   function togglePilih(id: string) {
@@ -179,8 +195,10 @@ export function DewanClient({
         arr.map((r) => (setId.has(r.id) ? { ...r, status: bulkStatus } : r ))
       );
       setDipilih(new Set());
-    } catch {
-      /* biarkan daftar apa adanya; pengguna bisa coba lagi */
+      setPesanStatus(null);
+    } catch (e) {
+      console.error("Gagal menerapkan status massal:", e);
+      setPesanStatus("Status massal belum bisa diterapkan. Periksa koneksi lalu coba lagi.");
     } finally {
       setBulkProses(false);
     }
@@ -266,6 +284,12 @@ export function DewanClient({
     [daftar, filterStatus]
   );
 
+  const tersaringDewan = useMemo(
+    () =>
+      daftar.filter((r) => filterStatus === "semua" || r.status === filterStatus),
+    [daftar, filterStatus]
+  );
+
   const kartu = [
     {
       label: "Total laporan",
@@ -292,7 +316,7 @@ export function DewanClient({
       warna: "text-muted bg-panel-2",
     },
     {
-      label: "Melewati Target SLA",
+      label: "Melewati batas waktu layanan (SLA)",
       nilai: lewatSla,
       ikon: <AlarmClock size={20} />,
       warna:
@@ -312,7 +336,7 @@ export function DewanClient({
           Dashboard Dewan
         </h1>
         <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Pantau & kelola penanganan laporan permukiman secara realtime.
+          Pantau & kelola penanganan laporan permukiman secara langsung.
         </p>
       </header>
 
@@ -340,7 +364,12 @@ export function DewanClient({
       <div className="mb-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
         <Card className="p-5">
           <h2 className="mb-4 font-display font-bold">Tren laporan 14 hari</h2>
-          <div className="h-56">
+          <p className="sr-only">
+            {tren.length === 0
+              ? "Belum ada data tren laporan."
+              : `Tren 14 hari: total ${tren.reduce((a, b) => a + (b.jumlah ?? 0), 0)} laporan. Puncak ${Math.max(...tren.map((t) => t.jumlah ?? 0))} laporan dalam sehari.`}
+          </p>
+          <div className="h-56" role="img" aria-label="Grafik tren laporan 14 hari">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={tren} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
                 <defs>
@@ -375,7 +404,12 @@ export function DewanClient({
 
         <Card className="p-5">
           <h2 className="mb-4 font-display font-bold">Komposisi kategori</h2>
-          <div className="h-56">
+          <p className="sr-only">
+            {kategori.length === 0
+              ? "Belum ada data kategori."
+              : `Komposisi: ${kategori.map((k) => `${k.nama} ${k.jumlah}`).join(", ")}.`}
+          </p>
+          <div className="h-56" role="img" aria-label="Grafik komposisi kategori">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={kategori} layout="vertical" margin={{ left: 10, right: 10 }}>
                 <XAxis type="number" hide />
@@ -424,7 +458,7 @@ export function DewanClient({
                   </option>
                 ))}
               </Select>
-              <Button size="sm" onClick={terapkanBulk} disabled={bulkProses}>
+              <Button size="sm" onClick={terapkanBulk} disabled={bulkProses} loading={bulkProses} loadingLabel="Menerapkan…">
                 {bulkProses
                   ? "Menerapkan…"
                   : `Terapkan ke ${dipilih.size} laporan`}
@@ -450,7 +484,7 @@ export function DewanClient({
                 <Download size={14} /> Ekspor CSV
               </Button>
               <Select
-                aria-label="Filter status"
+                aria-label="Saringan status"
                 className="w-32 sm:w-40"
                 value={filterStatus}
                 onChange={(e) =>
@@ -467,9 +501,12 @@ export function DewanClient({
             </div>
           </div>
           <div className="max-h-[520px] overflow-y-auto divide-y garis-halus">
-            {daftar
-              .filter((r) => filterStatus === "semua" || r.status === filterStatus)
-              .map((r) => {
+            {pesanStatus && (
+              <p role="alert" className="bg-danger/10 px-5 py-2.5 text-xs font-semibold text-danger">
+                {pesanStatus}
+              </p>
+            )}
+            {tersaringDewan.map((r) => {
                 const sla = hitungSla(r.categories?.slug, r.created_at);
                 const telat =
                   sla.lewatSla && !["selesai", "ditolak"].includes(r.status);
@@ -494,7 +531,7 @@ export function DewanClient({
                   {telat && (
                     <span className="rounded-full bg-danger/10 px-2 py-1 text-[11px] font-bold text-danger">
                       <AlarmClock size={11} className="inline align-[-1px]" />{" "}
-                      +{sla.hariTerlambat} hr lewat SLA ({sla.targetHari} hr)
+                      +{sla.hariTerlambat} hari lewat batas waktu ({sla.targetHari} hari)
                     </span>
                   )}
                   <StatusChip status={r.status} />
@@ -523,10 +560,24 @@ export function DewanClient({
                 </div>
                 );
               })}
-            {daftar.length === 0 && (
-              <p className="px-5 py-10 text-center text-sm text-muted">
-                Belum ada laporan masuk.
-              </p>
+            {tersaringDewan.length === 0 && (
+              <FeedbackState
+                jenis={daftar.length === 0 ? "kosong" : "tanpa-hasil"}
+                ikon={Inbox}
+                judul={daftar.length === 0 ? "Belum ada laporan masuk" : "Tidak ada laporan yang cocok"}
+                deskripsi={
+                  daftar.length === 0
+                    ? "Laporan warga yang masuk akan tampil di sini untuk dikelola."
+                    : "Coba ubah saringan status ke semua."
+                }
+                aksi={
+                  daftar.length === 0 ? undefined : (
+                    <Button variant="sekunder" size="sm" onClick={() => setFilterStatus("semua")}>
+                      Hapus saringan
+                    </Button>
+                  )
+                }
+              />
             )}
           </div>
         </Card>
@@ -538,6 +589,7 @@ export function DewanClient({
               onClick={() => setHeatAktif((v) => !v)}
               role="switch"
               aria-checked={heatAktif}
+              aria-label="Tampilkan peta panas"
               className={`relative h-6 w-11 rounded-full transition ${
                 heatAktif ? "bg-action" : "bg-line"
               }`}

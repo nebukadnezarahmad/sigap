@@ -8,6 +8,7 @@ import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";
+import { SkeletonTeks } from "@/components/ui";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
 const LeafletMap = dynamic(
@@ -49,7 +50,7 @@ type LaporanMirip = {
 
 export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, muat } = useUser();
   const [judul, setJudul] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [slugKategori, setSlugKategori] = useState(KATEGORI[0].slug);
@@ -167,18 +168,30 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   async function handleDukungLaporanMirip(id: string) {
     if (!user) return;
     setProses(true);
+    setPesan(null);
     try {
       const supabase = createClient();
-      await supabase.from("votes").upsert(
+      const { error } = await supabase.from("votes").upsert(
         { report_id: id, user_id: user.id },
         { onConflict: "report_id,user_id" }
       );
+      if (error) throw error;
       selesai();
       router.push(`/laporan/${id}`);
-    } catch {
-      selesai();
-      router.push(`/laporan/${id}`);
+    } catch (e) {
+      console.error("Gagal mendukung laporan serupa:", e);
+      setPesan("Dukungan belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+      setProses(false);
     }
+  }
+
+  if (muat) {
+    return (
+      <div className="grid gap-5 lg:grid-cols-2">
+        <SkeletonTeks baris={4} label="Memuat formulir laporan…" />
+        <SkeletonTeks baris={3} label="Memuat peta…" />
+      </div>
+    );
   }
 
   if (!user) {
@@ -186,7 +199,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       <div className="space-y-4 py-2">
         <div className="text-center">
           <p className="font-display font-bold text-base">
-            Masuk untuk Melaporkan Masalah
+            Masuk untuk melaporkan masalah
           </p>
           <p className="mt-1 text-sm text-muted">
             Setiap laporan diikat dengan akun warga agar validitas dan poin partisipasi dapat tercatat.
@@ -204,10 +217,10 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           <span>Punya akun sendiri?</span>
           <div className="flex gap-2">
             <Button size="sm" variant="sekunder" onClick={() => router.push("/masuk?next=/peta?lapor=1")}>
-              Masuk Manual
+              Masuk manual
             </Button>
             <Button size="sm" onClick={() => router.push("/daftar?next=/peta?lapor=1")}>
-              Daftar Akun
+              Daftar akun
             </Button>
           </div>
         </div>
@@ -234,7 +247,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       fokusId ??= "deskripsi";
     }
     if (!posisi) {
-      setGalatPeta("Klik lokasi masalah di peta dulu, lalu kirim lagi.");
+      setGalatPeta("Pilih lokasi masalah di peta dulu, lalu kirim lagi.");
       fokusId ??= "peta-pilih";
     }
     if (fokusId) {
@@ -270,7 +283,10 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         const { error: upErr } = await supabase.storage
           .from("foto-laporan")
           .upload(path, f, { contentType: f.type });
-        if (upErr) throw new Error(`Gagal unggah foto: ${upErr.message} Periksa koneksi lalu coba lagi.`);
+        if (upErr) {
+          console.error("Gagal mengunggah foto:", upErr);
+          throw new Error("Foto belum bisa diunggah. Periksa koneksi lalu coba lagi.");
+        }
         const { data: pub } = supabase.storage
           .from("foto-laporan")
           .getPublicUrl(path);
@@ -298,7 +314,10 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         })
         .select("id")
         .single();
-      if (error) throw new Error(`${error.message} Periksa koneksi lalu coba lagi.`);
+      if (error) {
+        console.error("Gagal mengirim laporan:", error);
+        throw new Error("Laporan belum bisa dikirim. Periksa koneksi lalu coba lagi.");
+      }
 
       if (urls.length > 0 && inserted) {
         const baris = urls.map((url) => ({
@@ -312,7 +331,8 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       selesai();
       router.refresh();
     } catch (err) {
-      setPesan(err instanceof Error ? `${err.message} Periksa koneksi lalu coba lagi.` : "Terjadi kesalahan. Periksa koneksi lalu coba lagi.");
+      console.error("Gagal mengirim laporan:", err);
+      setPesan(err instanceof Error ? err.message : "Laporan belum bisa dikirim. Periksa koneksi lalu coba lagi.");
     } finally {
       setProses(false);
     }
@@ -433,7 +453,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       <div className="flex flex-col">
         <Label>
           <span className="inline-flex items-center gap-1.5">
-            <MapPin size={13} /> Klik peta untuk menandai titik masalah
+            <MapPin size={13} /> Pilih peta untuk menandai titik masalah
           </span>
         </Label>
         <div className="min-h-64 flex-1 overflow-hidden rounded-xl border garis-halus">
@@ -484,7 +504,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
               <AlertTriangle size={17} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                  Laporan Serupa Ditemukan ({Math.round(laporanMirip[0].jarak_m)} m dari titikmu)
+                  Laporan serupa ditemukan ({Math.round(laporanMirip[0].jarak_m)} m dari titikmu)
                 </p>
                 <p className="mt-1 text-sm font-semibold truncate text-ink">
                   {laporanMirip[0].judul}
@@ -507,7 +527,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
                     type="button"
                     onClick={() => setAbaikanDuplikat(true)}
                   >
-                    Ini Masalah Berbeda
+                    Ini masalah berbeda
                   </Button>
                 </div>
               </div>
@@ -522,7 +542,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         )}
 
         <div className="mt-3 flex w-full flex-col gap-2">
-          <Button type="submit" disabled={proses} aria-busy={proses} size="lg" className="w-full">
+          <Button type="submit" disabled={proses} loading={proses} loadingLabel="Mengirim…" aria-busy={proses} size="lg" className="w-full">
             {proses ? (
               <Loader2 size={16} aria-hidden className="animate-spin" />
             ) : (

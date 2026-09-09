@@ -80,7 +80,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
       return;
     }
     if (!posisi) {
-      setGalatPeta("Klik lokasi fasilitas di peta dulu, lalu simpan lagi.");
+      setGalatPeta("Pilih lokasi fasilitas di peta dulu, lalu simpan lagi.");
       document.getElementById("peta-fasilitas")?.focus();
       return;
     }
@@ -97,11 +97,15 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
         jam_buka: jam.trim() || null,
         lokasi: `SRID=4326;POINT(${posisi.lng} ${posisi.lat})`,
       });
-      if (error) throw new Error(`${error.message} Periksa koneksi lalu coba lagi.`);
+      if (error) {
+        console.error("Gagal menyimpan fasilitas:", error);
+        throw new Error("Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
+      }
       selesai();
       router.refresh();
     } catch (err) {
-      setPesan(err instanceof Error ? err.message : "Terjadi kesalahan. Periksa koneksi lalu coba lagi.");
+      console.error("Gagal menyimpan fasilitas:", err);
+      setPesan(err instanceof Error ? err.message : "Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
     } finally {
       setProses(false);
     }
@@ -175,7 +179,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
       <div className="flex flex-col">
         <Label>
           <span className="inline-flex items-center gap-1.5">
-            <MapPin size={13} /> Klik peta untuk menandai lokasi
+            <MapPin size={13} /> Pilih peta untuk menandai lokasi
           </span>
         </Label>
         <div className="min-h-56 flex-1 overflow-hidden rounded-xl border garis-halus">
@@ -215,7 +219,7 @@ export function FormFasilitas({ selesai }: { selesai: () => void }) {
             {pesan}
           </p>
         )}
-        <Button type="submit" disabled={proses} aria-busy={proses} className="mt-3 w-full">
+        <Button type="submit" disabled={proses} loading={proses} loadingLabel="Menyimpan…" aria-busy={proses} className="mt-3 w-full">
           {proses ? (
             <Loader2 size={16} aria-hidden className="animate-spin" />
           ) : (

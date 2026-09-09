@@ -13,6 +13,8 @@ import {
   Shield,
 } from "lucide-react";
 import { Card } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
+import { SearchX } from "lucide-react";
 
 type Layanan = {
   id: string;
@@ -128,9 +130,20 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
           );
         })}
         {grup.length === 0 && (
-          <Card className="p-10 text-center text-sm text-muted">
-            Tidak ada layanan yang cocok dengan pencarianmu.
-          </Card>
+          <FeedbackState
+            jenis="tanpa-hasil"
+            ikon={SearchX}
+            judul="Tidak ada layanan yang cocok"
+            deskripsi="Coba kata kunci lain, misalnya nama instansi atau jenis layanan."
+            aksi={
+              <button
+                onClick={() => setKueri("")}
+                className="inline-flex min-h-[44px] items-center justify-center rounded-full border garis-halus px-5 text-sm font-semibold text-ink transition hover:border-action hover:text-action"
+              >
+                Hapus saringan
+              </button>
+            }
+          />
         )}
       </div>
     </div>

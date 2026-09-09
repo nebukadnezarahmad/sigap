@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
@@ -18,6 +19,8 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import type { Barang } from "./page";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
+import { PackageSearch } from "lucide-react";
 import { Modal } from "@/components/modal";
 
 const KATEGORI = [
@@ -95,7 +98,8 @@ function KartuBarang({
         .eq("status", "tersedia")
         .select("id");
       if (error) {
-        setPesan(error.message);
+        console.error("Gagal mengklaim barang:", error);
+        setPesan("Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
         setProses(false);
         return;
       }
@@ -152,20 +156,26 @@ function KartuBarang({
       )}
 
       {tersedia && !data.milikKu && (
-        <Button
-          className="mt-4 w-full"
-          variant={masuk ? "utama" : "sekunder"}
-          disabled={proses || !masuk}
-          onClick={klaim}
-        >
-          {masuk ? (
-            <>
-              <HandHeart size={15} /> {proses ? "Mengklaim…" : "Klaim barang ini (+3 poin)"}
-            </>
-          ) : (
-            "Masuk untuk mengklaim"
-          )}
-        </Button>
+        masuk ? (
+          <Button
+            className="mt-4 w-full"
+            variant="utama"
+            disabled={proses}
+            loading={proses}
+            loadingLabel="Mengklaim…"
+            onClick={klaim}
+            aria-live="polite"
+          >
+            <HandHeart size={15} /> {proses ? "Mengklaim…" : "Klaim barang ini (+3 poin)"}
+          </Button>
+        ) : (
+          <Link
+            href="/masuk?next=/pasar"
+            className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border garis-halus px-5 text-sm font-semibold text-ink transition hover:border-action hover:text-action"
+          >
+            <HandHeart size={15} /> Masuk untuk mengklaim
+          </Link>
+        )
       )}
       {!tersedia && (
         <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-daun-700 dark:text-daun-300">
@@ -213,7 +223,8 @@ function FormPasangBarang({
       .single();
     setProses(false);
     if (error) {
-      setPesan(error.message);
+      console.error("Gagal memasang barang:", error);
+      setPesan("Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
       return;
     }
     selesai({
@@ -296,8 +307,8 @@ function FormPasangBarang({
         <Button type="button" variant="sekunder" onClick={tutup}>
           Batal
         </Button>
-        <Button type="submit" disabled={proses}>
-          {proses ? "Menyimpan…" : "Pasang barang (+10 poin)"}
+        <Button type="submit" disabled={proses} loading={proses} loadingLabel="Menerbitkan…">
+          {proses ? "Menerbitkan…" : "Pasang barang (+10 poin)"}
         </Button>
       </div>
     </form>
@@ -392,9 +403,21 @@ export function PasarKlien({
         </motion.div>
       </AnimatePresence>
       {tampil.length === 0 && (
-        <Card className="p-10 text-center text-sm text-muted">
-          Belum ada barang pada kategori ini.
-        </Card>
+        <FeedbackState
+          jenis={barang.length === 0 ? "kosong" : "tanpa-hasil"}
+          ikon={PackageSearch}
+          judul={barang.length === 0 ? "Belum ada barang" : "Tidak ada barang yang cocok"}
+          deskripsi={
+            barang.length === 0
+              ? "Jadilah yang pertama memberi barang bekas layak pakai."
+              : "Coba kategori lain atau pasang barangmu sendiri."
+          }
+          aksi={
+            <Button variant="sekunder" onClick={() => setFilter("semua")}>
+              Hapus saringan
+            </Button>
+          }
+        />
       )}
 
       <Modal terbuka={formBuka} tutup={() => setFormBuka(false)} judul="Pasang barang bekas">

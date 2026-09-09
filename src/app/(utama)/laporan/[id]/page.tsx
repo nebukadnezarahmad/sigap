@@ -85,18 +85,23 @@ export default async function HalamanLaporan({
   const semuaFoto = (r.report_photos ?? []) as unknown as FotoLaporan[];
   const fotoSebelum = semuaFoto.filter((f) => f.fase === "sebelum");
   const fotoSesudah = semuaFoto.filter((f) => f.fase === "sesudah");
+  // Dedup: foto_url biasanya sama dengan foto "sebelum" pertama (satu
+  // unggahan, dua referensi) — bandingkan URL agar tak tampil ganda.
+  const urlSebelum = new Set(fotoSebelum.map((f) => f.url));
   const galeri = [
-    ...(r.foto_url ? [{ id: "utama", url: r.foto_url }] : []),
-    ...fotoSebelum.map((f) => ({ id: f.id, url: f.url })),
+    ...(r.foto_url && !urlSebelum.has(r.foto_url)
+      ? [{ id: "utama", url: r.foto_url, fase: "sebelum" as const }]
+      : []),
+    ...fotoSebelum.map((f) => ({ id: f.id, url: f.url, fase: "sebelum" as const })),
   ];
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
       <Link
         href="/peta"
-        className="mb-5 inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-ink"
+        className="mb-5 inline-flex min-h-[44px] items-center gap-1.5 text-sm text-muted transition hover:text-ink"
       >
-        <ArrowLeft size={15} /> Kembali ke peta
+        <ArrowLeft size={15} /> Buka peta
       </Link>
 
       {r.status === "selesai" && (
@@ -126,7 +131,7 @@ export default async function HalamanLaporan({
                 </span>
               )}
 
-              {/* Badge Target SLA */}
+              {/* Lencana target batas waktu layanan */}
               {r.status !== "selesai" && (
                 <span
                   className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
@@ -134,17 +139,17 @@ export default async function HalamanLaporan({
                       ? "bg-danger/15 text-danger font-bold"
                       : "bg-panel-2 text-muted border garis-halus"
                   }`}
-                  title={`Target SLA Kategori: ${sla.targetHari} hari (Jatuh tempo: ${formatTanggal(sla.jatuhTempo.toISOString())})`}
+                  title={`Target batas waktu layanan kategori: ${sla.targetHari} hari (jatuh tempo: ${formatTanggal(sla.jatuhTempo.toISOString())})`}
                 >
                   {sla.lewatSla ? (
                     <>
                       <AlertTriangle size={12} className="text-danger shrink-0" />
-                      <span>Lewat SLA {sla.hariTerlambat} hr</span>
+                      <span>Lewat batas waktu {sla.hariTerlambat} hari</span>
                     </>
                   ) : (
                     <>
                       <Timer size={12} className="text-muted shrink-0" />
-                      <span>Sisa {sla.sisaHari} hr</span>
+                      <span>Sisa {sla.sisaHari} hari</span>
                     </>
                   )}
                 </span>
@@ -190,9 +195,11 @@ export default async function HalamanLaporan({
                 <img
                   key={f.id}
                   src={f.url}
-                  alt={`Foto ${i + 1} — ${r.judul}`}
+                  alt={`Foto kondisi ${r.judul} — sebelum ${i + 1}`}
+                  width={800}
+                  height={600}
                   className={`w-full rounded-2xl border garis-halus object-cover shadow-sm ${
-                    galeri.length === 1 ? "max-h-[420px]" : "h-44 sm:h-52"
+                    galeri.length === 1 ? "aspect-[4/3] max-h-[420px]" : "aspect-[4/3] h-44 sm:h-52"
                   }`}
                 />
               ))}
@@ -234,29 +241,34 @@ export default async function HalamanLaporan({
                 <SebelumSesudah
                   sebelum={galeri[0].url}
                   sesudah={fotoSesudah[0].url}
+                  judul={r.judul}
                 />
               ) : (
                 <div className="grid grid-cols-2 gap-2">
-                  {fotoSesudah.map((f) => (
+                  {fotoSesudah.map((f, i) => (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       key={f.id}
                       src={f.url}
-                      alt="Kondisi setelah ditangani"
-                      className="h-44 w-full rounded-xl object-cover"
+                      alt={`Foto kondisi ${r.judul} — sesudah ${i + 1}`}
+                      width={800}
+                      height={600}
+                      className="aspect-[4/3] h-44 w-full rounded-xl object-cover"
                     />
                   ))}
                 </div>
               )}
               {galeri.length > 0 && fotoSesudah.length > 1 && (
                 <div className="mt-2 grid grid-cols-2 gap-2">
-                  {fotoSesudah.slice(1).map((f) => (
+                  {fotoSesudah.slice(1).map((f, i) => (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       key={f.id}
                       src={f.url}
-                      alt="Kondisi setelah ditangani"
-                      className="h-36 w-full rounded-xl object-cover"
+                      alt={`Foto kondisi ${r.judul} — sesudah ${i + 2}`}
+                      width={800}
+                      height={600}
+                      className="aspect-[4/3] h-36 w-full rounded-xl object-cover"
                     />
                   ))}
                 </div>

@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Plus, MapPinOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { Card, StatusChip } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
 import { GalatMuatUlang } from "@/components/layout-konten";
 import { STATUS, type StatusKey } from "@/lib/constants";
 import { AksiLaporanSaya } from "./aksi";
 import { HapusAreaKlien } from "./hapus-area";
 import { GerbangLaporanSaya } from "./gerbang-laporan-saya";
 
-export const metadata: Metadata = { title: "Laporan Saya" };
+export const metadata: Metadata = { title: "Laporan saya" };
 export const dynamic = "force-dynamic";
 
 const PROGRES_STATUS: Record<string, number> = {
@@ -56,7 +58,7 @@ export default async function HalamanLaporanSaya() {
   if (galatLaporan || galatArea) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
-        <GalatMuatUlang judul="Laporan Saya belum bisa dimuat" />
+        <GalatMuatUlang judul="Laporan saya belum bisa dimuat" />
       </main>
     );
   }
@@ -67,7 +69,7 @@ export default async function HalamanLaporanSaya() {
     <main className="mx-auto max-w-3xl px-4 py-10">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold">Laporan Saya</h1>
+          <h1 className="font-display text-3xl font-bold">Laporan saya</h1>
           <p className="mt-2 max-w-xl text-muted">
             Sunting laporan selama statusnya masih{" "}
             <b className="text-ink">Baru</b>. Setelah diverifikasi dewan, isinya
@@ -76,27 +78,28 @@ export default async function HalamanLaporanSaya() {
         </div>
         <Link
           href="/peta?lapor=1"
-          className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-action px-6 text-sm font-semibold text-white transition hover:bg-action-hover active:scale-[0.97]"
+          className="inline-flex min-h-[48px] items-center justify-center gap-1.5 rounded-full bg-action px-6 text-sm font-semibold text-white transition hover:bg-action-hover active:scale-[0.97]"
         >
-          + Buat laporan
+          <Plus size={15} strokeWidth={2.5} /> Buat laporan
         </Link>
       </header>
 
       {daftar.length === 0 ? (
-        <Card className="p-10 text-center">
-          <p className="font-display text-xl font-bold">
-            Belum ada laporan darimu
-          </p>
-          <p className="mx-auto mt-2 max-w-sm text-sm text-muted">
-            Mulai dari satu titik di sekitarmu. Laporan pertama hanya butuh
-            foto dan dua menit.
-          </p>
-          <Link
-            href="/peta?lapor=1"
-            className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-action px-7 text-sm font-semibold text-white transition hover:bg-action-hover active:scale-[0.97]"
-          >
-            Buat laporan pertama
-          </Link>
+        <Card className="p-2">
+          <FeedbackState
+            jenis="kosong"
+            ikon={MapPinOff}
+            judul="Belum ada laporan darimu"
+            deskripsi="Mulai dari satu titik di sekitarmu. Laporan pertama hanya butuh sekitar 2 menit, foto opsional tapi membantu."
+            aksi={
+              <Link
+                href="/peta?lapor=1"
+                className="inline-flex min-h-[48px] items-center justify-center gap-1.5 rounded-full bg-action px-7 text-sm font-semibold text-white transition hover:bg-action-hover active:scale-[0.97]"
+              >
+                <Plus size={15} strokeWidth={2.5} /> Buat laporan pertama
+              </Link>
+            }
+          />
         </Card>
       ) : (
         <div className="space-y-3">

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    return NextResponse.redirect(`${origin}/masuk`);
+    return NextResponse.redirect(`${origin}/masuk?galat=konfigurasi`);
   }
 
   if (kode) {
@@ -41,5 +41,5 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/masuk`);
+  return NextResponse.redirect(`${origin}/masuk?galat=oauth`);
 }

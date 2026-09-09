@@ -39,11 +39,13 @@ export function AdminPanel({
   const [file, setFile] = useState<File | null>(null);
   const [proses, setProses] = useState(false);
   const [pesan, setPesan] = useState<string | null>(null);
+  const [gagal, setGagal] = useState(false);
 
   async function simpan() {
     if (!user) return;
     setProses(true);
     setPesan(null);
+    setGagal(false);
     try {
       const supabase = createClient();
 
@@ -68,7 +70,10 @@ export function AdminPanel({
         const { error: upErr } = await supabase.storage
           .from("foto-laporan")
           .upload(path, file, { contentType: file.type });
-        if (upErr) throw new Error(`Gagal unggah foto: ${upErr.message} Periksa koneksi lalu coba lagi.`);
+        if (upErr) {
+          console.error("Gagal mengunggah foto sesudah:", upErr);
+          throw new Error("Foto belum bisa diunggah. Periksa koneksi lalu coba lagi.");
+        }
         const { data: pub } = supabase.storage
           .from("foto-laporan")
           .getPublicUrl(path);
@@ -89,7 +94,10 @@ export function AdminPanel({
         .from("reports")
         .update(ubah)
         .eq("id", reportId);
-      if (error) throw new Error(`${error.message} Periksa koneksi lalu coba lagi.`);
+      if (error) {
+        console.error("Gagal menyimpan perubahan laporan:", error);
+        throw new Error("Perubahan belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+      }
 
       try {
         if (status !== statusAwal || catatan.trim()) {
@@ -121,11 +129,14 @@ export function AdminPanel({
       }
 
       setPesan("Tersimpan!");
+      setGagal(false);
       setCatatan("");
       setFile(null);
       router.refresh();
     } catch (e) {
-      setPesan(e instanceof Error ? e.message : "Gagal menyimpan. Periksa koneksi lalu coba lagi.");
+      console.error("Gagal menyimpan panel admin:", e);
+      setGagal(true);
+      setPesan(e instanceof Error ? e.message : "Perubahan belum bisa disimpan. Periksa koneksi lalu coba lagi.");
     } finally {
       setProses(false);
     }
@@ -205,13 +216,17 @@ export function AdminPanel({
         </div>
       )}
       <div className="mt-4 flex items-center gap-3">
-        <Button type="button" onClick={simpan} disabled={proses} aria-busy={proses}>
+        <Button type="button" onClick={simpan} disabled={proses} loading={proses} loadingLabel="Menyimpan…" aria-busy={proses}>
           <Save size={16} /> {proses ? "Menyimpan…" : "Simpan perubahan"}
         </Button>
         {pesan && (
           <span
-            role={pesan === "Tersimpan!" ? "status" : "alert"}
-            className="text-sm font-semibold text-daun-700 dark:text-daun-300"
+            role={gagal ? "alert" : "status"}
+            className={
+              gagal
+                ? "text-sm font-semibold text-danger"
+                : "text-sm font-semibold text-daun-700 dark:text-daun-300"
+            }
           >
             {pesan}
           </span>

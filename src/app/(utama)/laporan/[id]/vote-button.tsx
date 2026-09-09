@@ -85,13 +85,15 @@ export function VoteButton({
 
   return (
     <>
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5" aria-live="polite">
         <div className="flex items-center gap-3">
           <Button
             type="button"
             variant={sudahVote ? "utama" : "sekunder"}
             onClick={toggle}
             disabled={proses}
+            loading={proses}
+            loadingLabel="Menyimpan…"
             aria-pressed={sudahVote}
             aria-busy={proses}
             title={user ? "" : "Masuk untuk mendukung laporan ini"}

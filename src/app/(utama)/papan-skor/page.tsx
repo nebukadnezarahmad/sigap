@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Crown, Medal, ShieldCheck } from "lucide-react";
+import { Crown, Medal, ShieldCheck, Trophy } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { BADGES } from "@/lib/constants";
 import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
 import { Avatar, Card } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
 import { BadgeSaya } from "./badge-saya";
 
 export const metadata: Metadata = {
@@ -60,6 +61,15 @@ export default async function HalamanPapanSkor() {
         <Card className="mb-6 p-5 text-center text-sm text-muted">
           Database belum tersambung — papan skor akan tampil setelah Supabase diatur.
         </Card>
+      )}
+
+      {dbAktif && pemimpin.length === 0 && (
+        <FeedbackState
+          jenis="kosong"
+          ikon={Trophy}
+          judul="Belum ada peringkat"
+          deskripsi="Jadilah yang pertama mengumpulkan poin dengan melapor, berkomentar, atau mendukung laporan warga."
+        />
       )}
 
       {pemimpin.length > 0 && (
@@ -123,8 +133,8 @@ export default async function HalamanPapanSkor() {
         </Card>
       )}
 
-      <section aria-label="Koleksi badge">
-        <h2 className="mb-4 font-display text-xl font-bold">Koleksi Badge</h2>
+      <section aria-label="Koleksi lencana">
+        <h2 className="mb-4 font-display text-xl font-bold">Koleksi lencana</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {BADGES.map((b) => (
             <Card key={b.key} className="p-4">

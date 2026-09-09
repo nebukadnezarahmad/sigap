@@ -280,7 +280,7 @@ export function CommandPalette() {
             >
               {hasil.length === 0 && (
                 <li className="px-3 py-6 text-center text-sm text-muted">
-                  Tidak ada perintah cocok.
+                  Tidak ada perintah yang cocok.
                 </li>
               )}
               {hasil.map((a, i) => (
