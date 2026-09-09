@@ -80,7 +80,7 @@ export default async function HalamanAksi() {
       <PageHeader
         eyebrow="Gerakan bersama"
         judul="Aksi Bersama"
-        deskripsi="Dari laporan menjadi aksi nyata. Ikut satu aksi = +5 poin; ikut dua aksi membuka badge Relawan."
+        deskripsi="Dari laporan menjadi aksi nyata. Ikut satu aksi = +5 poin; ikut dua aksi membuka lencana Relawan."
       />
 
       <AksiKlien awal={daftar} masuk={!!user} />

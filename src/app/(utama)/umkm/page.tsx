@@ -57,7 +57,7 @@ export default async function HalamanUmkm() {
       <PageHeader
         eyebrow="Ekonomi lingkunganmu"
         judul="UMKM Warga"
-        deskripsi="Usaha tetanggamu lebih dekat daripada yang kamu kira. Belanja di warga berarti memperkuat ekonomi lingkungan sekaligus memangkas jejak transportasi."
+        deskripsi="Usaha tetanggamu lebih dekat daripada yang kamu kira. Belanja dari usaha warga berarti memperkuat ekonomi lingkungan sekaligus memangkas jejak transportasi."
       />
 
       <UmkmKlien awal={umkm} masuk={!!user} />

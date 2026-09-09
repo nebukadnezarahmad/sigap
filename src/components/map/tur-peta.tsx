@@ -26,7 +26,7 @@ const LANGKAH = [
   {
     Ikon: MapPin,
     judul: "Siap melapor?",
-    isi: "Klik 'Laporkan Masalah', tempel pin di peta, selesai dalam 30 detik.",
+    isi: "Pilih 'Laporkan Masalah', tempel pin di peta — sekitar 2 menit, foto opsional tapi membantu.",
   },
 ];
 

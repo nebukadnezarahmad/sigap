@@ -7,7 +7,7 @@ import {
   PageHeader,
 } from "@/components/layout-konten";
 
-export const metadata: Metadata = { title: "Polling Warga" };
+export const metadata: Metadata = { title: "Jajak pendapat warga" };
 export const dynamic = "force-dynamic";
 
 export type Poll = {
@@ -26,7 +26,7 @@ export default async function HalamanPolling() {
   if (!supabase) {
     return (
       <KontenUtama>
-        <GalatMuatUlang judul="Polling Warga belum bisa dimuat" />
+        <GalatMuatUlang judul="Jajak pendapat belum bisa dimuat" />
       </KontenUtama>
     );
   }
@@ -51,7 +51,7 @@ export default async function HalamanPolling() {
   if (galatPolling || hasilSuara.error) {
     return (
       <KontenUtama>
-        <GalatMuatUlang judul="Polling Warga belum bisa dimuat" />
+        <GalatMuatUlang judul="Jajak pendapat belum bisa dimuat" />
       </KontenUtama>
     );
   }
@@ -82,8 +82,8 @@ export default async function HalamanPolling() {
     <main className="mx-auto max-w-4xl px-4 py-10">
       <PageHeader
         eyebrow="Suara warga"
-        judul="Polling Partisipatif"
-        deskripsi="Pendapatmu menentukan arah kebijakan lingkungan. Satu warga, satu suara per polling — hasilnya terbuka dan berjalan realtime."
+        judul="Jajak pendapat partisipatif"
+        deskripsi="Pendapatmu menentukan arah kebijakan lingkungan. Satu warga, satu suara per jajak pendapat — hasilnya terbuka dan berjalan langsung."
       />
 
       <PollingKlien

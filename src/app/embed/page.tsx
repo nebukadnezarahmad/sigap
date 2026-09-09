@@ -78,7 +78,7 @@ export default async function HalamanEmbed() {
           rel="noopener"
           className="ml-1 flex items-center gap-1 rounded-full bg-action px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-action-hover"
         >
-          Buka penuh <ExternalLink size={10} />
+          Buka peta lengkap <ExternalLink size={10} />
         </Link>
       </div>
       <div className="absolute bottom-3 left-3 z-[600] flex flex-wrap gap-1.5">

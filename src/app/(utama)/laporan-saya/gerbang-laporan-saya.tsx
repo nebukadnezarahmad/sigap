@@ -14,11 +14,11 @@ export function GerbangLaporanSaya() {
         </div>
 
         <h1 className="font-display text-2xl font-bold">
-          Riwayat Laporan Saya
+          Riwayat laporan saya
         </h1>
 
         <p className="mt-2 text-sm text-muted leading-relaxed">
-          Anda belum masuk. Halaman ini menampilkan seluruh laporan yang pernah Anda buat dan perkembangan status penanganannya. Silakan masuk untuk melihat daftar laporan Anda.
+          Kamu belum masuk. Halaman ini menampilkan seluruh laporan yang pernah kamu buat dan perkembangan status penanganannya. Silakan masuk untuk melihat daftar laporanmu.
         </p>
 
         <div className="mt-6 rounded-2xl border border-action/30 bg-action/5 p-4 text-left">
@@ -45,7 +45,7 @@ export function GerbangLaporanSaya() {
             href="/peta"
             className="inline-flex items-center gap-1.5 text-muted hover:text-ink transition"
           >
-            <ArrowLeft size={14} /> Kembali ke Peta Publik
+            <ArrowLeft size={14} /> Kembali ke peta publik
           </Link>
         </div>
       </Card>

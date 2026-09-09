@@ -141,7 +141,7 @@ export const BADGES: BadgeDef[] = [
   {
     key: "cerdas_lingkungan",
     nama: "Cerdas Lingkungan",
-    deskripsi: "Lulus quiz edukasi dengan skor minimal 4/5",
+    deskripsi: "Lulus kuis edukasi dengan skor minimal 4/5",
     ikon: "cerdas_lingkungan",
   },
   {

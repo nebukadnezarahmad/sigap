@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/components/ui";
 
 export default function TidakDitemukan() {
   return (
@@ -15,11 +14,17 @@ export default function TidakDitemukan() {
         dan diarsipkan, atau tautannya salah ketik.
       </p>
       <div className="mt-7 flex gap-3">
-        <Link href="/peta">
-          <Button>Kembali ke peta</Button>
+        <Link
+          href="/peta"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-action px-5 text-sm font-semibold text-white transition hover:bg-action-hover"
+        >
+          Buka peta
         </Link>
-        <Link href="/">
-          <Button variant="sekunder">Halaman utama</Button>
+        <Link
+          href="/"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full border garis-halus px-5 text-sm font-semibold transition hover:border-action hover:text-action"
+        >
+          Halaman utama
         </Link>
       </div>
     </main>

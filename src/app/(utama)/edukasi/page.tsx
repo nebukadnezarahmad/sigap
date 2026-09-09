@@ -30,20 +30,20 @@ const MATERI = [
     ringkas:
       "Sisa makanan dan daun kering bisa jadi pupuk dalam 4–6 minggu memakai ember bekas.",
     poin: [
-      "Takashi: susun ember berlubang + kerajang kering",
+      "Takakura: susun ember berlubang + keranjang kering",
       "Aduk tiap 3 hari, jaga lembap seperti spons peras",
       "Kompos matang berwarna gelap dan tidak berbau",
     ],
   },
   {
     slug: "tiga-r",
-    judul: "Reduce, Reuse, Recycle",
+    judul: "Kurangi, pakai ulang, daur ulang (Reduce, Reuse, Recycle)",
     ringkas:
       "Urutannya penting: kurangi dulu, pakai ulang, baru daur ulang — bukan sebaliknya.",
     poin: [
-      "Reduce: bawa tas belanja & tumbler sendiri",
-      "Reuse: toples selai jadi wadah bumbu",
-      "Recycle: serahkan ke bank sampah, bukan tong campuran",
+      "Kurangi (reduce): bawa tas belanja & tumbler sendiri",
+      "Pakai ulang (reuse): toples selai jadi wadah bumbu",
+      "Daur ulang (recycle): serahkan ke bank sampah, bukan tong campuran",
     ],
   },
   {
@@ -146,7 +146,7 @@ export default async function HalamanEdukasi() {
       <PageHeader
         eyebrow="Sekolah lingkungan"
         judul="Edukasi Permukiman"
-        deskripsi="Materi ringkas untuk memulai perubahan dari rumah — lengkap dengan quiz dan kalkulator jejak sampah pribadi."
+        deskripsi="Materi ringkas untuk memulai perubahan dari rumah — lengkap dengan kuis dan kalkulator jejak sampah pribadi."
       />
 
       <section aria-label="Materi" className="mb-12 grid gap-4 sm:grid-cols-2">

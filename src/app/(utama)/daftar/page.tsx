@@ -27,7 +27,7 @@ function FormulirDaftar() {
 
     if (!/^[a-z0-9_]{3,20}$/.test(username)) {
       setPesan(
-        "Username 3–20 karakter: huruf kecil, angka, dan garis bawah saja."
+        "Nama pengguna 3–20 karakter: huruf kecil, angka, dan garis bawah saja."
       );
       setProses(false);
       return;
@@ -41,7 +41,7 @@ function FormulirDaftar() {
       .eq("username", username)
       .maybeSingle();
     if (ada) {
-      setPesan("Username sudah dipakai, coba yang lain.");
+      setPesan("Nama pengguna sudah dipakai, coba yang lain.");
       setProses(false);
       return;
     }
@@ -65,7 +65,7 @@ function FormulirDaftar() {
         kodeDb === "23505" ||
         /already registered|already exists|duplicate|unique/i.test(pesanDb)
       ) {
-        setPesan("Username/email sudah dipakai");
+        setPesan("Nama pengguna/email sudah dipakai");
       } else {
         setPesan("Gagal mendaftar. Coba lagi.");
       }
@@ -101,7 +101,7 @@ function FormulirDaftar() {
           <Input id="nama" required value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Budi Santoso" />
         </div>
         <div>
-          <Label htmlFor="username">Username</Label>
+          <Label htmlFor="username">Nama pengguna</Label>
           <Input id="username" required value={username} onChange={(e) => setUsername(e.target.value.toLowerCase())} placeholder="budi_s" />
         </div>
         <div>

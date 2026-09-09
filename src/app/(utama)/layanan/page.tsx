@@ -39,7 +39,7 @@ export default async function HalamanLayanan() {
       <PageHeader
         eyebrow="Nomor yang wajib dihafal"
         judul="Direktori Layanan"
-        deskripsi="Kontak darurat dan layanan harian lingkunganmu — satu ketukan untuk menelepon atau chat WhatsApp. Tidak perlu lagi mencari-cari saat keadaan mendesak."
+        deskripsi="Kontak darurat dan layanan harian lingkunganmu — satu ketukan untuk menelepon atau lewat WhatsApp. Tidak perlu lagi mencari-cari saat keadaan mendesak."
       />
 
       <LayananKlien

@@ -167,8 +167,8 @@ export default async function HalamanWarga({
         </div>
       </Card>
 
-      <section className="mt-8" aria-label="Koleksi badge">
-        <h2 className="mb-3 font-display text-lg font-bold">Badge</h2>
+      <section className="mt-8" aria-label="Koleksi lencana">
+        <h2 className="mb-3 font-display text-lg font-bold">Lencana</h2>
         <div className="flex flex-wrap gap-2">
           {BADGES.map((b) => {
             const punya = dimiliki.has(b.key);

@@ -19,7 +19,7 @@ export const AKUN_DEMO = [
   {
     peran: "Budi (Warga Aktif)",
     email: "budi@sigap.demo",
-    deskripsi: "Warga dengan poin, riwayat laporan, dan badge",
+    deskripsi: "Warga dengan poin, riwayat laporan, dan lencana",
     admin: false,
     warna: "border-action/30 bg-action/5 hover:border-action/60",
     badge: "bg-action/15 text-action",
