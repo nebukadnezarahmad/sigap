@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Card } from "@/components/ui";
 import { cn } from "@/lib/utils";
@@ -67,10 +68,12 @@ export function PageHeader({
 
 export function GalatMuatUlang({
   judul,
-  pesan = "Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba lagi.",
+  pesan = "Data belum dapat dimuat. Periksa koneksi lalu coba lagi.",
+  butuhMasuk = false,
 }: {
   judul: string;
   pesan?: string;
+  butuhMasuk?: boolean;
 }) {
   const router = useRouter();
   return (
@@ -78,9 +81,19 @@ export function GalatMuatUlang({
       <Card className="p-8">
         <h1 className="font-display text-2xl font-bold">{judul}</h1>
         <p className="mt-2 text-sm text-muted">{pesan}</p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
-          Coba lagi
-        </Button>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          <Button onClick={() => router.refresh()}>
+            Coba lagi
+          </Button>
+          {butuhMasuk ? (
+            <Link
+              href="/masuk"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full border garis-halus bg-panel px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-action hover:text-action"
+            >
+              Masuk
+            </Link>
+          ) : null}
+        </div>
       </Card>
     </div>
   );
