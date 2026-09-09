@@ -6,19 +6,29 @@ import { MoveHorizontal } from "lucide-react";
 export function SebelumSesudah({
   sebelum,
   sesudah,
+  judul,
 }: {
   sebelum: string;
   sesudah: string;
+  judul?: string;
 }) {
   const [posisi, setPosisi] = useState(50);
+  const altSebelum = judul
+    ? `Foto kondisi ${judul} — sebelum`
+    : "Foto kondisi sebelum ditangani";
+  const altSesudah = judul
+    ? `Foto kondisi ${judul} — sesudah`
+    : "Foto kondisi sesudah ditangani";
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border garis-halus select-none focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-action has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-action">
+    <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border garis-halus select-none focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-action has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-action">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={sesudah}
-        alt="Kondisi sesudah ditangani"
-        className="h-72 w-full object-cover sm:h-80"
+        alt={altSesudah}
+        width={800}
+        height={600}
+        className="h-full w-full object-cover sm:h-80"
         draggable={false}
       />
       <div
@@ -28,8 +38,10 @@ export function SebelumSesudah({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={sebelum}
-          alt="Kondisi sebelum ditangani"
-          className="h-72 w-full object-cover sm:h-80"
+          alt={altSebelum}
+          width={800}
+          height={600}
+          className="h-full w-full object-cover sm:h-80"
           style={{ width: "100%" , maxWidth: "none" }}
           draggable={false}
         />
