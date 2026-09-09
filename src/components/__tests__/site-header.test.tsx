@@ -50,7 +50,7 @@ describe("SiteHeader", () => {
       "page"
     );
     expect(
-      within(nav).getByRole("link", { name: "Laporan Saya" })
+      within(nav).getByRole("link", { name: "Laporan saya" })
     ).not.toHaveAttribute("aria-current");
   });
 
@@ -144,7 +144,8 @@ describe("SiteHeader menu akun", () => {
     const pemicu = screen.getByRole("button", { name: "Menu akun" });
     pemicu.focus();
     fireEvent.click(pemicu);
-    fireEvent.click(screen.getByRole("link", { name: "Laporan saya" }));
+    const menu = screen.getByRole("menu");
+    fireEvent.click(within(menu).getByRole("link", { name: "Laporan saya" }));
     expect(pemicu).toHaveAttribute("aria-expanded", "false");
     expect(pemicu).toHaveFocus();
   });

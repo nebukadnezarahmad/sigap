@@ -61,10 +61,10 @@ export function SiteHeader() {
 
   const tautan = [
     { href: "/peta", label: "Peta" },
-    { href: "/laporan-saya", label: "Laporan Saya" },
-    { href: "/papan-skor", label: "Papan Skor" },
+    { href: "/laporan-saya", label: "Laporan saya" },
+    { href: "/papan-skor", label: "Papan skor" },
     { href: "/transparansi", label: "Transparansi" },
-    { href: "/demo", label: "Panduan Demo" },
+    { href: "/demo", label: "Panduan demo" },
   ];
 
   async function keluar() {
