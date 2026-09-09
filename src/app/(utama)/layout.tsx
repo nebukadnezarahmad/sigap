@@ -23,7 +23,7 @@ export default function LayoutUtama({
         <div id="isi-utama" tabIndex={-1}>
           {children}
         </div>
-        <footer className="border-t garis-halus mt-16 print:hidden">
+        <footer className="border-t garis-halus mt-16 pb-[env(safe-area-inset-bottom)] print:hidden">
           <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-muted flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="font-display font-semibold text-base">
               SIGAP{" "}

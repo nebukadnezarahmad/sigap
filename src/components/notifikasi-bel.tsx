@@ -33,6 +33,7 @@ export function NotifikasiBel() {
   const [daftar, setDaftar] = useState<Notif[]>([]);
   const refPemicu = useRef<HTMLButtonElement>(null);
   const refPanel = useRef<HTMLDivElement>(null);
+  const pernahBuka = useRef(false);
 
   useEffect(() => {
     if (!user) return;
@@ -70,11 +71,18 @@ export function NotifikasiBel() {
   const belum = daftar.filter((n) => !n.dibaca).length;
 
   useEffect(() => {
-    if (!buka) return;
+    if (!buka) {
+      // Kembalikan fokus ke pemicu setiap panel ditutup (outside-click,
+      // pilih item, Escape) — bukan saat mount awal.
+      if (pernahBuka.current) {
+        refPemicu.current?.focus();
+      }
+      return;
+    }
+    pernahBuka.current = true;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         setBuka(false);
-        refPemicu.current?.focus();
         return;
       }
       if (e.key === "Tab") {

@@ -45,7 +45,7 @@ export function CommandPalette() {
   const refPemicu = useRef<HTMLButtonElement>(null);
   const refDialog = useRef<HTMLDivElement>(null);
   const refInput = useRef<HTMLInputElement>(null);
-  const refFokusTerakhir = useRef<Element | null>(null);
+  const pernahBuka = useRef(false);
 
   const aksi: Aksi[] = useMemo(() => {
     const dasar: Aksi[] = [
@@ -155,14 +155,14 @@ export function CommandPalette() {
 
   useEffect(() => {
     if (buka) {
-      refFokusTerakhir.current = document.activeElement;
+      pernahBuka.current = true;
       const t = window.setTimeout(() => refInput.current?.focus(), 0);
       return () => window.clearTimeout(t);
     }
-    const pemicu = refFokusTerakhir.current as HTMLElement | null;
-    if (refFokusTerakhir.current) {
-      pemicu?.focus?.();
-      refFokusTerakhir.current = null;
+    // Kembalikan fokus ke pemicu setiap palet ditutup (Escape, backdrop,
+    // pilih aksi) — bukan saat mount awal agar tidak mencuri fokus.
+    if (pernahBuka.current) {
+      refPemicu.current?.focus();
     }
     return undefined;
   }, [buka]);
@@ -230,7 +230,7 @@ export function CommandPalette() {
             className="relative w-full max-w-lg overflow-hidden rounded-2xl border garis-halus bg-panel shadow-2xl"
             role="dialog"
             aria-modal="true"
-            aria-label="Command palette"
+            aria-label="Palet perintah"
             ref={refDialog}
             onKeyDown={onTrapTab}
           >

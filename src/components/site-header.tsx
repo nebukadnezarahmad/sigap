@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   BookOpen,
   FileText,
@@ -35,7 +35,7 @@ function ToggleTema() {
   return (
     <button
       onClick={ubah}
-      aria-label={gelap ? "Mode terang" : "Mode gelap"}
+      aria-label={gelap ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
       className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
     >
       <span className="hidden dark:block">
@@ -55,6 +55,9 @@ export function SiteHeader() {
   const [modalDemoBuka, setModalDemoBuka] = useState(false);
   const [menuBuka, setMenuBuka] = useState(false);
   const [akunBuka, setAkunBuka] = useState(false);
+  const refPemicuMenu = useRef<HTMLButtonElement>(null);
+  const refPemicuAkun = useRef<HTMLButtonElement>(null);
+  const refMenuAkun = useRef<HTMLDivElement>(null);
 
   const tautan = [
     { href: "/peta", label: "Peta" },
@@ -70,6 +73,54 @@ export function SiteHeader() {
     router.push("/");
     router.refresh();
   }
+
+  function tutupMenu(kembalikanFokus = false) {
+    setMenuBuka(false);
+    if (kembalikanFokus) refPemicuMenu.current?.focus();
+  }
+
+  function tutupAkun(kembalikanFokus = false) {
+    setAkunBuka(false);
+    if (kembalikanFokus) refPemicuAkun.current?.focus();
+  }
+
+  // Menu akun: tutup saat klik di luar + Escape (kembalikan fokus ke pemicu).
+  useEffect(() => {
+    if (!akunBuka) return;
+    function onPointer(e: MouseEvent) {
+      if (
+        refMenuAkun.current &&
+        !refMenuAkun.current.contains(e.target as Node)
+      ) {
+        setAkunBuka(false);
+      }
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setAkunBuka(false);
+        refPemicuAkun.current?.focus();
+      }
+    }
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [akunBuka]);
+
+  // Menu seluler: Escape menutup + mengembalikan fokus ke pemicu.
+  useEffect(() => {
+    if (!menuBuka) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setMenuBuka(false);
+        refPemicuMenu.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [menuBuka]);
 
   return (
     <header className="sticky top-0 z-[900] border-b garis-halus bg-paper/85 backdrop-blur-md print:hidden">
@@ -87,23 +138,28 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-0.5 md:flex" aria-label="Utama">
-          {tautan.map((t) => (
-            <Link
-              key={t.href}
-              href={t.href}
-              className={cn(
-                "inline-flex min-h-[44px] items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
-                pathname.startsWith(t.href)
-                  ? "bg-action/10 text-action font-semibold"
-                  : "text-muted hover:bg-panel-2 hover:text-ink"
-              )}
-            >
-              {t.label}
-            </Link>
-          ))}
+          {tautan.map((t) => {
+            const aktif = pathname.startsWith(t.href);
+            return (
+              <Link
+                key={t.href}
+                href={t.href}
+                aria-current={aktif ? "page" : undefined}
+                className={cn(
+                  "inline-flex min-h-[44px] items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
+                  aktif
+                    ? "bg-action/10 text-action font-semibold"
+                    : "text-muted hover:bg-panel-2 hover:text-ink"
+                )}
+              >
+                {t.label}
+              </Link>
+            );
+          })}
           {profil?.role === "admin" && (
             <Link
               href="/dewan"
+              aria-current={pathname.startsWith("/dewan") ? "page" : undefined}
               className={cn(
                 "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
                 pathname.startsWith("/dewan")
@@ -119,6 +175,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <ToggleTema />
           <button
+            ref={refPemicuMenu}
             onClick={() => setMenuBuka((v) => !v)}
             aria-expanded={menuBuka}
             aria-label={menuBuka ? "Tutup menu navigasi" : "Buka menu navigasi"}
@@ -128,8 +185,9 @@ export function SiteHeader() {
           </button>
           {user && <NotifikasiBel />}
           {user ? (
-            <div className="group relative">
+            <div className="group relative" ref={refMenuAkun}>
               <button
+                ref={refPemicuAkun}
                 aria-label="Menu akun"
                 aria-expanded={akunBuka}
                 aria-haspopup="menu"
@@ -139,7 +197,7 @@ export function SiteHeader() {
                     e.preventDefault();
                     setAkunBuka((v) => !v);
                   }
-                  if (e.key === "Escape") setAkunBuka(false);
+                  if (e.key === "Escape") tutupAkun(true);
                 }}
                 className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition hover:ring-4 hover:ring-action/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
               >
@@ -167,18 +225,21 @@ export function SiteHeader() {
                 </div>
                 <Link
                   href={`/warga/${profil?.username ?? ""}`}
+                  onClick={() => tutupAkun(true)}
                   className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
                 >
                   <UserRound size={15} /> Profil saya
                 </Link>
                 <Link
                   href="/laporan-saya"
+                  onClick={() => tutupAkun(true)}
                   className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
                 >
                   <FileText size={15} /> Laporan saya
                 </Link>
                 <Link
                   href="/papan-skor"
+                  onClick={() => tutupAkun(true)}
                   className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
                 >
                   <Trophy size={15} /> Papan skor
@@ -186,6 +247,7 @@ export function SiteHeader() {
                 {profil?.role === "admin" && (
                   <Link
                     href="/dewan"
+                    onClick={() => tutupAkun(true)}
                     className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-kunyit-600 transition hover:bg-kunyit-500/10 dark:text-kunyit-400"
                   >
                     <ShieldCheck size={15} /> Dashboard dewan
@@ -193,12 +255,16 @@ export function SiteHeader() {
                 )}
                 <Link
                   href="/demo"
+                  onClick={() => tutupAkun(true)}
                   className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
                 >
                   <BookOpen size={15} /> Panduan demo
                 </Link>
                 <button
-                  onClick={keluar}
+                  onClick={() => {
+                    tutupAkun(true);
+                    void keluar();
+                  }}
                   className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-danger transition hover:bg-danger/10"
                 >
                   <LogOut size={15} /> Keluar
@@ -233,27 +299,34 @@ export function SiteHeader() {
           aria-label="Navigasi seluler"
         >
           <ul className="flex flex-col gap-1">
-            {tautan.map((t) => (
-              <li key={t.href}>
-                <Link
-                  href={t.href}
-                  onClick={() => setMenuBuka(false)}
-                  className={cn(
-                    "flex min-h-[44px] items-center rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
-                    pathname.startsWith(t.href)
-                      ? "bg-action/10 text-action font-semibold"
-                      : "text-muted hover:bg-panel-2 hover:text-ink"
-                  )}
-                >
-                  {t.label}
-                </Link>
-              </li>
-            ))}
+            {tautan.map((t) => {
+              const aktif = pathname.startsWith(t.href);
+              return (
+                <li key={t.href}>
+                  <Link
+                    href={t.href}
+                    onClick={() => tutupMenu(true)}
+                    aria-current={aktif ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-[44px] items-center rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
+                      aktif
+                        ? "bg-action/10 text-action font-semibold"
+                        : "text-muted hover:bg-panel-2 hover:text-ink"
+                    )}
+                  >
+                    {t.label}
+                  </Link>
+                </li>
+              );
+            })}
             {profil?.role === "admin" && (
               <li>
                 <Link
                   href="/dewan"
-                  onClick={() => setMenuBuka(false)}
+                  onClick={() => tutupMenu(true)}
+                  aria-current={
+                    pathname.startsWith("/dewan") ? "page" : undefined
+                  }
                   className={cn(
                     "flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
                     pathname.startsWith("/dewan")
