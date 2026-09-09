@@ -29,15 +29,12 @@ export default async function HalamanLaporan({
   if (!supabase) {
     return (
       <KontenUtama>
-        <GalatMuatUlang
-          judul="Database belum tersambung"
-          pesan="Atur env Supabase lalu jalankan schema.sql (lihat README)."
-        />
+        <GalatMuatUlang judul="Laporan belum bisa dimuat" />
       </KontenUtama>
     );
   }
 
-  const { data: r } = await supabase
+  const { data: r, error: galatLaporan } = await supabase
     .from("reports")
     .select(
       `*, lat, lng, categories(slug,nama,warna),
@@ -47,7 +44,15 @@ export default async function HalamanLaporan({
        report_photos(id,url,fase)`
     )
     .eq("id", id)
-    .single();
+    .maybeSingle();
+
+  if (galatLaporan) {
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Laporan belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   if (!r) notFound();
 

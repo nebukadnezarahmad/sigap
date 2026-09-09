@@ -35,7 +35,7 @@ export default async function HalamanPolling() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: pollsRaw } = await supabase
+  const { data: pollsRaw, error: galatPolling } = await supabase
     .from("polls")
     .select("id, pertanyaan, opsi, created_by, created_at")
     .eq("aktif", true)
@@ -43,9 +43,18 @@ export default async function HalamanPolling() {
     .limit(20);
 
   const ids = (pollsRaw ?? []).map((p) => p.id);
-  const { data: votesRaw } = ids.length
+  const hasilSuara = ids.length
     ? await supabase.from("poll_votes").select("poll_id, user_id, opsi_idx").in("poll_id", ids)
-    : { data: [] };
+    : { data: [] as { poll_id: string; user_id: string; opsi_idx: number }[], error: null };
+  const votesRaw = hasilSuara.data;
+
+  if (galatPolling || hasilSuara.error) {
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Polling Warga belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   const polls: Poll[] = (pollsRaw ?? []).map((p) => {
     const opsi = p.opsi as string[];

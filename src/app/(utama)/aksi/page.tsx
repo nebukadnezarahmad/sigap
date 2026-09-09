@@ -40,7 +40,7 @@ export default async function HalamanAksi() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: eventsRaw } = await supabase
+  const { data: eventsRaw, error: galatAksi } = await supabase
     .from("events")
     .select(
       `*, profiles!events_user_id_fkey(username, nama_lengkap),
@@ -49,6 +49,14 @@ export default async function HalamanAksi() {
     .gte("tanggal", batasLewat())
     .order("tanggal", { ascending: true })
     .limit(30);
+
+  if (galatAksi) {
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Aksi Bersama belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   const daftar: EventAksi[] = (eventsRaw ?? []).map((e) => {
     const rsvp = e.event_rsvp ?? [];

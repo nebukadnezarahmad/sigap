@@ -38,11 +38,19 @@ export default async function HalamanPasar() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: raw } = await supabase
+  const { data: raw, error: galatPasar } = await supabase
     .from("pasar_barang")
     .select("id, user_id, judul, deskripsi, kategori, kondisi, titik_ambil, status, created_at, pemilik:profiles!pasar_barang_user_id_fkey(username)")
     .order("created_at", { ascending: false })
     .limit(60);
+
+  if (galatPasar) {
+    return (
+      <KontenUtama lebar="lebar">
+        <GalatMuatUlang judul="Pasar ReUse belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   const barang: Barang[] = (raw ?? []).map((b) => {
     const pemilik = b.pemilik as

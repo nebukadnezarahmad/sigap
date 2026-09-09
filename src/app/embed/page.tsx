@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { PetaEmbedKlien } from "@/components/map/peta-embed-klien";
+import { GalatMuatUlang } from "@/components/layout-konten";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
@@ -18,28 +19,43 @@ export default async function HalamanEmbed() {
     slug: string;
     judul: string;
   }[] = [];
+  let galatPeta = false;
 
   try {
     const supabase = await createClient();
     if (supabase) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("reports")
         .select("id, judul, status, lat, lng, categories(slug,warna)")
         .order("created_at", { ascending: false })
         .limit(300);
-      titik = ((data ?? []) as unknown as LaporanDenganRelasi[])
-        .filter((r) => r.lat != null && r.lng != null)
-        .map((r) => ({
-          id: r.id,
-          lat: r.lat as number,
-          lng: r.lng as number,
-          warna: r.categories?.warna ?? "#64748b",
-          slug: r.categories?.slug ?? "lainnya",
-          judul: `${r.judul} · ${STATUS[r.status as StatusKey]?.label ?? ""}`,
-        }));
+      if (error) {
+        galatPeta = true;
+      } else {
+        titik = ((data ?? []) as unknown as LaporanDenganRelasi[])
+          .filter((r) => r.lat != null && r.lng != null)
+          .map((r) => ({
+            id: r.id,
+            lat: r.lat as number,
+            lng: r.lng as number,
+            warna: r.categories?.warna ?? "#64748b",
+            slug: r.categories?.slug ?? "lainnya",
+            judul: `${r.judul} · ${STATUS[r.status as StatusKey]?.label ?? ""}`,
+          }));
+      }
+    } else {
+      galatPeta = true;
     }
   } catch {
-    /* peta kosong */
+    galatPeta = true;
+  }
+
+  if (galatPeta) {
+    return (
+      <main className="flex h-dvh w-full items-center justify-center px-4">
+        <GalatMuatUlang judul="Peta belum bisa dimuat" />
+      </main>
+    );
   }
 
   return (

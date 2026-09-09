@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { Card, StatusChip } from "@/components/ui";
+import { GalatMuatUlang } from "@/components/layout-konten";
 import { STATUS, type StatusKey } from "@/lib/constants";
 import { AksiLaporanSaya } from "./aksi";
 import { HapusAreaKlien } from "./hapus-area";
@@ -30,7 +31,7 @@ export default async function HalamanLaporanSaya() {
   } = await supabase.auth.getUser();
   if (!user) return <GerbangLaporanSaya />;
 
-  const { data: milik } = await supabase
+  const { data: milik, error: galatLaporan } = await supabase
     .from("reports")
     .select(
       `*, lat, lng, categories(slug,nama,warna),
@@ -46,11 +47,20 @@ export default async function HalamanLaporanSaya() {
     comment_count: r.comments?.[0]?.count ?? 0,
   })) as unknown as LaporanDenganRelasi[];
 
-  const { data: areaRaw } = await supabase
+  const { data: areaRaw, error: galatArea } = await supabase
     .from("area_follows")
     .select("id, label, radius_m, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
+
+  if (galatLaporan || galatArea) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-10">
+        <GalatMuatUlang judul="Laporan Saya belum bisa dimuat" />
+      </main>
+    );
+  }
+
   const area = areaRaw ?? [];
 
   return (

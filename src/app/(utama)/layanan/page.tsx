@@ -21,10 +21,18 @@ export default async function HalamanLayanan() {
     );
   }
 
-  const { data: layanan } = await supabase
+  const { data: layanan, error: galatLayanan } = await supabase
     .from("layanan_penting")
     .select("id, nama, kategori, telepon, bisa_wa, alamat, jam_layanan")
     .order("urutan", { ascending: true });
+
+  if (galatLayanan) {
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Direktori Layanan belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">

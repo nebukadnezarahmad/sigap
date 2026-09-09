@@ -25,12 +25,20 @@ export default async function HalamanUmkm() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: raw } = await supabase
+  const { data: raw, error: galatUmkm } = await supabase
     .from("umkm")
     .select("id, nama, kategori, produk, whatsapp, alamat, jam_buka, verified, owner_id")
     .order("verified", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(60);
+
+  if (galatUmkm) {
+    return (
+      <KontenUtama lebar="lebar">
+        <GalatMuatUlang judul="UMKM Warga belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   const umkm = (raw ?? []).map((u) => ({
     id: u.id,

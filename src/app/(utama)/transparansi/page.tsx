@@ -58,12 +58,12 @@ export default async function HalamanTransparansi() {
   if (!supabase) {
     return (
       <KontenUtama>
-        <GalatMuatUlang judul="Database belum tersambung" />
+        <GalatMuatUlang judul="Transparansi belum bisa dimuat" />
       </KontenUtama>
     );
   }
 
-  const { data: semua } = await supabase
+  const { data: semua, error: galatLaporan } = await supabase
     .from("reports")
     .select(
       `id, judul, status, created_at, lat, lng, alamat_teks, categories(slug,nama,warna),
@@ -71,6 +71,14 @@ export default async function HalamanTransparansi() {
     )
     .order("created_at", { ascending: false })
     .limit(1000);
+
+  if (galatLaporan) {
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Transparansi belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   const daftar = (semua ?? []) as unknown as BarisLaporan[];
 

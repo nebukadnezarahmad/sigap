@@ -59,12 +59,15 @@ export default async function Beranda() {
         statistikGagal = true;
       }
       kategoriGagal = Boolean(perKategori.error);
+      const petaGagal = Boolean(laporanPeta.error);
       hitungKategori = new Map();
       for (const r of (perKategori.data ?? []) as unknown as LaporanDenganRelasi[]) {
         const slug = r.categories?.slug ?? "lainnya";
         hitungKategori.set(slug, (hitungKategori.get(slug) ?? 0) + 1);
       }
-      if (laporanPeta.data && laporanPeta.data.length > 0) {
+      // Mode demo (titik contoh di PetaHeroVisual) hanya sah bila TIDAK
+      // ada error: kegagalan kueri bukan "data kosong".
+      if (!petaGagal && laporanPeta.data && laporanPeta.data.length > 0) {
         titikAwal = (laporanPeta.data as unknown as {
           id: string;
           judul: string;

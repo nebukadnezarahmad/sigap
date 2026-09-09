@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { DewanClient } from "./dewan-klien";
 import { GerbangDewan } from "./gerbang-dewan";
+import { GalatMuatUlang } from "@/components/layout-konten";
 
 export const metadata: Metadata = {
   title: "Dashboard Dewan",
@@ -15,10 +16,7 @@ export default async function HalamanDewan() {
   if (!supabase) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-bold">Database belum tersambung</h1>
-        <p className="mt-2 text-muted">
-          Isi env Supabase lalu jalankan schema.sql — lihat README.
-        </p>
+        <GalatMuatUlang judul="Dashboard Dewan belum bisa dimuat" />
       </main>
     );
   }
@@ -30,17 +28,25 @@ export default async function HalamanDewan() {
     return <GerbangDewan alasan="belum_login" />;
   }
 
-  const { data: profil } = await supabase
+  const { data: profil, error: galatProfil } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
+  if (galatProfil) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <GalatMuatUlang judul="Dashboard Dewan belum bisa dimuat" />
+      </main>
+    );
+  }
+
   if (profil?.role !== "admin") {
     return <GerbangDewan alasan="bukan_admin" />;
   }
 
-  const { data: semua } = await supabase
+  const { data: semua, error: galatLaporan } = await supabase
     .from("reports")
     .select(
       `*, lat, lng, categories(slug,nama,warna),
@@ -50,15 +56,31 @@ export default async function HalamanDewan() {
     .order("created_at", { ascending: false })
     .limit(500);
 
+  if (galatLaporan) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <GalatMuatUlang judul="Dashboard Dewan belum bisa dimuat" />
+      </main>
+    );
+  }
+
   const daftar: LaporanDenganRelasi[] = (semua ?? []).map((r) => ({
     ...r,
     vote_count: r.votes?.[0]?.count ?? 0,
     comment_count: r.comments?.[0]?.count ?? 0,
   }));
 
-  const { count: totalWarga } = await supabase
+  const { count: totalWarga, error: galatWarga } = await supabase
     .from("profiles")
     .select("id", { count: "exact", head: true });
+
+  if (galatWarga) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <GalatMuatUlang judul="Dashboard Dewan belum bisa dimuat" />
+      </main>
+    );
+  }
 
   const hitungKategori = new Map<
     string,

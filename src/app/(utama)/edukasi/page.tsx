@@ -118,8 +118,9 @@ export default async function HalamanEdukasi() {
 
   let lulusSebelumnya = false;
   let kgTahun: number | null = null;
+  let galatRiwayat = false;
   if (user) {
-    const [{ data: q }, { data: k }] = await Promise.all([
+    const [{ data: q, error: galatKuis }, { data: k, error: galatKalk }] = await Promise.all([
       supabase
         .from("quiz_results")
         .select("benar")
@@ -130,10 +131,14 @@ export default async function HalamanEdukasi() {
         .from("kalkulator_hasil")
         .select("kg_tahun")
         .eq("user_id", user.id)
-        .single(),
+        .maybeSingle(),
     ]);
-    lulusSebelumnya = (q ?? []).length > 0;
-    kgTahun = k?.kg_tahun ?? null;
+    if (galatKuis || galatKalk) {
+      galatRiwayat = true;
+    } else {
+      lulusSebelumnya = (q ?? []).length > 0;
+      kgTahun = k?.kg_tahun ?? null;
+    }
   }
 
   return (
@@ -169,13 +174,17 @@ export default async function HalamanEdukasi() {
         ))}
       </section>
 
-      <EdukasiKlien
-        soal={SOAL}
-        masuk={!!user}
-        lulusSebelumnya={lulusSebelumnya}
-        kgTahunAwal={kgTahun}
-        ikonHadiah={NODE_LAIN.cerdas_lingkungan ?? NODE_LAIN.semai}
-      />
+      {galatRiwayat ? (
+        <GalatMuatUlang judul="Progres belajarmu belum bisa dimuat" />
+      ) : (
+        <EdukasiKlien
+          soal={SOAL}
+          masuk={!!user}
+          lulusSebelumnya={lulusSebelumnya}
+          kgTahunAwal={kgTahun}
+          ikonHadiah={NODE_LAIN.cerdas_lingkungan ?? NODE_LAIN.semai}
+        />
+      )}
     </main>
   );
 }

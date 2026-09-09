@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { BADGES, LEVELS, levelDari } from "@/lib/constants";
+import { GalatMuatUlang } from "@/components/layout-konten";import { BADGES, LEVELS, levelDari } from "@/lib/constants";
 import { IkonKategori, IkonVektor, nodeBadge, nodeLevel } from "@/lib/ikon-vektor";
 import { FileText, Flame, Lock } from "lucide-react";
 import type { StatusLaporan } from "@/types/database";
@@ -39,14 +39,27 @@ export default async function HalamanWarga({
 }) {
   const { username } = await params;
   const supabase = await createClient();
-  if (!supabase) notFound();
+  if (!supabase) {
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-10">
+        <GalatMuatUlang judul="Profil warga belum bisa dimuat" />
+      </main>
+    );
+  }
 
-  const { data: p } = await supabase
+  const { data: p, error: galatProfil } = await supabase
     .from("profiles")
     .select("*")
     .eq("username", username)
     .single();
-  if (!p) notFound();
+  if (galatProfil || !p) {
+    if (!galatProfil) notFound();
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-10">
+        <GalatMuatUlang judul="Profil warga belum bisa dimuat" />
+      </main>
+    );
+  }
 
   const [laporan, komentar, votes, badges] = await Promise.all([
     supabase
@@ -59,6 +72,14 @@ export default async function HalamanWarga({
     supabase.from("votes").select("created_at").eq("user_id", p.id),
     supabase.from("user_badges").select("badge_key").eq("user_id", p.id),
   ]);
+
+  if (laporan.error || komentar.error || votes.error || badges.error) {
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-10">
+        <GalatMuatUlang judul="Profil warga belum bisa dimuat" />
+      </main>
+    );
+  }
 
   const lv = levelDari(p.poin);
   const dimiliki = new Set((badges.data ?? []).map((b) => b.badge_key));
