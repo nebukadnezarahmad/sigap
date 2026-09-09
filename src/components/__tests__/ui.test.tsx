@@ -1,6 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Button } from "@/components/ui";
+import { Search } from "lucide-react";
+import {
+  Avatar,
+  Button,
+  IconButton,
+  Skeleton,
+  SkeletonGrafik,
+  SkeletonKartu,
+  SkeletonTeks,
+} from "@/components/ui";
 
 describe("Button", () => {
   it("me-render children", () => {
@@ -37,5 +46,84 @@ describe("Button", () => {
     expect(screen.getByRole("button", { name: "Aksi" })).toHaveClass(
       "bg-danger/10"
     );
+  });
+
+  it("size md/lg memenuhi target sentuh 44px", () => {
+    const { rerender } = render(<Button size="md">Simpan</Button>);
+    expect(screen.getByRole("button", { name: "Simpan" })).toHaveClass(
+      "min-h-[44px]"
+    );
+    rerender(<Button size="lg">Simpan</Button>);
+    expect(screen.getByRole("button", { name: "Simpan" })).toHaveClass(
+      "min-h-[44px]"
+    );
+  });
+
+  it("loading membuat tombol disabled + aria-busy + spinner", () => {
+    render(<Button loading>Kirim</Button>);
+    const tombol = screen.getByRole("button", { name: "Kirim" });
+    expect(tombol).toBeDisabled();
+    expect(tombol).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("loadingLabel menggantikan children saat loading", () => {
+    render(
+      <Button loading loadingLabel="Mengirim…">
+        Kirim
+      </Button>
+    );
+    expect(
+      screen.getByRole("button", { name: "Mengirim…" })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Kirim" })).not.toBeInTheDocument();
+  });
+});
+
+describe("IconButton", () => {
+  it("me-render dengan nama aksesibel wajib", () => {
+    render(
+      <IconButton aria-label="Cari">
+        <Search size={16} />
+      </IconButton>
+    );
+    expect(screen.getByRole("button", { name: "Cari" })).toBeInTheDocument();
+  });
+
+  it("ukuran md memenuhi target 44px dan rounded-full", () => {
+    render(
+      <IconButton aria-label="Tutup" ukuran="md">
+        <Search size={16} />
+      </IconButton>
+    );
+    const tombol = screen.getByRole("button", { name: "Tutup" });
+    expect(tombol).toHaveClass("rounded-full");
+    expect(tombol).toHaveClass("min-h-[44px]");
+  });
+});
+
+describe("Skeleton", () => {
+  it("Skeleton dasar disembunyikan dari pembaca layar", () => {
+    const { container } = render(<Skeleton className="h-4 w-full" />);
+    expect(container.firstElementChild).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("SkeletonTeks mengumumkan status muat", () => {
+    render(<SkeletonTeks baris={3} label="Memuat komentar…" />);
+    expect(
+      screen.getByRole("status", { name: "Memuat komentar…" })
+    ).toBeInTheDocument();
+  });
+
+  it("SkeletonKartu dan SkeletonGrafik memakai label bawaan", () => {
+    render(<SkeletonKartu />);
+    render(<SkeletonGrafik />);
+    expect(screen.getAllByRole("status").length).toBe(2);
+  });
+});
+
+describe("Avatar", () => {
+  it("alt foto memakai pola Foto profil nama", () => {
+    render(<Avatar nama="Siti Aminah" url="https://contoh.id/foto.jpg" />);
+    expect(screen.getByAltText("Foto profil Siti Aminah")).toBeInTheDocument();
   });
 });
