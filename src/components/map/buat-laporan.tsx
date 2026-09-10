@@ -7,6 +7,7 @@ import { AlertTriangle, ImagePlus, Loader2, MapPin, Send, ThumbsUp } from "lucid
 import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
+import { ACCEPT_GAMBAR, pesanValidasiGambar } from "@/lib/validasi-gambar";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";
 import { SkeletonTeks } from "@/components/ui";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
@@ -272,25 +273,38 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       const supabase = createClient();
 
       for (const f of files) {
-        if (f.size > 5 * 1024 * 1024) throw new Error("Setiap foto maksimal 5 MB. Pilih foto lebih kecil lalu coba lagi.");
+        const galatFile = await pesanValidasiGambar(f);
+        if (galatFile) throw new Error(galatFile);
       }
 
       // Unggah sekali per file langsung ke report_photos;
       // foto pertama juga dipakai sebagai foto_url (satu upload, dua referensi).
       const urls: string[] = [];
-      for (const [i, f] of files.entries()) {
-        const path = `${pelapor.id}/${Date.now()}-${i}-${f.name.replace(/[^\w.-]/g, "_")}`;
-        const { error: upErr } = await supabase.storage
-          .from("foto-laporan")
-          .upload(path, f, { contentType: f.type });
-        if (upErr) {
-          console.error("Gagal mengunggah foto:", upErr);
-          throw new Error("Foto belum bisa diunggah. Periksa koneksi lalu coba lagi.");
+      const uploadPaths: string[] = [];
+      try {
+        for (const [i, f] of files.entries()) {
+          const path = `${pelapor.id}/${Date.now()}-${i}-${f.name.replace(/[^\w.-]/g, "_")}`;
+          const { error: upErr } = await supabase.storage
+            .from("foto-laporan")
+            .upload(path, f, { contentType: f.type });
+          if (upErr) {
+            console.error("Gagal mengunggah foto:", upErr);
+            throw new Error("Foto belum bisa diunggah. Periksa koneksi lalu coba lagi.");
+          }
+          const { data: pub } = supabase.storage
+            .from("foto-laporan")
+            .getPublicUrl(path);
+          uploadPaths.push(path);
+          urls.push(pub.publicUrl);
         }
-        const { data: pub } = supabase.storage
-          .from("foto-laporan")
-          .getPublicUrl(path);
-        urls.push(pub.publicUrl);
+      } catch (error) {
+        if (uploadPaths.length > 0) {
+          const { error: bersihErr } = await supabase.storage
+            .from("foto-laporan")
+            .remove(uploadPaths);
+          if (bersihErr) console.error("Gagal membersihkan unggahan parsial:", bersihErr);
+        }
+        throw error;
       }
       const foto_url: string | null = urls[0] ?? null;
 
@@ -316,6 +330,12 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         .single();
       if (error) {
         console.error("Gagal mengirim laporan:", error);
+        if (uploadPaths.length > 0) {
+          const { error: bersihErr } = await supabase.storage
+            .from("foto-laporan")
+            .remove(uploadPaths);
+          if (bersihErr) console.error("Gagal membersihkan unggahan foto:", bersihErr);
+        }
         throw new Error("Laporan belum bisa dikirim. Periksa koneksi lalu coba lagi.");
       }
 
@@ -325,7 +345,25 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           url,
           fase: "sebelum",
         }));
-        await supabase.from("report_photos").insert(baris);
+        const { error: fotoErr } = await supabase.from("report_photos").insert(baris);
+        if (fotoErr) {
+          console.error("Gagal mengaitkan foto laporan:", fotoErr);
+          const { error: hapusErr } = await supabase
+            .from("reports")
+            .delete()
+            .eq("id", inserted.id);
+          if (hapusErr) {
+            console.error("Gagal membatalkan laporan parsial:", hapusErr);
+            router.push(`/laporan/${inserted.id}`);
+            router.refresh();
+            return;
+          }
+          const { error: bersihErr } = await supabase.storage
+            .from("foto-laporan")
+            .remove(uploadPaths);
+          if (bersihErr) console.error("Gagal membersihkan unggahan foto:", bersihErr);
+          throw new Error("Foto belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+        }
       }
 
       selesai();
@@ -427,7 +465,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
               id="foto"
               name="foto"
               type="file"
-              accept="image/*"
+              accept={ACCEPT_GAMBAR}
               multiple
               className="sr-only"
               onChange={(e) =>

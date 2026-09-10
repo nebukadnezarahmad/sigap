@@ -82,7 +82,9 @@ describe("SiteHeader", () => {
     pemicu.focus();
     fireEvent.click(pemicu);
     const nav = screen.getByRole("navigation", { name: "Navigasi seluler" });
-    fireEvent.click(within(nav).getByRole("link", { name: "Peta" }));
+    const tautan = within(nav).getByRole("link", { name: "Peta" });
+    tautan.addEventListener("click", (event) => event.preventDefault(), { once: true });
+    fireEvent.click(tautan);
     expect(
       screen.queryByRole("navigation", { name: "Navigasi seluler" })
     ).not.toBeInTheDocument();
@@ -144,8 +146,11 @@ describe("SiteHeader menu akun", () => {
     const pemicu = screen.getByRole("button", { name: "Menu akun" });
     pemicu.focus();
     fireEvent.click(pemicu);
-    const menu = screen.getByRole("menu");
-    fireEvent.click(within(menu).getByRole("link", { name: "Laporan saya" }));
+    const menu = document.getElementById("menu-akun");
+    expect(menu).not.toBeNull();
+    const tautan = within(menu!).getByRole("link", { name: "Laporan saya" });
+    tautan.addEventListener("click", (event) => event.preventDefault(), { once: true });
+    fireEvent.click(tautan);
     expect(pemicu).toHaveAttribute("aria-expanded", "false");
     expect(pemicu).toHaveFocus();
   });

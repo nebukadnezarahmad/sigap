@@ -77,7 +77,7 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
         },
         (payload) => {
           const baru = payload.new as { opsi_idx: number; user_id: string };
-          // Suara sendiri sudah dihitung optimistis di pilih()
+          // Suara sendiri diterapkan setelah insert terkonfirmasi di pilih().
           if (baru.user_id && baru.user_id === pengguna?.id) return;
           setData((d) => {
             const perOpsi = [...d.perOpsi];
@@ -124,28 +124,18 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
       setProses(false);
       return;
     }
-    setData((d) => {
-      const perOpsi = [...d.perOpsi];
-      perOpsi[idx] = (perOpsi[idx] ?? 0) + 1;
-      return { ...d, perOpsi, totalSuara: d.totalSuara + 1, pilihanKu: idx };
-    });
     const { error } = await supabase
       .from("poll_votes")
       .insert({ poll_id: data.id, user_id: user.id, opsi_idx: idx });
     if (error) {
       console.error("Gagal menyimpan suara:", error);
-      setData((d) => {
-        const perOpsi = [...d.perOpsi];
-        perOpsi[idx] = Math.max(0, (perOpsi[idx] ?? 0) - 1);
-        return {
-          ...d,
-          perOpsi,
-          totalSuara: Math.max(0, d.totalSuara - 1),
-          pilihanKu: null,
-        };
-      });
       setPesan("Suaramu belum tercatat. Periksa koneksi lalu coba lagi.");
     } else {
+      setData((d) => {
+        const perOpsi = [...d.perOpsi];
+        perOpsi[idx] = (perOpsi[idx] ?? 0) + 1;
+        return { ...d, perOpsi, totalSuara: d.totalSuara + 1, pilihanKu: idx };
+      });
       router.refresh();
     }
     setProses(false);
@@ -202,6 +192,8 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
               Masuk sekarang
             </Link>
           </span>
+        ) : proses ? (
+          "Menyimpan suaramu…"
         ) : sudahVote ? (
           "Terima kasih — suaramu tercatat."
         ) : (

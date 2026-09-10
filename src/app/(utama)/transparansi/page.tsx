@@ -196,7 +196,7 @@ export default async function HalamanTransparansi() {
           <Link
             href="/api/open-data"
             target="_blank"
-            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border garis-halus px-4 text-sm font-semibold transition hover:border-action hover:text-action"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border garis-halus px-4 text-sm font-semibold transition hover:border-action hover:text-action"
           >
             <FileSpreadsheet size={15} /> Open Data (JSON)
           </Link>
@@ -205,14 +205,15 @@ export default async function HalamanTransparansi() {
       </header>
 
       {/* Papan Keterlambatan Publik (Overdue Watchlist) */}
-      {total === 0 && (
+      {total === 0 ? (
         <FeedbackState
           jenis="kosong"
           ikon={Inbox}
           judul="Data belum tersedia"
           deskripsi="Belum ada laporan yang bisa dihitung. Metrik kinerja akan muncul setelah warga mulai melapor."
         />
-      )}
+      ) : (
+      <>
       <Card className="mb-6 border-danger/30 p-5">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b garis-halus pb-3">
           <div className="flex items-center gap-2">
@@ -463,12 +464,14 @@ export default async function HalamanTransparansi() {
           <Link
             href="/api/open-data"
             target="_blank"
-            className="mt-4 inline-flex min-h-[36px] w-full items-center justify-center gap-1.5 rounded-full border garis-halus px-4 text-xs font-semibold transition hover:border-action hover:text-action"
+            className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-full border garis-halus px-4 text-xs font-semibold transition hover:border-action hover:text-action"
           >
             <ExternalLink size={13} /> Akses /api/open-data
           </Link>
         </Card>
       </div>
+      </>
+      )}
     </main>
   );
 }

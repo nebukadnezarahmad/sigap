@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { KATEGORI } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { AngkaHidup, PetaHeroVisual, Terungkap } from "./landing-visual";
+import { AngkaHidup, PetaHeroVisual, Terungkap, type ModePetaHero } from "./landing-visual";
 import styles from "./beranda.module.css";
 
 export const dynamic = "force-dynamic";
@@ -30,10 +30,12 @@ export default async function Beranda() {
     judul: string;
     status?: string;
   }[] = [];
+  let modePeta: ModePetaHero = "demo";
 
   try {
     const supabase = await createClient();
     if (supabase) {
+      modePeta = "live";
       const [laporan, selesai, warga, perKategori, laporanPeta] = await Promise.all([
         supabase.from("reports").select("id", { count: "exact", head: true }),
         supabase
@@ -60,6 +62,7 @@ export default async function Beranda() {
       }
       kategoriGagal = Boolean(perKategori.error);
       const petaGagal = Boolean(laporanPeta.error);
+      modePeta = petaGagal ? "galat" : "live";
       hitungKategori = new Map();
       for (const r of (perKategori.data ?? []) as unknown as LaporanDenganRelasi[]) {
         const slug = r.categories?.slug ?? "lainnya";
@@ -92,6 +95,7 @@ export default async function Beranda() {
   } catch {
     statistikGagal = true;
     kategoriGagal = true;
+    modePeta = "galat";
   }
 
   return (
@@ -122,7 +126,7 @@ export default async function Beranda() {
           <p className={styles.heroNote}>Terbuka untuk dilihat. Mudah untuk ikut peduli.</p>
         </div>
         <div className={styles.productStage}>
-          <PetaHeroVisual awalTitik={titikAwal} />
+          <PetaHeroVisual awalTitik={titikAwal} modeAwal={modePeta} />
         </div>
       </section>
 

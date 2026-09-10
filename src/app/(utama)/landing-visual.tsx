@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { fadeNaik } from "@/lib/motion";
 import { createClient } from "@/lib/supabase/client";
@@ -103,6 +103,12 @@ const CONTOH_TITIK: TitikHero[] = [
   },
 ];
 
+export type ModePetaHero = "demo" | "live" | "galat";
+
+export function pilihTitikHero(mode: ModePetaHero, laporan: TitikHero[]) {
+  return mode === "demo" ? CONTOH_TITIK : laporan;
+}
+
 const ADA_KONFIGURASI = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
@@ -125,16 +131,26 @@ function warnaKategori(warna: string): CSSProperties {
   return { "--category-color": /^#[0-9a-f]{6}$/i.test(warna) ? warna : "#64748b" } as CSSProperties;
 }
 
-export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
+export function PetaHeroVisual({
+  awalTitik,
+  modeAwal = "demo",
+}: {
+  awalTitik?: TitikHero[];
+  modeAwal?: ModePetaHero;
+}) {
   const [laporan, setLaporan] = useState<TitikHero[]>(() => (awalTitik ?? []).filter(titikValid));
+  const [modeData, setModeData] = useState<ModePetaHero>(modeAwal);
   const [terpilihId, setTerpilihId] = useState<string | null>(null);
   const [koneksi, setKoneksi] = useState<"menghubungkan" | "terhubung" | "tertunda">("menghubungkan");
   const [gagalMemuat, setGagalMemuat] = useState(false);
-  const contoh = laporan.length === 0;
-  const titik = contoh ? CONTOH_TITIK : laporan;
-  const terpilih = titik.find((item) => item.id === terpilihId) ?? titik[0];
-  const statusInfo = terpilih.status ? STATUS[terpilih.status as StatusKey] : undefined;
-  const pusat = useMemo<[number, number]>(() => [terpilih.lat, terpilih.lng], [terpilih.lat, terpilih.lng]);
+  const contoh = modeData === "demo";
+  const titik = pilihTitikHero(modeData, laporan);
+  const kosong = titik.length === 0;
+  const terpilih = titik.find((item) => item.id === terpilihId) ?? titik[0] ?? null;
+  const statusInfo = terpilih?.status ? STATUS[terpilih.status as StatusKey] : undefined;
+  const pusat: [number, number] = terpilih
+    ? [terpilih.lat, terpilih.lng]
+    : [-6.2, 106.816666];
 
   useEffect(() => {
     if (!ADA_KONFIGURASI) return;
@@ -159,6 +175,7 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
         if (!aktif || permintaan !== urutan) return;
         if (error) {
           setGagalMemuat(true);
+          setModeData("galat");
           return;
         }
         const hasil = (data as unknown as BarisLaporan[]).map((baris) => ({
@@ -172,8 +189,12 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
         })).filter(titikValid);
         setLaporan(hasil);
         setGagalMemuat(false);
+        setModeData("live");
       } catch {
-        if (aktif && permintaan === urutan) setGagalMemuat(true);
+        if (aktif && permintaan === urutan) {
+          setGagalMemuat(true);
+          setModeData("galat");
+        }
       }
     }
 
@@ -202,9 +223,11 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
 
   const statusKoneksi = contoh
     ? "Pratinjau demo"
-    : !ADA_KONFIGURASI
-      ? "Data tersimpan"
-      : gagalMemuat || koneksi === "tertunda"
+    : modeData === "galat" || gagalMemuat
+      ? "Data belum dapat dimuat"
+      : kosong
+        ? "Belum ada laporan"
+        : koneksi === "tertunda"
         ? "Pembaruan tertunda"
         : koneksi === "terhubung"
           ? "Pembaruan langsung"
@@ -216,7 +239,7 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
         <div className={styles.titlebar}>
           <div className={styles.trafficLights} aria-hidden="true"><i /><i /><i /></div>
           <span className={styles.windowTitle}><Map size={14} aria-hidden="true" /> SIGAP · Peta lingkungan</span>
-          <span className={styles.connection} data-live={!contoh && !gagalMemuat && koneksi === "terhubung"} role="status">
+          <span className={styles.connection} data-live={modeData === "live" && !kosong && !gagalMemuat && koneksi === "terhubung"} role="status">
             <span />{statusKoneksi}
           </span>
         </div>
@@ -228,7 +251,7 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
               <div><p className={styles.eyebrow}>LINGKUNGAN KITA</p><h3>Setiap titik, berarti.</h3></div>
             </div>
             <div className={styles.listHeading}>
-              <span>{contoh ? "Contoh laporan" : "Laporan terbaru"}</span>
+              <span>{contoh ? "Contoh laporan" : modeData === "galat" ? "Data tertunda" : "Laporan terbaru"}</span>
               <span className={styles.count}>{titik.length}</span>
             </div>
             <ul className={styles.reportList}>
@@ -239,7 +262,7 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
                     <button
                       type="button"
                       className={styles.reportButton}
-                      aria-pressed={item.id === terpilih.id}
+                      aria-pressed={item.id === terpilih?.id}
                       onClick={() => setTerpilihId(item.id)}
                       style={warnaKategori(item.warna)}
                     >
@@ -250,23 +273,34 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
                   </li>
                 );
               })}
+              {kosong && (
+                <li className="px-3 py-6 text-center text-xs text-muted">
+                  {modeData === "galat"
+                    ? "Laporan belum bisa dimuat. Buka peta untuk mencoba lagi."
+                    : "Belum ada laporan warga pada peta."}
+                </li>
+              )}
             </ul>
-            <div className={styles.mobileSelector}>
+            {terpilih && <div className={styles.mobileSelector}>
               <label htmlFor="hero-pilih-laporan">{contoh ? "Pilih contoh laporan" : "Pilih laporan"}</label>
               <select id="hero-pilih-laporan" value={terpilih.id} onChange={(event) => setTerpilihId(event.target.value)}>
                 {titik.map((item) => <option value={item.id} key={item.id}>{item.judul}</option>)}
               </select>
-            </div>
+            </div>}
             <p className={styles.sidebarNote}>
               <Radio size={15} aria-hidden="true" />
-              {contoh ? "Data contoh untuk menjelajahi SIGAP." : "Pilih laporan untuk melihat lokasinya."}
+              {contoh
+                ? "Data contoh untuk menjelajahi SIGAP."
+                : kosong
+                  ? "Data warga tidak diganti dengan contoh."
+                  : "Pilih laporan untuk melihat lokasinya."}
             </p>
           </aside>
 
           <div className={styles.mapArea}>
-            <LeafletMap titik={titik} terpilih={terpilih.id} onKlikTitik={setTerpilihId} pusat={pusat} zoom={14} className={styles.mapCanvas} />
+            <LeafletMap titik={titik} terpilih={terpilih?.id} onKlikTitik={setTerpilihId} pusat={pusat} zoom={14} className={styles.mapCanvas} />
             <div className={styles.mapLabel}><span />{contoh ? "Peta contoh · Jakarta" : "Peta laporan warga"}</div>
-            <article className={styles.dossier} aria-live="polite" aria-atomic="true">
+            {terpilih && <article className={styles.dossier} aria-live="polite" aria-atomic="true">
               <div className={styles.dossierHeading}>
                 <span className={styles.dossierCategory} style={warnaKategori(terpilih.warna)}>
                   <IkonKategori slug={terpilih.slug} ukuran={18} />
@@ -285,15 +319,15 @@ export function PetaHeroVisual({ awalTitik }: { awalTitik?: TitikHero[] }) {
                   {contoh ? "Jelajahi peta" : "Lihat detail"}<ArrowUpRight size={15} aria-hidden="true" />
                 </Link>
               </div>
-            </article>
+            </article>}
           </div>
         </div>
         <div className={styles.statusbar}>
-          <span><MapPin size={13} aria-hidden="true" />{contoh ? "Data demo, bukan laporan warga." : "Lokasi dan status dalam satu pandangan."}</span>
+          <span><MapPin size={13} aria-hidden="true" />{contoh ? "Data demo, bukan laporan warga." : kosong ? "Belum ada titik laporan untuk ditampilkan." : "Lokasi dan status dalam satu pandangan."}</span>
           <Link href="/peta">Buka peta lengkap <ArrowUpRight size={13} aria-hidden="true" /></Link>
         </div>
       </div>
-      <p className={styles.caption}>Ini peta interaktif. Coba pilih salah satu laporan.</p>
+      <p className={styles.caption}>{kosong ? "Buka peta lengkap untuk memuat ulang data." : "Ini peta interaktif. Coba pilih salah satu laporan."}</p>
     </div>
   );
 }

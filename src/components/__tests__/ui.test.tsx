@@ -66,6 +66,18 @@ describe("Button", () => {
     expect(tombol).toHaveAttribute("aria-busy", "true");
   });
 
+  it("loading tetap menonaktifkan tombol saat disabled diberikan false", () => {
+    render(<Button loading disabled={false}>Kirim</Button>);
+    expect(screen.getByRole("button", { name: "Kirim" })).toBeDisabled();
+  });
+
+  it("size sm tetap memenuhi target sentuh 44px", () => {
+    render(<Button size="sm">Simpan</Button>);
+    expect(screen.getByRole("button", { name: "Simpan" })).toHaveClass(
+      "min-h-[44px]"
+    );
+  });
+
   it("loadingLabel menggantikan children saat loading", () => {
     render(
       <Button loading loadingLabel="Mengirim…">
@@ -98,6 +110,17 @@ describe("IconButton", () => {
     const tombol = screen.getByRole("button", { name: "Tutup" });
     expect(tombol).toHaveClass("rounded-full");
     expect(tombol).toHaveClass("min-h-[44px]");
+  });
+
+  it("ukuran sm tetap menyediakan kotak interaksi 44px", () => {
+    render(
+      <IconButton aria-label="Cari" ukuran="sm">
+        <Search size={16} />
+      </IconButton>
+    );
+    expect(screen.getByRole("button", { name: "Cari" })).toHaveClass(
+      "min-h-[44px]"
+    );
   });
 });
 

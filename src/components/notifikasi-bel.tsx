@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { animasiPopover, transisiCepat } from "@/lib/motion";
-import { Bell, BellOff, CheckCheck, Eye, Flag, Star, Wrench } from "lucide-react";
+import { Bell, BellOff, CheckCheck, Eye, Flag, Star, Wrench, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import { cn, waktuRelatif } from "@/lib/utils";
@@ -35,6 +35,7 @@ export function NotifikasiBel() {
   const [galat, setGalat] = useState<string | null>(null);
   const refPemicu = useRef<HTMLButtonElement>(null);
   const refPanel = useRef<HTMLDivElement>(null);
+  const refTutup = useRef<HTMLButtonElement>(null);
   const pernahBuka = useRef(false);
 
   useEffect(() => {
@@ -82,6 +83,9 @@ export function NotifikasiBel() {
       return;
     }
     pernahBuka.current = true;
+    const timerFokus = window.setTimeout(() => {
+      (refTutup.current ?? refPanel.current)?.focus();
+    }, 0);
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         setBuka(false);
@@ -101,7 +105,10 @@ export function NotifikasiBel() {
         }
         const pertama = daftarFokus[0];
         const terakhir = daftarFokus[daftarFokus.length - 1];
-        if (e.shiftKey && document.activeElement === pertama) {
+        if (!panel.contains(document.activeElement)) {
+          e.preventDefault();
+          (e.shiftKey ? terakhir : pertama).focus();
+        } else if (e.shiftKey && document.activeElement === pertama) {
           e.preventDefault();
           terakhir.focus();
         } else if (!e.shiftKey && document.activeElement === terakhir) {
@@ -111,8 +118,18 @@ export function NotifikasiBel() {
       }
     }
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.clearTimeout(timerFokus);
+      window.removeEventListener("keydown", onKey);
+    };
   }, [buka]);
+
+  useEffect(() => {
+    const panel = refPanel.current;
+    if (buka && panel && !panel.contains(document.activeElement)) {
+      refTutup.current?.focus();
+    }
+  }, [buka, daftar]);
 
   async function tandaiSemua() {
     if (!user) return;
@@ -159,32 +176,44 @@ export function NotifikasiBel() {
       <AnimatePresence>
         {buka && (
           <>
-            <button
-              type="button"
-              aria-label="Tutup notifikasi"
-              onClick={() => setBuka(false)}
-              className="fixed inset-0 z-30 cursor-default bg-transparent"
+            <div
+              aria-hidden="true"
+              onMouseDown={() => setBuka(false)}
+              className="fixed inset-0 z-30 cursor-default bg-black/15 backdrop-blur-[1px]"
             />
             <motion.div
               ref={refPanel}
               role="dialog"
               aria-label="Notifikasi"
+              aria-modal="true"
+              tabIndex={-1}
               initial={animasiPopover.initial}
               animate={animasiPopover.animate}
               exit={animasiPopover.exit}
               transition={transisiCepat}
               className="absolute right-0 top-full z-40 mt-2 w-80 overflow-hidden rounded-2xl border garis-halus bg-panel shadow-xl"
             >
-              <div className="flex items-center justify-between border-b garis-halus px-4 py-2.5">
+              <div className="flex min-h-[52px] items-center justify-between gap-2 border-b garis-halus px-4 py-1.5">
                 <p className="font-display text-sm font-bold">Notifikasi</p>
-                {belum > 0 && (
+                <div className="flex items-center gap-1">
+                  {belum > 0 && (
+                    <button
+                      onClick={tandaiSemua}
+                      className="flex min-h-[44px] items-center gap-1 px-2 text-xs font-semibold text-action hover:underline"
+                    >
+                      <CheckCheck size={13} /> Tandai semua dibaca
+                    </button>
+                  )}
                   <button
-                    onClick={tandaiSemua}
-                    className="flex items-center gap-1 text-xs font-semibold text-action hover:underline"
+                    ref={refTutup}
+                    type="button"
+                    aria-label="Tutup notifikasi"
+                    onClick={() => setBuka(false)}
+                    className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
                   >
-                    <CheckCheck size={13} /> Tandai semua dibaca
+                    <X size={18} aria-hidden="true" />
                   </button>
-                )}
+                </div>
               </div>
               {galat && (
                 <p role="alert" className="border-b garis-halus bg-danger/10 px-4 py-2 text-xs font-semibold text-danger">

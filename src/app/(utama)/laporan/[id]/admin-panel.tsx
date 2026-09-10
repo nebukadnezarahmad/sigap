@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ImagePlus, Save, Wrench } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { ACCEPT_GAMBAR, pesanValidasiGambar } from "@/lib/validasi-gambar";
 import { STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
@@ -48,15 +49,22 @@ export function AdminPanel({
     setGagal(false);
     try {
       const supabase = createClient();
+      let fotoBaru: { id: string } | null = null;
+      let pathFotoBaru: string | null = null;
 
       if ((status === "selesai" || status === "menunggu_verifikasi") && !file) {
         // Cek apakah sudah ada foto sesudah sebelumnya
-        const { data: adaFoto } = await supabase
+        const { data: adaFoto, error: cekFotoErr } = await supabase
           .from("report_photos")
           .select("id")
           .eq("report_id", reportId)
           .eq("fase", "sesudah")
           .limit(1);
+
+        if (cekFotoErr) {
+          console.error("Gagal memeriksa foto penanganan:", cekFotoErr);
+          throw new Error("Foto penanganan belum bisa diperiksa. Coba lagi.");
+        }
 
         if (!adaFoto || adaFoto.length === 0) {
           throw new Error("Foto bukti fisik sesudah penanganan wajib diunggah. Unggah foto dulu lalu simpan lagi.");
@@ -64,9 +72,10 @@ export function AdminPanel({
       }
 
       if (file) {
-        if (file.size > 5 * 1024 * 1024)
-          throw new Error("Ukuran foto maksimal 5 MB. Pilih foto lebih kecil lalu coba lagi.");
+        const galatFile = await pesanValidasiGambar(file);
+        if (galatFile) throw new Error(galatFile);
         const path = `${user.id}/sesudah-${Date.now()}-${file.name.replace(/[^\w.-]/g, "_")}`;
+        pathFotoBaru = path;
         const { error: upErr } = await supabase.storage
           .from("foto-laporan")
           .upload(path, file, { contentType: file.type });
@@ -77,11 +86,24 @@ export function AdminPanel({
         const { data: pub } = supabase.storage
           .from("foto-laporan")
           .getPublicUrl(path);
-        await supabase.from("report_photos").insert({
-          report_id: reportId,
-          url: pub.publicUrl,
-          fase: "sesudah",
-        });
+        const { data, error: fotoErr } = await supabase
+          .from("report_photos")
+          .insert({
+            report_id: reportId,
+            url: pub.publicUrl,
+            fase: "sesudah",
+          })
+          .select("id")
+          .single();
+        if (fotoErr) {
+          console.error("Gagal mengaitkan foto sesudah:", fotoErr);
+          const { error: bersihErr } = await supabase.storage
+            .from("foto-laporan")
+            .remove([path]);
+          if (bersihErr) console.error("Gagal membersihkan unggahan foto:", bersihErr);
+          throw new Error("Foto belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+        }
+        fotoBaru = data;
       }
 
       const ubah: Record<string, unknown> = { status };
@@ -96,6 +118,20 @@ export function AdminPanel({
         .eq("id", reportId);
       if (error) {
         console.error("Gagal menyimpan perubahan laporan:", error);
+        if (fotoBaru && pathFotoBaru) {
+          const { error: hapusFotoErr } = await supabase
+            .from("report_photos")
+            .delete()
+            .eq("id", fotoBaru.id);
+          if (hapusFotoErr) {
+            console.error("Gagal membatalkan foto penanganan:", hapusFotoErr);
+          } else {
+            const { error: bersihErr } = await supabase.storage
+              .from("foto-laporan")
+              .remove([pathFotoBaru]);
+            if (bersihErr) console.error("Gagal membersihkan unggahan foto:", bersihErr);
+          }
+        }
         throw new Error("Perubahan belum bisa disimpan. Periksa koneksi lalu coba lagi.");
       }
 
@@ -205,7 +241,7 @@ export function AdminPanel({
             <input
               id="foto-sesudah"
               type="file"
-              accept="image/*"
+              accept={ACCEPT_GAMBAR}
               className="sr-only"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />

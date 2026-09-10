@@ -171,7 +171,7 @@ function KartuAksi({ event, masuk }: { event: EventAksi; masuk: boolean }) {
             ) : (
               <Link
                 href="/masuk?next=/aksi"
-                className="inline-flex min-h-[36px] items-center justify-center rounded-full border garis-halus px-4 text-sm font-semibold text-ink transition hover:border-action hover:text-action"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-full border garis-halus px-4 text-sm font-semibold text-ink transition hover:border-action hover:text-action"
               >
                 Masuk untuk ikut
               </Link>
@@ -371,4 +371,3 @@ export function AksiKlien({
     </div>
   );
 }
-

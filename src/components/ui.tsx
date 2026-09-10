@@ -20,11 +20,11 @@ export function Button({
   const sibuk = loading === true;
   return (
     <button
-      disabled={disabled ?? sibuk}
+      disabled={Boolean(disabled) || sibuk}
       aria-busy={sibuk || undefined}
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
-        size === "sm" && "px-3.5 py-1.5 text-sm",
+        size === "sm" && "min-h-[44px] px-3.5 py-1.5 text-sm",
         size === "md" && "min-h-[44px] px-5 py-2.5 text-sm",
         size === "lg" && "min-h-[44px] px-7 py-3 text-base",
         variant === "utama" &&
@@ -60,7 +60,7 @@ export function IconButton({
     <button
       className={cn(
         "inline-flex items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
-        ukuran === "sm" && "size-9",
+        ukuran === "sm" && "size-11 min-h-[44px] min-w-[44px]",
         ukuran === "md" && "size-11 min-h-[44px] min-w-[44px]",
         ukuran === "lg" && "size-12",
         className

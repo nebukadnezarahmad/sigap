@@ -51,15 +51,15 @@ export default async function HalamanWarga({
     .from("profiles")
     .select("*")
     .eq("username", username)
-    .single();
-  if (galatProfil || !p) {
-    if (!galatProfil) notFound();
+    .maybeSingle();
+  if (galatProfil) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
         <GalatMuatUlang judul="Profil warga belum bisa dimuat" />
       </main>
     );
   }
+  if (!p) notFound();
 
   const [laporan, komentar, votes, badges] = await Promise.all([
     supabase

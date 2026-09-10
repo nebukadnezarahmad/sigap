@@ -407,19 +407,41 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  if public.is_admin() then
-    return new;
-  end if;
   if auth.uid() is null then
     return new; -- SQL Editor / service role (tepercaya, dipakai seeding)
   end if;
-  if auth.uid() <> new.user_id then
-    return null;
+  if public.is_admin() then
+    return new;
   end if;
-  if old.status <> 'baru'
-     or new.status is distinct from old.status
-     or new.user_id is distinct from old.user_id then
-    return null;
+  if current_setting('app.bypass_owner_guard', true) = 'on' then
+    return new; -- perubahan status dari RPC sistem yang tepercaya
+  end if;
+  if auth.uid() <> new.user_id then
+    raise exception 'hanya pemilik atau admin yang boleh mengubah laporan';
+  end if;
+  if old.status <> 'baru' then
+    raise exception 'laporan hanya bisa diubah saat status baru';
+  end if;
+  if new.status is distinct from old.status then
+    raise exception 'hanya admin yang boleh mengubah status';
+  end if;
+  if new.user_id is distinct from old.user_id then
+    raise exception 'hanya admin yang boleh mengubah pemilik laporan';
+  end if;
+  if new.petugas is distinct from old.petugas then
+    raise exception 'hanya admin yang boleh mengubah petugas';
+  end if;
+  if new.assigned_at is distinct from old.assigned_at then
+    raise exception 'hanya admin yang boleh mengubah assigned_at';
+  end if;
+  if new.category_id is distinct from old.category_id then
+    raise exception 'hanya admin yang boleh mengubah kategori';
+  end if;
+  if new.lokasi is distinct from old.lokasi then
+    raise exception 'hanya admin yang boleh mengubah lokasi';
+  end if;
+  if new.foto_url is distinct from old.foto_url then
+    raise exception 'hanya admin yang boleh mengubah foto_url';
   end if;
   return new;
 end;
@@ -470,9 +492,18 @@ create policy "report_events_select_public" on public.report_events
 -- ============================================================
 -- 14. STORAGE: bucket foto laporan (publik untuk dibaca)
 -- ============================================================
-insert into storage.buckets (id, name, public)
-values ('foto-laporan', 'foto-laporan', true)
-on conflict (id) do nothing;
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'foto-laporan',
+  'foto-laporan',
+  true,
+  5242880,
+  array['image/jpeg', 'image/png', 'image/webp']
+)
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
 
 drop policy if exists "foto_laporan_select_public" on storage.objects;
 create policy "foto_laporan_select_public" on storage.objects
@@ -482,8 +513,8 @@ drop policy if exists "foto_laporan_insert_authenticated" on storage.objects;
 create policy "foto_laporan_insert_authenticated" on storage.objects
   for insert to authenticated with check (
     bucket_id = 'foto-laporan'
-    and (storage.foldername(name))[1] = auth.uid()::text
-    and lower((storage.extension(name))) in ('png','jpg','jpeg','webp','gif')
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+    and lower((storage.extension(name))) in ('png','jpg','jpeg','webp')
   );
 
 drop policy if exists "foto_laporan_update_owner" on storage.objects;
@@ -1149,3 +1180,50 @@ exception when duplicate_object then null; end $$;
 do $$ begin
   alter publication supabase_realtime add table public.event_rsvp;
 exception when duplicate_object then null; end $$;
+
+-- ============================================================
+-- 22. V10 — penolakan verifikasi warga
+-- ============================================================
+
+create or replace function public.tolak_verifikasi(p_report_id uuid)
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_status public.report_status;
+begin
+  if auth.uid() is null then
+    raise exception 'harus login untuk menolak verifikasi';
+  end if;
+
+  perform pg_advisory_xact_lock(hashtext('tolak:' || p_report_id::text));
+
+  select status into v_status
+  from public.reports
+  where id = p_report_id;
+
+  if v_status is distinct from 'menunggu_verifikasi' then
+    raise exception 'penolakan hanya berlaku saat status menunggu verifikasi';
+  end if;
+
+  perform set_config('app.bypass_owner_guard', 'on', true);
+  update public.reports
+  set status = 'dikerjakan'
+  where id = p_report_id and status = 'menunggu_verifikasi';
+
+  insert into public.comments (report_id, user_id, isi)
+  values (
+    p_report_id,
+    auth.uid(),
+    '⚠️ Verifikasi penutupan ditolak warga: Masalah belum sepenuhnya terselesaikan di lapangan.'
+  );
+
+  insert into public.report_events (report_id, status, catatan, actor_id)
+  values (p_report_id, 'dikerjakan', 'Verifikasi ditolak warga, kembali dikerjakan', auth.uid());
+
+  return jsonb_build_object('ditolak', true);
+end;
+$$;
+
+grant execute on function public.tolak_verifikasi(uuid) to authenticated;

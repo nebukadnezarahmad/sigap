@@ -47,14 +47,14 @@ export function SearchField({
         value={nilai}
         placeholder={placeholder ?? label}
         onChange={(e) => onUbah(e.target.value)}
-        className="w-full rounded-xl border garis-halus bg-panel py-2.5 pl-10 pr-10 text-sm outline-none transition placeholder:text-muted/70 focus:border-action focus:ring-4 focus:ring-action/15"
+        className="min-h-[44px] w-full rounded-xl border garis-halus bg-panel py-2.5 pl-10 pr-11 text-sm outline-none transition placeholder:text-muted/70 focus:border-action focus:ring-4 focus:ring-action/15"
       />
       {nilai.length > 0 && (
         <button
           type="button"
           onClick={bersihkan}
           aria-label="Bersihkan pencarian"
-          className="absolute right-2 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
+          className="absolute right-0 top-1/2 flex size-11 min-h-[44px] min-w-[44px] -translate-y-1/2 items-center justify-center rounded-full text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
         >
           <X size={15} aria-hidden="true" />
         </button>

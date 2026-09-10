@@ -64,4 +64,38 @@ describe("Modal", () => {
     fireEvent.click(screen.getByRole("button", { name: "Tutup" }));
     await waitFor(() => expect(pemicu).toHaveFocus());
   });
+
+  it("menahan fokus Tab dan Shift+Tab di dalam dialog", async () => {
+    const rect = {
+      bottom: 1,
+      height: 1,
+      left: 0,
+      right: 1,
+      top: 0,
+      width: 1,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    } as DOMRect;
+    const getClientRects = vi
+      .spyOn(HTMLElement.prototype, "getClientRects")
+      .mockReturnValue([rect] as unknown as DOMRectList);
+    render(
+      <Modal terbuka tutup={() => {}} judul="Jebak Fokus">
+        <button type="button">Aksi terakhir</button>
+      </Modal>
+    );
+    const tutup = await screen.findByRole("button", { name: "Tutup" });
+    const terakhir = screen.getByRole("button", { name: "Aksi terakhir" });
+    await waitFor(() => expect(tutup).toHaveFocus());
+
+    terakhir.focus();
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(tutup).toHaveFocus();
+
+    tutup.focus();
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+    expect(terakhir).toHaveFocus();
+    getClientRects.mockRestore();
+  });
 });

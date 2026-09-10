@@ -185,12 +185,12 @@ export function SiteHeader() {
           </button>
           {user && <NotifikasiBel />}
           {user ? (
-            <div className="group relative" ref={refMenuAkun}>
+            <div className="relative" ref={refMenuAkun}>
               <button
                 ref={refPemicuAkun}
                 aria-label="Menu akun"
                 aria-expanded={akunBuka}
-                aria-haspopup="menu"
+                aria-controls="menu-akun"
                 onClick={() => setAkunBuka((v) => !v)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
@@ -204,9 +204,9 @@ export function SiteHeader() {
                 <Avatar nama={profil?.nama_lengkap ?? "?"} url={profil?.avatar_url} ukuran={34} />
               </button>
               <div
-                role="menu"
+                id="menu-akun"
                 className={cn(
-                  "invisible absolute right-0 top-full z-20 w-56 translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100",
+                  "invisible absolute right-0 top-full z-20 w-56 translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition",
                   akunBuka && "visible translate-y-0 opacity-100"
                 )}
               >
