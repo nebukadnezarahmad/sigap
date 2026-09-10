@@ -67,7 +67,7 @@ export default async function HalamanLaporanSaya() {
   const area = areaRaw ?? [];
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-5xl px-4 py-10">
       <PageHeader
         eyebrow="Progresmu"
         judul="Laporan saya"
@@ -100,7 +100,7 @@ export default async function HalamanLaporanSaya() {
           />
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="grid items-start gap-4 sm:grid-cols-2">
           {daftar.map((r) => (
             <Card key={r.id} className="rounded-[28px] p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -162,7 +162,7 @@ export default async function HalamanLaporanSaya() {
       )}
 
       {area.length > 0 && (
-        <section aria-label="Area yang diikuti" className="mt-10">
+        <section aria-label="Area yang diikuti" className="mt-10 max-w-3xl">
           <h2 className="mb-1 font-display text-xl font-bold">
             Area yang diikuti
           </h2>
