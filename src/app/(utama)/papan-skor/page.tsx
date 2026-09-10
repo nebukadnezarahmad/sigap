@@ -79,8 +79,8 @@ export default async function HalamanPapanSkor() {
             <Card className="overflow-hidden rounded-[28px] p-0">
               <ol aria-label="Peringkat 10 besar">
                 {podium[0] && (
-                  <li className="m-3 rounded-[21px] bg-daun-800 p-5 text-white dark:bg-daun-900">
-                    <p className="text-xs font-semibold text-white/70">Juara pertama</p>
+                  <li className="m-3 rounded-[21px] bg-action p-5 text-[var(--on-action)]">
+                    <p className="text-xs font-semibold opacity-90">Juara pertama</p>
                     <div className="mt-3 flex items-center gap-3.5">
                       <span className="shrink-0 rounded-full ring-2 ring-white/25">
                         <Avatar
@@ -93,13 +93,13 @@ export default async function HalamanPapanSkor() {
                         <p className="truncate font-display text-base font-bold" title={podium[0].nama_lengkap}>
                           {podium[0].nama_lengkap}
                         </p>
-                        <p className="truncate text-xs text-white/70" title={`@${podium[0].username}`}>
+                        <p className="truncate text-xs opacity-90" title={`@${podium[0].username}`}>
                           @{podium[0].username}
                         </p>
                       </div>
                       <div className="shrink-0 text-right">
                         <p className="text-2xl font-bold tracking-tight tabular-nums">{podium[0].poin}</p>
-                        <p className="text-xs text-white/70">poin</p>
+                        <p className="text-xs opacity-90">poin</p>
                       </div>
                     </div>
                   </li>

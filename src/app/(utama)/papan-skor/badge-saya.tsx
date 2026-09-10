@@ -121,7 +121,7 @@ export function BadgeSaya() {
           <Card className="rounded-[28px] p-6 sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div className="flex min-w-0 items-center gap-3">
-                <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-action-soft text-action">
                   <IkonVektor node={nodeBadge(level.sekarang)} ukuran={24} />
                 </span>
                 <div className="min-w-0">
@@ -138,7 +138,7 @@ export function BadgeSaya() {
             <Progress
               nilai={level.progres}
               label={`Progres level ${level.sekarang.nama}`}
-              varian="data"
+              varian="aksi"
               className="mt-6"
             />
             <p className="mt-3 text-sm text-muted">
@@ -173,10 +173,10 @@ export function BadgeSaya() {
                   aria-hidden="true"
                   className={`flex size-10 shrink-0 items-center justify-center rounded-[13px] ${
                     punya
-                      ? "bg-daun-600 text-white"
+                      ? "bg-action text-[var(--on-action)]"
                       : statusDiketahui
                         ? "bg-panel-2 text-muted"
-                        : "bg-daun-600/10 text-daun-700 dark:text-daun-300"
+                        : "bg-action-soft text-action"
                   }`}
                 >
                   <IkonVektor node={nodeBadge(b)} ukuran={19} />
@@ -186,7 +186,7 @@ export function BadgeSaya() {
                   <p className="mt-0.5 text-xs leading-5 text-muted teks-pretty">{b.deskripsi}</p>
                 </div>
                 {statusDiketahui && (
-                  <span className={punya ? "text-daun-700 dark:text-daun-300" : "text-muted"}>
+                  <span className={punya ? "text-action" : "text-muted"}>
                     {punya ? <Check size={17} aria-hidden="true" /> : <Lock size={15} aria-hidden="true" />}
                     <span className="sr-only">{punya ? "Dimiliki" : "Terkunci"}</span>
                   </span>
