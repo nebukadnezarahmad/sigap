@@ -192,7 +192,7 @@ export function Avatar({
   return (
     <span
       aria-hidden
-      className="flex shrink-0 items-center justify-center rounded-full bg-action font-display font-bold text-[var(--on-action)]"
+      className="flex shrink-0 items-center justify-center rounded-full bg-panel-2 font-display font-bold text-muted"
       style={{ width: ukuran, height: ukuran, fontSize: ukuran * 0.38 }}
     >
       {inisial(nama || "?")}

@@ -91,11 +91,11 @@ export default async function HalamanPapanSkor() {
             <div className="rounded-[28px] bg-panel p-3 sm:p-4">
               <div className="flex flex-col gap-[7px]">
                 {podium.map((p, i) => (
-                  <div key={p.id} className="flex min-h-[64px] items-center gap-3 rounded-[13px] bg-panel px-3.5 py-2 ring-1 ring-line">
+                  <div key={p.id} className="flex min-h-[60px] items-center gap-3 rounded-[13px] bg-panel-2 px-3.5 py-2">
                     <span className="w-6 shrink-0 text-center text-sm font-bold tabular-nums">
                       {i + 1}
                     </span>
-                    <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={44} />
+                    <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={40} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold" title={p.nama_lengkap}>
                         {p.nama_lengkap}
