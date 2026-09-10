@@ -90,7 +90,7 @@ export function PilihanAkunDemo({
             {pesanGalat}
           </p>
         )}
-        <div className="grid gap-2 sm:grid-cols-3">
+        <div className="flex flex-col gap-2">
           {akunTampil.map((a) => {
             const isLoading = loadingEmail === a.email;
             return (
@@ -104,22 +104,22 @@ export function PilihanAkunDemo({
                   isLoading ? "opacity-75" : ""
                 }`}
               >
-                <div className="flex w-full items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-xs font-bold">
+                <div className="flex w-full items-center justify-between gap-2">
+                  <span className="flex min-w-0 items-center gap-1.5 text-xs font-bold">
                     {a.admin ? <Crown size={13} /> : <UserRound size={13} />}
-                    {a.peran.split(" ")[0]}
+                    <span className="truncate" title={a.peran}>{a.peran.split(" ")[0]}</span>
                   </span>
                   {isLoading ? (
-                    <span className="flex items-center gap-1 text-[10px] font-semibold text-muted">
+                    <span className="flex shrink-0 items-center gap-1 text-[10px] font-semibold text-muted">
                       <Loader2 size={13} className="animate-spin" /> Masuk…
                     </span>
                   ) : (
-                    <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${a.badge}`}>
+                    <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${a.badge}`}>
                       1-Klik
                     </span>
                   )}
                 </div>
-                <span className="mt-1 text-[11px] text-muted">
+                <span className="mt-1 block w-full truncate text-[11px] text-muted" title={a.email}>
                   {a.email}
                 </span>
               </button>
