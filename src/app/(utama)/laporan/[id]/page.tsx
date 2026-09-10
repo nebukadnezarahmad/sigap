@@ -126,7 +126,7 @@ export default async function HalamanLaporan({
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
               {r.petugas && (
-                <span className="flex items-center gap-1 rounded-full bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300">
+                <span className="flex items-center gap-1 rounded-full border garis-halus bg-panel-2 px-2.5 py-1 text-xs font-semibold text-muted">
                   <Wrench size={12} /> {r.petugas}
                 </span>
               )}
@@ -159,7 +159,7 @@ export default async function HalamanLaporan({
                 {waktuRelatif(r.created_at)}
               </span>
             </div>
-            <h1 className="font-display text-3xl font-bold leading-tight">
+            <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight">
               {r.judul}
             </h1>
             <div className="mt-3 flex items-center gap-2.5">
@@ -234,7 +234,7 @@ export default async function HalamanLaporan({
 
           {fotoSesudah.length > 0 && (
             <Card className="border-daun-500/40 p-5">
-              <h2 className="mb-3 flex items-center gap-2 font-display font-bold text-daun-700 dark:text-daun-300">
+              <h2 className="mb-3 flex items-center gap-2 font-display font-semibold text-daun-700 dark:text-daun-300">
                 <CheckCircle2 size={17} /> Bukti penyelesaian
               </h2>
               {galeri.length > 0 ? (
@@ -311,7 +311,7 @@ export default async function HalamanLaporan({
           </Card>
 
           <Card className="p-5">
-            <h2 className="mb-4 font-display font-bold">Linimasa penanganan</h2>
+            <h2 className="mb-4 font-display font-semibold">Linimasa penanganan</h2>
             <ol className="space-y-4">
               {(r.report_events ?? []).length === 0 && (
                 <li className="text-sm text-muted">
@@ -324,7 +324,7 @@ export default async function HalamanLaporan({
                     new Date(a.created_at).getTime() -
                     new Date(b.created_at).getTime()
                 )
-                .map((ev) => (
+                .map((ev, idx, semua) => (
                   <li key={ev.id} className="relative pl-6">
                     <span
                       className="absolute left-0 top-1 size-3 rounded-full ring-4 ring-panel"
@@ -333,10 +333,12 @@ export default async function HalamanLaporan({
                           STATUS[ev.status as StatusKey]?.warna ?? "#94a3b8",
                       }}
                     />
-                    <span
-                      className="absolute left-[5.5px] top-4 h-[calc(100%+16px)] w-px bg-line"
-                      aria-hidden
-                    />
+                    {idx < semua.length - 1 && (
+                      <span
+                        className="absolute left-[5.5px] top-4 h-[calc(100%+16px)] w-px bg-line"
+                        aria-hidden
+                      />
+                    )}
                     <p className="text-sm font-semibold">
                       {STATUS[ev.status as StatusKey]?.label ?? ev.status}
                     </p>
