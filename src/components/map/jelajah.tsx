@@ -328,7 +328,7 @@ export function Jelajah({
         </div>
       )}
 
-      <div className="mb-4 space-y-2.5 rounded-2xl border garis-halus bg-panel p-2.5">
+      <div className="mb-4 space-y-2.5 rounded-[24px] bg-panel p-3">
         <div>
           <label className="relative block">
             <Search
@@ -734,7 +734,7 @@ export function Jelajah({
                   tabIndex={0}
                   role="button"
                   aria-label={`Buka laporan ${r.judul}`}
-                  className={`cursor-pointer p-4 transition hover:bg-panel-2/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action ${
+                  className={`cursor-pointer rounded-[24px] p-5 transition hover:bg-panel-2/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action ${
                     terpilihId === r.id ? "ring-1 ring-action" : ""
                   }`}
                 >
@@ -750,7 +750,7 @@ export function Jelajah({
                       {waktuRelatif(r.created_at)}
                     </span>
                   </div>
-                  <h3 className="font-display font-bold leading-snug">
+                  <h3 className="font-display text-[17px] font-semibold leading-snug tracking-[-0.02em]">
                     {r.judul}
                   </h3>
                   <p className="mt-1 line-clamp-2 text-sm text-muted">

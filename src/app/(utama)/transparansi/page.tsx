@@ -213,7 +213,7 @@ export default async function HalamanTransparansi() {
             {laporanLewatSla.length} laporan
           </span>
         </div>
-        <Card className="overflow-hidden p-0">
+        <Card className="overflow-hidden rounded-[28px] p-0">
 
         {laporanLewatSla.length === 0 ? (
           <div className="px-5 py-8 text-center text-sm text-muted">
@@ -306,29 +306,29 @@ export default async function HalamanTransparansi() {
 
       {/* Ringkasan Metrik Utama */}
       <section aria-label="Ringkasan kinerja" className="mb-8">
-        <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border garis-halus bg-line lg:grid-cols-4">
-          <div className="bg-panel px-5 py-5">
-            <dt className="text-xs text-muted">Total laporan warga</dt>
-            <dd className="mt-1 text-3xl font-bold tabular-nums tracking-tight">
+        <dl className="grid grid-cols-2 gap-6 rounded-[28px] bg-panel p-7 sm:p-8 lg:grid-cols-4">
+          <div>
+            <dt className="text-[11px] text-muted">Total laporan warga</dt>
+            <dd className="mt-1.5 text-[31px] font-semibold leading-none tabular-nums tracking-[-0.05em]">
               {total}
             </dd>
           </div>
-          <div className="bg-panel px-5 py-5">
-            <dt className="text-xs text-muted">Tingkat tuntas</dt>
-            <dd className="mt-1 text-3xl font-bold tabular-nums tracking-tight text-daun-700 dark:text-daun-300">
+          <div>
+            <dt className="text-[11px] text-muted">Tingkat tuntas</dt>
+            <dd className="mt-1.5 text-[31px] font-semibold leading-none tabular-nums tracking-[-0.05em] text-daun-700 dark:text-daun-300">
               {persenSelesai}%
             </dd>
           </div>
-          <div className="bg-panel px-5 py-5">
-            <dt className="text-xs text-muted">Median waktu beres</dt>
-            <dd className="mt-1 text-3xl font-bold tabular-nums tracking-tight">
+          <div>
+            <dt className="text-[11px] text-muted">Median waktu beres</dt>
+            <dd className="mt-1.5 text-[31px] font-semibold leading-none tabular-nums tracking-[-0.05em]">
               {medianHari ? `${medianHari} hari` : "<1 hari"}
             </dd>
           </div>
-          <div className="bg-panel px-5 py-5">
-            <dt className="text-xs text-muted">Melewati batas waktu</dt>
+          <div>
+            <dt className="text-[11px] text-muted">Melewati batas waktu</dt>
             <dd
-              className={`mt-1 text-3xl font-bold tabular-nums tracking-tight ${laporanLewatSla.length > 0 ? "text-danger" : ""}`}
+              className={`mt-1.5 text-[31px] font-semibold leading-none tabular-nums tracking-[-0.05em] ${laporanLewatSla.length > 0 ? "text-danger" : ""}`}
             >
               {laporanLewatSla.length}
             </dd>
@@ -344,29 +344,33 @@ export default async function HalamanTransparansi() {
         <p className="mb-3 text-sm text-muted">
           Batas hari penyelesaian per kategori yang mengikat dewan.
         </p>
-        <dl className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-          {KATEGORI.filter((k) => k.slug !== "lainnya").map((k) => (
-            <div
-              key={k.slug}
-              className="rounded-2xl border garis-halus bg-panel p-4"
-            >
-              <dt className="flex items-center gap-1.5 text-xs font-semibold text-muted">
-                <IkonKategori slug={k.slug} ukuran={13} />
-                <span className="truncate">{k.nama}</span>
-              </dt>
-              <dd className="mt-1 text-2xl font-bold tabular-nums tracking-tight">
-                {SLA_KATEGORI[k.slug] ?? 7} hari
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <div className="rounded-[28px] bg-panel p-3 sm:p-4">
+          <dl className="flex flex-col gap-[7px]">
+            {KATEGORI.filter((k) => k.slug !== "lainnya").map((k) => (
+              <div
+                key={k.slug}
+                className="flex min-h-[53px] items-center gap-3 rounded-[13px] bg-panel-2 px-3.5 py-2 text-xs"
+              >
+                <dt className="flex min-w-0 flex-1 items-center gap-3 font-medium">
+                  <span className="flex text-muted">
+                    <IkonKategori slug={k.slug} ukuran={20} />
+                  </span>
+                  <span className="truncate">{k.nama}</span>
+                </dt>
+                <dd className="tabular-nums text-muted">
+                  {SLA_KATEGORI[k.slug] ?? 7} hari
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </section>
 
       {/* Insight Otomatis */}
       {(teratas || tercepat) && (
       <div className="mb-8 grid gap-3 md:grid-cols-2">
         {teratas && (
-          <Card className="flex items-start gap-3 p-5">
+          <Card className="flex items-start gap-3 rounded-[28px] p-6 sm:p-7">
             <TrendingUp className="mt-0.5 shrink-0 text-muted" size={20} />
             <div>
               <p className="font-display font-bold">Tren naik minggu ini</p>
@@ -382,7 +386,7 @@ export default async function HalamanTransparansi() {
           </Card>
         )}
         {tercepat && (
-          <Card className="flex items-start gap-3 p-5">
+          <Card className="flex items-start gap-3 rounded-[28px] p-6 sm:p-7">
             <TrendingDown className="mt-0.5 shrink-0 text-muted" size={20} />
             <div>
               <p className="font-display font-bold">Ketuntasan tertinggi</p>
@@ -398,17 +402,17 @@ export default async function HalamanTransparansi() {
       )}
 
       {/* Grafik Laporan & Kategori */}
-      <div className="mb-8 grid gap-4 lg:grid-cols-2">
-        <Card className="p-5">
-          <h2 className="font-display font-bold">
+      <div className="mb-8 grid gap-5 lg:grid-cols-2">
+        <Card className="rounded-[28px] p-6 sm:p-7">
+          <h2 className="font-display text-[19px] font-semibold tracking-[-0.035em]">
             Tren 6 bulan
           </h2>
           <p className="mb-4 mt-0.5 text-xs text-muted">Laporan masuk vs tuntas</p>
           <GrafikBulanan data={bulan} />
         </Card>
 
-        <Card className="p-5">
-          <h2 className="font-display font-bold">
+        <Card className="rounded-[28px] p-6 sm:p-7">
+          <h2 className="font-display text-[19px] font-semibold tracking-[-0.035em]">
             Ketuntasan per kategori
           </h2>
           <p className="mb-4 mt-0.5 text-xs text-muted">Persentase laporan tuntas</p>
@@ -418,8 +422,8 @@ export default async function HalamanTransparansi() {
 
       {/* Distribusi Status & Open Data API Info */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="p-5 sm:col-span-2">
-          <h2 className="font-display font-bold">Distribusi status</h2>
+        <Card className="rounded-[28px] p-6 sm:col-span-2 sm:p-7">
+          <h2 className="font-display text-[19px] font-semibold tracking-[-0.035em]">Distribusi status</h2>
           <p className="mb-4 mt-0.5 text-xs text-muted">Jumlah laporan per tahap</p>
           <div className="flex flex-wrap gap-2.5">
             {(Object.keys(STATUS) as StatusKey[]).map((s) => (
@@ -434,7 +438,7 @@ export default async function HalamanTransparansi() {
           </div>
         </Card>
 
-        <Card className="flex flex-col justify-between p-5">
+        <Card className="flex flex-col justify-between rounded-[28px] p-6 sm:p-7">
           <div>
             <h2 className="font-display font-bold text-base">Open data</h2>
             <p className="mt-1.5 text-sm text-muted leading-relaxed">

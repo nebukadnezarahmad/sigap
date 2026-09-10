@@ -101,7 +101,7 @@ export default async function HalamanLaporanSaya() {
       ) : (
         <div className="space-y-3">
           {daftar.map((r) => (
-            <Card key={r.id} className="p-5">
+            <Card key={r.id} className="rounded-[28px] p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex flex-wrap items-center gap-2">
@@ -115,7 +115,7 @@ export default async function HalamanLaporanSaya() {
                   </div>
                   <Link
                     href={`/laporan/${r.id}`}
-                    className="font-display font-bold hover:underline"
+                    className="font-display text-[19px] font-semibold tracking-[-0.02em] hover:underline"
                   >
                     {r.judul}
                   </Link>
@@ -167,18 +167,20 @@ export default async function HalamanLaporanSaya() {
           <p className="mb-3 text-sm text-muted">
             Notifikasi setiap ada laporan baru dalam radius ini.
           </p>
-          <div className="space-y-2">
+          <div className="rounded-[28px] bg-panel p-3 sm:p-4">
+            <div className="flex flex-col gap-[7px]">
             {area.map((a) => (
-              <Card key={a.id} className="flex items-center justify-between gap-3 p-4">
-                <div>
-                  <p className="text-sm font-semibold">{a.label}</p>
-                  <p className="angka-tabular text-xs text-muted">
+              <div key={a.id} className="flex min-h-[53px] items-center justify-between gap-3 rounded-[13px] bg-panel-2 px-3.5 py-2">
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-medium">{a.label}</p>
+                  <p className="angka-tabular text-xs tabular-nums text-muted">
                     radius {a.radius_m} m
                   </p>
                 </div>
                 <HapusAreaKlien id={a.id} />
-              </Card>
+              </div>
             ))}
+            </div>
           </div>
         </section>
       )}

@@ -65,26 +65,27 @@ export default function HalamanDemo() {
       <section aria-label="Tur fitur" className="mb-10">
         <h2 className="mb-1 font-display text-xl font-bold">Alur pengujian</h2>
         <p className="mb-3 text-sm text-muted">Empat rute utama untuk dinilai.</p>
-        <Card className="divide-y garis-halus overflow-hidden p-0">
+        <div className="rounded-[28px] bg-panel p-3 sm:p-4">
+          <div className="flex flex-col gap-[7px]">
           {TUR.map((t) => (
             <Link
               key={t.judul}
               href={t.href}
-              className="group flex items-center gap-3.5 px-4 py-4 transition hover:bg-panel-2/50"
+              className="group flex min-h-[53px] items-center gap-3 rounded-[13px] bg-panel-2 px-3.5 py-2 transition hover:bg-line/60"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-panel-2 text-ink">
-                <t.ikon size={18} strokeWidth={1.8} />
+              <span className="flex shrink-0 text-muted">
+                <t.ikon size={20} strokeWidth={1.8} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-display font-bold">
+                <span className="block truncate text-xs font-medium">
                   {t.judul}
                   {t.khususAdmin && (
-                    <span className="ml-2 rounded-full bg-panel-2 px-2 py-0.5 align-middle text-[10px] font-bold text-muted">
+                    <span className="ml-2 rounded-full bg-panel px-2 py-0.5 align-middle text-[10px] font-bold text-muted">
                       perlu akun dewan
                     </span>
                   )}
                 </span>
-                <span className="mt-0.5 block truncate text-sm text-muted">
+                <span className="mt-0.5 block truncate text-xs text-muted">
                   {t.isi}
                 </span>
               </span>
@@ -95,13 +96,14 @@ export default function HalamanDemo() {
               <span className="sr-only">{t.label}</span>
             </Link>
           ))}
-        </Card>
+          </div>
+        </div>
       </section>
 
       <section aria-label="Checklist fitur">
         <h2 className="mb-1 font-display text-xl font-bold">Cakupan fitur</h2>
         <p className="mb-3 text-sm text-muted">Fungsional dan keamanan (SDG 11).</p>
-        <Card className="p-6">
+        <Card className="rounded-[28px] p-6 sm:p-7">
           <ul className="grid gap-x-6 gap-y-2 text-sm text-muted sm:grid-cols-2">
             {[
               "Peta spasial PostGIS + Marker Cluster + Heatmap",
@@ -125,7 +127,7 @@ export default function HalamanDemo() {
       </section>
 
       <section aria-label="Glosarium istilah" className="mt-6">
-        <Card className="p-6">
+        <Card className="rounded-[28px] p-6 sm:p-7">
           <h2 className="font-display font-bold text-base">Glosarium singkat</h2>
           <dl className="mt-3 space-y-2.5 text-sm">
             <div>
