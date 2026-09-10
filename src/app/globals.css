@@ -334,6 +334,14 @@ img.foto-laporan {
   }
 }
 
+@media (prefers-reduced-transparency: reduce) {
+  header[class*="backdrop-blur"],
+  [class*="backdrop-blur"] {
+    background-color: var(--panel) !important;
+    backdrop-filter: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

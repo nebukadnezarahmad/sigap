@@ -163,8 +163,8 @@ export function NotifikasiBel() {
         {belum > 0 && (
           <motion.span
             key={belum}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
             transition={transisiCepat}
             className="absolute -right-0.5 -top-0.5 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold text-white"
           >
@@ -191,7 +191,7 @@ export function NotifikasiBel() {
               animate={animasiPopover.animate}
               exit={animasiPopover.exit}
               transition={transisiCepat}
-              className="absolute right-0 top-full z-40 mt-2 w-80 overflow-hidden rounded-2xl border garis-halus bg-panel shadow-xl"
+              className="absolute right-0 top-full z-40 mt-2 w-80 origin-top-right overflow-hidden rounded-2xl border garis-halus bg-panel shadow-xl"
             >
               <div className="flex min-h-[52px] items-center justify-between gap-2 border-b garis-halus px-4 py-1.5">
                 <p className="font-display text-sm font-bold">Notifikasi</p>
