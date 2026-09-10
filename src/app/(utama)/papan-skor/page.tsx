@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Trophy } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { BADGES } from "@/lib/constants";
-import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
 import { Avatar, Card } from "@/components/ui";
 import { FeedbackState } from "@/components/feedback-state";
 import { PageHeader } from "@/components/layout-konten";
@@ -44,9 +42,8 @@ export default async function HalamanPapanSkor() {
   const sisanya = pemimpin.slice(3, 10);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
+    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <PageHeader
-        tengah
         judul="Papan skor"
         deskripsi="Apresiasi warga yang aktif menjaga lingkungan: melapor (+10), komentar solusi (+3), dan mendukung laporan lain (+1)."
       />
@@ -66,36 +63,57 @@ export default async function HalamanPapanSkor() {
         />
       )}
 
-      <div className="grid items-start gap-8 lg:grid-cols-[1fr_360px]">
-        <section aria-label="Koleksi lencana" className="order-2 lg:order-1">
-          <h2 className="mb-1 font-display text-xl font-bold">Lencana</h2>
-          <p className="mb-3 text-sm text-muted">Pencapaian partisipasi warga.</p>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {BADGES.map((b) => (
-              <Card key={b.key} className="rounded-[24px] p-5">
-                <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
-                  <IkonVektor node={nodeBadge(b)} ukuran={20} />
-                </span>
-                <p className="mt-2 font-display text-sm font-bold">{b.nama}</p>
-                <p className="mt-0.5 text-xs text-muted">{b.deskripsi}</p>
-              </Card>
-            ))}
-          </div>
-          <BadgeSaya />
-        </section>
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
+        <BadgeSaya />
 
         {pemimpin.length > 0 && (
-          <section aria-label="Peringkat 10 besar" className="order-1 lg:order-2">
-            <h2 className="mb-1 font-display text-xl font-bold">10 besar</h2>
-            <p className="mb-3 text-sm text-muted">Warga dengan poin tertinggi.</p>
-            <div className="rounded-[28px] bg-panel p-3 sm:p-4">
-              <div className="flex flex-col gap-[7px]">
-                {podium.map((p, i) => (
-                  <div key={p.id} className="flex min-h-[60px] items-center gap-3 rounded-[13px] bg-panel-2 px-3.5 py-2">
-                    <span className="w-6 shrink-0 text-center text-sm font-bold tabular-nums">
-                      {i + 1}
+          <section
+            aria-labelledby="judul-peringkat"
+            className="order-2 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+          >
+            <h2 id="judul-peringkat" className="font-display text-xl font-bold">
+              10 besar
+            </h2>
+            <p className="mb-4 mt-1 text-sm text-muted">Warga dengan poin tertinggi.</p>
+
+            <Card className="overflow-hidden rounded-[28px] p-0">
+              <ol aria-label="Peringkat 10 besar">
+                {podium[0] && (
+                  <li className="m-3 rounded-[21px] bg-daun-800 p-5 text-white dark:bg-daun-900">
+                    <p className="text-xs font-semibold text-white/70">Juara pertama</p>
+                    <div className="mt-3 flex items-center gap-3.5">
+                      <span className="shrink-0 rounded-full ring-2 ring-white/25">
+                        <Avatar
+                          nama={podium[0].nama_lengkap}
+                          url={podium[0].avatar_url}
+                          ukuran={52}
+                        />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-display text-base font-bold" title={podium[0].nama_lengkap}>
+                          {podium[0].nama_lengkap}
+                        </p>
+                        <p className="truncate text-xs text-white/70" title={`@${podium[0].username}`}>
+                          @{podium[0].username}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className="text-2xl font-bold tracking-tight tabular-nums">{podium[0].poin}</p>
+                        <p className="text-xs text-white/70">poin</p>
+                      </div>
+                    </div>
+                  </li>
+                )}
+
+                {podium.slice(1).map((p, i) => (
+                  <li
+                    key={p.id}
+                    className="flex min-h-[68px] items-center gap-3 border-t border-line px-4 py-3"
+                  >
+                    <span className="w-5 shrink-0 text-center text-base font-bold tabular-nums">
+                      {i + 2}
                     </span>
-                    <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={40} />
+                    <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={38} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold" title={p.nama_lengkap}>
                         {p.nama_lengkap}
@@ -105,27 +123,28 @@ export default async function HalamanPapanSkor() {
                       </p>
                     </div>
                     <span className="shrink-0 text-sm font-bold tabular-nums">{p.poin}</span>
-                  </div>
+                  </li>
                 ))}
+
                 {sisanya.map((p, i) => (
-                  <div key={p.id} className="flex min-h-[53px] items-center gap-3 rounded-[13px] bg-panel-2 px-3.5 py-2">
-                    <span className="w-6 shrink-0 text-center text-xs font-medium tabular-nums text-muted">
+                  <li key={p.id} className="flex min-h-[58px] items-center gap-3 border-t border-line px-4 py-2.5">
+                    <span className="w-5 shrink-0 text-center text-xs font-semibold tabular-nums text-muted">
                       {i + 4}
                     </span>
                     <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={34} />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs font-medium" title={p.nama_lengkap}>
+                      <p className="truncate text-sm font-semibold" title={p.nama_lengkap}>
                         {p.nama_lengkap}
                       </p>
                       <p className="truncate text-xs text-muted" title={`@${p.username}`}>
                         @{p.username}
                       </p>
                     </div>
-                    <span className="shrink-0 text-xs tabular-nums text-muted">{p.poin}</span>
-                  </div>
+                    <span className="shrink-0 text-sm font-semibold tabular-nums">{p.poin}</span>
+                  </li>
                 ))}
-              </div>
-            </div>
+              </ol>
+            </Card>
           </section>
         )}
       </div>
