@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowRight,
   Check,
+  ChevronRight,
   Map,
   Scale,
   ShieldCheck,
-  Sparkles,
   Trophy,
 } from "lucide-react";
 import { Card } from "@/components/ui";
+import { PageHeader } from "@/components/layout-konten";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
 export const metadata: Metadata = { title: "Panduan Demo Juri" };
@@ -48,64 +48,61 @@ const TUR = [
 
 export default function HalamanDemo() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-12">
-      <header className="mb-10 text-center">
-        <p className="inline-flex items-center gap-1.5 rounded-full border border-action/30 bg-action-soft px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-action">
-          <Sparkles size={13} /> Khusus Dewan Juri & Penguji
-        </p>
-        <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
-          Panduan Demo Cepat SIGAP
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-muted teks-pretty">
-          Pilih salah satu akun demo di bawah untuk masuk secara instan (1-klik).
-          Jelajahi alur kolaborasi antara warga dan dewan pemerintah dalam menyelesaikan masalah permukiman.
-        </p>
-      </header>
+    <main className="mx-auto max-w-4xl px-4 py-10">
+      <PageHeader
+        tengah
+        eyebrow="Untuk juri dan penguji"
+        judul="Panduan demo"
+        deskripsi="Masuk instan 1-klik dengan akun demo, lalu jelajahi alur kolaborasi warga dan dewan dalam menyelesaikan masalah permukiman."
+      />
 
-      <section aria-label="Akun demo instan" className="mb-12">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-lg font-bold">Akun Demo Siap Pakai</h2>
-          <span className="text-xs text-muted">Tanpa perlu mendaftar</span>
-        </div>
+      <section aria-label="Akun demo instan" className="mb-10">
+        <h2 className="mb-1 font-display text-xl font-bold">Akun demo siap pakai</h2>
+        <p className="mb-3 text-sm text-muted">Tanpa perlu mendaftar.</p>
         <PilihanAkunDemo />
       </section>
 
-      <section aria-label="Tur fitur" className="mb-12">
-        <h2 className="mb-4 font-display text-lg font-bold">Alur Pengujian Utama</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
+      <section aria-label="Tur fitur" className="mb-10">
+        <h2 className="mb-1 font-display text-xl font-bold">Alur pengujian</h2>
+        <p className="mb-3 text-sm text-muted">Empat rute utama untuk dinilai.</p>
+        <Card className="divide-y garis-halus overflow-hidden p-0">
           {TUR.map((t) => (
-            <Card key={t.judul} className="flex flex-col p-5">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-action-soft text-action">
+            <Link
+              key={t.judul}
+              href={t.href}
+              className="group flex items-center gap-3.5 px-4 py-4 transition hover:bg-panel-2/50"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-panel-2 text-ink">
                 <t.ikon size={18} strokeWidth={1.8} />
               </span>
-              <h3 className="mt-3 font-display font-bold">{t.judul}</h3>
-              <p className="mt-1 flex-1 text-sm leading-relaxed text-muted">
-                {t.isi}
-              </p>
-              <Link
-                href={t.href}
-                className="group mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-action"
-              >
-                {t.label}
-                <ArrowRight
-                  size={14}
-                  className="transition-transform group-hover:translate-x-0.5"
-                />
-                {t.khususAdmin && (
-                  <span className="rounded-full bg-kunyit-500/15 px-2 py-0.5 text-[10px] font-bold text-kunyit-600">
-                    perlu akun dewan
-                  </span>
-                )}
-              </Link>
-            </Card>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-display font-bold">
+                  {t.judul}
+                  {t.khususAdmin && (
+                    <span className="ml-2 rounded-full bg-panel-2 px-2 py-0.5 align-middle text-[10px] font-bold text-muted">
+                      perlu akun dewan
+                    </span>
+                  )}
+                </span>
+                <span className="mt-0.5 block truncate text-sm text-muted">
+                  {t.isi}
+                </span>
+              </span>
+              <ChevronRight
+                size={16}
+                className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5"
+              />
+              <span className="sr-only">{t.label}</span>
+            </Link>
           ))}
-        </div>
+        </Card>
       </section>
 
       <section aria-label="Checklist fitur">
-        <Card className="bg-panel-2/60 p-6">
-          <h2 className="font-display font-bold text-base">Checklist Fungsional & Keamanan (SDG 11)</h2>
-          <ul className="mt-4 grid gap-x-6 gap-y-2 text-sm text-muted sm:grid-cols-2">
+        <h2 className="mb-1 font-display text-xl font-bold">Cakupan fitur</h2>
+        <p className="mb-3 text-sm text-muted">Fungsional dan keamanan (SDG 11).</p>
+        <Card className="p-6">
+          <ul className="grid gap-x-6 gap-y-2 text-sm text-muted sm:grid-cols-2">
             {[
               "Peta spasial PostGIS + Marker Cluster + Heatmap",
               "Lapor pin-drop presisi + multi-foto bukti",
