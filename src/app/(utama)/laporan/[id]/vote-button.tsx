@@ -86,39 +86,28 @@ export function VoteButton({
   return (
     <>
       <div className="flex flex-col gap-1.5" aria-live="polite">
-        <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant={sudahVote ? "utama" : "sekunder"}
-            onClick={toggle}
-            disabled={proses}
-            loading={proses}
-            loadingLabel="Menyimpan…"
-            aria-pressed={sudahVote}
-            aria-busy={proses}
-            title={user ? "" : "Masuk untuk mendukung laporan ini"}
+        <Button
+          type="button"
+          variant={sudahVote ? "utama" : "sekunder"}
+          onClick={toggle}
+          disabled={proses}
+          loading={proses}
+          loadingLabel="Menyimpan…"
+          aria-pressed={sudahVote}
+          aria-busy={proses}
+          title={user ? "" : "Masuk untuk mendukung laporan ini"}
+        >
+          <ThumbsUp size={16} className={sudahVote ? "fill-current" : ""} />
+          <motion.span
+            key={jumlah}
+            initial={{ opacity: 0.4 }}
+            animate={{ opacity: 1 }}
+            transition={transisiCepat}
           >
-            <ThumbsUp size={16} className={sudahVote ? "fill-current" : ""} />
-            <motion.span
-              key={jumlah}
-              initial={{ opacity: 0.4 }}
-              animate={{ opacity: 1 }}
-              transition={transisiCepat}
-            >
-              {jumlah}
-            </motion.span>
-            <span>{sudahVote ? "Didukung" : "Dukung laporan ini"}</span>
-          </Button>
-          {!user && (
-            <button
-              type="button"
-              onClick={() => setModalAuth(true)}
-              className="text-xs text-muted hover:text-ink hover:underline transition"
-            >
-              masuk untuk memberi dukungan
-            </button>
-          )}
-        </div>
+            {jumlah}
+          </motion.span>
+          <span>{sudahVote ? "Didukung" : "Dukung laporan ini"}</span>
+        </Button>
         {pesan && (
           <p role="alert" className="text-xs font-semibold text-danger">
             {pesan}

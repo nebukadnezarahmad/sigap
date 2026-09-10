@@ -94,12 +94,16 @@ export default async function HalamanLaporan({
       : []),
     ...fotoSebelum.map((f) => ({ id: f.id, url: f.url, fase: "sebelum" as const })),
   ];
+  const linimasa = [...(r.report_events ?? [])].sort(
+    (a, b) =>
+      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8">
+    <main className="mx-auto max-w-5xl px-4 py-7 sm:px-6 sm:py-10">
       <Link
         href="/peta"
-        className="mb-5 inline-flex min-h-[44px] items-center gap-1.5 text-sm text-muted transition hover:text-ink"
+        className="mb-6 inline-flex min-h-[44px] items-center gap-2 text-sm font-medium text-muted transition hover:text-ink"
       >
         <ArrowLeft size={15} /> Buka peta
       </Link>
@@ -108,79 +112,85 @@ export default async function HalamanLaporan({
         <MomenSelesai reportId={r.id} awalSelesai />
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
-        <div className="space-y-6">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+        <article className="min-w-0 space-y-7 lg:col-start-1 lg:row-start-1">
           <header>
-            <div className="mb-3 flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2">
               <StatusChip status={r.status} />
               <span
-                className="rounded-full px-2.5 py-1 text-xs font-semibold"
+                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
                 style={{
                   backgroundColor: `${kat?.warna}22`,
                   color: kat?.warna,
                 }}
               >
                 <IkonKategori slug={kat?.slug ?? "lainnya"} ukuran={13} />{" "}
-                {kat?.nama ?? "Lainnya"}
-              </span>
-            </div>
-            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-              {r.petugas && (
-                <span className="flex items-center gap-1 rounded-full border garis-halus bg-panel-2 px-2.5 py-1 text-xs font-semibold text-muted">
-                  <Wrench size={12} /> {r.petugas}
-                </span>
-              )}
-
-              {/* Lencana target batas waktu layanan */}
-              {r.status !== "selesai" && (
-                <span
-                  className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    sla.lewatSla
-                      ? "bg-danger/15 text-danger font-bold"
-                      : "bg-panel-2 text-muted border garis-halus"
-                  }`}
-                  title={`Target batas waktu layanan kategori: ${sla.targetHari} hari (jatuh tempo: ${formatTanggal(sla.jatuhTempo.toISOString())})`}
-                >
-                  {sla.lewatSla ? (
-                    <>
-                      <AlertTriangle size={12} className="text-danger shrink-0" />
-                      <span>Lewat batas waktu {sla.hariTerlambat} hari</span>
-                    </>
-                  ) : (
-                    <>
-                      <Timer size={12} className="text-muted shrink-0" />
-                      <span>Sisa {sla.sisaHari} hari</span>
-                    </>
-                  )}
-                </span>
-              )}
-
-              <span className="text-xs text-muted" suppressHydrationWarning>
+                 {kat?.nama ?? "Lainnya"}
+               </span>
+              <time
+                dateTime={r.created_at}
+                className="text-xs font-medium text-muted"
+                suppressHydrationWarning
+              >
                 {waktuRelatif(r.created_at)}
-              </span>
+              </time>
             </div>
-            <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight">
+            <h1 className="mt-4 max-w-3xl font-display text-3xl font-semibold leading-[1.12] tracking-tight sm:text-4xl">
               {r.judul}
             </h1>
-            <div className="mt-3 flex items-center gap-2.5">
+
+            <div className="mt-5 grid gap-4 border-y garis-halus py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
               <Link
                 href={`/warga/${profilPelapor?.username ?? ""}`}
-                className="flex items-center gap-2.5 transition hover:opacity-80"
+                className="flex min-h-[44px] min-w-0 items-center gap-3 rounded-lg transition hover:opacity-80 focus-visible:outline-offset-4"
               >
                 <Avatar
                   nama={profilPelapor?.nama_lengkap ?? "Warga"}
                   url={profilPelapor?.avatar_url}
                   ukuran={32}
                 />
-                <div className="text-sm">
+                <div className="min-w-0 text-sm">
+                  <p className="text-xs text-muted">Dilaporkan oleh</p>
                   <p className="font-semibold">
                     {profilPelapor?.nama_lengkap ?? "Warga"}
                   </p>
-                  <p className="text-xs text-muted">
+                  <p className="truncate text-xs text-muted">
                     @{profilPelapor?.username}
                   </p>
                 </div>
               </Link>
+
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:justify-self-end">
+                <div>
+                  <dt className="text-xs text-muted">Ditangani oleh</dt>
+                  <dd className="mt-1 flex items-center gap-1.5 text-sm font-semibold">
+                    <Wrench size={14} className="shrink-0 text-muted" aria-hidden="true" />
+                    <span>{r.petugas ?? "Belum ditugaskan"}</span>
+                  </dd>
+                </div>
+                {r.status !== "selesai" && (
+                  <div>
+                    <dt className="text-xs text-muted">Batas waktu layanan</dt>
+                    <dd
+                      className={`mt-1 flex items-center gap-1.5 text-sm font-semibold ${
+                        sla.lewatSla ? "text-danger" : "text-ink"
+                      }`}
+                      title={`Target kategori ${sla.targetHari} hari, jatuh tempo ${formatTanggal(sla.jatuhTempo.toISOString())}`}
+                    >
+                      {sla.lewatSla ? (
+                        <AlertTriangle size={14} className="shrink-0" aria-hidden="true" />
+                      ) : (
+                        <Timer size={14} className="shrink-0 text-muted" aria-hidden="true" />
+                      )}
+                      <span>
+                        {sla.lewatSla
+                          ? `Terlambat ${sla.hariTerlambat} hari`
+                          : `Tersisa ${sla.sisaHari} hari`}
+                      </span>
+                    </dd>
+                  </div>
+                )}
+              </dl>
             </div>
           </header>
 
@@ -206,30 +216,57 @@ export default async function HalamanLaporan({
             </div>
           )}
 
-          <Card className="p-5">
-            <p className="whitespace-pre-line leading-relaxed">{r.deskripsi}</p>
+          <section
+            aria-labelledby="detail-laporan"
+            className="rounded-2xl border garis-halus bg-panel p-5 sm:p-6"
+          >
+            <h2 id="detail-laporan" className="sr-only">
+              Detail laporan
+            </h2>
+            <p className="whitespace-pre-line text-[1.02rem] leading-7">
+              {r.deskripsi}
+            </p>
             {r.alamat_teks && (
-              <p className="mt-3 flex items-center gap-1.5 border-t garis-halus pt-3 text-sm text-muted">
-                <MapPin size={13} /> {r.alamat_teks}
+              <p className="mt-5 flex items-start gap-2 border-t garis-halus pt-4 text-sm leading-6 text-muted">
+                <MapPin size={15} className="mt-1 shrink-0" aria-hidden="true" />
+                <span>{r.alamat_teks}</span>
               </p>
             )}
-          </Card>
+          </section>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <div className="w-full sm:w-auto sm:min-w-56 [&_button]:w-full">
-              <VoteButton
-                reportId={r.id}
-                jumlahAwal={r.votes?.[0]?.count ?? 0}
-              />
+          <div
+            role="group"
+            aria-label="Aksi laporan"
+            className="rounded-2xl border garis-halus bg-panel p-3 sm:p-4"
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <div className="w-full sm:w-auto [&_button]:w-full sm:[&_button]:w-auto">
+                <VoteButton
+                  reportId={r.id}
+                  jumlahAwal={r.votes?.[0]?.count ?? 0}
+                />
+              </div>
+              <div className="w-full sm:w-auto [&_button]:w-full sm:[&_button]:w-auto">
+                <KonfirmasiButton
+                  reportId={r.id}
+                  jumlahAwal={r.confirmations?.[0]?.count ?? 0}
+                  sudahAwal={sudahKonfirmasi}
+                  masuk={!!user}
+                  status={r.status as StatusKey}
+                />
+              </div>
             </div>
-            <KonfirmasiButton
-              reportId={r.id}
-              jumlahAwal={r.confirmations?.[0]?.count ?? 0}
-              sudahAwal={sudahKonfirmasi}
-              masuk={!!user}
-              status={r.status as StatusKey}
-            />
-            <ShareButtons judul={r.judul} />
+            <div className="mt-3 flex flex-col gap-3 border-t garis-halus pt-3 sm:flex-row sm:items-center sm:justify-between">
+              {!user && (
+                <p className="text-xs leading-5 text-muted">
+                  Masuk untuk memberi dukungan, mengonfirmasi kondisi, atau ikut berdiskusi.
+                </p>
+              )}
+              <div className="flex items-center justify-between gap-3 sm:ml-auto sm:justify-start">
+                <span className="text-xs font-medium text-muted">Bagikan</span>
+                <ShareButtons judul={r.judul} />
+              </div>
+            </div>
           </div>
 
           {fotoSesudah.length > 0 && (
@@ -276,6 +313,102 @@ export default async function HalamanLaporan({
             </Card>
           )}
 
+        </article>
+
+        <aside
+          aria-label="Lokasi dan penanganan laporan"
+          className="lg:col-start-2 lg:row-span-2 lg:row-start-1"
+        >
+          <Card className="overflow-hidden p-0">
+            <section aria-labelledby="lokasi-laporan" className="p-4">
+              <h2 id="lokasi-laporan" className="font-display text-lg font-semibold">
+                Lokasi laporan
+              </h2>
+              {r.alamat_teks && (
+                <p className="mt-1 text-sm leading-5 text-muted">{r.alamat_teks}</p>
+              )}
+              <div className="mt-4 h-52 w-full overflow-hidden rounded-xl border garis-halus">
+                <LeafletMap
+                  mode="satu"
+                  zoom={16}
+                  titik={[
+                    {
+                      id: r.id,
+                      lat: koordinat[1],
+                      lng: koordinat[0],
+                      warna: kat?.warna ?? "#64748b",
+                      slug: kat?.slug ?? "lainnya",
+                      judul: r.judul,
+                    },
+                  ]}
+                />
+              </div>
+              <p className="mt-2 angka-tabular text-xs text-muted">
+                Koordinat {koordinat[0].toFixed(5)}, {koordinat[1].toFixed(5)}
+              </p>
+            </section>
+
+            <section
+              aria-labelledby="linimasa-penanganan"
+              className="border-t garis-halus p-5"
+            >
+              <h2 id="linimasa-penanganan" className="font-display text-xl font-semibold">
+                Linimasa penanganan
+              </h2>
+              <ol className="mt-5 space-y-5">
+                {linimasa.length === 0 && (
+                  <li className="text-sm text-muted">
+                    Belum ada pembaruan penanganan.
+                  </li>
+                )}
+                {linimasa.map((ev, idx) => {
+                  const terbaru = idx === linimasa.length - 1;
+                  return (
+                    <li key={ev.id} className="relative pl-7">
+                      {terbaru && (
+                        <p className="mb-1 text-xs font-semibold text-action">
+                          Pembaruan terbaru
+                        </p>
+                      )}
+                      <span
+                        className={`absolute left-0 size-3 rounded-full ring-4 ring-panel ${
+                          terbaru ? "top-6" : "top-1"
+                        }`}
+                        style={{
+                          backgroundColor:
+                            STATUS[ev.status as StatusKey]?.warna ?? "#94a3b8",
+                        }}
+                      />
+                      {idx < linimasa.length - 1 && (
+                        <span
+                          className="absolute left-[5.5px] top-4 h-[calc(100%+16px)] w-px bg-line"
+                          aria-hidden="true"
+                        />
+                      )}
+                      <p
+                        className={`text-sm font-semibold ${
+                          terbaru ? "text-ink" : "text-muted"
+                        }`}
+                      >
+                        {STATUS[ev.status as StatusKey]?.label ?? ev.status}
+                      </p>
+                      {ev.catatan && (
+                        <p className="mt-1 text-sm leading-5 text-muted">
+                          {ev.catatan}
+                        </p>
+                      )}
+                      <p className="mt-1 text-xs text-muted">
+                        {formatTanggal(ev.created_at)}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
+          </Card>
+        </aside>
+
+        <div className="space-y-7 lg:col-start-1 lg:row-start-2">
           <Komentar reportId={r.id} jumlahAwal={r.comments?.[0]?.count ?? 0} />
 
           {isAdmin && (
@@ -286,74 +419,6 @@ export default async function HalamanLaporan({
             />
           )}
         </div>
-
-        <aside className="space-y-5">
-          <Card className="overflow-hidden p-0">
-            <div className="h-56 w-full">
-              <LeafletMap
-                mode="satu"
-                zoom={16}
-                titik={[
-                  {
-                    id: r.id,
-                    lat: koordinat[1],
-                    lng: koordinat[0],
-                    warna: kat?.warna ?? "#64748b",
-                    slug: kat?.slug ?? "lainnya",
-                    judul: r.judul,
-                  },
-                ]}
-              />
-            </div>
-            <p className="px-4 py-2.5 text-center text-xs text-muted">
-              {koordinat[0].toFixed(5)}, {koordinat[1].toFixed(5)}
-            </p>
-          </Card>
-
-          <Card className="p-5">
-            <h2 className="mb-4 font-display font-semibold">Linimasa penanganan</h2>
-            <ol className="space-y-4">
-              {(r.report_events ?? []).length === 0 && (
-                <li className="text-sm text-muted">
-                  Belum ada update dari dewan.
-                </li>
-              )}
-              {[...(r.report_events ?? [])]
-                .sort(
-                  (a, b) =>
-                    new Date(a.created_at).getTime() -
-                    new Date(b.created_at).getTime()
-                )
-                .map((ev, idx, semua) => (
-                  <li key={ev.id} className="relative pl-6">
-                    <span
-                      className="absolute left-0 top-1 size-3 rounded-full ring-4 ring-panel"
-                      style={{
-                        backgroundColor:
-                          STATUS[ev.status as StatusKey]?.warna ?? "#94a3b8",
-                      }}
-                    />
-                    {idx < semua.length - 1 && (
-                      <span
-                        className="absolute left-[5.5px] top-4 h-[calc(100%+16px)] w-px bg-line"
-                        aria-hidden
-                      />
-                    )}
-                    <p className="text-sm font-semibold">
-                      {STATUS[ev.status as StatusKey]?.label ?? ev.status}
-                    </p>
-                    {ev.catatan && (
-                      <p className="mt-0.5 text-sm text-muted">{ev.catatan}</p>
-                    )}
-                    <p className="mt-0.5 text-xs text-muted">
-                      {formatTanggal(ev.created_at)}
-                    </p>
-                  </li>
-                ))}
-            </ol>
-          </Card>
-
-        </aside>
       </div>
     </main>
   );
