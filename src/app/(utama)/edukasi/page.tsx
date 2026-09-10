@@ -21,7 +21,7 @@ const MATERI = [
     poin: [
       "Sediakan 3 wadah: organik, anorganik, residu",
       "Bilas kemasan sebelum dibuang agar tidak menarik lalat",
-      "Kardus dan botol punya nilai jual — kumpulkan terpisah",
+      "Kardus dan botol punya nilai jual, kumpulkan terpisah",
     ],
   },
   {
@@ -39,7 +39,7 @@ const MATERI = [
     slug: "tiga-r",
     judul: "Kurangi, pakai ulang, daur ulang (Reduce, Reuse, Recycle)",
     ringkas:
-      "Urutannya penting: kurangi dulu, pakai ulang, baru daur ulang — bukan sebaliknya.",
+      "Urutannya penting: kurangi dulu, pakai ulang, baru daur ulang. Bukan sebaliknya.",
     poin: [
       "Kurangi (reduce): bawa tas belanja & tumbler sendiri",
       "Pakai ulang (reuse): toples selai jadi wadah bumbu",
@@ -145,19 +145,13 @@ export default async function HalamanEdukasi() {
     <main className="mx-auto max-w-4xl px-4 py-10">
       <PageHeader
         judul="Edukasi Permukiman"
-        deskripsi="Materi ringkas untuk memulai perubahan dari rumah — lengkap dengan kuis dan kalkulator jejak sampah pribadi."
+        deskripsi="Materi ringkas untuk memulai perubahan dari rumah, lengkap dengan kuis dan kalkulator jejak sampah pribadi."
       />
 
       <section aria-label="Materi" className="mb-12 grid gap-4 sm:grid-cols-2">
-        {MATERI.map((m, i) => (
+        {MATERI.map((m) => (
           <Card key={m.slug} className="flex flex-col p-6">
-            <span
-              aria-hidden
-              className="font-display text-4xl font-extrabold text-daun-600/15 dark:text-daun-300/15"
-            >
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <h2 className="mt-2 font-display text-lg font-bold">{m.judul}</h2>
+            <h2 className="font-display text-lg font-semibold">{m.judul}</h2>
             <p className="mt-1.5 text-sm leading-relaxed text-muted teks-pretty">
               {m.ringkas}
             </p>

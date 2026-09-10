@@ -87,7 +87,7 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
           const meta = KATEGORI_META[kategori] ?? KATEGORI_META.utilitas;
           return (
             <section key={kategori}>
-              <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted">
+              <h2 className="mb-3 flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
                 <meta.Ikon size={15} /> {meta.label}
               </h2>
               <motion.div layout className="space-y-3">

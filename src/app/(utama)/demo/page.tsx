@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  Check,
   ChevronRight,
   Map,
   Scale,
@@ -56,21 +55,21 @@ export default function HalamanDemo() {
       />
 
       <section aria-label="Akun demo instan" className="mb-10">
-        <h2 className="mb-1 font-display text-xl font-bold">Akun demo siap pakai</h2>
-        <p className="mb-3 text-sm text-muted">Masuk tanpa mendaftar.</p>
+        <h2 className="mb-1 font-display text-xl font-semibold tracking-tight">Akun demo siap pakai</h2>
+        <p className="mb-3 text-sm text-muted">Langsung masuk tanpa mendaftar akun baru.</p>
         <PilihanAkunDemo />
       </section>
 
       <section aria-label="Tur fitur" className="mb-10">
-        <h2 className="mb-1 font-display text-xl font-bold">Alur pengujian</h2>
+        <h2 className="mb-1 font-display text-xl font-semibold tracking-tight">Alur pengujian</h2>
         <p className="mb-3 text-sm text-muted">Empat rute untuk kamu nilai.</p>
-        <div className="rounded-[28px] bg-panel p-3 sm:p-4">
+        <div className="rounded-[24px] bg-panel p-3 sm:p-4">
           <div className="flex flex-col gap-[7px]">
           {TUR.map((t) => (
             <Link
               key={t.judul}
               href={t.href}
-              className="group flex min-h-[53px] items-center gap-3 rounded-[13px] bg-panel-2 px-3.5 py-2 transition hover:bg-line/60"
+              className="group flex min-h-[53px] items-center gap-3 rounded-xl bg-panel-2 px-3.5 py-2 transition hover:bg-line/60"
             >
               <span className="flex shrink-0 text-muted">
                 <t.ikon size={20} strokeWidth={1.8} />
@@ -100,34 +99,55 @@ export default function HalamanDemo() {
       </section>
 
       <section aria-label="Checklist fitur">
-        <h2 className="mb-1 font-display text-xl font-bold">Cakupan fitur</h2>
+        <h2 className="mb-1 font-display text-xl font-semibold tracking-tight">Cakupan fitur</h2>
         <p className="mb-3 text-sm text-muted">Fungsional dan keamanan (SDG 11).</p>
-        <Card className="rounded-[28px] p-6 sm:p-7">
-          <ul className="grid gap-x-6 gap-y-2 text-sm text-muted sm:grid-cols-2">
+        <Card className="rounded-[24px] p-6 sm:p-7">
+          <div className="grid gap-6 sm:grid-cols-2">
             {[
-              "Peta spasial PostGIS + Marker Cluster + Heatmap",
-              "Lapor pin-drop presisi + multi-foto bukti",
-              "Vote langsung & diskusi warga terintegrasi",
-              "Notifikasi langsung perubahan status & tindak lanjut",
-              "Gamifikasi: Poin otomatis (DB Trigger), Lencana, & Level warga",
-              "Laporan Saya: hak edit terkunci setelah verifikasi demi audit",
-              "Dasbor Dewan: Penugasan petugas, pelacakan batas waktu, & Bulk update",
-              "Transparansi Publik: Metrik kecepatan, rasio batas waktu, & Open Data",
-              "Keamanan Tinggi: Row Level Security (RLS) & Cooldown anti-spam",
-              "Desain Aksesibel: Reduksi gerakan (reduced-motion), Mode Gelap, & PWA",
-            ].map((f) => (
-              <li key={f} className="flex items-start gap-2">
-                <Check size={15} className="mt-0.5 shrink-0 text-daun-600 dark:text-daun-400" />
-                {f}
-              </li>
+              {
+                grup: "Peta & pelaporan",
+                isi: [
+                  "Peta spasial PostGIS + Marker Cluster + Heatmap",
+                  "Lapor pin-drop presisi + multi-foto bukti",
+                  "Vote langsung & diskusi warga terintegrasi",
+                ],
+              },
+              {
+                grup: "Partisipasi warga",
+                isi: [
+                  "Notifikasi langsung perubahan status & tindak lanjut",
+                  "Gamifikasi: Poin otomatis (DB Trigger), Lencana, & Level warga",
+                  "Laporan Saya: hak edit terkunci setelah verifikasi demi audit",
+                  "Transparansi Publik: Metrik kecepatan, rasio batas waktu, & Open Data",
+                ],
+              },
+              {
+                grup: "Dewan & keamanan",
+                isi: [
+                  "Dasbor Dewan: Penugasan petugas, pelacakan batas waktu, & Bulk update",
+                  "Keamanan Tinggi: Row Level Security (RLS) & Cooldown anti-spam",
+                  "Desain Aksesibel: Reduksi gerakan (reduced-motion), Mode Gelap, & PWA",
+                ],
+              },
+            ].map((g) => (
+              <div key={g.grup} className="sm:[&:nth-child(1)]:col-span-2">
+                <h3 className="text-sm font-semibold">{g.grup}</h3>
+                <ul className="mt-2 divide-y divide-line border-y garis-halus text-sm text-muted">
+                  {g.isi.map((f) => (
+                    <li key={f} className="py-2">
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         </Card>
       </section>
 
       <section aria-label="Glosarium istilah" className="mt-6">
-        <Card className="rounded-[28px] p-6 sm:p-7">
-          <h2 className="font-display font-bold text-base">Glosarium singkat</h2>
+        <Card className="rounded-[24px] p-6 sm:p-7">
+          <h2 className="font-display text-base font-semibold">Glosarium singkat</h2>
           <dl className="mt-3 space-y-2.5 text-sm">
             <div>
               <dt className="font-semibold">SLA (batas waktu layanan)</dt>

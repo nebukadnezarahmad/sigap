@@ -44,7 +44,7 @@ function PersenBar({  persen,
           {label}
         </span>
         <span className="angka-tabular shrink-0 font-bold text-muted">
-          {persen}% · {jumlah}
+          {persen}% ({jumlah} suara)
         </span>
       </div>
     </div>

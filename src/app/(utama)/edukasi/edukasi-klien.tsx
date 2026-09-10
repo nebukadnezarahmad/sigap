@@ -116,8 +116,8 @@ function QuizSection({
     <section aria-label="Kuis edukasi">
       <Card className="overflow-hidden p-0">
         <div className="border-b garis-halus bg-panel-2/60 px-6 py-4">
-          <h2 className="flex items-center gap-2 font-display text-xl font-bold">
-            <Award size={19} className="text-kunyit-500" /> Kuis: Seberapa Hijau
+          <h2 className="flex items-center gap-2 font-display text-xl font-semibold tracking-tight">
+            <Award size={19} className="text-action" /> Kuis: Seberapa Hijau
             Kamu?
           </h2>
           <p className="mt-1 text-sm text-muted">
@@ -341,7 +341,7 @@ function KalkulatorSection({
     <section aria-label="Kalkulator jejak sampah">
       <Card className="p-6">
         <h2 className="flex items-center gap-2 font-display text-xl font-bold">
-          <Calculator size={19} className="text-kunyit-500" /> Kalkulator Jejak
+          <Calculator size={19} className="text-action" /> Kalkulator Jejak
           Sampah Pribadi
         </h2>
         <p className="mt-1 text-sm text-muted">
