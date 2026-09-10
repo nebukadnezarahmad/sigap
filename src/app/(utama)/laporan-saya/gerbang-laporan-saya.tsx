@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, Sparkles, ArrowLeft } from "lucide-react";
+import { FileText, LogIn, ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
@@ -23,7 +23,7 @@ export function GerbangLaporanSaya() {
 
         <div className="mt-6 rounded-2xl border border-action/30 bg-action/5 p-4 text-left">
           <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-action">
-            <Sparkles size={14} /> Coba Akun Demo dengan Data Laporan (1-Klik)
+            <LogIn size={14} /> Coba Akun Demo dengan Data Laporan (1-Klik)
           </p>
           <PilihanAkunDemo tujuan="/laporan-saya" />
         </div>

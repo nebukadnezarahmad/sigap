@@ -6,12 +6,12 @@ import { useEffect, useRef, useState } from "react";
 import {
   BookOpen,
   FileText,
+  LogIn,
   LogOut,
   MapPin,
   Menu,
   Moon,
   ShieldCheck,
-  Sparkles,
   Sun,
   Trophy,
   UserRound,
@@ -279,7 +279,7 @@ export function SiteHeader() {
                 onClick={() => setModalDemoBuka(true)}
                 className="hidden sm:inline-flex min-h-[44px] items-center gap-1.5 border-action/30 text-action hover:bg-action/10"
               >
-                <Sparkles size={14} className="text-action" />
+                <LogIn size={14} className="text-action" />
                 Akun Demo
               </Button>
               <Link

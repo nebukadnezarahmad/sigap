@@ -5,6 +5,7 @@ import { Plus, MapPinOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { Card, StatusChip } from "@/components/ui";
+import { IkonKategori } from "@/lib/ikon-vektor";
 import { FeedbackState } from "@/components/feedback-state";
 import { GalatMuatUlang, PageHeader } from "@/components/layout-konten";
 import { STATUS, type StatusKey } from "@/lib/constants";
@@ -87,7 +88,7 @@ export default async function HalamanLaporanSaya() {
             jenis="kosong"
             ikon={MapPinOff}
             judul="Belum ada laporan darimu"
-            deskripsi="Mulai dari satu titik di sekitarmu. Laporan pertama hanya butuh sekitar 2 menit, foto opsional tapi membantu."
+            deskripsi="Mulai dari satu titik di sekitarmu. Laporan pertama butuh kurang dari 2 menit. Foto opsional tapi membantu."
             aksi={
               <Link
                 href="/peta?lapor=1"
@@ -106,10 +107,11 @@ export default async function HalamanLaporanSaya() {
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex flex-wrap items-center gap-2">
                     <StatusChip status={r.status} />
-                    <span
-                      className="text-xs font-semibold"
-                      style={{ color: r.categories?.warna }}
-                    >
+                    <span className="flex items-center gap-1.5 text-xs font-semibold">
+                      {/* Warna hanya di ikon; nama kategori tetap ink agar kontras AA. */}
+                      <span style={{ color: r.categories?.warna }} className="flex">
+                        <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={13} />
+                      </span>
                       {r.categories?.nama ?? "Lainnya"}
                     </span>
                   </div>
@@ -165,7 +167,7 @@ export default async function HalamanLaporanSaya() {
             Area yang diikuti
           </h2>
           <p className="mb-3 text-sm text-muted">
-            Notifikasi setiap ada laporan baru dalam radius ini.
+            Dapatkan notifikasi setiap ada laporan baru dalam radius ini.
           </p>
           <div className="rounded-[28px] bg-panel p-3 sm:p-4">
             <div className="flex flex-col gap-[7px]">

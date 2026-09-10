@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { MapPin, ShieldAlert, Sparkles } from "lucide-react";
+import { MapPin, ShieldAlert, LogIn } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isTujuanAman } from "@/lib/utils";
 import { Button, Card, Input, Label } from "@/components/ui";
@@ -92,7 +92,7 @@ function FormulirMasuk() {
         <div className="mb-6 rounded-2xl border border-action/30 bg-action-soft p-4">
           <div className="mb-3 flex items-center justify-between">
             <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-action">
-              <Sparkles size={14} /> Akun Demo (1-Klik untuk Juri)
+              <LogIn size={14} /> Akun Demo (1-Klik untuk Juri)
             </p>
             <Link
               href="/demo"

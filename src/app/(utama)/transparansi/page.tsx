@@ -262,9 +262,9 @@ export default async function HalamanTransparansi() {
                         <Link
                           href={`/laporan/${r.id}`}
                           aria-label={`Detail laporan ${r.judul}`}
-                          className="inline-flex min-h-[44px] items-center gap-1 text-xs font-semibold text-action hover:underline"
+                          className="inline-flex min-h-[44px] items-center text-xs font-semibold text-action hover:underline"
                         >
-                          Detail <ExternalLink size={12} />
+                          Detail
                         </Link>
                       </td>
                     </tr>
@@ -291,9 +291,9 @@ export default async function HalamanTransparansi() {
                     <Link
                       href={`/laporan/${r.id}`}
                       aria-label={`Detail laporan ${r.judul}`}
-                      className="ml-auto inline-flex min-h-[44px] items-center gap-1 text-xs font-semibold text-action hover:underline"
+                      className="ml-auto inline-flex min-h-[44px] items-center text-xs font-semibold text-action hover:underline"
                     >
-                      Detail <ExternalLink size={12} />
+                      Detail
                     </Link>
                   </div>
                 </li>

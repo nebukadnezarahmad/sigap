@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { transisiCepat } from "@/lib/motion";
 import {
+  BadgeCheck,
   CookingPot,
   Flower2,
   Hammer,
   MessageCircle,
   Plus,
   ShoppingBag,
-  Sparkles,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
@@ -63,7 +63,7 @@ function KartuUsaha({ usaha }: { usaha: Usaha }) {
         </div>
         {usaha.verified && (
           <span className="flex shrink-0 items-center gap-1 rounded-full bg-daun-500/15 px-2.5 py-1 text-xs font-semibold text-daun-700 dark:text-daun-300">
-            <Sparkles size={11} /> Terverifikasi
+            <BadgeCheck size={11} /> Terverifikasi
           </span>
         )}
       </div>

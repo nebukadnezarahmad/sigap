@@ -323,7 +323,7 @@ export function Jelajah({
 
       {!dbAktif && (
         <div className="mb-4 flex items-center gap-2 rounded-xl border border-kunyit-500/40 bg-kunyit-100/50 px-4 py-3 text-sm text-kunyit-600">
-          <WifiOff size={16} /> Database belum tersambung — atur env Supabase lalu
+          <WifiOff size={16} /> Database belum tersambung. Atur env Supabase lalu
           jalankan schema.sql (lihat README).
         </div>
       )}
@@ -739,11 +739,10 @@ export function Jelajah({
                   }`}
                 >
                   <div className="mb-1.5 flex items-center justify-between gap-2">
-                    <span
-                      className="flex items-center gap-1.5 text-xs font-semibold"
-                      style={{ color: r.categories?.warna }}
-                    >
-                      <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={13} />
+                    <span className="flex items-center gap-1.5 text-xs font-semibold">
+                      <span style={{ color: r.categories?.warna }} className="flex">
+                        <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={13} />
+                      </span>
                       {r.categories?.nama ?? "Lainnya"}
                     </span>
                     <span className="text-xs text-muted" suppressHydrationWarning>
@@ -943,7 +942,7 @@ export function Jelajah({
               <p className="text-sm text-muted">Jam buka: {fasTerpilih.jam_buka}</p>
             )}
             <p className="text-xs text-muted">
-              Lokasi titik perkiraan — konfirmasi ke pengelola sebelum berkunjung.
+              Lokasi titik perkiraan. Konfirmasi ke pengelola sebelum berkunjung.
             </p>
           </div>
         )}

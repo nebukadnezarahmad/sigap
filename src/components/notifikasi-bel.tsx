@@ -179,7 +179,7 @@ export function NotifikasiBel() {
             <div
               aria-hidden="true"
               onMouseDown={() => setBuka(false)}
-              className="fixed inset-0 z-30 cursor-default bg-black/15 backdrop-blur-[1px]"
+              className="fixed inset-0 z-30 cursor-default bg-black/15"
             />
             <motion.div
               ref={refPanel}

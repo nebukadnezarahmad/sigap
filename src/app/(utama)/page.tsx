@@ -190,7 +190,7 @@ export default async function Beranda() {
           </Terungkap>
           <Terungkap className={styles.featureSmall} tunda={0.08}>
             <span className={styles.featureIcon}><ScanLine size={24} strokeWidth={1.5} aria-hidden="true" /></span>
-            <h3>Bukan sekadar<br />berganti status.</h3>
+            <h3>Setiap status<br />ada buktinya.</h3>
             <p>Penanganan menyertakan foto bukti. Status selesai membutuhkan konfirmasi warga.</p>
             <div className={styles.verification}>
               <span className={styles.checkIcon}><Check size={26} aria-hidden="true" /></span>

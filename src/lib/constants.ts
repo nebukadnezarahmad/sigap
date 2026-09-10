@@ -52,11 +52,12 @@ export type KategoriDef = {
 };
 
 export const KATEGORI: KategoriDef[] = [
-  { slug: "sampah", nama: "Sampah Menumpuk", warna: "#65a30d" },
-  { slug: "drainase", nama: "Drainase & Banjir", warna: "#0284c7" },
+  // Turf -700: teks label 12px di atas putih lulus AA (≥4.5).
+  { slug: "sampah", nama: "Sampah Menumpuk", warna: "#4d7c0f" },
+  { slug: "drainase", nama: "Drainase & Banjir", warna: "#0369a1" },
   { slug: "lampu", nama: "Lampu Jalan Mati", warna: "#b45309" },
   { slug: "jalan", nama: "Jalan Rusak", warna: "#78716c" },
-  { slug: "ruang-hijau", nama: "Ruang Hijau", warna: "#059669" },
+  { slug: "ruang-hijau", nama: "Ruang Hijau", warna: "#047857" },
   { slug: "lainnya", nama: "Lainnya", warna: "#64748b" },
 ];
 

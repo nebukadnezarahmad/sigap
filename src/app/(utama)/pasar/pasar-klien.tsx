@@ -11,10 +11,10 @@ import {
   CheckCircle2,
   HandHeart,
   Laptop,
+  MapPin,
   PackageOpen,
   Plus,
   Shirt,
-  Sparkles,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Barang } from "./page";
@@ -146,7 +146,7 @@ function KartuBarang({
       )}
 
       <p className="mt-3 flex items-center gap-1.5 text-xs text-muted">
-        <Sparkles size={13} /> Ambil di: {data.titik_ambil}
+        <MapPin size={13} /> Ambil di: {data.titik_ambil}
       </p>
 
       {pesan && (

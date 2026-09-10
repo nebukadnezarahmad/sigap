@@ -55,7 +55,7 @@ export default async function HalamanPapanSkor() {
 
       {!dbAktif && (
         <Card className="mb-6 p-5 text-center text-sm text-muted">
-          Database belum tersambung — papan skor akan tampil setelah Supabase diatur.
+          Database belum tersambung, sambungkan Supabase untuk menampilkan papan skor.
         </Card>
       )}
 

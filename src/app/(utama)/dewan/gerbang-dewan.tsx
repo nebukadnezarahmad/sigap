@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Crown, ArrowLeft, Sparkles } from "lucide-react";
+import { Crown, ArrowLeft, LogIn } from "lucide-react";
 import { Card } from "@/components/ui";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
@@ -29,7 +29,7 @@ export function GerbangDewan({
 
         <div className="mt-6 rounded-2xl border border-kunyit-500/30 bg-kunyit-500/5 p-4 text-left">
           <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-kunyit-700 dark:text-kunyit-400">
-            <Sparkles size={14} /> Masuk sebagai Admin Demo (1-Klik)
+            <LogIn size={14} /> Masuk sebagai Admin Demo (1-Klik)
           </p>
           <PilihanAkunDemo tujuan="/dewan" hanyaAdmin />
         </div>

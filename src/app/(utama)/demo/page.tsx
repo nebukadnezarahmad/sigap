@@ -58,13 +58,13 @@ export default function HalamanDemo() {
 
       <section aria-label="Akun demo instan" className="mb-10">
         <h2 className="mb-1 font-display text-xl font-bold">Akun demo siap pakai</h2>
-        <p className="mb-3 text-sm text-muted">Tanpa perlu mendaftar.</p>
+        <p className="mb-3 text-sm text-muted">Masuk tanpa mendaftar.</p>
         <PilihanAkunDemo />
       </section>
 
       <section aria-label="Tur fitur" className="mb-10">
         <h2 className="mb-1 font-display text-xl font-bold">Alur pengujian</h2>
-        <p className="mb-3 text-sm text-muted">Empat rute utama untuk dinilai.</p>
+        <p className="mb-3 text-sm text-muted">Empat rute untuk kamu nilai.</p>
         <div className="rounded-[28px] bg-panel p-3 sm:p-4">
           <div className="flex flex-col gap-[7px]">
           {TUR.map((t) => (
