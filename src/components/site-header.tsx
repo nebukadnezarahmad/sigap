@@ -163,7 +163,7 @@ export function SiteHeader() {
               className={cn(
                 "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
                 pathname.startsWith("/dewan")
-                  ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
+                  ? "bg-action/10 text-action font-semibold"
                   : "text-muted hover:bg-panel-2 hover:text-ink"
               )}
             >
@@ -217,7 +217,7 @@ export function SiteHeader() {
                   <p className="truncate text-xs text-muted">
                     @{profil?.username ?? "warga"}{" "}
                     {profil?.role === "admin" && (
-                      <span className="rounded bg-kunyit-500/15 px-1.5 py-0.5 text-[10px] font-bold text-kunyit-600">
+                      <span className="rounded bg-panel-2 px-1.5 py-0.5 text-[10px] font-bold text-muted">
                         Admin
                       </span>
                     )}
@@ -248,7 +248,7 @@ export function SiteHeader() {
                   <Link
                     href="/dewan"
                     onClick={() => tutupAkun(true)}
-                    className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-kunyit-600 transition hover:bg-kunyit-500/10 dark:text-kunyit-400"
+                    className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition hover:bg-panel-2 hover:text-ink"
                   >
                     <ShieldCheck size={15} /> Dashboard dewan
                   </Link>
@@ -330,7 +330,7 @@ export function SiteHeader() {
                   className={cn(
                     "flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
                     pathname.startsWith("/dewan")
-                      ? "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400 font-semibold"
+                      ? "bg-action/10 text-action font-semibold"
                       : "text-muted hover:bg-panel-2 hover:text-ink"
                   )}
                 >

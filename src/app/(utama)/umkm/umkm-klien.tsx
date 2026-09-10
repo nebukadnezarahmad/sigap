@@ -52,7 +52,7 @@ function KartuUsaha({ usaha }: { usaha: Usaha }) {
   return (
     <Card className="flex h-full flex-col p-5">
       <div className="flex items-start gap-3">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-panel-2 text-ink">
           <meta.Ikon size={20} />
         </span>
         <div className="min-w-0 flex-1">

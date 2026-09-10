@@ -45,7 +45,19 @@ export function PageHeader({
 }) {
   return (
     <header className={cn("mb-8", tengah && "text-center")}>
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-action">
+      <p
+        className={cn(
+          "flex items-center gap-2 text-[13px] font-medium text-muted",
+          tengah && "justify-center"
+        )}
+      >
+        <span
+          aria-hidden="true"
+          className="size-1.5 shrink-0 rounded-full"
+          style={{
+            background: "linear-gradient(145deg, #4098ff, #0066cc)",
+          }}
+        />
         {eyebrow}
       </p>
       <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">

@@ -91,8 +91,8 @@ function FormulirMasuk() {
         {/* Section 1-Klik Demo untuk Juri */}
         <div className="mb-6 rounded-2xl border border-action/30 bg-action-soft p-4">
           <div className="mb-3 flex items-center justify-between">
-            <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-action">
-              <LogIn size={14} /> Akun Demo (1-Klik untuk Juri)
+            <p className="flex items-center gap-1.5 text-xs font-bold text-action">
+              <LogIn size={14} /> Akun demo (1-klik untuk juri)
             </p>
             <Link
               href="/demo"

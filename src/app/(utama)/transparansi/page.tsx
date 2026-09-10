@@ -11,10 +11,11 @@ import { createClient } from "@/lib/supabase/server";
 import { KATEGORI, STATUS, SLA_KATEGORI, hitungSla, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { Card, StatusChip } from "@/components/ui";
+import { Progress } from "@/components/progress";
 import { FeedbackState } from "@/components/feedback-state";
 import { GalatMuatUlang, KontenUtama, PageHeader } from "@/components/layout-konten";
 import { formatTanggal } from "@/lib/utils";
-import { GrafikBulanan, GrafikKategori } from "./grafik";
+import { GrafikBulanan } from "./grafik";
 import { TombolCetak } from "./tombol-cetak";
 
 export const metadata: Metadata = { title: "Transparansi" };
@@ -401,22 +402,50 @@ export default async function HalamanTransparansi() {
       </div>
       )}
 
-      {/* Grafik Laporan & Kategori */}
-      <div className="mb-8 grid gap-5 lg:grid-cols-2">
+      {/* Grafik Laporan & Peringkat Kategori */}
+      <div className="mb-8 grid gap-5">
         <Card className="rounded-[28px] p-6 sm:p-7">
           <h2 className="font-display text-[19px] font-semibold tracking-[-0.035em]">
             Tren 6 bulan
           </h2>
           <p className="mb-4 mt-0.5 text-xs text-muted">Laporan masuk vs tuntas</p>
-          <GrafikBulanan data={bulan} />
+          <div className="h-72">
+            <GrafikBulanan data={bulan} />
+          </div>
         </Card>
 
         <Card className="rounded-[28px] p-6 sm:p-7">
           <h2 className="font-display text-[19px] font-semibold tracking-[-0.035em]">
-            Ketuntasan per kategori
+            Peringkat ketuntasan kategori
           </h2>
-          <p className="mb-4 mt-0.5 text-xs text-muted">Persentase laporan tuntas</p>
-          <GrafikKategori data={perKategori} />
+          <p className="mb-4 mt-0.5 text-xs text-muted">Diurutkan dari yang paling tuntas</p>
+          <p className="sr-only">
+            {perKategori.length === 0
+              ? "Belum ada data ketuntasan kategori."
+              : `Ketuntasan per kategori: ${[...perKategori].sort((a, b) => b.persen - a.persen).map((d) => `${d.nama} ${d.persen} persen`).join("; ")}.`}
+          </p>
+          <ol className="flex flex-col gap-4">
+            {[...perKategori]
+              .sort((a, b) => b.persen - a.persen)
+              .map((k, i) => (
+                <li key={k.nama}>
+                  <div className="mb-1.5 flex items-baseline justify-between gap-3">
+                    <p className="min-w-0 truncate text-sm font-semibold">
+                      <span className="mr-2 tabular-nums text-muted">{i + 1}</span>
+                      {k.nama}
+                    </p>
+                    <p className="shrink-0 text-sm font-bold tabular-nums">
+                      {k.persen}%
+                    </p>
+                  </div>
+                  <Progress
+                    nilai={k.persen}
+                    label={`Ketuntasan ${k.nama}: ${k.persen} persen`}
+                    varian="data"
+                  />
+                </li>
+              ))}
+          </ol>
         </Card>
       </div>
 

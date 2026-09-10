@@ -301,7 +301,7 @@ export function DewanClient({
       label: "Sedang diproses",
       nilai: aktif,
       ikon: <Flame size={20} />,
-      warna: "text-kunyit-600 dark:text-kunyit-400 bg-kunyit-500/10",
+      warna: "text-ink bg-panel-2",
     },
     {
       label: "Selesai",

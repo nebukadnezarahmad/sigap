@@ -208,8 +208,8 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         </div>
 
         <div className="rounded-2xl border border-action/30 bg-action/5 p-4">
-          <p className="mb-2.5 text-xs font-bold uppercase tracking-wider text-action">
-            Masuk Cepat Mode Demo (1-Klik untuk Juri)
+          <p className="mb-2.5 text-xs font-bold text-action">
+            Masuk cepat mode demo (1-klik untuk juri)
           </p>
           <PilihanAkunDemo ringkas />
         </div>
@@ -541,7 +541,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             <div className="flex items-start gap-2.5">
               <AlertTriangle size={17} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                <p className="text-xs font-bold text-amber-700 dark:text-amber-400">
                   Laporan serupa ditemukan ({Math.round(laporanMirip[0].jarak_m)} m dari titikmu)
                 </p>
                 <p className="mt-1 text-sm font-semibold truncate text-ink">

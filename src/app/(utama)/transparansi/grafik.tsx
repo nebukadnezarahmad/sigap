@@ -12,7 +12,6 @@ const gayaTooltip = {
 } as const;
 
 type DataBulanan = { label: string; masuk: number; tuntas: number };
-type DataKategori = { nama: string; warna: string; persen: number };
 
 function KerangkaGrafik() {
   return <Skeleton className="h-60 w-full" />;
@@ -73,57 +72,11 @@ const IsiGrafikBulanan = dynamic<{ data: DataBulanan[] }>(
   }
 );
 
-const IsiGrafikKategori = dynamic<{ data: DataKategori[] }>(
-  () =>
-    import("recharts").then((m) => {
-      const {
-        Bar,
-        BarChart,
-        Cell,
-        ResponsiveContainer,
-        Tooltip,
-        XAxis,
-        YAxis,
-      } = m;
-      return function IsiKategori({ data }: { data: DataKategori[] }) {
-        return (
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} layout="vertical" margin={{ left: 10 }}>
-              <XAxis type="number" domain={[0, 100]} hide />
-              <YAxis
-                type="category"
-                dataKey="nama"
-                width={120}
-                tick={{ fontSize: 11 }}
-                stroke="var(--muted)"
-              />
-              <Tooltip contentStyle={gayaTooltip} />
-              <Bar
-                dataKey="persen"
-                name="Selesai (%)"
-                radius={[0, 8, 8, 0]}
-                barSize={18}
-              >
-                {data.map((k) => (
-                  <Cell key={k.nama} fill={k.warna} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        );
-      };
-    }),
-  {
-    ssr: false,
-    loading: () => <KerangkaGrafik />,
-  }
-);
-
 export function GrafikBulanan({ data }: { data: DataBulanan[] }) {
   const totalMasuk = data.reduce((a, b) => a + b.masuk, 0);
   const totalTuntas = data.reduce((a, b) => a + b.tuntas, 0);
   return (
-    <div className="h-60 [--chart-masuk:var(--muted)] [--chart-selesai:var(--color-daun-500)] dark:[--chart-selesai:var(--color-daun-400)]">
+    <div className="h-full [--chart-masuk:var(--muted)] [--chart-selesai:var(--color-daun-500)] dark:[--chart-selesai:var(--color-daun-400)]">
       <p className="sr-only">
         {data.length === 0
           ? "Belum ada data bulanan."
@@ -131,21 +84,6 @@ export function GrafikBulanan({ data }: { data: DataBulanan[] }) {
       </p>
       <div className="h-full" role="img" aria-label="Grafik laporan masuk versus tuntas enam bulan terakhir">
         <IsiGrafikBulanan data={data} />
-      </div>
-    </div>
-  );
-}
-
-export function GrafikKategori({ data }: { data: DataKategori[] }) {
-  return (
-    <div className="h-60">
-      <p className="sr-only">
-        {data.length === 0
-          ? "Belum ada data ketuntasan kategori."
-          : `Ketuntasan per kategori: ${data.map((d) => `${d.nama} ${d.persen} persen`).join("; ")}.`}
-      </p>
-      <div className="h-full" role="img" aria-label="Grafik ketuntasan per kategori">
-        <IsiGrafikKategori data={data} />
       </div>
     </div>
   );

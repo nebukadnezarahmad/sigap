@@ -45,11 +45,11 @@ export function SebelumSesudah({
           style={{ width: "100%" , maxWidth: "none" }}
           draggable={false}
         />
-        <span className="absolute left-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+        <span className="absolute left-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-bold text-white">
           Sebelum
         </span>
       </div>
-      <span className="absolute right-3 top-3 rounded-full bg-daun-600/90 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+      <span className="absolute right-3 top-3 rounded-full bg-daun-600/90 px-2.5 py-1 text-[11px] font-bold text-white">
         Sesudah
       </span>
 

@@ -109,7 +109,7 @@ export default async function HalamanWarga({
                 <h1 className="font-display text-2xl font-bold">
                   {p.nama_lengkap}
                   {p.role === "admin" && (
-                    <span className="ml-2 rounded-full bg-kunyit-500/15 px-2.5 py-1 text-xs font-bold text-kunyit-600">
+                    <span className="ml-2 rounded-full bg-panel-2 px-2.5 py-1 text-xs font-bold text-muted">
                       Dewan
                     </span>
                   )}

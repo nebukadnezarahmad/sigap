@@ -13,7 +13,7 @@ export function GerbangDewan({
   return (
     <main className="mx-auto max-w-lg px-4 py-16">
       <Card className="p-8 text-center">
-        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400">
+        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-panel-2 text-ink">
           <Crown size={28} />
         </div>
 
@@ -27,9 +27,9 @@ export function GerbangDewan({
             : "Kamu belum masuk. Dasbor dewan digunakan untuk memverifikasi laporan masuk, menugaskan petugas, dan memantau batas waktu penanganan masalah."}
         </p>
 
-        <div className="mt-6 rounded-2xl border border-kunyit-500/30 bg-kunyit-500/5 p-4 text-left">
-          <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-kunyit-700 dark:text-kunyit-400">
-            <LogIn size={14} /> Masuk sebagai Admin Demo (1-Klik)
+        <div className="mt-6 rounded-2xl border garis-halus bg-panel-2/40 p-4 text-left">
+          <p className="mb-3 flex items-center gap-1.5 text-xs font-bold text-ink">
+            <LogIn size={14} /> Masuk sebagai admin demo (1-klik)
           </p>
           <PilihanAkunDemo tujuan="/dewan" hanyaAdmin />
         </div>
@@ -37,7 +37,7 @@ export function GerbangDewan({
         <div className="mt-6 flex flex-col items-center gap-2 text-sm">
           <Link
             href="/masuk?next=/dewan"
-            className="font-semibold text-kunyit-700 hover:underline dark:text-kunyit-400"
+            className="font-semibold text-action hover:underline"
           >
             Masuk manual sebagai admin
           </Link>

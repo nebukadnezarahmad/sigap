@@ -13,8 +13,8 @@ export const AKUN_DEMO = [
     email: "dewan@sigap.demo",
     deskripsi: "Dashboard statistik, kelola status laporan, dan heatmap",
     admin: true,
-    warna: "border-kunyit-500/30 bg-kunyit-500/5 hover:border-kunyit-500/60",
-    badge: "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400",
+    warna: "border garis-halus bg-panel hover:bg-panel-2/50",
+    badge: "bg-panel-2 text-muted",
   },
   {
     peran: "Budi (Warga Aktif)",
@@ -155,7 +155,7 @@ export function PilihanAkunDemo({
                 <span
                   className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl ${
                     a.admin
-                      ? "bg-kunyit-500/15 text-kunyit-600"
+                      ? "bg-panel-2 text-ink"
                       : "bg-action/10 text-action"
                   }`}
                 >
@@ -167,7 +167,7 @@ export function PilihanAkunDemo({
                       {a.peran}
                     </p>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${a.badge}`}
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${a.badge}`}
                     >
                       Demo
                     </span>

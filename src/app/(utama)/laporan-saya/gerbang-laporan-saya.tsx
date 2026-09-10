@@ -22,8 +22,8 @@ export function GerbangLaporanSaya() {
         </p>
 
         <div className="mt-6 rounded-2xl border border-action/30 bg-action/5 p-4 text-left">
-          <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-action">
-            <LogIn size={14} /> Coba Akun Demo dengan Data Laporan (1-Klik)
+          <p className="mb-3 flex items-center gap-1.5 text-xs font-bold text-action">
+            <LogIn size={14} /> Coba akun demo berisi laporan (1-klik)
           </p>
           <PilihanAkunDemo tujuan="/laporan-saya" />
         </div>
