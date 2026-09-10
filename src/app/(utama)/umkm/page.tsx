@@ -55,7 +55,6 @@ export default async function HalamanUmkm() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <PageHeader
-        eyebrow="Ekonomi lingkunganmu"
         judul="UMKM Warga"
         deskripsi="Usaha tetanggamu lebih dekat daripada yang kamu kira. Belanja dari usaha warga berarti memperkuat ekonomi lingkungan sekaligus memangkas jejak transportasi."
       />

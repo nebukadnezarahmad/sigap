@@ -248,7 +248,7 @@ export function PetaHeroVisual({
           <aside className={styles.sidebar} aria-label="Daftar laporan pada peta">
             <div className={styles.sidebarHeading}>
               <span className={styles.appIcon}><MapPin size={21} strokeWidth={2.1} aria-hidden="true" /></span>
-              <div><p className={styles.eyebrow}>LINGKUNGAN KITA</p><h3>Setiap titik, berarti.</h3></div>
+              <div><p className={styles.eyebrow}>Lingkungan kita</p><h3>Setiap titik, berarti.</h3></div>
             </div>
             <div className={styles.listHeading}>
               <span>{contoh ? "Contoh laporan" : modeData === "galat" ? "Data tertunda" : "Laporan terbaru"}</span>

@@ -48,7 +48,6 @@ export default async function HalamanPapanSkor() {
     <main className="mx-auto max-w-4xl px-4 py-10">
       <PageHeader
         tengah
-        eyebrow="Partisipasi warga"
         judul="Papan skor"
         deskripsi="Apresiasi warga yang aktif menjaga lingkungan: melapor (+10), komentar solusi (+3), dan mendukung laporan lain (+1)."
       />

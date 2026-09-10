@@ -37,7 +37,6 @@ export default async function HalamanLayanan() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <PageHeader
-        eyebrow="Nomor yang wajib dihafal"
         judul="Direktori Layanan"
         deskripsi="Kontak darurat dan layanan harian lingkunganmu — satu ketukan untuk menelepon atau lewat WhatsApp. Tidak perlu lagi mencari-cari saat keadaan mendesak."
       />

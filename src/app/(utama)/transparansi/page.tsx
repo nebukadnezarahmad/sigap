@@ -178,7 +178,6 @@ export default async function HalamanTransparansi() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <PageHeader
-        eyebrow="Akuntabilitas publik"
         judul="Transparansi"
         deskripsi="Kinerja penanganan laporan warga secara terbuka. Setiap kategori memiliki target waktu penanganan yang mengikat dewan."
         aksi={

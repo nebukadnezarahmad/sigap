@@ -78,7 +78,6 @@ export default async function HalamanPasar() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <PageHeader
-        eyebrow="Ekonomi sirkular warga"
         judul="Pasar ReUse"
         deskripsi="Barang bekas layak pakai dipindahtangankan gratis antar-warga. Kurangi tumpukan sampah, perpanjang usia barang. Pasang barangmu dan dapatkan poin."
       />

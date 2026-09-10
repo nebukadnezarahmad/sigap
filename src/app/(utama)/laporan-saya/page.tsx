@@ -69,7 +69,6 @@ export default async function HalamanLaporanSaya() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
       <PageHeader
-        eyebrow="Progresmu"
         judul="Laporan saya"
         deskripsi="Sunting laporan selama statusnya masih Baru. Setelah diverifikasi dewan, isinya terkunci demi akuntabilitas."
         aksi={

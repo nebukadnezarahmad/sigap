@@ -51,7 +51,6 @@ export default function HalamanDemo() {
     <main className="mx-auto max-w-4xl px-4 py-10">
       <PageHeader
         tengah
-        eyebrow="Untuk juri dan penguji"
         judul="Panduan demo"
         deskripsi="Masuk instan 1-klik dengan akun demo, lalu jelajahi alur kolaborasi warga dan dewan dalam menyelesaikan masalah permukiman."
       />

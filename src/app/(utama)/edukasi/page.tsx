@@ -144,7 +144,6 @@ export default async function HalamanEdukasi() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <PageHeader
-        eyebrow="Sekolah lingkungan"
         judul="Edukasi Permukiman"
         deskripsi="Materi ringkas untuk memulai perubahan dari rumah — lengkap dengan kuis dan kalkulator jejak sampah pribadi."
       />

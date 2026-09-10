@@ -81,7 +81,6 @@ export default async function HalamanPolling() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <PageHeader
-        eyebrow="Suara warga"
         judul="Jajak pendapat partisipatif"
         deskripsi="Pendapatmu menentukan arah kebijakan lingkungan. Satu warga, satu suara per jajak pendapat — hasilnya terbuka dan berjalan langsung."
       />
