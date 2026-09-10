@@ -3,7 +3,6 @@ import { Trophy } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar, Card } from "@/components/ui";
 import { FeedbackState } from "@/components/feedback-state";
-import { PageHeader } from "@/components/layout-konten";
 import { BadgeSaya } from "./badge-saya";
 
 export const metadata: Metadata = {
@@ -43,10 +42,17 @@ export default async function HalamanPapanSkor() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <PageHeader
-        judul="Papan skor"
-        deskripsi="Apresiasi warga yang aktif menjaga lingkungan: melapor (+10), komentar solusi (+3), dan mendukung laporan lain (+1)."
-      />
+      <header className="mb-10 text-center">
+        <h1 className="font-display text-4xl font-semibold tracking-tight">
+          Papan <span className="text-action">skor</span>
+        </h1>
+        <p className="mx-auto mt-3 max-w-2xl text-muted teks-pretty">
+          Apresiasi warga yang aktif menjaga lingkungan: melapor{" "}
+          <strong className="font-semibold text-action">(+10)</strong>, komentar solusi{" "}
+          <strong className="font-semibold text-action">(+3)</strong>, dan mendukung laporan lain{" "}
+          <strong className="font-semibold text-action">(+1)</strong>.
+        </p>
+      </header>
 
       {!dbAktif && (
         <Card className="mb-6 p-5 text-center text-sm text-muted">
