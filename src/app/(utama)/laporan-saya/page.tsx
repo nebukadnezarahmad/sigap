@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { Card, StatusChip } from "@/components/ui";
 import { FeedbackState } from "@/components/feedback-state";
-import { GalatMuatUlang } from "@/components/layout-konten";
+import { GalatMuatUlang, PageHeader } from "@/components/layout-konten";
 import { STATUS, type StatusKey } from "@/lib/constants";
 import { AksiLaporanSaya } from "./aksi";
 import { HapusAreaKlien } from "./hapus-area";
@@ -67,22 +67,19 @@ export default async function HalamanLaporanSaya() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl font-bold">Laporan saya</h1>
-          <p className="mt-2 max-w-xl text-muted">
-            Sunting laporan selama statusnya masih{" "}
-            <b className="text-ink">Baru</b>. Setelah diverifikasi dewan, isinya
-            terkunci demi akuntabilitas.
-          </p>
-        </div>
-        <Link
-          href="/peta?lapor=1"
-          className="inline-flex min-h-[48px] items-center justify-center gap-1.5 rounded-full bg-action px-6 text-sm font-semibold text-white transition hover:bg-action-hover active:scale-[0.97]"
-        >
-          <Plus size={15} strokeWidth={2.5} /> Buat laporan
-        </Link>
-      </header>
+      <PageHeader
+        eyebrow="Progresmu"
+        judul="Laporan saya"
+        deskripsi="Sunting laporan selama statusnya masih Baru. Setelah diverifikasi dewan, isinya terkunci demi akuntabilitas."
+        aksi={
+          <Link
+            href="/peta?lapor=1"
+            className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-action px-6 text-sm font-semibold text-white transition hover:bg-action-hover active:scale-[0.97]"
+          >
+            <Plus size={15} strokeWidth={2.5} /> Buat laporan
+          </Link>
+        }
+      />
 
       {daftar.length === 0 ? (
         <Card className="p-2">
@@ -94,7 +91,7 @@ export default async function HalamanLaporanSaya() {
             aksi={
               <Link
                 href="/peta?lapor=1"
-                className="inline-flex min-h-[48px] items-center justify-center gap-1.5 rounded-full bg-action px-7 text-sm font-semibold text-white transition hover:bg-action-hover active:scale-[0.97]"
+                className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-action px-7 text-sm font-semibold text-white transition hover:bg-action-hover active:scale-[0.97]"
               >
                 <Plus size={15} strokeWidth={2.5} /> Buat laporan pertama
               </Link>
@@ -130,7 +127,7 @@ export default async function HalamanLaporanSaya() {
                     komentar
                   </p>
                   <div
-                    className="mt-3 h-1.5 overflow-hidden rounded-full bg-panel-2"
+                    className="mt-3 h-1 overflow-hidden rounded-full bg-panel-2"
                     role="progressbar"
                     aria-valuenow={PROGRES_STATUS[r.status] ?? 0}
                     aria-valuemin={0}
@@ -164,11 +161,11 @@ export default async function HalamanLaporanSaya() {
 
       {area.length > 0 && (
         <section aria-label="Area yang diikuti" className="mt-10">
-          <h2 className="mb-3 font-display text-xl font-bold">
-            Area yang kamu ikuti
+          <h2 className="mb-1 font-display text-xl font-bold">
+            Area yang diikuti
           </h2>
           <p className="mb-3 text-sm text-muted">
-            Kamu mendapat notifikasi setiap ada laporan baru dalam radius ini.
+            Notifikasi setiap ada laporan baru dalam radius ini.
           </p>
           <div className="space-y-2">
             {area.map((a) => (

@@ -297,19 +297,19 @@ export function Jelajah({
     <main className="mx-auto max-w-7xl px-4 pb-10 pt-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold">
-            Peta Masalah Permukiman
+          <h1 className="font-display text-2xl font-bold tracking-tight">
+            Peta
           </h1>
-          <p className="text-sm text-muted">
-            {tersaring.length} laporan ditampilkan ·{" "}
+          <p className="mt-0.5 text-sm text-muted">
+            {tersaring.length} laporan ·{" "}
             <span
-              className={`inline-flex items-center gap-1 ${
+              className={`inline-flex items-center gap-1.5 ${
                 realtimeAktif ? "text-daun-600 dark:text-daun-400" : ""
               }`}
             >
               <span
                 className={`size-1.5 rounded-full ${
-                  realtimeAktif ? "animate-pulse bg-daun-500" : "bg-muted"
+                  realtimeAktif ? "bg-daun-500" : "bg-muted"
                 }`}
               />
               {realtimeAktif ? "Langsung aktif" : "Menyambungkan…"}
@@ -340,7 +340,7 @@ export function Jelajah({
               onChange={(e) => setKueri(e.target.value)}
               placeholder="Cari judul atau isi laporan…"
               aria-label="Cari laporan"
-              className="h-10 w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-action focus:ring-4 focus:ring-action/15"
+              className="h-11 w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-action focus:ring-4 focus:ring-action/15"
             />
           </label>
         </div>
@@ -658,7 +658,7 @@ export function Jelajah({
             aria-controls={`panel-${t}`}
             tabIndex={tabSeluler === t ? 0 : -1}
             onClick={() => setTabSeluler(t)}
-            className={`min-h-[40px] rounded-full text-sm font-semibold transition ${
+            className={`min-h-[44px] rounded-full text-sm font-semibold transition ${
               tabSeluler === t ? "bg-action text-white" : "text-muted"
             }`}
           >
@@ -734,8 +734,8 @@ export function Jelajah({
                   tabIndex={0}
                   role="button"
                   aria-label={`Buka laporan ${r.judul}`}
-                  className={`cursor-pointer p-4 transition hover:border-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action ${
-                    terpilihId === r.id ? "ring-2 ring-action" : ""
+                  className={`cursor-pointer p-4 transition hover:bg-panel-2/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action ${
+                    terpilihId === r.id ? "ring-1 ring-action" : ""
                   }`}
                 >
                   <div className="mb-1.5 flex items-center justify-between gap-2">

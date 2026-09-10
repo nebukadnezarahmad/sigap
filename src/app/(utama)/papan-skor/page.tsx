@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import { Crown, Medal, ShieldCheck, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { BADGES } from "@/lib/constants";
 import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
 import { Avatar, Card } from "@/components/ui";
 import { FeedbackState } from "@/components/feedback-state";
+import { PageHeader } from "@/components/layout-konten";
 import { BadgeSaya } from "./badge-saya";
 
 export const metadata: Metadata = {
-  title: "Daftar Kehormatan Warga",
+  title: "Papan skor",
 };
 
 export const dynamic = "force-dynamic";
@@ -45,17 +46,12 @@ export default async function HalamanPapanSkor() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <header className="mb-10 text-center">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-daun-600/10 px-3 py-1 text-xs font-bold text-daun-700 dark:text-daun-300 uppercase tracking-wider mb-2">
-          <ShieldCheck size={14} /> Piagam Partisipasi Sipil
-        </div>
-        <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight">
-          Daftar Kehormatan Warga
-        </h1>
-        <p className="mt-2 text-sm text-muted max-w-lg mx-auto teks-pretty">
-          Apresiasi bagi warga yang aktif menjaga lingkungan: Melaporkan masalah (<b>+10</b>), komentar solusi (<b>+3</b>), dan mendukung laporan warga lain (<b>+1</b>).
-        </p>
-      </header>
+      <PageHeader
+        tengah
+        eyebrow="Partisipasi warga"
+        judul="Papan skor"
+        deskripsi="Apresiasi warga yang aktif menjaga lingkungan: melapor (+10), komentar solusi (+3), dan mendukung laporan lain (+1)."
+      />
 
       {!dbAktif && (
         <Card className="mb-6 p-5 text-center text-sm text-muted">
@@ -73,24 +69,16 @@ export default async function HalamanPapanSkor() {
       )}
 
       {pemimpin.length > 0 && (
-        <div className="mb-10 grid grid-cols-3 items-end gap-3 sm:gap-5">
+        <div className="mb-10 grid grid-cols-3 items-end gap-3 sm:gap-4">
           {urutanPodium.map((p) => {
             const juara = podium.indexOf(p) + 1;
             return (
               <Card
                 key={p.id}
-                className={`flex w-full flex-col items-center p-5 text-center ${
-                  juara === 1
-                    ? "ring-2 ring-kunyit-500 sm:-translate-y-3 sm:shadow-xl"
-                    : ""
-                }`}
+                className="flex w-full flex-col items-center p-5 text-center"
               >
-                <span className="mb-2">
-                  {juara === 1 ? (
-                    <Crown size={30} className="text-kunyit-500" />
-                  ) : (
-                    <Medal size={22} className={juara === 2 ? "text-slate-400" : "text-amber-700"} />
-                  )}
+                <span className="mb-2 flex size-8 items-center justify-center rounded-full bg-panel-2 text-sm font-bold tabular-nums text-muted">
+                  {juara}
                 </span>
                 <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={juara === 1 ? 72 : 52} />
                 <p
@@ -134,7 +122,8 @@ export default async function HalamanPapanSkor() {
       )}
 
       <section aria-label="Koleksi lencana">
-        <h2 className="mb-4 font-display text-xl font-bold">Koleksi lencana</h2>
+        <h2 className="mb-1 font-display text-xl font-bold">Lencana</h2>
+        <p className="mb-3 text-sm text-muted">Pencapaian partisipasi warga.</p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {BADGES.map((b) => (
             <Card key={b.key} className="p-4">
