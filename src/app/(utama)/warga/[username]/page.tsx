@@ -1,12 +1,14 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { GalatMuatUlang } from "@/components/layout-konten";import { BADGES, LEVELS, levelDari } from "@/lib/constants";
+import { GalatMuatUlang } from "@/components/layout-konten";
+import { BADGES, LEVELS, levelDari } from "@/lib/constants";
 import { IkonKategori, IkonVektor, nodeBadge, nodeLevel } from "@/lib/ikon-vektor";
-import { FileText, Flame, Lock } from "lucide-react";
+import { Check, Lock } from "lucide-react";
 import type { StatusLaporan } from "@/types/database";
 import { waktuRelatif } from "@/lib/utils";
 import { Avatar, Card, StatusChip } from "@/components/ui";
+import { Progress } from "@/components/progress";
 
 export const dynamic = "force-dynamic";
 
@@ -92,135 +94,187 @@ export default async function HalamanWarga({
   ]);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <Card className="relative overflow-hidden p-0">
-        <div aria-hidden className="h-28 bg-action sm:h-32" />
-        <div className="-mt-10 px-6 pb-6">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="flex items-end gap-4">
-              <span className="rounded-full ring-4 ring-panel">
-                <Avatar
-                  nama={p.nama_lengkap}
-                  url={p.avatar_url}
-                  ukuran={84}
-                />
-              </span>
-              <div className="pb-1">
-                <h1 className="font-display text-2xl font-bold">
-                  {p.nama_lengkap}
-                  {p.role === "admin" && (
-                    <span className="ml-2 rounded-full bg-panel-2 px-2.5 py-1 text-xs font-bold text-muted">
-                      Dewan
-                    </span>
-                  )}
-                </h1>
-                <p className="text-sm text-muted">@{p.username}</p>
-              </div>
-            </div>
-            <div className="flex gap-2 pb-1">
-              <span className="flex items-center gap-1.5 rounded-full bg-panel-2 px-3.5 py-1.5 text-xs font-semibold text-muted">
-                <FileText size={12} /> {(laporan.data ?? []).length} laporan
-                terakhir
-              </span>
-              <span className="flex items-center gap-1 rounded-full bg-panel-2 px-3.5 py-1.5 text-xs font-semibold text-muted">
-                <Flame size={13} className="text-kunyit-500" /> {streak} hari
-                aktif (7hr)
-              </span>
+    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
+      <Card className="p-6 sm:p-7">
+        <div aria-hidden="true" className="mb-6 h-1 w-16 rounded-full bg-action" />
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="flex min-w-0 items-center gap-4">
+            <span className="rounded-full border garis-halus">
+              <Avatar
+                nama={p.nama_lengkap}
+                url={p.avatar_url}
+                ukuran={64}
+              />
+            </span>
+            <div className="min-w-0">
+              <h1 className="truncate font-display text-2xl font-semibold tracking-tight">
+                {p.nama_lengkap}
+                {p.role === "admin" && (
+                  <span className="ml-2 rounded-full bg-panel-2 px-2.5 py-1 align-middle text-xs font-semibold text-muted">
+                    Dewan
+                  </span>
+                )}
+              </h1>
+              <p className="mt-0.5 text-sm text-muted">@{p.username}</p>
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
-            <div>
-              <div className="mb-1.5 flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2 font-display font-bold">
-                  <IkonVektor node={nodeLevel(lv.sekarang)} ukuran={16} />
-                  Level {lv.sekarang.nama}
-                </span>
-                <span className="text-muted">
-                  {p.poin} poin
-                  {lv.berikut && ` · ${lv.berikut.min - p.poin} lagi ke ${lv.berikut.nama}`}
-                </span>
+          <div role="group" aria-label="Statistik kontribusi">
+            <dl className="flex gap-7">
+              <div>
+                <dt className="text-xs text-muted">Laporan terakhir</dt>
+                <dd className="angka-tabular mt-1 text-xl font-semibold">
+                  {(laporan.data ?? []).length}
+                </dd>
               </div>
-              <div className="h-2.5 overflow-hidden rounded-full bg-line">
-                <div
-                  className="h-full rounded-full bg-daun-500 transition-[width,background-color]"
-                  style={{ width: `${lv.progres}%` }}
-                />
+              <div>
+                <dt className="text-xs text-muted">Hari beruntun</dt>
+                <dd className="angka-tabular mt-1 text-xl font-semibold">{streak}</dd>
               </div>
-              <div className="mt-1.5 flex gap-3 text-[11px] text-muted">
-                {LEVELS.map((l) => (
-                  <span
-                    key={l.key}
-                    className={`flex items-center gap-1 ${
-                      p.poin >= l.min
-                        ? "font-semibold text-daun-700 dark:text-daun-300"
-                        : ""
-                    }`}
-                  >
-                    <IkonVektor node={nodeLevel(l)} ukuran={12} />
-                    {l.nama} ({l.min}+)
-                  </span>
-                ))}
-              </div>
-            </div>
+            </dl>
           </div>
+        </div>
+
+        <div className="mt-6 border-t garis-halus pt-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="flex items-center gap-2 text-sm font-semibold">
+              <IkonVektor node={nodeLevel(lv.sekarang)} ukuran={16} />
+              Level {lv.sekarang.nama}
+            </p>
+            <p className="text-sm text-muted">
+              <span className="angka-tabular font-semibold text-ink">
+                {p.poin} poin
+              </span>
+            </p>
+          </div>
+          <Progress
+            nilai={lv.progres}
+            label={`Progres level ${lv.sekarang.nama}`}
+            varian="aksi"
+            className="mt-3"
+          />
+          <p className="mt-2 text-sm text-muted">
+            {lv.berikut
+              ? `${lv.berikut.min - p.poin} poin lagi menuju ${lv.berikut.nama}`
+              : "Level tertinggi tercapai."}
+          </p>
+          <ol
+            aria-label="Tahapan level"
+            className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted"
+          >
+            {LEVELS.map((l) => (
+              <li
+                key={l.key}
+                aria-current={l.key === lv.sekarang.key ? "step" : undefined}
+                className={
+                  p.poin >= l.min ? "font-semibold text-ink" : undefined
+                }
+              >
+                <span className="flex items-center gap-1">
+                  <IkonVektor node={nodeLevel(l)} ukuran={12} />
+                  {l.nama} ({l.min}+)
+                </span>
+              </li>
+            ))}
+          </ol>
         </div>
       </Card>
 
-      <section className="mt-8" aria-label="Koleksi lencana">
-        <h2 className="mb-3 font-display text-lg font-bold">Lencana</h2>
-        <div className="flex flex-wrap gap-2">
+      <section aria-labelledby="judul-lencana" className="mt-10">
+        <h2
+          id="judul-lencana"
+          className="font-display text-xl font-semibold tracking-tight"
+        >
+          Koleksi lencana
+        </h2>
+        <p className="mb-4 mt-1 text-sm text-muted">
+          {dimiliki.size} dari {BADGES.length} dimiliki
+        </p>
+        <ul
+          aria-label="Koleksi lencana"
+          className="grid gap-px overflow-hidden rounded-2xl border garis-halus bg-line sm:grid-cols-2"
+        >
           {BADGES.map((b) => {
             const punya = dimiliki.has(b.key);
             return (
-              <span
-                key={b.key}
-                title={b.deskripsi}
-                className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
-                  punya
-                    ? "border-transparent bg-daun-600 text-white"
-                    : "garis-halus text-muted opacity-55"
-                }`}
-              >
-                {punya ? (
-                  <IkonVektor node={nodeBadge(b)} ukuran={13} />
-                ) : (
-                  <Lock size={12} />
-                )}
-                {b.nama}
-              </span>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="mt-8" aria-label="Laporan terakhir">
-        <h2 className="mb-3 font-display text-lg font-bold">
-          Laporan terakhir
-        </h2>
-        <div className="space-y-2.5">
-          {(laporan.data ?? []).length === 0 && (
-            <Card className="p-6 text-center text-sm text-muted">
-              Belum ada laporan.
-            </Card>
-          )}
-          {laporanTerakhir.map((r) => (
-            <Link key={r.id} href={`/laporan/${r.id}`} className="block">
-              <Card className="flex items-center gap-3 p-4 transition hover:border-action">
-                <span style={{ color: r.categories?.warna }}>
-                  <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={18} />
+              <li key={b.key} className="flex items-start gap-3 bg-panel p-4">
+                <span
+                  aria-hidden="true"
+                  className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${
+                    punya ? "bg-action-soft text-action" : "bg-panel-2 text-muted"
+                  }`}
+                >
+                  <IkonVektor node={nodeBadge(b)} ukuran={19} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">{r.judul}</p>
-                  <p className="text-xs text-muted" suppressHydrationWarning>
-                    {waktuRelatif(r.created_at)}
+                  <p className="text-sm font-semibold">{b.nama}</p>
+                  <p className="teks-pretty mt-0.5 text-xs leading-5 text-muted">
+                    {b.deskripsi}
+                  </p>
+                  <p
+                    className={`mt-1 text-xs font-semibold ${
+                      punya ? "text-action" : "text-muted"
+                    }`}
+                  >
+                    {punya ? "Dimiliki" : "Terkunci"}
                   </p>
                 </div>
-                <StatusChip status={r.status as StatusLaporan} />
-              </Card>
-            </Link>
-          ))}
-        </div>
+                <span
+                  aria-hidden="true"
+                  className={punya ? "text-action" : "text-muted"}
+                >
+                  {punya ? (
+                    <Check size={17} aria-hidden="true" />
+                  ) : (
+                    <Lock size={15} aria-hidden="true" />
+                  )}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      <section aria-labelledby="judul-laporan" className="mt-10">
+        <h2
+          id="judul-laporan"
+          className="font-display text-xl font-semibold tracking-tight"
+        >
+          Laporan terakhir
+        </h2>
+        <p className="mb-4 mt-1 text-sm text-muted">
+          Aktivitas terbaru {p.nama_lengkap}.
+        </p>
+        {(laporan.data ?? []).length === 0 ? (
+          <Card className="p-6 text-center text-sm text-muted">
+            Belum ada laporan.
+          </Card>
+        ) : (
+          <ul
+            aria-label="Laporan terakhir"
+            className="divide-y divide-line overflow-hidden rounded-2xl border garis-halus bg-panel"
+          >
+            {laporanTerakhir.map((r) => (
+              <li key={r.id}>
+                <Link
+                  href={`/laporan/${r.id}`}
+                  className="flex items-center gap-3 p-4 transition hover:bg-panel-2"
+                >
+                  <span style={{ color: r.categories?.warna }}>
+                    <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={18} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">{r.judul}</p>
+                    <p className="text-xs text-muted" suppressHydrationWarning>
+                      {waktuRelatif(r.created_at)}
+                    </p>
+                  </div>
+                  <StatusChip status={r.status as StatusLaporan} />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </main>
   );
