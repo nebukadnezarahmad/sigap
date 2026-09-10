@@ -69,15 +69,15 @@ export default async function HalamanPapanSkor() {
         {pemimpin.length > 0 && (
           <section
             aria-labelledby="judul-peringkat"
-            className="order-2 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+            className="order-2 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:flex lg:h-full lg:self-stretch lg:flex-col"
           >
             <h2 id="judul-peringkat" className="font-display text-xl font-bold">
               10 besar
             </h2>
             <p className="mb-4 mt-1 text-sm text-muted">Warga dengan poin tertinggi.</p>
 
-            <Card className="overflow-hidden rounded-[28px] p-0">
-              <ol aria-label="Peringkat 10 besar">
+            <Card className="overflow-hidden rounded-[28px] p-0 lg:flex lg:flex-1 lg:flex-col">
+              <ol aria-label="Peringkat 10 besar" className="lg:flex lg:flex-1 lg:flex-col">
                 {podium[0] && (
                   <li className="m-3 rounded-[21px] bg-action p-5 text-[var(--on-action)]">
                     <p className="text-xs font-semibold opacity-90">Juara pertama</p>
@@ -108,7 +108,7 @@ export default async function HalamanPapanSkor() {
                 {podium.slice(1).map((p, i) => (
                   <li
                     key={p.id}
-                    className="flex min-h-[68px] items-center gap-3 border-t border-line px-4 py-3"
+                    className="flex min-h-[68px] items-center gap-3 border-t border-line px-4 py-3 lg:flex-1"
                   >
                     <span className="w-5 shrink-0 text-center text-base font-bold tabular-nums">
                       {i + 2}
@@ -127,7 +127,7 @@ export default async function HalamanPapanSkor() {
                 ))}
 
                 {sisanya.map((p, i) => (
-                  <li key={p.id} className="flex min-h-[58px] items-center gap-3 border-t border-line px-4 py-2.5">
+                  <li key={p.id} className="flex min-h-[58px] items-center gap-3 border-t border-line px-4 py-2.5 lg:flex-1">
                     <span className="w-5 shrink-0 text-center text-xs font-semibold tabular-nums text-muted">
                       {i + 4}
                     </span>
