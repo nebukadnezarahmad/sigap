@@ -44,7 +44,7 @@ export default async function HalamanPapanSkor() {
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <header className="mb-10 text-center">
         <h1 className="font-display text-4xl font-semibold tracking-tight">
-          Papan <span className="text-action">skor</span>
+          Papan skor
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-muted teks-pretty">
           Apresiasi warga yang aktif menjaga lingkungan: melapor{" "}
@@ -77,15 +77,15 @@ export default async function HalamanPapanSkor() {
             aria-labelledby="judul-peringkat"
             className="order-2 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:flex lg:h-full lg:self-stretch lg:flex-col"
           >
-            <h2 id="judul-peringkat" className="font-display text-xl font-bold">
+            <h2 id="judul-peringkat" className="font-display text-xl font-semibold tracking-tight">
               10 besar
             </h2>
             <p className="mb-4 mt-1 text-sm text-muted">Warga dengan poin tertinggi.</p>
 
-            <Card className="overflow-hidden rounded-[28px] p-0 lg:flex lg:flex-1 lg:flex-col">
+            <Card className="overflow-hidden rounded-[24px] p-0 lg:flex lg:flex-1 lg:flex-col">
               <ol aria-label="Peringkat 10 besar" className="lg:flex lg:flex-1 lg:flex-col">
                 {podium[0] && (
-                  <li className="m-3 rounded-[21px] bg-action p-5 text-[var(--on-action)]">
+                  <li className="m-3 rounded-[16px] bg-action p-5 text-[var(--on-action)]">
                     <p className="text-xs font-semibold opacity-90">Juara pertama</p>
                     <div className="mt-3 flex items-center gap-3.5">
                       <span className="shrink-0 rounded-full ring-2 ring-white/25">
@@ -116,19 +116,19 @@ export default async function HalamanPapanSkor() {
                     key={p.id}
                     className="flex min-h-[68px] items-center gap-3 border-t border-line px-4 py-3 lg:flex-1"
                   >
-                    <span className="w-5 shrink-0 text-center text-base font-bold tabular-nums">
+                    <span className="w-5 shrink-0 text-center text-base font-semibold tabular-nums">
                       {i + 2}
                     </span>
                     <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={38} />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold" title={p.nama_lengkap}>
+                      <p className="truncate text-sm font-semibold" title={p.nama_lengkap}>
                         {p.nama_lengkap}
                       </p>
                       <p className="truncate text-xs text-muted" title={`@${p.username}`}>
                         @{p.username}
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm font-bold tabular-nums">{p.poin}</span>
+                    <span className="shrink-0 text-sm font-semibold tabular-nums">{p.poin}</span>
                   </li>
                 ))}
 
