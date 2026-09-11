@@ -25,17 +25,42 @@ export function PanggungPetaScroll({ children }: { children: ReactNode }) {
     offset: ["start end", "center center"],
   });
 
-  // Tilts in 3D perspective from 7deg to 0deg, scales from 0.94 to 1.0
-  const rotateX = useTransform(scrollYProgress, [0, 1], [7, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [0.94, 1.0]);
-  const y = useTransform(scrollYProgress, [0, 1], [32, 0]);
+  // Fey 3D Perspective Stage Transformation:
+  // Starts angled back (14deg), scaled (0.91), offset Y (44px)
+  // Lands flat (0deg), full scale (1.0), zero offset (0px) when centered in viewport
+  const rotateX = useTransform(scrollYProgress, [0, 1], [14, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.91, 1.0]);
+  const y = useTransform(scrollYProgress, [0, 1], [44, 0]);
+
+  // Differential Parallax for Fey Floating Badges
+  const badgeYTop = useTransform(scrollYProgress, [0, 1], [36, 0]);
+  const badgeYBottom = useTransform(scrollYProgress, [0, 1], [-20, 0]);
+  const badgeOpacity = useTransform(scrollYProgress, [0, 0.35, 1], [0, 0.8, 1]);
 
   if (kurangiGerak) {
     return <div>{children}</div>;
   }
 
   return (
-    <div ref={containerRef} className={styles.stagePerspective} data-testid="panggung-peta-scroll">
+    <div
+      ref={containerRef}
+      className={styles.stagePerspective}
+      data-testid="panggung-peta-scroll"
+    >
+      {/* Floating Badge Atas: Status Wilayah Aktif */}
+      <motion.div
+        className={styles.feyBadgeTop}
+        style={{
+          y: badgeYTop,
+          opacity: badgeOpacity,
+        }}
+        aria-hidden="true"
+      >
+        <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        <span>Pemantauan Wilayah Aktif</span>
+      </motion.div>
+
+      {/* Main 3D Tilted Stage */}
       <motion.div
         className={styles.stageInner}
         style={{
@@ -45,6 +70,19 @@ export function PanggungPetaScroll({ children }: { children: ReactNode }) {
         }}
       >
         {children}
+      </motion.div>
+
+      {/* Floating Badge Bawah: Mode Tinjauan Real-Time */}
+      <motion.div
+        className={styles.feyBadgeBottom}
+        style={{
+          y: badgeYBottom,
+          opacity: badgeOpacity,
+        }}
+        aria-hidden="true"
+      >
+        <span className="inline-block w-2 h-2 rounded-full bg-action" />
+        <span>Peta Terverifikasi Warga</span>
       </motion.div>
     </div>
   );
