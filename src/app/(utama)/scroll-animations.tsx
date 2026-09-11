@@ -10,7 +10,7 @@ import {
   useReducedMotion,
   type MotionValue,
 } from "motion/react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import styles from "./scroll-animations.module.css";
 
 /* -------------------------------------------------------------------------
@@ -404,3 +404,125 @@ export function GaleriBuktiScroll() {
     </section>
   );
 }
+
+/* -------------------------------------------------------------------------
+   ANIMASI 4: Tedy Kinetic Emerge & Orbit pada Closing CTA
+   ------------------------------------------------------------------------- */
+interface PenutupKineticOrbitProps {
+  children?: ReactNode;
+}
+
+export function PenutupKineticOrbit({ children }: PenutupKineticOrbitProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const kurangiGerak = useReducedMotion();
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start 0.95", "center 0.65"],
+  });
+
+  // Central Icon Bloom & Specular Radiance
+  const iconScale = useTransform(scrollYProgress, [0, 0.7, 1], [0.72, 1.06, 1.0]);
+  const iconOpacity = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.8, 1]);
+  const haloScale = useTransform(scrollYProgress, [0, 1], [0.5, 1.25]);
+  const haloOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 0.6, 0.85]);
+
+  // Orbital Satellite Badges (Inward convergence toward center)
+  const badge1X = useTransform(scrollYProgress, [0, 1], [-70, 0]);
+  const badge1Y = useTransform(scrollYProgress, [0, 1], [-25, 0]);
+  const badge1Opacity = useTransform(scrollYProgress, [0, 0.45, 1], [0, 0.7, 1]);
+
+  const badge2X = useTransform(scrollYProgress, [0, 1], [70, 0]);
+  const badge2Y = useTransform(scrollYProgress, [0, 1], [-20, 0]);
+  const badge2Opacity = useTransform(scrollYProgress, [0, 0.45, 1], [0, 0.7, 1]);
+
+  const badge3X = useTransform(scrollYProgress, [0, 1], [50, 0]);
+  const badge3Y = useTransform(scrollYProgress, [0, 1], [25, 0]);
+  const badge3Opacity = useTransform(scrollYProgress, [0, 0.55, 1], [0, 0.65, 1]);
+
+  // Kinetic Typography & Actions
+  const contentY = useTransform(scrollYProgress, [0, 1], [24, 0]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.6, 1], [0.2, 0.85, 1]);
+
+  if (kurangiGerak) {
+    return (
+      <div className={styles.closingOrbitRoot} data-testid="penutup-kinetic-orbit">
+        <div className={styles.orbitStage}>
+          <span className={styles.closingAppIcon}>
+            <MapPin size={37} strokeWidth={1.6} aria-hidden="true" />
+          </span>
+        </div>
+        <div className={styles.orbitContent}>
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className={styles.closingOrbitRoot}
+      data-testid="penutup-kinetic-orbit"
+    >
+      {/* Halo Specular Glow di belakang icon */}
+      <motion.div
+        className={styles.orbitHalo}
+        style={{ scale: haloScale, opacity: haloOpacity }}
+        aria-hidden="true"
+      />
+
+      {/* Orbit Stage dengan Icon Tengah dan Satelit Melayang */}
+      <div className={styles.orbitStage}>
+        {/* Satelit Kiri: Laporan Masalah */}
+        <motion.div
+          className={`${styles.orbitSatellite} ${styles.satelliteLeft}`}
+          style={{ x: badge1X, y: badge1Y, opacity: badge1Opacity }}
+          aria-hidden="true"
+        >
+          <span className="inline-block w-2 h-2 rounded-full bg-action animate-pulse" />
+          <span>Laporkan titik masalah</span>
+        </motion.div>
+
+        {/* Central Blooming Icon */}
+        <motion.div
+          className={styles.orbitIconCenter}
+          style={{ scale: iconScale, opacity: iconOpacity }}
+        >
+          <span className={styles.closingAppIcon}>
+            <MapPin size={37} strokeWidth={1.6} aria-hidden="true" />
+          </span>
+        </motion.div>
+
+        {/* Satelit Kanan Atas: Foto Konfirmasi */}
+        <motion.div
+          className={`${styles.orbitSatellite} ${styles.satelliteRightTop}`}
+          style={{ x: badge2X, y: badge2Y, opacity: badge2Opacity }}
+          aria-hidden="true"
+        >
+          <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+          <span>Bukti foto tuntas</span>
+        </motion.div>
+
+        {/* Satelit Kanan Bawah: Gotong Royong */}
+        <motion.div
+          className={`${styles.orbitSatellite} ${styles.satelliteRightBottom}`}
+          style={{ x: badge3X, y: badge3Y, opacity: badge3Opacity }}
+          aria-hidden="true"
+        >
+          <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
+          <span>Bergerak bersama warga</span>
+        </motion.div>
+      </div>
+
+      {/* Typography & Actions Container */}
+      <motion.div
+        className={styles.orbitContent}
+        style={{ y: contentY, opacity: contentOpacity }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+

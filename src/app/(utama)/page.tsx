@@ -11,6 +11,7 @@ import {
   PanggungPetaScroll,
   SorotTeksScroll,
   GaleriBuktiScroll,
+  PenutupKineticOrbit,
 } from "./scroll-animations";
 import styles from "./beranda.module.css";
 
@@ -243,13 +244,14 @@ export default async function Beranda() {
       <GaleriBuktiScroll />
 
       <section className={styles.closing} aria-labelledby="judul-mulai">
-        <span className={styles.appIcon}><MapPin size={37} strokeWidth={1.6} aria-hidden="true" /></span>
-        <h2 id="judul-mulai">Ada yang perlu<br /><span>kita bereskan?</span></h2>
-        <p>Mulai dari satu titik. Mulai dari lingkunganmu.</p>
-        <div className={styles.actions}>
-          <Link href="/peta?lapor=1" className={styles.primaryLink}>Buat laporan <ArrowUpRight size={18} aria-hidden="true" /></Link>
-          <Link href="/daftar" className={styles.secondaryLink}>Bergabung sebagai warga <ChevronRight size={17} aria-hidden="true" /></Link>
-        </div>
+        <PenutupKineticOrbit>
+          <h2 id="judul-mulai">Ada yang perlu<br /><span>kita bereskan?</span></h2>
+          <p>Mulai dari satu titik. Mulai dari lingkunganmu.</p>
+          <div className={styles.actions}>
+            <Link href="/peta?lapor=1" className={styles.primaryLink}>Buat laporan <ArrowUpRight size={18} aria-hidden="true" /></Link>
+            <Link href="/daftar" className={styles.secondaryLink}>Bergabung sebagai warga <ChevronRight size={17} aria-hidden="true" /></Link>
+          </div>
+        </PenutupKineticOrbit>
       </section>
     </main>
   );

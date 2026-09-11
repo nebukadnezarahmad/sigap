@@ -361,13 +361,159 @@
   }
 }
 
+/* -------------------------------------------------------------------------
+   ANIMASI 4: Tedy Kinetic Emerge & Orbit pada Closing CTA
+   ------------------------------------------------------------------------- */
+.closingOrbitRoot {
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: visible;
+}
+
+.orbitHalo {
+  position: absolute;
+  top: 54px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--action) 28%, transparent) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(24px);
+}
+
+.orbitStage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+  width: 100%;
+  min-height: 120px;
+}
+
+.orbitIconCenter {
+  position: relative;
+  z-index: 2;
+  will-change: transform, opacity;
+}
+
+.closingAppIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  color: white;
+  background: linear-gradient(145deg, #3894ff, #0066cc 65%, #004da3);
+  border: 1px solid rgb(255 255 255 / 0.4);
+  box-shadow:
+    inset 0 1px 2px rgb(255 255 255 / 0.8),
+    inset 0 -2px 4px rgb(0 0 0 / 0.2),
+    0 16px 32px -8px rgb(0 102 204 / 0.45);
+  transition: transform var(--dur-cepat, 0.18s) var(--ease-apple, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+.closingAppIcon:hover {
+  transform: scale(1.06);
+}
+
+.orbitSatellite {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--foreground);
+  background: var(--liquid-glass-bg);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 12px 28px -6px rgb(0 0 0 / 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+
+.satelliteLeft {
+  top: 14px;
+  left: calc(50% - 280px);
+  animation: floatSlow 5s ease-in-out infinite alternate;
+}
+
+.satelliteRightTop {
+  top: 8px;
+  right: calc(50% - 280px);
+  animation: floatSlow 5.5s ease-in-out infinite alternate-reverse;
+}
+
+.satelliteRightBottom {
+  bottom: 0px;
+  right: calc(50% - 250px);
+  animation: floatSlow 6s ease-in-out 1s infinite alternate;
+}
+
+@keyframes floatSlow {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-6px); }
+}
+
+.orbitContent {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  width: 100%;
+  will-change: transform, opacity;
+}
+
+@media (max-width: 768px) {
+  .orbitStage {
+    min-height: 100px;
+    margin-bottom: 20px;
+  }
+  .satelliteLeft {
+    left: 4px;
+    top: -8px;
+    font-size: 10px;
+    padding: 6px 12px;
+  }
+  .satelliteRightTop {
+    right: 4px;
+    top: -8px;
+    font-size: 10px;
+    padding: 6px 12px;
+  }
+  .satelliteRightBottom {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .stageInner, .horizontalTrack, .card {
+  .stageInner, .horizontalTrack, .card, .orbitIconCenter, .orbitContent {
     transform: none !important;
     transition: none !important;
   }
   .feyBadgeTop,
-  .feyBadgeBottom {
+  .feyBadgeBottom,
+  .satelliteLeft,
+  .satelliteRightTop,
+  .satelliteRightBottom {
+    animation: none !important;
+    transform: none !important;
     display: none !important;
   }
   .word {
@@ -380,5 +526,8 @@
     position: relative !important;
     top: auto !important;
     height: auto !important;
+  }
+  .closingAppIcon:hover {
+    transform: none !important;
   }
 }
