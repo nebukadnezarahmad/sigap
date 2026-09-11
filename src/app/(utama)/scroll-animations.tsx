@@ -433,12 +433,6 @@ const TEDY_CARDS = [
     foto: "/images/gotong-royong.jpg",
     alt: "Dokumentasi foto pembuktian warga",
   },
-  {
-    id: "card-cover",
-    tag: "Dokumentasi SIGAP",
-    foto: "/images/lingkungan-permukiman.jpg",
-    alt: "Dokumentasi perubahan nyata di lingkungan",
-  },
 ];
 
 interface PenutupTedyScrollProps {
@@ -448,51 +442,88 @@ interface PenutupTedyScrollProps {
 export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const kurangiGerak = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(typeof window !== "undefined" && window.innerWidth <= 800);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // Tedy Radial Exploding Card Transforms:
-  // Starts as a tight stack in the center, explodes radially outward, and fades away completely
-  // Card 1: Top Left
-  const card1X = useTransform(scrollYProgress, [0, 0.45], ["0px", "-240%"]);
-  const card1Y = useTransform(scrollYProgress, [0, 0.45], ["0px", "-110%"]);
-  const card1Rotate = useTransform(scrollYProgress, [0, 0.45], [-4, -12]);
-  const card1Scale = useTransform(scrollYProgress, [0, 0.45], [0.92, 1.05]);
+  // Tedy Card Transforms:
+  // Kartu foto menyebar ke sekeliling teks dan logo di 4 sudut, membingkai konten utama dengan rapi
+  // Card 1: Top Left (membingkai sisi kiri atas judul & logo)
+  const card1X = useTransform(
+    scrollYProgress,
+    [0, 0.55],
+    [isMobile ? "-10px" : "-20px", isMobile ? "-120px" : "-430px"]
+  );
+  const card1Y = useTransform(
+    scrollYProgress,
+    [0, 0.55],
+    [isMobile ? "-15px" : "-15px", isMobile ? "-180px" : "-145px"]
+  );
+  const card1Rotate = useTransform(scrollYProgress, [0, 0.55], [-4, -7]);
+  const card1Scale = useTransform(scrollYProgress, [0, 0.55], [0.9, 1.0]);
 
-  // Card 2: Bottom Left
-  const card2X = useTransform(scrollYProgress, [0, 0.45], ["0px", "-220%"]);
-  const card2Y = useTransform(scrollYProgress, [0, 0.45], ["0px", "120%"]);
-  const card2Rotate = useTransform(scrollYProgress, [0, 0.45], [3, -8]);
-  const card2Scale = useTransform(scrollYProgress, [0, 0.45], [0.95, 1.05]);
+  // Card 2: Bottom Left (membingkai sisi kiri bawah di samping tombol "Buat laporan")
+  const card2X = useTransform(
+    scrollYProgress,
+    [0, 0.55],
+    [isMobile ? "-10px" : "-15px", isMobile ? "-110px" : "-410px"]
+  );
+  const card2Y = useTransform(
+    scrollYProgress,
+    [0, 0.55],
+    [isMobile ? "15px" : "15px", isMobile ? "190px" : "145px"]
+  );
+  const card2Rotate = useTransform(scrollYProgress, [0, 0.55], [3, 4]);
+  const card2Scale = useTransform(scrollYProgress, [0, 0.55], [0.9, 1.0]);
 
-  // Card 3: Top Right
-  const card3X = useTransform(scrollYProgress, [0, 0.45], ["0px", "240%"]);
-  const card3Y = useTransform(scrollYProgress, [0, 0.45], ["0px", "-110%"]);
-  const card3Rotate = useTransform(scrollYProgress, [0, 0.45], [-2, 10]);
-  const card3Scale = useTransform(scrollYProgress, [0, 0.45], [0.9, 1.05]);
+  // Card 3: Top Right (membingkai sisi kanan atas judul & logo)
+  const card3X = useTransform(
+    scrollYProgress,
+    [0, 0.55],
+    [isMobile ? "10px" : "20px", isMobile ? "120px" : "430px"]
+  );
+  const card3Y = useTransform(
+    scrollYProgress,
+    [0, 0.55],
+    [isMobile ? "-15px" : "-15px", isMobile ? "-180px" : "-145px"]
+  );
+  const card3Rotate = useTransform(scrollYProgress, [0, 0.55], [4, 7]);
+  const card3Scale = useTransform(scrollYProgress, [0, 0.55], [0.9, 1.0]);
 
-  // Card 4: Bottom Right
-  const card4X = useTransform(scrollYProgress, [0, 0.45], ["0px", "220%"]);
-  const card4Y = useTransform(scrollYProgress, [0, 0.45], ["0px", "120%"]);
-  const card4Rotate = useTransform(scrollYProgress, [0, 0.45], [5, 8]);
-  const card4Scale = useTransform(scrollYProgress, [0, 0.45], [0.94, 1.05]);
+  // Card 4: Bottom Right (membingkai sisi kanan bawah di samping tombol "Bergabung sebagai warga")
+  const card4X = useTransform(
+    scrollYProgress,
+    [0, 0.55],
+    [isMobile ? "10px" : "15px", isMobile ? "110px" : "410px"]
+  );
+  const card4Y = useTransform(
+    scrollYProgress,
+    [0, 0.55],
+    [isMobile ? "15px" : "15px", isMobile ? "190px" : "145px"]
+  );
+  const card4Rotate = useTransform(scrollYProgress, [0, 0.55], [-3, -5]);
+  const card4Scale = useTransform(scrollYProgress, [0, 0.55], [0.9, 1.0]);
 
-  // FOTONYA MENYEBAR DAN MENGHILANG: all 4 photo cards fade to 0 opacity as they scatter away
-  const cardsFade = useTransform(scrollYProgress, [0.16, 0.44], [1, 0]);
+  // Kartu foto tetap terlihat jelas dan membingkai teks dan logo di sekelilingnya
+  const cardsOpacity = useTransform(scrollYProgress, [0, 0.2], [0.85, 1.0]);
 
-  // Card 5: Top Cover Card in Center (dissolves rapidly as stack opens)
-  const coverOpacity = useTransform(scrollYProgress, [0, 0.20], [1, 0]);
-  const coverScale = useTransform(scrollYProgress, [0, 0.20], [1.0, 0.75]);
-  const coverY = useTransform(scrollYProgress, [0, 0.20], [0, -35]);
-
-  // Central Content Reveal (App Icon + Headline + Description + CTA Buttons)
-  // Emerges cleanly in the center as photos vanish, leaving only clean text and logo
-  const centerOpacity = useTransform(scrollYProgress, [0.26, 0.52], [0, 1]);
-  const centerScale = useTransform(scrollYProgress, [0.26, 0.52], [0.88, 1.0]);
-  const centerY = useTransform(scrollYProgress, [0.26, 0.52], [28, 0]);
+  // Central Content Reveal (Logo squircle + Headline + Deskripsi + Tombol CTA):
+  // Mekar di tengah seiring kartu foto menyebar ke sekelilingnya (tanpa ada foto di tengah)
+  const centerOpacity = useTransform(scrollYProgress, [0.08, 0.42], [0, 1]);
+  const centerScale = useTransform(scrollYProgress, [0.08, 0.45], [0.88, 1.0]);
+  const centerY = useTransform(scrollYProgress, [0.08, 0.45], [24, 0]);
 
   if (kurangiGerak) {
     return (
@@ -515,7 +546,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
     >
       <div className={styles.tedySticky}>
         <div className={styles.tedyStage}>
-          {/* Central Revealing Content (Ada yang perlu kita bereskan?) */}
+          {/* Konten Utama di Tengah: Logo, Headline, Subtitle, dan Tombol Saja */}
           <motion.div
             className={styles.tedyCenterContent}
             style={{
@@ -530,7 +561,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
             {children}
           </motion.div>
 
-          {/* Exploding Card 1: Top Left */}
+          {/* Kartu 1: Menyebar ke Kiri Atas */}
           <motion.div
             className={`${styles.tedyCard} ${styles.tedyCard1}`}
             style={{
@@ -538,7 +569,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               y: card1Y,
               rotate: card1Rotate,
               scale: card1Scale,
-              opacity: cardsFade,
+              opacity: cardsOpacity,
             }}
             aria-hidden="true"
           >
@@ -546,7 +577,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               src={TEDY_CARDS[0].foto}
               alt={TEDY_CARDS[0].alt}
               fill
-              sizes="(max-width: 768px) 140px, 280px"
+              sizes="(max-width: 768px) 140px, 240px"
               className="object-cover"
               draggable={false}
             />
@@ -554,7 +585,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
             <span className={styles.tedyCardTag}>{TEDY_CARDS[0].tag}</span>
           </motion.div>
 
-          {/* Exploding Card 2: Bottom Left */}
+          {/* Kartu 2: Menyebar ke Kiri Bawah */}
           <motion.div
             className={`${styles.tedyCard} ${styles.tedyCard2}`}
             style={{
@@ -562,7 +593,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               y: card2Y,
               rotate: card2Rotate,
               scale: card2Scale,
-              opacity: cardsFade,
+              opacity: cardsOpacity,
             }}
             aria-hidden="true"
           >
@@ -570,7 +601,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               src={TEDY_CARDS[1].foto}
               alt={TEDY_CARDS[1].alt}
               fill
-              sizes="(max-width: 768px) 140px, 280px"
+              sizes="(max-width: 768px) 140px, 240px"
               className="object-cover"
               draggable={false}
             />
@@ -578,7 +609,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
             <span className={styles.tedyCardTag}>{TEDY_CARDS[1].tag}</span>
           </motion.div>
 
-          {/* Exploding Card 3: Top Right */}
+          {/* Kartu 3: Menyebar ke Kanan Atas */}
           <motion.div
             className={`${styles.tedyCard} ${styles.tedyCard3}`}
             style={{
@@ -586,7 +617,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               y: card3Y,
               rotate: card3Rotate,
               scale: card3Scale,
-              opacity: cardsFade,
+              opacity: cardsOpacity,
             }}
             aria-hidden="true"
           >
@@ -594,7 +625,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               src={TEDY_CARDS[2].foto}
               alt={TEDY_CARDS[2].alt}
               fill
-              sizes="(max-width: 768px) 140px, 280px"
+              sizes="(max-width: 768px) 140px, 240px"
               className="object-cover"
               draggable={false}
             />
@@ -602,7 +633,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
             <span className={styles.tedyCardTag}>{TEDY_CARDS[2].tag}</span>
           </motion.div>
 
-          {/* Exploding Card 4: Bottom Right */}
+          {/* Kartu 4: Menyebar ke Kanan Bawah */}
           <motion.div
             className={`${styles.tedyCard} ${styles.tedyCard4}`}
             style={{
@@ -610,7 +641,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               y: card4Y,
               rotate: card4Rotate,
               scale: card4Scale,
-              opacity: cardsFade,
+              opacity: cardsOpacity,
             }}
             aria-hidden="true"
           >
@@ -618,34 +649,12 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               src={TEDY_CARDS[3].foto}
               alt={TEDY_CARDS[3].alt}
               fill
-              sizes="(max-width: 768px) 140px, 280px"
+              sizes="(max-width: 768px) 140px, 240px"
               className="object-cover"
               draggable={false}
             />
             <div className={styles.tedyCardOverlay} />
             <span className={styles.tedyCardTag}>{TEDY_CARDS[3].tag}</span>
-          </motion.div>
-
-          {/* Card 5: Top Stack Cover (Dissolves as scroll begins) */}
-          <motion.div
-            className={`${styles.tedyCard} ${styles.tedyCardCover}`}
-            style={{
-              opacity: coverOpacity,
-              scale: coverScale,
-              y: coverY,
-            }}
-            aria-hidden="true"
-          >
-            <Image
-              src={TEDY_CARDS[4].foto}
-              alt={TEDY_CARDS[4].alt}
-              fill
-              sizes="(max-width: 768px) 140px, 280px"
-              className="object-cover"
-              draggable={false}
-            />
-            <div className={styles.tedyCardOverlay} />
-            <span className={styles.tedyCardTag}>{TEDY_CARDS[4].tag}</span>
           </motion.div>
         </div>
       </div>

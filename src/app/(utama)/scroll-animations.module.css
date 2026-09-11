@@ -395,8 +395,8 @@
 .tedyStage {
   position: relative;
   width: 100%;
-  max-width: 1040px;
-  min-height: 520px;
+  max-width: 1240px;
+  min-height: 560px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -409,7 +409,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  max-width: 620px;
+  max-width: 520px;
   margin: 0 auto;
   will-change: transform, opacity;
 }
@@ -459,11 +459,11 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-top: -95px;
-  margin-left: -130px;
-  width: 260px;
-  height: 190px;
-  border-radius: 24px;
+  margin-top: -85px;
+  margin-left: -120px;
+  width: 240px;
+  height: 170px;
+  border-radius: 20px;
   overflow: hidden;
   background: var(--panel-2);
   border: 1px solid var(--liquid-glass-border);
@@ -479,7 +479,6 @@
 .tedyCard2 { z-index: 3; }
 .tedyCard3 { z-index: 2; }
 .tedyCard4 { z-index: 1; }
-.tedyCardCover { z-index: 6; }
 
 .tedyCardOverlay {
   position: absolute;
@@ -512,14 +511,14 @@
     height: 150vh;
   }
   .tedyStage {
-    min-height: 440px;
+    min-height: 500px;
   }
   .tedyCard {
-    width: 160px;
-    height: 120px;
-    margin-top: -60px;
-    margin-left: -80px;
-    border-radius: 16px;
+    width: 140px;
+    height: 100px;
+    margin-top: -50px;
+    margin-left: -70px;
+    border-radius: 14px;
   }
   .tedyCardTag {
     font-size: 8px;
