@@ -191,7 +191,7 @@ export function NotifikasiBel() {
               animate={animasiPopover.animate}
               exit={animasiPopover.exit}
               transition={transisiCepat}
-              className="absolute right-0 top-full z-40 mt-2 w-80 origin-top-right overflow-hidden rounded-2xl border garis-halus bg-panel shadow-xl"
+              className="absolute right-0 top-full z-40 mt-2 w-80 origin-top-right overflow-hidden rounded-2xl liquid-glass-sheet shadow-2xl"
             >
               <div className="flex min-h-[52px] items-center justify-between gap-2 border-b garis-halus px-4 py-1.5">
                 <p className="font-display text-sm font-bold">Notifikasi</p>

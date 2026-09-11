@@ -389,18 +389,18 @@ export function LeafletMap({
               type="button"
               onClick={pakaiLokasiSaya}
               disabled={mencariLokasi}
-              className="pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full border garis-halus bg-panel/95 px-4 text-sm font-semibold shadow-lg backdrop-blur transition hover:border-action disabled:opacity-60"
+              className="liquid-glass-dock pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold transition hover:border-action disabled:opacity-60"
             >
               {mencariLokasi ? "Mencari…" : "Pakai lokasi saya"}
             </button>
-            <p className="rounded-lg bg-panel/90 px-2.5 py-1 text-[11px] leading-snug text-muted shadow backdrop-blur">
+            <p className="liquid-glass-dock rounded-xl px-3 py-1.5 text-[11px] leading-snug text-muted">
               Keyboard: geser dengan tombol panah, tekan Enter untuk menandai
               titik tengah.
             </p>
             {statusLokasi && (
               <p
                 role="status"
-                className="rounded-lg bg-panel/90 px-2.5 py-1 text-[11px] leading-snug text-ink shadow backdrop-blur"
+                className="liquid-glass-dock rounded-xl px-3 py-1.5 text-[11px] leading-snug text-ink"
               >
                 {statusLokasi}
               </p>

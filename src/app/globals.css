@@ -20,6 +20,10 @@
   --bg-elevated: #ffffff;
   --glass: rgb(255 255 255 / 0.72);
   --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.12);
+  --liquid-glass-bg: rgb(255 255 255 / 0.68);
+  --liquid-glass-border-specular: rgb(255 255 255 / 0.75);
+  --liquid-glass-border: rgb(222 222 227 / 0.7);
+  --liquid-glass-shadow: 0 12px 36px -4px rgb(0 0 0 / 0.1), 0 4px 12px -2px rgb(0 0 0 / 0.04);
   --dur-instan: 100ms;
   --dur-cepat: 180ms;
   --dur-sedang: 300ms;
@@ -45,6 +49,10 @@
   --bg-elevated: #2c2c30;
   --glass: rgb(28 28 31 / 0.72);
   --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.45);
+  --liquid-glass-bg: rgb(28 28 31 / 0.72);
+  --liquid-glass-border-specular: rgb(255 255 255 / 0.16);
+  --liquid-glass-border: rgb(53 53 59 / 0.7);
+  --liquid-glass-shadow: 0 16px 40px -4px rgb(0 0 0 / 0.5), 0 4px 16px -2px rgb(0 0 0 / 0.3);
 }
 
 @theme inline {
@@ -359,5 +367,89 @@ img.foto-laporan {
   .animate-ping,
   .animate-pulse {
     animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   Liquid Glass System — Terstandarisasi Apple HIG & Anti-Slop (R-10, R-25)
+   Diterapkan khusus pada floating functional chrome: Header, Peta Dock, Modal Sheets.
+   ========================================================================== */
+
+/* 1. Header Mengambang */
+.liquid-glass-header,
+.kaca-header {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 8px 32px -8px rgb(0 0 0 / 0.08);
+}
+.dark .liquid-glass-header,
+.dark .kaca-header {
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 12px 36px -8px rgb(0 0 0 / 0.45);
+}
+
+/* 2. Floating Dock & Pill Controls (Peta, Floating Action, Search Button) */
+.liquid-glass-dock,
+.kaca-chip {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 8px 24px -6px rgb(0 0 0 / 0.15);
+  transition: transform var(--dur-cepat) var(--ease-apple),
+              background var(--dur-cepat) var(--ease-apple),
+              box-shadow var(--dur-cepat) var(--ease-apple),
+              border-color var(--dur-cepat) var(--ease-apple);
+}
+.dark .liquid-glass-dock,
+.dark .kaca-chip {
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 12px 28px -6px rgb(0 0 0 / 0.5);
+}
+.liquid-glass-dock:active,
+.kaca-chip:active {
+  transform: scale(0.97);
+}
+
+/* 3. Floating Modal Sheet & Flyout Dialogs (Modal, Command Palette, Notification) */
+.liquid-glass-sheet {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    var(--liquid-glass-shadow);
+}
+
+/* Fallback tanpa backdrop-filter */
+@supports not (backdrop-filter: blur(1px)) {
+  .liquid-glass-header,
+  .liquid-glass-dock,
+  .liquid-glass-sheet,
+  .kaca-header,
+  .kaca-chip {
+    background: var(--panel);
+  }
+}
+
+/* Aksesibilitas: Hormati prefers-reduced-transparency */
+@media (prefers-reduced-transparency: reduce) {
+  .liquid-glass-header,
+  .liquid-glass-dock,
+  .liquid-glass-sheet,
+  .kaca-header,
+  .kaca-chip {
+    background: var(--panel) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }

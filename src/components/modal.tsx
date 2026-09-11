@@ -118,7 +118,7 @@ export function Modal({
             ref={refDialog}
             tabIndex={-1}
             className={cn(
-              "relative z-10 mt-auto w-full max-h-[92dvh] overflow-y-auto rounded-b-none rounded-t-3xl border garis-halus bg-panel p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] focus:outline-none sm:my-auto sm:rounded-3xl",
+              "relative z-10 mt-auto w-full max-h-[92dvh] overflow-y-auto rounded-b-none rounded-t-3xl liquid-glass-sheet p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] focus:outline-none sm:my-auto sm:rounded-3xl shadow-2xl",
               lebar
             )}
             initial={animasiModal.initial}

@@ -205,7 +205,7 @@ export function CommandPalette() {
         aria-label="Buka palet perintah"
         aria-haspopup="dialog"
         aria-expanded={buka}
-        className="fixed bottom-4 right-4 z-[1100] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border garis-halus bg-panel text-muted shadow-xl transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
+        className="fixed bottom-4 right-4 z-[1100] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full liquid-glass-dock text-muted shadow-xl transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
       >
         <Search size={18} />
       </button>
@@ -227,7 +227,7 @@ export function CommandPalette() {
             animate={animasiModal.animate}
             exit={animasiModal.exit}
             transition={transisiModal}
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl border garis-halus bg-panel shadow-2xl"
+            className="relative w-full max-w-lg overflow-hidden rounded-2xl liquid-glass-sheet shadow-2xl"
             role="dialog"
             aria-modal="true"
             aria-label="Palet perintah"

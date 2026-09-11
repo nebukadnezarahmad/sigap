@@ -123,7 +123,7 @@ export function SiteHeader() {
   }, [menuBuka]);
 
   return (
-    <header className="sticky top-0 z-[900] border-b garis-halus bg-paper/85 backdrop-blur-md print:hidden">
+    <header className="liquid-glass-header sticky top-0 z-[900] print:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
         <Link
           href="/"
@@ -206,7 +206,7 @@ export function SiteHeader() {
               <div
                 id="menu-akun"
                 className={cn(
-                  "invisible absolute right-0 top-full z-20 w-56 translate-y-1 rounded-2xl border garis-halus bg-panel p-2 opacity-0 shadow-xl transition",
+                  "invisible absolute right-0 top-full z-20 w-56 translate-y-1 rounded-2xl liquid-glass-sheet p-2 opacity-0 shadow-xl transition",
                   akunBuka && "visible translate-y-0 opacity-100"
                 )}
               >
