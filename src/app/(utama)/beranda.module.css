@@ -4,6 +4,8 @@
 }
 
 .hero {
+  position: relative;
+  isolation: isolate;
   padding: 72px 24px 0;
   background:
     radial-gradient(ellipse at 50% 65%, color-mix(in srgb, var(--action) 16%, transparent), transparent 64%),

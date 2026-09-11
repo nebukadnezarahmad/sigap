@@ -6,6 +6,7 @@ import { KATEGORI } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { AngkaHidup, PetaHeroVisual, Terungkap, type ModePetaHero } from "./landing-visual";
+import { PixelGrid } from "@/components/pixel-grid";
 import styles from "./beranda.module.css";
 
 export const dynamic = "force-dynamic";
@@ -101,6 +102,7 @@ export default async function Beranda() {
   return (
     <main className={styles.home}>
       <section className={styles.hero} aria-labelledby="judul-beranda">
+        <PixelGrid cellSize={42} speed={0.3} />
         <div className={styles.heroCopy}>
           <Link href="/demo" className={styles.introLink}>
             <span className={styles.introDot} aria-hidden="true" />
