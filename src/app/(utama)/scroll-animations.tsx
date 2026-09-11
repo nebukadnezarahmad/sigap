@@ -30,11 +30,11 @@ export function PanggungPetaScroll({ children }: { children: ReactNode }) {
   // Lands flat (0deg), full scale (1.0), zero offset (0px) when centered in viewport
   const rotateX = useTransform(scrollYProgress, [0, 1], [16, 0]);
   const scale = useTransform(scrollYProgress, [0, 1], [0.88, 1.0]);
-  const y = useTransform(scrollYProgress, [0, 1], [60, 0]);
+  const y = useTransform(scrollYProgress, [0, 1], [18, 0]);
 
   // Differential Parallax for Fey Floating Badges
-  const badgeYTop = useTransform(scrollYProgress, [0, 1], [48, 0]);
-  const badgeYBottom = useTransform(scrollYProgress, [0, 1], [-28, 0]);
+  const badgeYTop = useTransform(scrollYProgress, [0, 1], [32, 0]);
+  const badgeYBottom = useTransform(scrollYProgress, [0, 1], [-16, 0]);
   const badgeOpacity = useTransform(scrollYProgress, [0, 0.35, 1], [0, 0.85, 1]);
 
   if (kurangiGerak) {

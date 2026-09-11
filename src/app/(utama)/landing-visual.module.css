@@ -290,7 +290,7 @@
 .statusbar > span { display: flex; align-items: center; gap: 7px; }
 .statusbar > a { display: flex; align-items: center; gap: 5px; min-height: 44px; flex-shrink: 0; color: var(--window-ink); font-weight: 550; text-decoration: none; }
 .statusbar > a:hover { color: var(--window-blue); }
-.caption { margin: 22px 0 0; color: var(--color-muted, #737984); text-align: center; font-size: 12px; letter-spacing: -.01em; }
+.caption { margin: clamp(28px, 3.8vh, 36px) 0 0; color: var(--color-muted, #737984); text-align: center; font-size: 12px; letter-spacing: -.01em; }
 .window :is(button, a, select):focus-visible { outline: 3px solid var(--window-blue); outline-offset: 3px; }
 
 @media (max-width: 800px) {
