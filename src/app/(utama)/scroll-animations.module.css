@@ -366,7 +366,7 @@
    ------------------------------------------------------------------------- */
 .tedySection {
   position: relative;
-  height: 200vh;
+  height: 180vh;
   margin: var(--section-space, 80px) auto 0;
 }
 
@@ -412,6 +412,25 @@
   max-width: 620px;
   margin: 0 auto;
   will-change: transform, opacity;
+}
+
+.tedyCenterContent h2 {
+  font-size: clamp(34px, 4.2vw, 56px);
+  line-height: 1.15;
+  letter-spacing: -0.055em;
+  font-weight: 600;
+  margin: 0;
+}
+
+.tedyCenterContent h2 > span {
+  color: var(--action);
+}
+
+.tedyCenterContent > p {
+  color: var(--muted);
+  margin-top: 22px;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .closingAppIcon {
@@ -490,7 +509,7 @@
 
 @media (max-width: 768px) {
   .tedySection {
-    height: 160vh;
+    height: 150vh;
   }
   .tedyStage {
     min-height: 440px;
@@ -501,7 +520,6 @@
     margin-top: -60px;
     margin-left: -80px;
     border-radius: 16px;
-    opacity: 0.75;
   }
   .tedyCardTag {
     font-size: 8px;
@@ -513,6 +531,14 @@
     width: 64px;
     height: 64px;
     margin-bottom: 16px;
+  }
+  .tedyCenterContent h2 {
+    font-size: clamp(28px, 6vw, 40px);
+    letter-spacing: -0.04em;
+  }
+  .tedyCenterContent > p {
+    margin-top: 16px;
+    font-size: 14px;
   }
 }
 

@@ -455,40 +455,44 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
   });
 
   // Tedy Radial Exploding Card Transforms:
-  // Starts as a tight stack in the center, then explodes radially outward to 4 corners
+  // Starts as a tight stack in the center, explodes radially outward, and fades away completely
   // Card 1: Top Left
-  const card1X = useTransform(scrollYProgress, [0, 0.65], ["0px", "-135%"]);
-  const card1Y = useTransform(scrollYProgress, [0, 0.65], ["0px", "-68%"]);
-  const card1Rotate = useTransform(scrollYProgress, [0, 0.65], [-4, -9]);
-  const card1Scale = useTransform(scrollYProgress, [0, 0.65], [0.92, 1.0]);
+  const card1X = useTransform(scrollYProgress, [0, 0.45], ["0px", "-240%"]);
+  const card1Y = useTransform(scrollYProgress, [0, 0.45], ["0px", "-110%"]);
+  const card1Rotate = useTransform(scrollYProgress, [0, 0.45], [-4, -12]);
+  const card1Scale = useTransform(scrollYProgress, [0, 0.45], [0.92, 1.05]);
 
   // Card 2: Bottom Left
-  const card2X = useTransform(scrollYProgress, [0, 0.65], ["0px", "-125%"]);
-  const card2Y = useTransform(scrollYProgress, [0, 0.65], ["0px", "74%"]);
-  const card2Rotate = useTransform(scrollYProgress, [0, 0.65], [3, -5]);
-  const card2Scale = useTransform(scrollYProgress, [0, 0.65], [0.95, 1.0]);
+  const card2X = useTransform(scrollYProgress, [0, 0.45], ["0px", "-220%"]);
+  const card2Y = useTransform(scrollYProgress, [0, 0.45], ["0px", "120%"]);
+  const card2Rotate = useTransform(scrollYProgress, [0, 0.45], [3, -8]);
+  const card2Scale = useTransform(scrollYProgress, [0, 0.45], [0.95, 1.05]);
 
   // Card 3: Top Right
-  const card3X = useTransform(scrollYProgress, [0, 0.65], ["0px", "135%"]);
-  const card3Y = useTransform(scrollYProgress, [0, 0.65], ["0px", "-64%"]);
-  const card3Rotate = useTransform(scrollYProgress, [0, 0.65], [-2, 8]);
-  const card3Scale = useTransform(scrollYProgress, [0, 0.65], [0.9, 1.0]);
+  const card3X = useTransform(scrollYProgress, [0, 0.45], ["0px", "240%"]);
+  const card3Y = useTransform(scrollYProgress, [0, 0.45], ["0px", "-110%"]);
+  const card3Rotate = useTransform(scrollYProgress, [0, 0.45], [-2, 10]);
+  const card3Scale = useTransform(scrollYProgress, [0, 0.45], [0.9, 1.05]);
 
   // Card 4: Bottom Right
-  const card4X = useTransform(scrollYProgress, [0, 0.65], ["0px", "125%"]);
-  const card4Y = useTransform(scrollYProgress, [0, 0.65], ["0px", "72%"]);
-  const card4Rotate = useTransform(scrollYProgress, [0, 0.65], [5, 6]);
-  const card4Scale = useTransform(scrollYProgress, [0, 0.65], [0.94, 1.0]);
+  const card4X = useTransform(scrollYProgress, [0, 0.45], ["0px", "220%"]);
+  const card4Y = useTransform(scrollYProgress, [0, 0.45], ["0px", "120%"]);
+  const card4Rotate = useTransform(scrollYProgress, [0, 0.45], [5, 8]);
+  const card4Scale = useTransform(scrollYProgress, [0, 0.45], [0.94, 1.05]);
 
-  // Card 5: Top Cover Card in Center (dissolves as stack opens)
-  const coverOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
-  const coverScale = useTransform(scrollYProgress, [0, 0.35], [1.0, 0.75]);
-  const coverY = useTransform(scrollYProgress, [0, 0.35], [0, -35]);
+  // FOTONYA MENYEBAR DAN MENGHILANG: all 4 photo cards fade to 0 opacity as they scatter away
+  const cardsFade = useTransform(scrollYProgress, [0.16, 0.44], [1, 0]);
 
-  // Center Content Reveal (App Icon + Headline + Description + CTA Buttons)
-  const centerOpacity = useTransform(scrollYProgress, [0.15, 0.55], [0, 1]);
-  const centerScale = useTransform(scrollYProgress, [0.15, 0.6], [0.85, 1.0]);
-  const centerY = useTransform(scrollYProgress, [0.15, 0.6], [28, 0]);
+  // Card 5: Top Cover Card in Center (dissolves rapidly as stack opens)
+  const coverOpacity = useTransform(scrollYProgress, [0, 0.20], [1, 0]);
+  const coverScale = useTransform(scrollYProgress, [0, 0.20], [1.0, 0.75]);
+  const coverY = useTransform(scrollYProgress, [0, 0.20], [0, -35]);
+
+  // Central Content Reveal (App Icon + Headline + Description + CTA Buttons)
+  // Emerges cleanly in the center as photos vanish, leaving only clean text and logo
+  const centerOpacity = useTransform(scrollYProgress, [0.26, 0.52], [0, 1]);
+  const centerScale = useTransform(scrollYProgress, [0.26, 0.52], [0.88, 1.0]);
+  const centerY = useTransform(scrollYProgress, [0.26, 0.52], [28, 0]);
 
   if (kurangiGerak) {
     return (
@@ -534,6 +538,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               y: card1Y,
               rotate: card1Rotate,
               scale: card1Scale,
+              opacity: cardsFade,
             }}
             aria-hidden="true"
           >
@@ -557,6 +562,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               y: card2Y,
               rotate: card2Rotate,
               scale: card2Scale,
+              opacity: cardsFade,
             }}
             aria-hidden="true"
           >
@@ -580,6 +586,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               y: card3Y,
               rotate: card3Rotate,
               scale: card3Scale,
+              opacity: cardsFade,
             }}
             aria-hidden="true"
           >
@@ -603,6 +610,7 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
               y: card4Y,
               rotate: card4Rotate,
               scale: card4Scale,
+              opacity: cardsFade,
             }}
             aria-hidden="true"
           >
