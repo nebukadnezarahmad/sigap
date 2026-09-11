@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, type ReactNode } from "react";
+import { useState, useRef, useCallback, useEffect, type ReactNode } from "react";
 import {
   motion,
   useScroll,
@@ -9,6 +9,7 @@ import {
   useReducedMotion,
   type MotionValue,
 } from "motion/react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import styles from "./scroll-animations.module.css";
 
 /* -------------------------------------------------------------------------
@@ -143,20 +144,115 @@ const BUKTI_DATA = [
 ];
 
 export function GaleriBuktiScroll() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const kurangiGerak = useReducedMotion();
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
 
-  // Smooth horizontal slide: 0% down to -38% as section scrolls past
-  const x = useTransform(scrollYProgress, [0.15, 0.85], ["0%", "-38%"]);
+  // Mouse drag tracking refs
+  const isDownRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+  const isDraggingRef = useRef(false);
+
+  // Scroll checking callback
+  const checkScroll = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 15);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 15);
+
+    const cards = el.querySelectorAll<HTMLElement>("article");
+    let closestIndex = 0;
+    let minDiff = Infinity;
+    cards.forEach((card, idx) => {
+      const diff = Math.abs(card.offsetLeft - el.offsetLeft - scrollLeft);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = idx;
+      }
+    });
+    setActiveIndex(closestIndex);
+  }, []);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDownRef.current || !containerRef.current) return;
+      const x = e.pageX - containerRef.current.offsetLeft;
+      const walk = (x - startXRef.current) * 1.3;
+      if (Math.abs(walk) > 4) {
+        if (!isDraggingRef.current) {
+          isDraggingRef.current = true;
+          setIsDragging(true);
+        }
+        containerRef.current.scrollLeft = scrollLeftRef.current - walk;
+      }
+    };
+
+    const onMouseUp = () => {
+      if (isDownRef.current) {
+        isDownRef.current = false;
+        if (isDraggingRef.current) {
+          isDraggingRef.current = false;
+          setIsDragging(false);
+        }
+      }
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [checkScroll]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    isDownRef.current = true;
+    startXRef.current = e.pageX - containerRef.current.offsetLeft;
+    scrollLeftRef.current = containerRef.current.scrollLeft;
+  };
+
+  const scrollToIndex = (index: number) => {
+    if (!containerRef.current) return;
+    const cards = containerRef.current.querySelectorAll<HTMLElement>("article");
+    const targetCard = cards[index];
+    if (targetCard) {
+      const scrollTarget = targetCard.offsetLeft - containerRef.current.offsetLeft;
+      containerRef.current.scrollTo({
+        left: scrollTarget,
+        behavior: kurangiGerak ? "auto" : "smooth",
+      });
+      setActiveIndex(index);
+    }
+  };
+
+  const scrollPrev = () => {
+    const target = Math.max(0, activeIndex - 1);
+    scrollToIndex(target);
+  };
+
+  const scrollNext = () => {
+    const target = Math.min(BUKTI_DATA.length - 1, activeIndex + 1);
+    scrollToIndex(target);
+  };
 
   return (
     <section
-      ref={sectionRef}
       className={styles.gallerySection}
       aria-labelledby="judul-galeri-bukti"
       data-testid="galeri-bukti-scroll"
@@ -170,19 +266,71 @@ export function GaleriBuktiScroll() {
             Perubahan nyata.<br />
             <span>Tercatat dan terlihat.</span>
           </h2>
-          <p>Gulir untuk menjelajahi rekam jejak gotong royong dan pembenahan fasilitas di permukiman.</p>
+          <p>Geser kartu atau gunakan tombol navigasi untuk menjelajahi rekam jejak gotong royong warga.</p>
         </div>
-        <div className={`${styles.progressPill} liquid-glass-dock`}>
-          <span className="inline-block w-2 h-2 rounded-full bg-action animate-pulse" />
-          <span>3 Dokumentasi Unggulan</span>
+
+        <div className={styles.galleryControls}>
+          <div className={`${styles.navGroup} liquid-glass-control`} role="group" aria-label="Navigasi Galeri">
+            <button
+              type="button"
+              className={styles.navButton}
+              onClick={scrollPrev}
+              disabled={!canScrollLeft}
+              aria-label="Geser ke kartu sebelumnya"
+            >
+              <ChevronLeft size={18} aria-hidden="true" />
+            </button>
+
+            <div className={styles.dots} role="tablist" aria-label="Pilih kartu dokumentasi">
+              {BUKTI_DATA.map((item, idx) => (
+                <button
+                  key={item.nomor}
+                  type="button"
+                  className={`${styles.dot} ${idx === activeIndex ? styles.dotActive : ""}`}
+                  onClick={() => scrollToIndex(idx)}
+                  aria-label={`Kartu ${item.nomor}: ${item.judul}`}
+                  aria-selected={idx === activeIndex}
+                  role="tab"
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className={styles.navButton}
+              onClick={scrollNext}
+              disabled={!canScrollRight}
+              aria-label="Geser ke kartu berikutnya"
+            >
+              <ChevronRight size={18} aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className={`${styles.progressPill} liquid-glass-dock`}>
+            <span className="inline-block w-2 h-2 rounded-full bg-action animate-pulse" />
+            <span>Kartu {activeIndex + 1} dari {BUKTI_DATA.length}</span>
+          </div>
         </div>
       </div>
 
-      <div className={styles.trackContainer}>
-        <motion.div
-          className={styles.horizontalTrack}
-          style={kurangiGerak ? undefined : { x }}
-        >
+      <div
+        ref={containerRef}
+        className={`${styles.trackContainer} ${isDragging ? styles.isDragging : ""}`}
+        onMouseDown={handleMouseDown}
+        tabIndex={0}
+        role="region"
+        aria-label="Galeri bukti perubahan nyata yang dapat digeser"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            scrollPrev();
+          } else if (e.key === "ArrowRight") {
+            e.preventDefault();
+            scrollNext();
+          }
+        }}
+      >
+        <div className={styles.horizontalTrack}>
           {BUKTI_DATA.map((item) => (
             <article key={item.nomor} className={`${styles.card} liquid-glass-tile`}>
               <Image
@@ -192,12 +340,13 @@ export function GaleriBuktiScroll() {
                 sizes="(max-width: 768px) 85vw, 45vw"
                 className={`object-cover ${styles.cardImage}`}
                 loading="lazy"
+                draggable={false}
               />
               <div className={styles.cardOverlay} />
               <div className={styles.cardContent}>
                 <div className={styles.cardTop}>
                   <span className={styles.cardTag}>{item.tag}</span>
-                  <span className={styles.cardNumber}>{item.nomor} / 03</span>
+                  <span className={styles.cardNumber}>{item.nomor} / 0{BUKTI_DATA.length}</span>
                 </div>
                 <div className={styles.cardBottom}>
                   <h3>{item.judul}</h3>
@@ -206,7 +355,7 @@ export function GaleriBuktiScroll() {
               </div>
             </article>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

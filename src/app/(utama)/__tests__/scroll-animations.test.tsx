@@ -27,7 +27,7 @@ describe("Scroll Animations", () => {
     expect(container).toHaveTextContent("dampaknya");
   });
 
-  it("me-render GaleriBuktiScroll dengan 3 kartu dokumentasi warga", () => {
+  it("me-render GaleriBuktiScroll dengan tombol navigasi geser dan indikator kartu", () => {
     render(<GaleriBuktiScroll />);
     expect(screen.getByTestId("galeri-bukti-scroll")).toBeInTheDocument();
     expect(
@@ -36,5 +36,27 @@ describe("Scroll Animations", () => {
     expect(
       screen.getByText(/Kota dan permukiman berkelanjutan/i)
     ).toBeInTheDocument();
+
+    // Memverifikasi tombol navigasi panah kiri dan kanan
+    const tombolSebelumnya = screen.getByRole("button", {
+      name: /geser ke kartu sebelumnya/i,
+    });
+    const tombolBerikutnya = screen.getByRole("button", {
+      name: /geser ke kartu berikutnya/i,
+    });
+    expect(tombolSebelumnya).toBeInTheDocument();
+    expect(tombolBerikutnya).toBeInTheDocument();
+
+    // Memverifikasi region yang dapat digeser
+    const regionGaleri = screen.getByRole("region", {
+      name: /galeri bukti perubahan nyata yang dapat digeser/i,
+    });
+    expect(regionGaleri).toBeInTheDocument();
+
+    // Memverifikasi tablist dots kartu
+    const tablist = screen.getByRole("tablist", {
+      name: /pilih kartu dokumentasi/i,
+    });
+    expect(tablist).toBeInTheDocument();
   });
 });
