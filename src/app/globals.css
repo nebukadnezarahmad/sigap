@@ -124,8 +124,22 @@
 }
 
 body {
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(at 100% 0%, color-mix(in srgb, var(--action) 9%, transparent) 0px, transparent 50%),
+    radial-gradient(at 0% 45%, color-mix(in srgb, var(--success) 7%, transparent) 0px, transparent 45%),
+    radial-gradient(at 85% 90%, color-mix(in srgb, #fd9d24 6%, transparent) 0px, transparent 45%);
+  background-attachment: fixed;
   color: var(--ink);
+}
+
+.dark body {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(at 100% 0%, color-mix(in srgb, var(--action) 16%, transparent) 0px, transparent 55%),
+    radial-gradient(at 0% 45%, color-mix(in srgb, var(--success) 12%, transparent) 0px, transparent 50%),
+    radial-gradient(at 85% 90%, color-mix(in srgb, #fd9d24 9%, transparent) 0px, transparent 50%);
+  background-attachment: fixed;
 }
 
 html {
@@ -430,11 +444,55 @@ img.foto-laporan {
     var(--liquid-glass-shadow);
 }
 
+/* 4. Large Liquid Glass Tile (Kartu Fitur, Stat Bar, Panggung Peta) */
+.liquid-glass-tile {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 16px 40px -8px rgb(0 0 0 / 0.07),
+    0 4px 12px -2px rgb(0 0 0 / 0.03);
+  transition: transform var(--dur-cepat) var(--ease-apple),
+              box-shadow var(--dur-cepat) var(--ease-apple),
+              border-color var(--dur-cepat) var(--ease-apple);
+}
+.dark .liquid-glass-tile {
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 20px 48px -8px rgb(0 0 0 / 0.5),
+    0 4px 16px -2px rgb(0 0 0 / 0.3);
+}
+
+/* 5. Micro-Frosted Glass Pill (Lencana, Kategori, Counter Capsule) */
+.liquid-glass-pill {
+  background: rgb(255 255 255 / 0.55);
+  backdrop-filter: blur(16px) saturate(170%);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  border: 1px solid rgb(255 255 255 / 0.6);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.8),
+    0 4px 16px -4px rgb(0 0 0 / 0.06);
+  transition: transform var(--dur-cepat) var(--ease-apple),
+              background var(--dur-cepat) var(--ease-apple),
+              border-color var(--dur-cepat) var(--ease-apple);
+}
+.dark .liquid-glass-pill {
+  background: rgb(255 255 255 / 0.07);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.15),
+    0 4px 16px -4px rgb(0 0 0 / 0.4);
+}
+
 /* Fallback tanpa backdrop-filter */
 @supports not (backdrop-filter: blur(1px)) {
   .liquid-glass-header,
   .liquid-glass-dock,
   .liquid-glass-sheet,
+  .liquid-glass-tile,
+  .liquid-glass-pill,
   .kaca-header,
   .kaca-chip {
     background: var(--panel);
@@ -446,6 +504,8 @@ img.foto-laporan {
   .liquid-glass-header,
   .liquid-glass-dock,
   .liquid-glass-sheet,
+  .liquid-glass-tile,
+  .liquid-glass-pill,
   .kaca-header,
   .kaca-chip {
     background: var(--panel) !important;
