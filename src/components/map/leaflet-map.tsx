@@ -9,31 +9,22 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/lib/use-theme";
 import { svgUriKategori } from "@/lib/ikon-vektor";
 
-const KUNCI_CARTO = process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "";
+const KUNCI_CARTO = (process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "").trim();
 const ADA_KUNCI_CARTO = KUNCI_CARTO.length > 0;
+const PARAM_KUNCI = ADA_KUNCI_CARTO ? `?api_key=${encodeURIComponent(KUNCI_CARTO)}` : "";
 
-const TILE_TERANG = `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${
-  ADA_KUNCI_CARTO ? `?api_key=${KUNCI_CARTO}` : ""
-}`;
-const TILE_GELAP = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${
-  ADA_KUNCI_CARTO ? `?api_key=${KUNCI_CARTO}` : ""
-}`;
+const TILE_TERANG = `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${PARAM_KUNCI}`;
+const TILE_GELAP = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${PARAM_KUNCI}`;
 
-// Fallback ubin OSM standar saat kunci CARTO kosong. Tanpa ini, ubin CARTO
-// tanpa kunci menampilkan watermark "API KEY REQUIRED" dan peta terlihat kotor.
-const TILE_OSM = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-const ATRIBUSI_OSM =
-  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors';
 const ATRIBUSI_CARTO =
   '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>';
 
 function urlTile(gelap: boolean) {
-  if (!ADA_KUNCI_CARTO) return TILE_OSM;
   return gelap ? TILE_GELAP : TILE_TERANG;
 }
 
 function atribusiTile() {
-  return ADA_KUNCI_CARTO ? ATRIBUSI_CARTO : ATRIBUSI_OSM;
+  return ATRIBUSI_CARTO;
 }
 
 // Palet literal khusus Leaflet: gradien kanvas heatmap dan data-URI ikon SVG
