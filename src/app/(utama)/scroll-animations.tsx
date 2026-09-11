@@ -463,67 +463,79 @@ export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
   // Card 1: Top Left (membingkai sisi kiri atas judul & logo)
   const card1X = useTransform(
     scrollYProgress,
-    [0, 0.55],
-    [isMobile ? "-10px" : "-20px", isMobile ? "-120px" : "-430px"]
+    [0, 0.55, 1.0],
+    [isMobile ? "-10px" : "-20px", isMobile ? "-120px" : "-430px", isMobile ? "-120px" : "-430px"]
   );
   const card1Y = useTransform(
     scrollYProgress,
-    [0, 0.55],
-    [isMobile ? "-15px" : "-15px", isMobile ? "-180px" : "-145px"]
+    [0, 0.55, 1.0],
+    [isMobile ? "-15px" : "-15px", isMobile ? "-180px" : "-145px", isMobile ? "-180px" : "-145px"]
   );
-  const card1Rotate = useTransform(scrollYProgress, [0, 0.55], [-4, -7]);
-  const card1Scale = useTransform(scrollYProgress, [0, 0.55], [0.9, 1.0]);
+  const card1Rotate = useTransform(scrollYProgress, [0, 0.55, 1.0], [-4, -7, -7]);
+  const card1Scale = useTransform(scrollYProgress, [0, 0.55, 1.0], [0.9, 1.0, 1.0]);
 
   // Card 2: Bottom Left (membingkai sisi kiri bawah di samping tombol "Buat laporan")
   const card2X = useTransform(
     scrollYProgress,
-    [0, 0.55],
-    [isMobile ? "-10px" : "-15px", isMobile ? "-110px" : "-410px"]
+    [0, 0.55, 1.0],
+    [isMobile ? "-10px" : "-15px", isMobile ? "-110px" : "-410px", isMobile ? "-110px" : "-410px"]
   );
   const card2Y = useTransform(
     scrollYProgress,
-    [0, 0.55],
-    [isMobile ? "15px" : "15px", isMobile ? "190px" : "145px"]
+    [0, 0.55, 1.0],
+    [isMobile ? "15px" : "15px", isMobile ? "190px" : "145px", isMobile ? "190px" : "145px"]
   );
-  const card2Rotate = useTransform(scrollYProgress, [0, 0.55], [3, 4]);
-  const card2Scale = useTransform(scrollYProgress, [0, 0.55], [0.9, 1.0]);
+  const card2Rotate = useTransform(scrollYProgress, [0, 0.55, 1.0], [3, 4, 4]);
+  const card2Scale = useTransform(scrollYProgress, [0, 0.55, 1.0], [0.9, 1.0, 1.0]);
 
   // Card 3: Top Right (membingkai sisi kanan atas judul & logo)
   const card3X = useTransform(
     scrollYProgress,
-    [0, 0.55],
-    [isMobile ? "10px" : "20px", isMobile ? "120px" : "430px"]
+    [0, 0.55, 1.0],
+    [isMobile ? "10px" : "20px", isMobile ? "120px" : "430px", isMobile ? "120px" : "430px"]
   );
   const card3Y = useTransform(
     scrollYProgress,
-    [0, 0.55],
-    [isMobile ? "-15px" : "-15px", isMobile ? "-180px" : "-145px"]
+    [0, 0.55, 1.0],
+    [isMobile ? "-15px" : "-15px", isMobile ? "-180px" : "-145px", isMobile ? "-180px" : "-145px"]
   );
-  const card3Rotate = useTransform(scrollYProgress, [0, 0.55], [4, 7]);
-  const card3Scale = useTransform(scrollYProgress, [0, 0.55], [0.9, 1.0]);
+  const card3Rotate = useTransform(scrollYProgress, [0, 0.55, 1.0], [4, 7, 7]);
+  const card3Scale = useTransform(scrollYProgress, [0, 0.55, 1.0], [0.9, 1.0, 1.0]);
 
   // Card 4: Bottom Right (membingkai sisi kanan bawah di samping tombol "Bergabung sebagai warga")
   const card4X = useTransform(
     scrollYProgress,
-    [0, 0.55],
-    [isMobile ? "10px" : "15px", isMobile ? "110px" : "410px"]
+    [0, 0.55, 1.0],
+    [isMobile ? "10px" : "15px", isMobile ? "110px" : "410px", isMobile ? "110px" : "410px"]
   );
   const card4Y = useTransform(
     scrollYProgress,
-    [0, 0.55],
-    [isMobile ? "15px" : "15px", isMobile ? "190px" : "145px"]
+    [0, 0.55, 1.0],
+    [isMobile ? "15px" : "15px", isMobile ? "190px" : "145px", isMobile ? "190px" : "145px"]
   );
-  const card4Rotate = useTransform(scrollYProgress, [0, 0.55], [-3, -5]);
-  const card4Scale = useTransform(scrollYProgress, [0, 0.55], [0.9, 1.0]);
+  const card4Rotate = useTransform(scrollYProgress, [0, 0.55, 1.0], [-3, -5, -5]);
+  const card4Scale = useTransform(scrollYProgress, [0, 0.55, 1.0], [0.9, 1.0, 1.0]);
 
-  // Kartu foto tetap terlihat jelas dan membingkai teks dan logo di sekelilingnya
-  const cardsOpacity = useTransform(scrollYProgress, [0, 0.2], [0.85, 1.0]);
+  // Kartu foto tetap terlihat jelas dan membingkai teks dan logo di sekelilingnya sampai akhir
+  const cardsOpacity = useTransform(scrollYProgress, [0, 0.2, 1.0], [0.85, 1.0, 1.0]);
 
   // Central Content Reveal (Logo squircle + Headline + Deskripsi + Tombol CTA):
-  // Mekar di tengah seiring kartu foto menyebar ke sekelilingnya (tanpa ada foto di tengah)
-  const centerOpacity = useTransform(scrollYProgress, [0.08, 0.42], [0, 1]);
-  const centerScale = useTransform(scrollYProgress, [0.08, 0.45], [0.88, 1.0]);
-  const centerY = useTransform(scrollYProgress, [0.08, 0.45], [24, 0]);
+  // Mekar di tengah seiring kartu foto menyebar, dan TETAP UTUH & TERANG BENDERANG (OPACITY 1.0) SAMPAI AKHIR
+  const centerOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.08, 0.40, 1.0],
+    [0, 0, 1.0, 1.0]
+  );
+  const centerScale = useTransform(
+    scrollYProgress,
+    [0, 0.08, 0.45, 1.0],
+    [0.88, 0.88, 1.0, 1.0]
+  );
+  const centerY = useTransform(
+    scrollYProgress,
+    [0, 0.08, 0.45, 1.0],
+    [24, 24, 0, 0]
+  );
 
   if (kurangiGerak) {
     return (
