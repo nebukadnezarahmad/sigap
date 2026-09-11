@@ -406,123 +406,246 @@ export function GaleriBuktiScroll() {
 }
 
 /* -------------------------------------------------------------------------
-   ANIMASI 4: Tedy Kinetic Emerge & Orbit pada Closing CTA
+   ANIMASI 4: Tedy Exploding Card Stack Scroll Showcase (Framer #5)
    ------------------------------------------------------------------------- */
-interface PenutupKineticOrbitProps {
-  children?: ReactNode;
+const TEDY_CARDS = [
+  {
+    id: "card-1",
+    tag: "Aksi Bersama",
+    foto: "/images/gotong-royong.jpg",
+    alt: "Warga bergotong royong merawat lingkungan",
+  },
+  {
+    id: "card-2",
+    tag: "Ruang Asri",
+    foto: "/images/lingkungan-permukiman.jpg",
+    alt: "Jalan permukiman yang bersih dan tertata",
+  },
+  {
+    id: "card-3",
+    tag: "SDG 11",
+    foto: "/images/kota-sdg11.jpg",
+    alt: "Fasilitas kota ramah lingkungan",
+  },
+  {
+    id: "card-4",
+    tag: "Hasil Tuntas",
+    foto: "/images/gotong-royong.jpg",
+    alt: "Dokumentasi foto pembuktian warga",
+  },
+  {
+    id: "card-cover",
+    tag: "Dokumentasi SIGAP",
+    foto: "/images/lingkungan-permukiman.jpg",
+    alt: "Dokumentasi perubahan nyata di lingkungan",
+  },
+];
+
+interface PenutupTedyScrollProps {
+  children: ReactNode;
 }
 
-export function PenutupKineticOrbit({ children }: PenutupKineticOrbitProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+export function PenutupTedyScroll({ children }: PenutupTedyScrollProps) {
+  const sectionRef = useRef<HTMLElement>(null);
   const kurangiGerak = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start 0.95", "center 0.65"],
+    target: sectionRef,
+    offset: ["start start", "end end"],
   });
 
-  // Central Icon Bloom & Specular Radiance
-  const iconScale = useTransform(scrollYProgress, [0, 0.7, 1], [0.72, 1.06, 1.0]);
-  const iconOpacity = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.8, 1]);
-  const haloScale = useTransform(scrollYProgress, [0, 1], [0.5, 1.25]);
-  const haloOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 0.6, 0.85]);
+  // Tedy Radial Exploding Card Transforms:
+  // Starts as a tight stack in the center, then explodes radially outward to 4 corners
+  // Card 1: Top Left
+  const card1X = useTransform(scrollYProgress, [0, 0.65], ["0px", "-135%"]);
+  const card1Y = useTransform(scrollYProgress, [0, 0.65], ["0px", "-68%"]);
+  const card1Rotate = useTransform(scrollYProgress, [0, 0.65], [-4, -9]);
+  const card1Scale = useTransform(scrollYProgress, [0, 0.65], [0.92, 1.0]);
 
-  // Orbital Satellite Badges (Inward convergence toward center)
-  const badge1X = useTransform(scrollYProgress, [0, 1], [-70, 0]);
-  const badge1Y = useTransform(scrollYProgress, [0, 1], [-25, 0]);
-  const badge1Opacity = useTransform(scrollYProgress, [0, 0.45, 1], [0, 0.7, 1]);
+  // Card 2: Bottom Left
+  const card2X = useTransform(scrollYProgress, [0, 0.65], ["0px", "-125%"]);
+  const card2Y = useTransform(scrollYProgress, [0, 0.65], ["0px", "74%"]);
+  const card2Rotate = useTransform(scrollYProgress, [0, 0.65], [3, -5]);
+  const card2Scale = useTransform(scrollYProgress, [0, 0.65], [0.95, 1.0]);
 
-  const badge2X = useTransform(scrollYProgress, [0, 1], [70, 0]);
-  const badge2Y = useTransform(scrollYProgress, [0, 1], [-20, 0]);
-  const badge2Opacity = useTransform(scrollYProgress, [0, 0.45, 1], [0, 0.7, 1]);
+  // Card 3: Top Right
+  const card3X = useTransform(scrollYProgress, [0, 0.65], ["0px", "135%"]);
+  const card3Y = useTransform(scrollYProgress, [0, 0.65], ["0px", "-64%"]);
+  const card3Rotate = useTransform(scrollYProgress, [0, 0.65], [-2, 8]);
+  const card3Scale = useTransform(scrollYProgress, [0, 0.65], [0.9, 1.0]);
 
-  const badge3X = useTransform(scrollYProgress, [0, 1], [50, 0]);
-  const badge3Y = useTransform(scrollYProgress, [0, 1], [25, 0]);
-  const badge3Opacity = useTransform(scrollYProgress, [0, 0.55, 1], [0, 0.65, 1]);
+  // Card 4: Bottom Right
+  const card4X = useTransform(scrollYProgress, [0, 0.65], ["0px", "125%"]);
+  const card4Y = useTransform(scrollYProgress, [0, 0.65], ["0px", "72%"]);
+  const card4Rotate = useTransform(scrollYProgress, [0, 0.65], [5, 6]);
+  const card4Scale = useTransform(scrollYProgress, [0, 0.65], [0.94, 1.0]);
 
-  // Kinetic Typography & Actions
-  const contentY = useTransform(scrollYProgress, [0, 1], [24, 0]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.6, 1], [0.2, 0.85, 1]);
+  // Card 5: Top Cover Card in Center (dissolves as stack opens)
+  const coverOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
+  const coverScale = useTransform(scrollYProgress, [0, 0.35], [1.0, 0.75]);
+  const coverY = useTransform(scrollYProgress, [0, 0.35], [0, -35]);
+
+  // Center Content Reveal (App Icon + Headline + Description + CTA Buttons)
+  const centerOpacity = useTransform(scrollYProgress, [0.15, 0.55], [0, 1]);
+  const centerScale = useTransform(scrollYProgress, [0.15, 0.6], [0.85, 1.0]);
+  const centerY = useTransform(scrollYProgress, [0.15, 0.6], [28, 0]);
 
   if (kurangiGerak) {
     return (
-      <div className={styles.closingOrbitRoot} data-testid="penutup-kinetic-orbit">
-        <div className={styles.orbitStage}>
+      <section className={styles.tedySectionReduced} data-testid="penutup-kinetic-orbit">
+        <div className={styles.tedyCenterContent}>
           <span className={styles.closingAppIcon}>
             <MapPin size={37} strokeWidth={1.6} aria-hidden="true" />
           </span>
-        </div>
-        <div className={styles.orbitContent}>
           {children}
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div
-      ref={containerRef}
-      className={styles.closingOrbitRoot}
+    <section
+      ref={sectionRef}
+      className={styles.tedySection}
       data-testid="penutup-kinetic-orbit"
     >
-      {/* Halo Specular Glow di belakang icon */}
-      <motion.div
-        className={styles.orbitHalo}
-        style={{ scale: haloScale, opacity: haloOpacity }}
-        aria-hidden="true"
-      />
+      <div className={styles.tedySticky}>
+        <div className={styles.tedyStage}>
+          {/* Central Revealing Content (Ada yang perlu kita bereskan?) */}
+          <motion.div
+            className={styles.tedyCenterContent}
+            style={{
+              opacity: centerOpacity,
+              scale: centerScale,
+              y: centerY,
+            }}
+          >
+            <span className={styles.closingAppIcon}>
+              <MapPin size={37} strokeWidth={1.6} aria-hidden="true" />
+            </span>
+            {children}
+          </motion.div>
 
-      {/* Orbit Stage dengan Icon Tengah dan Satelit Melayang */}
-      <div className={styles.orbitStage}>
-        {/* Satelit Kiri: Laporan Masalah */}
-        <motion.div
-          className={`${styles.orbitSatellite} ${styles.satelliteLeft}`}
-          style={{ x: badge1X, y: badge1Y, opacity: badge1Opacity }}
-          aria-hidden="true"
-        >
-          <span className="inline-block w-2 h-2 rounded-full bg-action animate-pulse" />
-          <span>Laporkan titik masalah</span>
-        </motion.div>
+          {/* Exploding Card 1: Top Left */}
+          <motion.div
+            className={`${styles.tedyCard} ${styles.tedyCard1}`}
+            style={{
+              x: card1X,
+              y: card1Y,
+              rotate: card1Rotate,
+              scale: card1Scale,
+            }}
+            aria-hidden="true"
+          >
+            <Image
+              src={TEDY_CARDS[0].foto}
+              alt={TEDY_CARDS[0].alt}
+              fill
+              sizes="(max-width: 768px) 140px, 280px"
+              className="object-cover"
+              draggable={false}
+            />
+            <div className={styles.tedyCardOverlay} />
+            <span className={styles.tedyCardTag}>{TEDY_CARDS[0].tag}</span>
+          </motion.div>
 
-        {/* Central Blooming Icon */}
-        <motion.div
-          className={styles.orbitIconCenter}
-          style={{ scale: iconScale, opacity: iconOpacity }}
-        >
-          <span className={styles.closingAppIcon}>
-            <MapPin size={37} strokeWidth={1.6} aria-hidden="true" />
-          </span>
-        </motion.div>
+          {/* Exploding Card 2: Bottom Left */}
+          <motion.div
+            className={`${styles.tedyCard} ${styles.tedyCard2}`}
+            style={{
+              x: card2X,
+              y: card2Y,
+              rotate: card2Rotate,
+              scale: card2Scale,
+            }}
+            aria-hidden="true"
+          >
+            <Image
+              src={TEDY_CARDS[1].foto}
+              alt={TEDY_CARDS[1].alt}
+              fill
+              sizes="(max-width: 768px) 140px, 280px"
+              className="object-cover"
+              draggable={false}
+            />
+            <div className={styles.tedyCardOverlay} />
+            <span className={styles.tedyCardTag}>{TEDY_CARDS[1].tag}</span>
+          </motion.div>
 
-        {/* Satelit Kanan Atas: Foto Konfirmasi */}
-        <motion.div
-          className={`${styles.orbitSatellite} ${styles.satelliteRightTop}`}
-          style={{ x: badge2X, y: badge2Y, opacity: badge2Opacity }}
-          aria-hidden="true"
-        >
-          <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-          <span>Bukti foto tuntas</span>
-        </motion.div>
+          {/* Exploding Card 3: Top Right */}
+          <motion.div
+            className={`${styles.tedyCard} ${styles.tedyCard3}`}
+            style={{
+              x: card3X,
+              y: card3Y,
+              rotate: card3Rotate,
+              scale: card3Scale,
+            }}
+            aria-hidden="true"
+          >
+            <Image
+              src={TEDY_CARDS[2].foto}
+              alt={TEDY_CARDS[2].alt}
+              fill
+              sizes="(max-width: 768px) 140px, 280px"
+              className="object-cover"
+              draggable={false}
+            />
+            <div className={styles.tedyCardOverlay} />
+            <span className={styles.tedyCardTag}>{TEDY_CARDS[2].tag}</span>
+          </motion.div>
 
-        {/* Satelit Kanan Bawah: Gotong Royong */}
-        <motion.div
-          className={`${styles.orbitSatellite} ${styles.satelliteRightBottom}`}
-          style={{ x: badge3X, y: badge3Y, opacity: badge3Opacity }}
-          aria-hidden="true"
-        >
-          <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
-          <span>Bergerak bersama warga</span>
-        </motion.div>
+          {/* Exploding Card 4: Bottom Right */}
+          <motion.div
+            className={`${styles.tedyCard} ${styles.tedyCard4}`}
+            style={{
+              x: card4X,
+              y: card4Y,
+              rotate: card4Rotate,
+              scale: card4Scale,
+            }}
+            aria-hidden="true"
+          >
+            <Image
+              src={TEDY_CARDS[3].foto}
+              alt={TEDY_CARDS[3].alt}
+              fill
+              sizes="(max-width: 768px) 140px, 280px"
+              className="object-cover"
+              draggable={false}
+            />
+            <div className={styles.tedyCardOverlay} />
+            <span className={styles.tedyCardTag}>{TEDY_CARDS[3].tag}</span>
+          </motion.div>
+
+          {/* Card 5: Top Stack Cover (Dissolves as scroll begins) */}
+          <motion.div
+            className={`${styles.tedyCard} ${styles.tedyCardCover}`}
+            style={{
+              opacity: coverOpacity,
+              scale: coverScale,
+              y: coverY,
+            }}
+            aria-hidden="true"
+          >
+            <Image
+              src={TEDY_CARDS[4].foto}
+              alt={TEDY_CARDS[4].alt}
+              fill
+              sizes="(max-width: 768px) 140px, 280px"
+              className="object-cover"
+              draggable={false}
+            />
+            <div className={styles.tedyCardOverlay} />
+            <span className={styles.tedyCardTag}>{TEDY_CARDS[4].tag}</span>
+          </motion.div>
+        </div>
       </div>
-
-      {/* Typography & Actions Container */}
-      <motion.div
-        className={styles.orbitContent}
-        style={{ y: contentY, opacity: contentOpacity }}
-      >
-        {children}
-      </motion.div>
-    </div>
+    </section>
   );
 }
+
+// Alias for backwards compatibility
+export { PenutupTedyScroll as PenutupKineticOrbit };
+
 

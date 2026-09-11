@@ -4,6 +4,7 @@ import {
   PanggungPetaScroll,
   SorotTeksScroll,
   GaleriBuktiScroll,
+  PenutupTedyScroll,
   PenutupKineticOrbit,
 } from "../scroll-animations";
 
@@ -61,12 +62,12 @@ describe("Scroll Animations", () => {
     expect(tablist).toBeInTheDocument();
   });
 
-  it("me-render PenutupKineticOrbit dengan orbit stage dan children CTA", () => {
+  it("me-render PenutupTedyScroll dengan exploding photo cards dan children CTA", () => {
     render(
-      <PenutupKineticOrbit>
+      <PenutupTedyScroll>
         <h2>Ada yang perlu kita bereskan?</h2>
         <button type="button">Buat laporan</button>
-      </PenutupKineticOrbit>
+      </PenutupTedyScroll>
     );
     expect(screen.getByTestId("penutup-kinetic-orbit")).toBeInTheDocument();
     expect(
@@ -76,10 +77,10 @@ describe("Scroll Animations", () => {
       screen.getByRole("button", { name: /Buat laporan/i })
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Laporkan titik masalah/i)
+      screen.getByText(/Aksi Bersama/i)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Bukti foto tuntas/i)
+      screen.getByText(/Ruang Asri/i)
     ).toBeInTheDocument();
   });
 });

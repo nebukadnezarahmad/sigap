@@ -362,45 +362,55 @@
 }
 
 /* -------------------------------------------------------------------------
-   ANIMASI 4: Tedy Kinetic Emerge & Orbit pada Closing CTA
+   ANIMASI 4: Tedy Exploding Card Stack Scroll Showcase (Framer #5)
    ------------------------------------------------------------------------- */
-.closingOrbitRoot {
+.tedySection {
   position: relative;
-  max-width: 860px;
-  margin: 0 auto;
+  height: 200vh;
+  margin: var(--section-space, 80px) auto 0;
+}
+
+.tedySectionReduced {
+  position: relative;
+  padding: var(--section-space, 80px) 24px;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  overflow: visible;
 }
 
-.orbitHalo {
-  position: absolute;
-  top: 54px;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--action) 28%, transparent) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-  filter: blur(24px);
-}
-
-.orbitStage {
-  position: relative;
+.tedySticky {
+  position: sticky;
+  top: 72px;
+  height: calc(100vh - 72px);
+  max-height: 900px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 32px;
-  width: 100%;
-  min-height: 120px;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 24px;
+  overflow: clip;
 }
 
-.orbitIconCenter {
+.tedyStage {
   position: relative;
-  z-index: 2;
+  width: 100%;
+  max-width: 1040px;
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tedyCenterContent {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto;
   will-change: transform, opacity;
 }
 
@@ -418,6 +428,7 @@
     inset 0 1px 2px rgb(255 255 255 / 0.8),
     inset 0 -2px 4px rgb(0 0 0 / 0.2),
     0 16px 32px -8px rgb(0 102 204 / 0.45);
+  margin-bottom: 24px;
   transition: transform var(--dur-cepat, 0.18s) var(--ease-apple, cubic-bezier(0.32, 0.72, 0, 1));
 }
 
@@ -425,93 +436,94 @@
   transform: scale(1.06);
 }
 
-.orbitSatellite {
+.tedyCard {
   position: absolute;
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--foreground);
-  background: var(--liquid-glass-bg);
+  top: 50%;
+  left: 50%;
+  margin-top: -95px;
+  margin-left: -130px;
+  width: 260px;
+  height: 190px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--panel-2);
   border: 1px solid var(--liquid-glass-border);
   box-shadow:
     inset 0 1px 0 var(--liquid-glass-border-specular),
-    0 12px 28px -6px rgb(0 0 0 / 0.12);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+    0 20px 40px -10px rgb(0 0 0 / 0.25);
   pointer-events: none;
   user-select: none;
-  white-space: nowrap;
   will-change: transform, opacity;
 }
 
-.satelliteLeft {
-  top: 14px;
-  left: calc(50% - 280px);
-  animation: floatSlow 5s ease-in-out infinite alternate;
+.tedyCard1 { z-index: 4; }
+.tedyCard2 { z-index: 3; }
+.tedyCard3 { z-index: 2; }
+.tedyCard4 { z-index: 1; }
+.tedyCardCover { z-index: 6; }
+
+.tedyCardOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.05) 0%, rgb(0 0 0 / 0.55) 100%);
+  z-index: 1;
 }
 
-.satelliteRightTop {
-  top: 8px;
-  right: calc(50% - 280px);
-  animation: floatSlow 5.5s ease-in-out infinite alternate-reverse;
-}
-
-.satelliteRightBottom {
-  bottom: 0px;
-  right: calc(50% - 250px);
-  animation: floatSlow 6s ease-in-out 1s infinite alternate;
-}
-
-@keyframes floatSlow {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-6px); }
-}
-
-.orbitContent {
-  position: relative;
+.tedyCardTag {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
   z-index: 2;
-  text-align: center;
-  width: 100%;
-  will-change: transform, opacity;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  color: white;
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / 0.25);
+  letter-spacing: 0.02em;
 }
 
 @media (max-width: 768px) {
-  .orbitStage {
-    min-height: 100px;
-    margin-bottom: 20px;
+  .tedySection {
+    height: 160vh;
   }
-  .satelliteLeft {
-    left: 4px;
-    top: -8px;
-    font-size: 10px;
-    padding: 6px 12px;
+  .tedyStage {
+    min-height: 440px;
   }
-  .satelliteRightTop {
-    right: 4px;
-    top: -8px;
-    font-size: 10px;
-    padding: 6px 12px;
+  .tedyCard {
+    width: 160px;
+    height: 120px;
+    margin-top: -60px;
+    margin-left: -80px;
+    border-radius: 16px;
+    opacity: 0.75;
   }
-  .satelliteRightBottom {
-    display: none;
+  .tedyCardTag {
+    font-size: 8px;
+    padding: 3px 8px;
+    bottom: 8px;
+    left: 10px;
+  }
+  .closingAppIcon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stageInner, .horizontalTrack, .card, .orbitIconCenter, .orbitContent {
+  .stageInner, .horizontalTrack, .card, .tedyCard, .tedyCenterContent {
     transform: none !important;
     transition: none !important;
   }
   .feyBadgeTop,
   .feyBadgeBottom,
-  .satelliteLeft,
-  .satelliteRightTop,
-  .satelliteRightBottom {
+  .tedyCard {
     animation: none !important;
     transform: none !important;
     display: none !important;
@@ -519,10 +531,10 @@
   .word {
     opacity: 1 !important;
   }
-  .gallerySection {
+  .gallerySection, .tedySection {
     height: auto !important;
   }
-  .stickyContainer {
+  .stickyContainer, .tedySticky {
     position: relative !important;
     top: auto !important;
     height: auto !important;
