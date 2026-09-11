@@ -83,14 +83,14 @@
   position: sticky;
   top: 72px;
   height: calc(100vh - 72px);
-  max-height: 860px;
+  max-height: 880px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   max-width: 1320px;
   margin: 0 auto;
-  padding: 0 24px;
-  overflow: hidden;
+  padding: 0 24px 24px;
+  overflow-x: clip;
 }
 
 .galleryHeader {
@@ -206,7 +206,8 @@
 .trackContainer {
   position: relative;
   overflow: hidden;
-  padding: 12px 0 24px;
+  padding: 20px 0 76px;
+  margin-bottom: -52px;
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
@@ -225,7 +226,7 @@
   display: flex;
   gap: 28px;
   width: max-content;
-  padding: 0 4px;
+  padding: 0 16px;
   will-change: transform;
 }
 
@@ -345,6 +346,8 @@
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    padding: 16px 0 56px;
+    margin-bottom: -36px;
   }
   .trackContainer::-webkit-scrollbar {
     display: none;

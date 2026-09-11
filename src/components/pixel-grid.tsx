@@ -227,6 +227,12 @@ export function PixelGrid({
     <div
       ref={containerRef}
       className={`absolute inset-0 -z-10 pointer-events-none overflow-hidden ${className}`}
+      style={{
+        maskImage:
+          "linear-gradient(to bottom, black 0%, black calc(100% - 160px), transparent 100%)",
+        WebkitMaskImage:
+          "linear-gradient(to bottom, black 0%, black calc(100% - 160px), transparent 100%)",
+      }}
       aria-hidden="true"
       data-testid="pixel-grid"
     >
