@@ -22,12 +22,25 @@
   transition: opacity 0.15s ease;
 }
 
-/* Horizontal Showcase Section */
+/* Sticky Horizontal Showcase Section (Framer #9 + Interactive Controls) */
 .gallerySection {
   position: relative;
+  height: 240vh;
+  margin: var(--section-space, 80px) auto 0;
+}
+
+.stickyContainer {
+  position: sticky;
+  top: 72px;
+  height: calc(100vh - 72px);
+  max-height: 860px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   max-width: 1320px;
-  margin: var(--section-space, 100px) auto 0;
+  margin: 0 auto;
   padding: 0 24px;
+  overflow: hidden;
 }
 
 .galleryHeader {
@@ -36,7 +49,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .galleryHeader h2 {
@@ -129,38 +142,33 @@
   opacity: 0.8;
 }
 
+.progressPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
 .trackContainer {
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  position: relative;
+  overflow: hidden;
   padding: 12px 0 24px;
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: pan-x pan-y;
-}
-
-.trackContainer::-webkit-scrollbar {
-  display: none;
-}
-
-.trackContainer:focus-visible {
-  outline: 2px solid var(--action);
-  outline-offset: 4px;
-  border-radius: 20px;
+  touch-action: pan-y;
 }
 
 .isDragging {
   cursor: grabbing !important;
-  scroll-behavior: auto !important;
-  scroll-snap-type: none !important;
 }
 
 .isDragging .card {
   pointer-events: none;
-  transition: none !important;
 }
 
 .horizontalTrack {
@@ -168,17 +176,16 @@
   gap: 28px;
   width: max-content;
   padding: 0 4px;
+  will-change: transform;
 }
 
 .card {
   position: relative;
   width: clamp(320px, 42vw, 540px);
-  height: 420px;
+  height: clamp(340px, 46vh, 430px);
   border-radius: 28px;
   overflow: hidden;
   flex-shrink: 0;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   background: var(--liquid-glass-bg);
   border: 1px solid var(--liquid-glass-border);
   box-shadow:
@@ -263,6 +270,26 @@
 }
 
 @media (max-width: 768px) {
+  .gallerySection {
+    height: auto;
+    margin: var(--section-space, 60px) auto 0;
+  }
+  .stickyContainer {
+    position: relative;
+    top: auto;
+    height: auto;
+    max-height: none;
+    padding: 0 16px;
+  }
+  .galleryHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .galleryControls {
+    width: 100%;
+    justify-content: space-between;
+  }
   .trackContainer {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
@@ -289,5 +316,13 @@
   }
   .word {
     opacity: 1 !important;
+  }
+  .gallerySection {
+    height: auto !important;
+  }
+  .stickyContainer {
+    position: relative !important;
+    top: auto !important;
+    height: auto !important;
   }
 }
