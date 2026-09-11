@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Check, ChevronRight, MapPin, ScanLine, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, ChevronDown, ChevronRight, MapPin, ScanLine, ShieldCheck, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI } from "@/lib/constants";
 import type { LaporanDenganRelasi } from "@/types/database";
@@ -131,6 +131,10 @@ export default async function Beranda() {
             </Link>
           </div>
           <p className={styles.heroNote}>Terbuka untuk dilihat. Mudah untuk ikut peduli.</p>
+          <div className={styles.scrollHint} aria-hidden="true">
+            <span>Gulir untuk melihat peta interaktif</span>
+            <ChevronDown size={14} />
+          </div>
         </div>
         <div className={styles.productStage}>
           <PanggungPetaScroll>
