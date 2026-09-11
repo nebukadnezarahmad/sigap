@@ -1,0 +1,196 @@
+.stagePerspective {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.stageInner {
+  transform-origin: center top;
+  will-change: transform;
+}
+
+.textReveal {
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.85;
+  color: var(--ink);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.word {
+  display: inline-block;
+  margin-right: 0.28em;
+  transition: opacity 0.15s ease;
+}
+
+/* Horizontal Showcase Section */
+.gallerySection {
+  position: relative;
+  max-width: 1320px;
+  margin: var(--section-space, 100px) auto 0;
+  padding: 0 24px;
+}
+
+.galleryHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.galleryHeader h2 {
+  font-size: clamp(32px, 3.6vw, 48px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+
+.galleryHeader p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.progressPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.trackContainer {
+  overflow: hidden;
+  padding: 12px 0 24px;
+}
+
+.horizontalTrack {
+  display: flex;
+  gap: 28px;
+  width: max-content;
+  will-change: transform;
+}
+
+.card {
+  position: relative;
+  width: clamp(320px, 42vw, 540px);
+  height: 420px;
+  border-radius: 28px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--liquid-glass-bg);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 16px 40px -10px rgb(0 0 0 / 0.12);
+  transition: transform var(--dur-cepat, 0.18s) var(--ease-apple, cubic-bezier(0.32, 0.72, 0, 1)),
+              box-shadow var(--dur-cepat, 0.18s) var(--ease-apple, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 24px 50px -10px rgb(0 0 0 / 0.2);
+}
+
+.cardImage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.1) 0%, rgb(0 0 0 / 0.4) 50%, rgb(0 0 0 / 0.85) 100%);
+}
+
+.cardContent {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 28px;
+  color: white;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgb(255 255 255 / 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / 0.35);
+  color: white;
+}
+
+.cardNumber {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+
+.cardBottom h3 {
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+}
+
+.cardBottom p {
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: 0.85;
+  max-width: 440px;
+}
+
+@media (max-width: 768px) {
+  .trackContainer {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .trackContainer::-webkit-scrollbar {
+    display: none;
+  }
+  .horizontalTrack {
+    transform: none !important;
+  }
+  .card {
+    scroll-snap-align: start;
+    width: 82vw;
+    height: 380px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stageInner, .horizontalTrack, .card {
+    transform: none !important;
+    transition: none !important;
+  }
+  .word {
+    opacity: 1 !important;
+  }
+}

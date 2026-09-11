@@ -7,6 +7,11 @@ import type { LaporanDenganRelasi } from "@/types/database";
 import { IkonKategori } from "@/lib/ikon-vektor";
 import { AngkaHidup, PetaHeroVisual, Terungkap, type ModePetaHero } from "./landing-visual";
 import { PixelGrid } from "@/components/pixel-grid";
+import {
+  PanggungPetaScroll,
+  SorotTeksScroll,
+  GaleriBuktiScroll,
+} from "./scroll-animations";
 import styles from "./beranda.module.css";
 
 export const dynamic = "force-dynamic";
@@ -128,7 +133,9 @@ export default async function Beranda() {
           <p className={styles.heroNote}>Terbuka untuk dilihat. Mudah untuk ikut peduli.</p>
         </div>
         <div className={styles.productStage}>
-          <PetaHeroVisual awalTitik={titikAwal} modeAwal={modePeta} />
+          <PanggungPetaScroll>
+            <PetaHeroVisual awalTitik={titikAwal} modeAwal={modePeta} />
+          </PanggungPetaScroll>
         </div>
       </section>
 
@@ -154,7 +161,10 @@ export default async function Beranda() {
           <div className={styles.sectionHeading}>
             <p className={styles.kicker}>Dari laporan menjadi perubahan</p>
             <h2 id="judul-alur">Kecil langkahnya.<br /><span>Terasa dampaknya.</span></h2>
-            <p>Masalah di sekitar kita layak mendapat perhatian.<br className="hidden sm:block" /> SIGAP membuat prosesnya terlihat, dari awal sampai akhir.</p>
+            <SorotTeksScroll
+              teks="Masalah di sekitar kita layak mendapat perhatian. Dari laporan warga, verifikasi dewan, hingga foto pembuktian tuntas, SIGAP membuat prosesnya terlihat dari awal sampai akhir."
+              className="mt-6 text-sm text-muted leading-relaxed"
+            />
           </div>
           <div className={styles.steps}>
             {LANGKAH.map(({ nomor, ikon: Ikon, judul, isi }) => (
@@ -217,21 +227,16 @@ export default async function Beranda() {
         <div className={styles.communityCopy}>
           <p className={styles.kicker}>Rumah. Jalan. Lingkungan kita.</p>
           <h2>Tempat tinggal.<br /><span>Tempat kita peduli.</span></h2>
-          <p>Jalan yang kita lewati setiap hari. Saluran air di depan rumah. Ruang hijau tempat anak bermain. Semua berawal dari perhatian orang-orang di sekitarnya.</p>
+          <SorotTeksScroll
+            teks="Jalan yang kita lewati setiap hari. Saluran air di depan rumah. Ruang hijau tempat anak bermain. Semua berawal dari perhatian orang-orang di sekitarnya."
+            className="mt-5 text-sm text-muted leading-relaxed"
+          />
           <Link href="/papan-skor" className={styles.secondaryLink}>Kenali kontribusi warga <ArrowUpRight size={18} aria-hidden="true" /></Link>
           <span className={styles.sdg}><span aria-hidden="true">11</span> Kota dan permukiman berkelanjutan</span>
         </div>
-        <div className={styles.buktiStrip} aria-label="Didokumentasikan warga">
-          <figure className={styles.buktiItem}>
-            <Image src="/images/gotong-royong.jpg" alt="Warga bergotong royong membersihkan lingkungan" fill sizes="(max-width: 760px) 100vw, 40vw" className="object-cover" loading="lazy" />
-            <figcaption>Gotong royong warga</figcaption>
-          </figure>
-          <figure className={styles.buktiItem}>
-            <Image src="/images/kota-sdg11.jpg" alt="Koridor kota dengan ruang hijau dan transportasi publik" fill sizes="(max-width: 760px) 100vw, 40vw" className="object-cover" loading="lazy" />
-            <figcaption>Kota yang kita tuju</figcaption>
-          </figure>
-        </div>
       </section>
+
+      <GaleriBuktiScroll />
 
       <section className={styles.closing} aria-labelledby="judul-mulai">
         <span className={styles.appIcon}><MapPin size={37} strokeWidth={1.6} aria-hidden="true" /></span>
