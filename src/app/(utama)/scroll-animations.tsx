@@ -122,18 +122,21 @@ export function SorotTeksScroll({
   const ref = useRef<HTMLParagraphElement>(null);
   const kurangiGerak = useReducedMotion();
 
+  // Animasi aktif saat teks masuk dari bawah (0.92) dan sudah 100% selesai saat teks tiba di tengah layar (0.58)
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start 0.88", "end 0.45"],
+    offset: ["start 0.92", "start 0.58"],
   });
 
   const kataArray = teks.split(" ");
+  const totalKata = kataArray.length;
 
   return (
     <p ref={ref} className={`${styles.textReveal} ${className}`} data-testid="sorot-teks-scroll">
       {kataArray.map((kata, i) => {
-        const start = i / kataArray.length;
-        const end = Math.min(1, start + 1.2 / kataArray.length);
+        // Pemetaan rentang selesai di progress 0.85 sehingga semua kata sudah terang benderang tepat di tengah layar
+        const start = (i / totalKata) * 0.85;
+        const end = Math.min(1, start + 0.15);
         return (
           <KataItem
             key={i}
