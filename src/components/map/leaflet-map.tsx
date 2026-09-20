@@ -11,7 +11,7 @@ import { svgUriKategori } from "@/lib/ikon-vektor";
 
 const KUNCI_CARTO = (process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "").trim();
 const ADA_KUNCI_CARTO = KUNCI_CARTO.length > 0;
-const PARAM_KUNCI = ADA_KUNCI_CARTO ? `?api_key=${encodeURIComponent(KUNCI_CARTO)}` : "";
+const PARAM_KUNCI = ADA_KUNCI_CARTO ? `?key=${encodeURIComponent(KUNCI_CARTO)}` : "";
 
 const TILE_TERANG = `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${PARAM_KUNCI}`;
 const TILE_GELAP = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${PARAM_KUNCI}`;
