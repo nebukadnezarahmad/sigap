@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { Button } from "@/components/ui";
 
 export default function TidakDitemukan() {
   return (
     <main className="mx-auto flex min-h-[60dvh] max-w-2xl flex-col items-center justify-center px-4 py-20 text-center">
-      <p className="font-display text-[88px] font-extrabold leading-none text-daun-600/15 dark:text-daun-300/15">
+      <p className="font-display text-[88px] font-extrabold leading-none text-action/15">
         404
       </p>
       <h1 className="-mt-8 font-display text-3xl font-bold">
@@ -15,11 +14,17 @@ export default function TidakDitemukan() {
         dan diarsipkan, atau tautannya salah ketik.
       </p>
       <div className="mt-7 flex gap-3">
-        <Link href="/peta">
-          <Button>Kembali ke peta</Button>
+        <Link
+          href="/peta"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-action px-5 text-sm font-semibold text-white transition hover:bg-action-hover"
+        >
+          Buka peta
         </Link>
-        <Link href="/">
-          <Button variant="sekunder">Halaman utama</Button>
+        <Link
+          href="/"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full border garis-halus px-5 text-sm font-semibold transition hover:border-action hover:text-action"
+        >
+          Halaman utama
         </Link>
       </div>
     </main>

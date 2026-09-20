@@ -13,24 +13,24 @@ export const AKUN_DEMO = [
     email: "dewan@sigap.demo",
     deskripsi: "Dashboard statistik, kelola status laporan, dan heatmap",
     admin: true,
-    warna: "border-kunyit-500/30 bg-kunyit-500/5 hover:border-kunyit-500/60",
-    badge: "bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400",
+    warna: "border garis-halus bg-panel hover:bg-panel-2/50",
+    badge: "bg-panel-2 text-muted",
   },
   {
     peran: "Budi (Warga Aktif)",
     email: "budi@sigap.demo",
-    deskripsi: "Warga dengan poin, riwayat laporan, dan badge",
+    deskripsi: "Warga dengan poin, riwayat laporan, dan lencana",
     admin: false,
-    warna: "border-daun-500/30 bg-daun-500/5 hover:border-daun-500/60",
-    badge: "bg-daun-500/15 text-daun-700 dark:text-daun-300",
+    warna: "border-action/30 bg-action/5 hover:border-action/60",
+    badge: "bg-action/15 text-action",
   },
   {
     peran: "Rafa (Warga Baru)",
     email: "rafa@sigap.demo",
     deskripsi: "Akun baru untuk mencoba alur pelaporan dari awal",
     admin: false,
-    warna: "border-daun-500/30 bg-daun-500/5 hover:border-daun-500/60",
-    badge: "bg-daun-500/15 text-daun-700 dark:text-daun-300",
+    warna: "border-action/30 bg-action/5 hover:border-action/60",
+    badge: "bg-action/15 text-action",
   },
 ];
 
@@ -90,7 +90,7 @@ export function PilihanAkunDemo({
             {pesanGalat}
           </p>
         )}
-        <div className="grid gap-2 sm:grid-cols-3">
+        <div className="flex flex-col gap-2">
           {akunTampil.map((a) => {
             const isLoading = loadingEmail === a.email;
             return (
@@ -104,22 +104,22 @@ export function PilihanAkunDemo({
                   isLoading ? "opacity-75" : ""
                 }`}
               >
-                <div className="flex w-full items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-xs font-bold">
+                <div className="flex w-full items-center justify-between gap-2">
+                  <span className="flex min-w-0 items-center gap-1.5 text-xs font-bold">
                     {a.admin ? <Crown size={13} /> : <UserRound size={13} />}
-                    {a.peran.split(" ")[0]}
+                    <span className="truncate" title={a.peran}>{a.peran.split(" ")[0]}</span>
                   </span>
                   {isLoading ? (
-                    <span className="flex items-center gap-1 text-[10px] font-semibold text-muted">
+                    <span className="flex shrink-0 items-center gap-1 text-[10px] font-semibold text-muted">
                       <Loader2 size={13} className="animate-spin" /> Masuk…
                     </span>
                   ) : (
-                    <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${a.badge}`}>
+                    <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${a.badge}`}>
                       1-Klik
                     </span>
                   )}
                 </div>
-                <span className="mt-1 text-[11px] text-muted">
+                <span className="mt-1 block w-full truncate text-[11px] text-muted" title={a.email}>
                   {a.email}
                 </span>
               </button>
@@ -155,8 +155,8 @@ export function PilihanAkunDemo({
                 <span
                   className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl ${
                     a.admin
-                      ? "bg-kunyit-500/15 text-kunyit-600"
-                      : "bg-daun-600/10 text-daun-700 dark:text-daun-300"
+                      ? "bg-panel-2 text-ink"
+                      : "bg-action/10 text-action"
                   }`}
                 >
                   {a.admin ? <Crown size={17} /> : <UserRound size={17} />}
@@ -167,7 +167,7 @@ export function PilihanAkunDemo({
                       {a.peran}
                     </p>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${a.badge}`}
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${a.badge}`}
                     >
                       Demo
                     </span>
@@ -226,7 +226,7 @@ export function DemoAuthModal({
                 tutup();
                 router.push(`/masuk${tujuanAman ? `?next=${encodeURIComponent(tujuanAman)}` : ""}`);
               }}
-              className="font-semibold text-daun-700 hover:underline dark:text-daun-300"
+              className="font-semibold text-action hover:underline"
             >
               Masuk manual
             </button>

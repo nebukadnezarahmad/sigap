@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { animasiModal, transisiCepat, transisiModal } from "@/lib/motion";
+import { IconButton } from "@/components/ui";
 
 const emptySubscribe = () => () => {};
 
@@ -15,12 +17,14 @@ export function Modal({
   terbuka,
   tutup,
   judul,
+  deskripsiId,
   children,
   lebar = "max-w-lg",
 }: {
   terbuka: boolean;
   tutup: () => void;
   judul: string;
+  deskripsiId?: string;
   children: React.ReactNode;
   lebar?: string;
 }) {
@@ -97,38 +101,40 @@ export function Modal({
   return createPortal(
     <AnimatePresence>
       {terbuka && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
+        <div className="fixed inset-0 z-[9999] flex items-end justify-center overflow-y-auto sm:items-center sm:p-6">
           <motion.div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={transisiCepat}
             onClick={tutup}
           />
           <motion.div
             role="dialog"
             aria-modal="true"
             aria-label={judul}
+            aria-describedby={deskripsiId}
             ref={refDialog}
             tabIndex={-1}
             className={cn(
-              "relative z-10 my-auto w-full max-h-[88vh] overflow-y-auto rounded-3xl border garis-halus bg-panel p-6 focus:outline-none",
+              "relative z-10 mt-auto w-full max-h-[92dvh] overflow-y-auto rounded-b-none rounded-t-3xl liquid-glass-sheet p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] focus:outline-none sm:my-auto sm:rounded-3xl shadow-2xl",
               lebar
             )}
-            initial={{ y: 24, opacity: 0, scale: 0.96 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 16, opacity: 0, scale: 0.96 }}
-            transition={{ type: "spring", damping: 28, stiffness: 340 }}
+            initial={animasiModal.initial}
+            animate={animasiModal.animate}
+            exit={animasiModal.exit}
+            transition={transisiModal}
           >
+            <div
+              aria-hidden="true"
+              className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-line sm:hidden"
+            />
             <div className="mb-4 flex items-start justify-between gap-4 border-b garis-halus pb-3">
               <h2 className="font-display text-lg sm:text-xl font-semibold">{judul}</h2>
-              <button
-                onClick={tutup}
-                aria-label="Tutup modal"
-                className="rounded-full p-1.5 text-muted transition hover:bg-panel-2 hover:text-ink focus-visible:ring-2 focus-visible:ring-daun-500"
-              >
+              <IconButton aria-label="Tutup" ukuran="sm" onClick={tutup}>
                 <X size={18} />
-              </button>
+              </IconButton>
             </div>
             {children}
           </motion.div>

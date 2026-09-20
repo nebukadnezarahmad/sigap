@@ -23,8 +23,8 @@ export function HapusAreaKlien({ id }: { id: string }) {
       setBuka(false);
       router.refresh();
     } catch (e) {
-      const inti = e instanceof Error ? e.message : "Gagal berhenti mengikuti area.";
-      setPesan(`${inti} Periksa koneksi lalu coba lagi.`);
+      console.error("Gagal berhenti mengikuti area:", e);
+      setPesan("Belum bisa berhenti mengikuti. Periksa koneksi lalu coba lagi.");
     } finally {
       setProses(false);
     }
@@ -39,9 +39,9 @@ export function HapusAreaKlien({ id }: { id: string }) {
           setBuka(true);
         }}
         disabled={proses}
-        aria-label="Berhenti ikuti area"
+        aria-label="Berhenti mengikuti area ini"
         aria-busy={proses}
-        title="Berhenti ikuti"
+        title="Berhenti mengikuti area ini"
         className="flex size-8 items-center justify-center rounded-lg text-muted transition hover:bg-danger/10 hover:text-danger"
       >
         <BellOff size={15} />
@@ -52,7 +52,7 @@ export function HapusAreaKlien({ id }: { id: string }) {
         tutup={() => {
           if (!proses) setBuka(false);
         }}
-        judul="Berhenti ikuti area ini?"
+        judul="Berhenti mengikuti area ini?"
         lebar="max-w-md"
       >
         <p className="text-sm leading-relaxed text-muted">
@@ -78,9 +78,11 @@ export function HapusAreaKlien({ id }: { id: string }) {
             variant="bahaya"
             onClick={hapus}
             disabled={proses}
+            loading={proses}
+            loadingLabel="Berhenti mengikuti…"
             aria-busy={proses}
           >
-            {proses ? "Memproses…" : "Ya, berhenti ikuti"}
+            {proses ? "Berhenti mengikuti…" : "Ya, berhenti mengikuti"}
           </Button>
         </div>
       </Modal>

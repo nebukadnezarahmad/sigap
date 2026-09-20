@@ -3,7 +3,46 @@ import { createClient } from "@/lib/supabase/server";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Pratinjau laporan SIGAP";
+
+async function ringkasanLaporan(id: string) {
+  let judul = "Laporan Warga";
+  let status = "baru";
+  try {
+    const supabase = await createClient();
+    if (supabase) {
+      const { data } = await supabase
+        .from("reports")
+        .select("judul, status")
+        .eq("id", id)
+        .single();
+      if (data) {
+        const baris = data as unknown as { judul: string; status: string };
+        judul = baris.judul;
+        status = baris.status;
+      }
+    }
+  } catch {
+    /* fallback teks bawaan */
+  }
+  return { judul, status };
+}
+
+export async function generateImageMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const { judul, status } = await ringkasanLaporan(id);
+  return [
+    {
+      id: "utama",
+      alt: `${judul} — status ${status} · SIGAP`,
+      size,
+      contentType,
+    },
+  ];
+}
 
 export default async function Gambar({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

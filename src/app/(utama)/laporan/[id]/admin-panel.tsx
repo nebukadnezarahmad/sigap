@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ImagePlus, Save, Wrench } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { ACCEPT_GAMBAR, pesanValidasiGambar } from "@/lib/validasi-gambar";
 import { STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
@@ -39,22 +40,31 @@ export function AdminPanel({
   const [file, setFile] = useState<File | null>(null);
   const [proses, setProses] = useState(false);
   const [pesan, setPesan] = useState<string | null>(null);
+  const [gagal, setGagal] = useState(false);
 
   async function simpan() {
     if (!user) return;
     setProses(true);
     setPesan(null);
+    setGagal(false);
     try {
       const supabase = createClient();
+      let fotoBaru: { id: string } | null = null;
+      let pathFotoBaru: string | null = null;
 
       if ((status === "selesai" || status === "menunggu_verifikasi") && !file) {
         // Cek apakah sudah ada foto sesudah sebelumnya
-        const { data: adaFoto } = await supabase
+        const { data: adaFoto, error: cekFotoErr } = await supabase
           .from("report_photos")
           .select("id")
           .eq("report_id", reportId)
           .eq("fase", "sesudah")
           .limit(1);
+
+        if (cekFotoErr) {
+          console.error("Gagal memeriksa foto penanganan:", cekFotoErr);
+          throw new Error("Foto penanganan belum bisa diperiksa. Coba lagi.");
+        }
 
         if (!adaFoto || adaFoto.length === 0) {
           throw new Error("Foto bukti fisik sesudah penanganan wajib diunggah. Unggah foto dulu lalu simpan lagi.");
@@ -62,21 +72,38 @@ export function AdminPanel({
       }
 
       if (file) {
-        if (file.size > 5 * 1024 * 1024)
-          throw new Error("Ukuran foto maksimal 5 MB. Pilih foto lebih kecil lalu coba lagi.");
+        const galatFile = await pesanValidasiGambar(file);
+        if (galatFile) throw new Error(galatFile);
         const path = `${user.id}/sesudah-${Date.now()}-${file.name.replace(/[^\w.-]/g, "_")}`;
+        pathFotoBaru = path;
         const { error: upErr } = await supabase.storage
           .from("foto-laporan")
           .upload(path, file, { contentType: file.type });
-        if (upErr) throw new Error(`Gagal unggah foto: ${upErr.message} Periksa koneksi lalu coba lagi.`);
+        if (upErr) {
+          console.error("Gagal mengunggah foto sesudah:", upErr);
+          throw new Error("Foto belum bisa diunggah. Periksa koneksi lalu coba lagi.");
+        }
         const { data: pub } = supabase.storage
           .from("foto-laporan")
           .getPublicUrl(path);
-        await supabase.from("report_photos").insert({
-          report_id: reportId,
-          url: pub.publicUrl,
-          fase: "sesudah",
-        });
+        const { data, error: fotoErr } = await supabase
+          .from("report_photos")
+          .insert({
+            report_id: reportId,
+            url: pub.publicUrl,
+            fase: "sesudah",
+          })
+          .select("id")
+          .single();
+        if (fotoErr) {
+          console.error("Gagal mengaitkan foto sesudah:", fotoErr);
+          const { error: bersihErr } = await supabase.storage
+            .from("foto-laporan")
+            .remove([path]);
+          if (bersihErr) console.error("Gagal membersihkan unggahan foto:", bersihErr);
+          throw new Error("Foto belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+        }
+        fotoBaru = data;
       }
 
       const ubah: Record<string, unknown> = { status };
@@ -89,7 +116,24 @@ export function AdminPanel({
         .from("reports")
         .update(ubah)
         .eq("id", reportId);
-      if (error) throw new Error(`${error.message} Periksa koneksi lalu coba lagi.`);
+      if (error) {
+        console.error("Gagal menyimpan perubahan laporan:", error);
+        if (fotoBaru && pathFotoBaru) {
+          const { error: hapusFotoErr } = await supabase
+            .from("report_photos")
+            .delete()
+            .eq("id", fotoBaru.id);
+          if (hapusFotoErr) {
+            console.error("Gagal membatalkan foto penanganan:", hapusFotoErr);
+          } else {
+            const { error: bersihErr } = await supabase.storage
+              .from("foto-laporan")
+              .remove([pathFotoBaru]);
+            if (bersihErr) console.error("Gagal membersihkan unggahan foto:", bersihErr);
+          }
+        }
+        throw new Error("Perubahan belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+      }
 
       try {
         if (status !== statusAwal || catatan.trim()) {
@@ -121,11 +165,14 @@ export function AdminPanel({
       }
 
       setPesan("Tersimpan!");
+      setGagal(false);
       setCatatan("");
       setFile(null);
       router.refresh();
     } catch (e) {
-      setPesan(e instanceof Error ? e.message : "Gagal menyimpan. Periksa koneksi lalu coba lagi.");
+      console.error("Gagal menyimpan panel admin:", e);
+      setGagal(true);
+      setPesan(e instanceof Error ? e.message : "Perubahan belum bisa disimpan. Periksa koneksi lalu coba lagi.");
     } finally {
       setProses(false);
     }
@@ -185,16 +232,16 @@ export function AdminPanel({
         <div className="mt-3 space-y-2">
           <label
             htmlFor="foto-sesudah"
-            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-daun-500/50 bg-daun-500/5 px-3.5 py-3 text-sm text-ink transition hover:border-daun-500 hover:bg-daun-500/10"
+            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-action/50 bg-action/5 px-3.5 py-3 text-sm text-ink transition hover:border-action hover:bg-action/10"
           >
-            <ImagePlus size={17} className="text-daun-600 dark:text-daun-400" />
+            <ImagePlus size={17} className="text-action" />
             <span className="font-semibold">
               {file ? file.name : "Unggah foto bukti fisik sesudah (Wajib)*"}
             </span>
             <input
               id="foto-sesudah"
               type="file"
-              accept="image/*"
+              accept={ACCEPT_GAMBAR}
               className="sr-only"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
@@ -205,13 +252,17 @@ export function AdminPanel({
         </div>
       )}
       <div className="mt-4 flex items-center gap-3">
-        <Button type="button" onClick={simpan} disabled={proses} aria-busy={proses}>
+        <Button type="button" onClick={simpan} disabled={proses} loading={proses} loadingLabel="Menyimpan…" aria-busy={proses}>
           <Save size={16} /> {proses ? "Menyimpan…" : "Simpan perubahan"}
         </Button>
         {pesan && (
           <span
-            role={pesan === "Tersimpan!" ? "status" : "alert"}
-            className="text-sm font-semibold text-daun-700 dark:text-daun-300"
+            role={gagal ? "alert" : "status"}
+            className={
+              gagal
+                ? "text-sm font-semibold text-danger"
+                : "text-sm font-semibold text-daun-700 dark:text-daun-300"
+            }
           >
             {pesan}
           </span>

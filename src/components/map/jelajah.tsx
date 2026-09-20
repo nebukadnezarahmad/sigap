@@ -5,13 +5,24 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { harusKurangiGerak, transisiCepat } from "@/lib/motion";
 import {
+  Check,
+  ChevronDown,
   Crosshair,
+  History,
+  ListFilter,
   MapPinOff,
+  MessageSquare,
+  Pause,
   Play,
   Plus,
   Search,
+  SearchX,
+  SlidersHorizontal,
+  ThumbsUp,
   WifiOff,
+  X,
 } from "lucide-react";
 import type { LaporanDenganRelasi } from "@/types/database";
 import type { FasilitasRingkas } from "@/app/(utama)/peta/page";
@@ -20,17 +31,9 @@ import { fasilitasByJenis } from "@/lib/constants";
 import { Recycle } from "lucide-react";
 import { KATEGORI, STATUS, kategoriBySlug, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import {
-  Check,
-  ChevronDown,
-  History,
-  MessageSquare,
-  SlidersHorizontal,
-  ThumbsUp,
-  X,
-} from "lucide-react";
 import { waktuRelatif } from "@/lib/utils";
 import { StatusChip, Button, Card } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
 import { Modal } from "@/components/modal";
 import { createClient } from "@/lib/supabase/client";
 import { BuatLaporanFormulir } from "./buat-laporan";
@@ -113,7 +116,11 @@ export function Jelajah({
     null
   );
   const [cariLokasi, setCariLokasi] = useState(false);
-  const [pop, setPop] = useState<"kategori" | "status" | null>(null);
+  const [pesanLokasi, setPesanLokasi] = useState<string | null>(null);
+  const [pop, setPop] = useState<"kategori" | "status" | "lainnya" | null>(
+    null
+  );
+  const [tabSeluler, setTabSeluler] = useState<"peta" | "daftar">("peta");
   const [layerFasilitas, setLayerFasilitas] = useState(false);
   const [fasTerpilih, setFasTerpilih] = useState<FasilitasRingkas | null>(null);
   const [modalFasilitas, setModalFasilitas] = useState(false);
@@ -128,6 +135,9 @@ export function Jelajah({
 
   useEffect(() => {
     if (!mainkan || periodeIdx === null) return;
+    // Reduced motion: garis waktu tidak autoplay; pengguna tetap bisa
+    // menggeser manual lewat slider/tombol putar (maju satu langkah per klik).
+    if (harusKurangiGerak()) return;
     const t = setInterval(() => {
       setPeriodeIdx((i) => {
         if (i === null || i >= BULAN.length - 1) {
@@ -247,12 +257,20 @@ export function Jelajah({
 
   const terpilih = laporan.find((r) => r.id === terpilihId) ?? null;
 
+  const lainAktif =
+    (pusatSaya ? 1 : 0) + (layerFasilitas ? 1 : 0) + (periodeIdx !== null ? 1 : 0);
+
   function aktifkanSekitarSaya() {
     if (pusatSaya) {
       setPusatSaya(null);
       return;
     }
+    if (!("geolocation" in navigator)) {
+      setPesanLokasi("Perambanmu tidak mendukung geolokasi.");
+      return;
+    }
     setCariLokasi(true);
+    setPesanLokasi(null);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setPusatSaya({
@@ -261,7 +279,16 @@ export function Jelajah({
         });
         setCariLokasi(false);
       },
-      () => setCariLokasi(false),
+      (err) => {
+        setCariLokasi(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setPesanLokasi("Akses lokasi ditolak. Izinkan akses lokasi di peramban untuk memakai saringan sekitar.");
+        } else if (err.code === err.TIMEOUT) {
+          setPesanLokasi("Pengambilan lokasi kehabisan waktu. Periksa koneksi lalu coba lagi.");
+        } else {
+          setPesanLokasi("Lokasi tidak tersedia saat ini. Coba lagi nanti.");
+        }
+      },
       { timeout: 8000 }
     );
   }
@@ -270,40 +297,40 @@ export function Jelajah({
     <main className="mx-auto max-w-7xl px-4 pb-10 pt-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold">
-            Peta Masalah Permukiman
+          <h1 className="font-display text-2xl font-bold tracking-tight">
+            Peta
           </h1>
-          <p className="text-sm text-muted">
-            {tersaring.length} laporan ditampilkan ·{" "}
+          <p className="mt-0.5 text-sm text-muted">
+            {tersaring.length} laporan ·{" "}
             <span
-              className={`inline-flex items-center gap-1 ${
+              className={`inline-flex items-center gap-1.5 ${
                 realtimeAktif ? "text-daun-600 dark:text-daun-400" : ""
               }`}
             >
               <span
                 className={`size-1.5 rounded-full ${
-                  realtimeAktif ? "animate-pulse bg-daun-500" : "bg-muted"
+                  realtimeAktif ? "bg-daun-500" : "bg-muted"
                 }`}
               />
-              {realtimeAktif ? "Realtime aktif" : "Menyambungkan…"}
+              {realtimeAktif ? "Langsung aktif" : "Menyambungkan…"}
             </span>
           </p>
         </div>
         <Button size="lg" onClick={() => setModalBuka(true)}>
-          <Plus size={18} strokeWidth={3} /> Laporkan Masalah
+          <Plus size={18} strokeWidth={2.5} /> Laporkan Masalah
         </Button>
       </div>
 
       {!dbAktif && (
         <div className="mb-4 flex items-center gap-2 rounded-xl border border-kunyit-500/40 bg-kunyit-100/50 px-4 py-3 text-sm text-kunyit-600">
-          <WifiOff size={16} /> Database belum tersambung — atur env Supabase lalu
+          <WifiOff size={16} /> Database belum tersambung. Atur env Supabase lalu
           jalankan schema.sql (lihat README).
         </div>
       )}
 
-      <div className="mb-4 rounded-2xl border garis-halus bg-panel p-2.5">
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="relative min-w-48 flex-1">
+      <div className="mb-4 space-y-2.5 rounded-[24px] bg-panel p-3">
+        <div>
+          <label className="relative block">
             <Search
               size={15}
               className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
@@ -313,17 +340,19 @@ export function Jelajah({
               onChange={(e) => setKueri(e.target.value)}
               placeholder="Cari judul atau isi laporan…"
               aria-label="Cari laporan"
-              className="h-10 w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-daun-500 focus:ring-4 focus:ring-daun-500/15"
+              className="h-11 w-full rounded-full border garis-halus bg-panel-2 pl-10 pr-4 text-sm outline-none transition focus:border-action focus:ring-4 focus:ring-action/15"
             />
           </label>
+        </div>
 
+        <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <button
               onClick={() => setPop(pop === "kategori" ? null : "kategori")}
               aria-expanded={pop === "kategori"}
               className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
                 pop === "kategori" || fKategori.length > 0
-                  ? "border-daun-500/50 bg-daun-500/5 text-daun-700 dark:text-daun-300"
+                  ? "border-action/50 bg-action/5 text-action"
                   : "text-muted hover:text-ink"
               }`}
               style={
@@ -335,7 +364,7 @@ export function Jelajah({
               <SlidersHorizontal size={15} />
               Kategori
               {fKategori.length > 0 && (
-                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-daun-600 text-[11px] font-bold text-white">
+                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-action text-[11px] font-bold text-white">
                   {fKategori.length}
                 </span>
               )}
@@ -364,11 +393,11 @@ export function Jelajah({
                       <span
                         className={`flex size-4 items-center justify-center rounded border transition ${
                           aktif
-                            ? "border-daun-600 bg-daun-600 text-white"
+                            ? "border-action bg-action text-white"
                             : "border-line"
                         }`}
                       >
-                        {aktif && <Check size={11} strokeWidth={3} />}
+                        {aktif && <Check size={11} strokeWidth={2.5} />}
                       </span>
                       <span style={{ color: k.warna }}>
                         <IkonKategori slug={k.slug} ukuran={14} />
@@ -395,7 +424,7 @@ export function Jelajah({
               aria-expanded={pop === "status"}
               className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
                 pop === "status" || fStatus.length > 0
-                  ? "border-daun-500/50 bg-daun-500/5 text-daun-700 dark:text-daun-300"
+                  ? "border-action/50 bg-action/5 text-action"
                   : "text-muted hover:text-ink"
               }`}
               style={
@@ -411,7 +440,7 @@ export function Jelajah({
               </span>
               Status
               {fStatus.length > 0 && (
-                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-daun-600 text-[11px] font-bold text-white">
+                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-action text-[11px] font-bold text-white">
                   {fStatus.length}
                 </span>
               )}
@@ -440,11 +469,11 @@ export function Jelajah({
                       <span
                         className={`flex size-4 items-center justify-center rounded border transition ${
                           aktif
-                            ? "border-daun-600 bg-daun-600 text-white"
+                            ? "border-action bg-action text-white"
                             : "border-line"
                         }`}
                       >
-                        {aktif && <Check size={11} strokeWidth={3} />}
+                        {aktif && <Check size={11} strokeWidth={2.5} />}
                       </span>
                       <span
                         className="size-2 rounded-full"
@@ -466,88 +495,119 @@ export function Jelajah({
             )}
           </div>
 
-          <span aria-hidden className="mx-1 hidden h-6 w-px bg-line sm:block" />
-
-          <button
-            onClick={aktifkanSekitarSaya}
-            aria-pressed={!!pusatSaya}
-            className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
-              pusatSaya
-                ? "border-transparent bg-daun-600 text-white"
-                : "text-muted hover:text-ink"
-            }`}
-            style={
-              pusatSaya ? undefined : { borderColor: "var(--line)" }
-            }
-          >
-            <Crosshair size={15} />
-            {cariLokasi
-              ? "Mencari…"
-              : pusatSaya
-                ? "≤ 2 km"
-                : "Sekitar saya"}
-          </button>
-
-          <button
-            onClick={() => setLayerFasilitas((v) => !v)}
-            aria-pressed={layerFasilitas}
-            className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
-              layerFasilitas
-                ? "border-transparent bg-teal-600 text-white"
-                : "text-muted hover:text-ink"
-            }`}
-            style={
-              layerFasilitas ? undefined : { borderColor: "var(--line)" }
-            }
-          >
-            <Recycle size={15} />
-            Fasilitas
-          </button>
-
-          {layerFasilitas && (
+          <div className="relative">
             <button
-              onClick={() => setModalFasilitas(true)}
-              className="flex min-h-[44px] items-center gap-1.5 rounded-full border border-dashed px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-teal-500 hover:text-ink"
-              style={{ borderColor: "var(--line)" }}
-            >
-              + Tambah fasilitas
-            </button>
-          )}
-
-          <TombolIkutiArea pusatSaya={pusatSaya} />
-
-          <button
-            onClick={() => {
-              if (periodeIdx === null) setPeriodeIdx(BULAN.length - 1);
-              else {
-                setPeriodeIdx(null);
-                setMainkan(false);
+              onClick={() => setPop(pop === "lainnya" ? null : "lainnya")}
+              aria-expanded={pop === "lainnya"}
+              className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
+                pop === "lainnya" || lainAktif > 0
+                  ? "border-action/50 bg-action/5 text-action"
+                  : "text-muted hover:text-ink"
+              }`}
+              style={
+                pop === "lainnya" || lainAktif > 0
+                  ? undefined
+                  : { borderColor: "var(--line)" }
               }
-            }}
-            aria-pressed={periodeIdx !== null}
-            className={`flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
-              periodeIdx !== null
-                ? "border-transparent bg-daun-600 text-white"
-                : "text-muted hover:text-ink"
-            }`}
-            style={
-              periodeIdx !== null ? undefined : { borderColor: "var(--line)" }
-            }
-          >
-            <History size={15} />
-            Garis waktu
-          </button>
+            >
+              <ListFilter size={15} />
+              Saringan lain
+              {lainAktif > 0 && (
+                <span className="angka-tabular flex size-5 items-center justify-center rounded-full bg-action text-[11px] font-bold text-white">
+                  {lainAktif}
+                </span>
+              )}
+              <ChevronDown
+                size={14}
+                className={`transition-transform duration-300 ${pop === "lainnya" ? "rotate-180" : ""}`}
+              />
+            </button>
+            {pop === "lainnya" && (
+              <div className="absolute left-0 top-full z-30 mt-2 flex w-72 flex-col gap-1 rounded-2xl border garis-halus bg-panel p-2 shadow-xl">
+                <button
+                  onClick={aktifkanSekitarSaya}
+                  aria-pressed={!!pusatSaya}
+                  className={`flex min-h-[44px] w-full items-center justify-start gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                    pusatSaya
+                      ? "bg-action text-white"
+                      : "hover:bg-panel-2"
+                  }`}
+                >
+                  <Crosshair size={15} />
+                  {cariLokasi
+                    ? "Mencari…"
+                    : pusatSaya
+                      ? "Sekitar saya · ≤ 2 km"
+                      : "Sekitar saya"}
+                </button>
+                <button
+                  onClick={() => setLayerFasilitas((v) => !v)}
+                  aria-pressed={layerFasilitas}
+                  className={`flex min-h-[44px] w-full items-center justify-start gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                    layerFasilitas
+                      ? "bg-action text-white"
+                      : "hover:bg-panel-2"
+                  }`}
+                >
+                  <Recycle size={15} />
+                  Fasilitas hijau
+                </button>
+                {layerFasilitas && (
+                  <button
+                    onClick={() => {
+                      setModalFasilitas(true);
+                      setPop(null);
+                    }}
+                    className="flex min-h-[44px] w-full items-center justify-start gap-2 rounded-xl border border-dashed garis-halus px-3 py-2 text-xs font-semibold text-muted transition hover:border-action hover:text-ink"
+                  >
+                    <Plus size={13} strokeWidth={2.5} /> Tambah fasilitas
+                  </button>
+                )}
+                <div className="[&_button]:w-full [&_button]:justify-start [&_button]:border-transparent [&_button]:bg-transparent [&_button]:px-3">
+                  <TombolIkutiArea pusatSaya={pusatSaya} />
+                </div>
+                <button
+                  onClick={() => {
+                    if (periodeIdx === null) setPeriodeIdx(BULAN.length - 1);
+                    else {
+                      setPeriodeIdx(null);
+                      setMainkan(false);
+                    }
+                  }}
+                  aria-pressed={periodeIdx !== null}
+                  className={`flex min-h-[44px] w-full items-center justify-start gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                    periodeIdx !== null
+                      ? "bg-action text-white"
+                      : "hover:bg-panel-2"
+                  }`}
+                >
+                  <History size={15} />
+                  Garis waktu
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {periodeIdx !== null && (
           <div className="mt-2.5 flex flex-wrap items-center gap-3 border-t garis-halus px-1 pt-2.5">
             <button
-              onClick={() => setMainkan((v) => !v)}
+              onClick={() => {
+                // Reduced motion: tanpa autoplay, tiap klik maju satu
+                // periode secara manual.
+                if (!mainkan && harusKurangiGerak()) {
+                  setPeriodeIdx((i) =>
+                    i === null || i >= BULAN.length - 1 ? i : i + 1
+                  );
+                  return;
+                }
+                setMainkan((v) => !v);
+              }}
               aria-label={mainkan ? "Jeda" : "Putar"}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-daun-600 text-white transition hover:bg-daun-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-action text-white transition hover:bg-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
             >
               {mainkan ? (
-                <span className="text-[10px] leading-none">■</span>
+                <Pause size={14} />
               ) : (
                 <Play size={14} />
               )}
@@ -558,7 +618,7 @@ export function Jelajah({
               max={BULAN.length - 1}
               value={periodeIdx}
               onChange={(e) => setPeriodeIdx(Number(e.target.value))}
-              className="w-52 accent-daun-600"
+              className="w-52 accent-action"
               aria-label="Pilih periode waktu"
             />
             <span className="text-xs font-semibold text-muted">
@@ -573,14 +633,52 @@ export function Jelajah({
       {pop && (
         <button
           type="button"
-          aria-label="Tutup filter"
+          aria-label="Tutup saringan"
           onClick={() => setPop(null)}
           className="fixed inset-0 z-20 cursor-default bg-transparent"
         />
       )}
 
+      <div
+        className="mb-3 grid grid-cols-2 gap-1 rounded-full border garis-halus bg-panel p-1 lg:hidden"
+        role="tablist"
+        aria-label="Tampilan peta"
+        onKeyDown={(e) => {
+          if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+          e.preventDefault();
+          setTabSeluler((t) => (t === "peta" ? "daftar" : "peta"));
+        }}
+      >
+        {(["peta", "daftar"] as const).map((t) => (
+          <button
+            key={t}
+            role="tab"
+            id={`tab-${t}`}
+            aria-selected={tabSeluler === t}
+            aria-controls={`panel-${t}`}
+            tabIndex={tabSeluler === t ? 0 : -1}
+            onClick={() => setTabSeluler(t)}
+            className={`min-h-[44px] rounded-full text-sm font-semibold transition ${
+              tabSeluler === t ? "bg-action text-white" : "text-muted"
+            }`}
+          >
+            {t === "peta" ? "Peta" : `Daftar · ${tersaring.length}`}
+          </button>
+        ))}
+      </div>
+      {pesanLokasi && (
+        <p role="alert" className="mb-3 rounded-xl bg-danger/10 px-4 py-2.5 text-sm text-danger">
+          {pesanLokasi}
+        </p>
+      )}
+
       <div className="grid h-[64dvh] min-h-[460px] grid-rows-[minmax(0,1fr)] gap-4 lg:grid-cols-[1fr_360px]">
-        <Card className="relative min-h-0 overflow-hidden p-0">
+        <Card
+          role="tabpanel"
+          id="panel-peta"
+          aria-labelledby="tab-peta"
+          className={`relative min-h-0 overflow-hidden p-0 ${tabSeluler === "daftar" ? "hidden lg:block" : ""}`}
+        >
           <LeafletMap
             pusat={
               pusatSaya ? [pusatSaya.lat, pusatSaya.lng] : undefined
@@ -607,7 +705,12 @@ export function Jelajah({
         </Card>
 
         <aside
-          className="hidden min-h-0 flex-col gap-3 overflow-y-auto pr-1 lg:flex"
+          role="tabpanel"
+          id="panel-daftar"
+          aria-labelledby="tab-daftar"
+          className={`min-h-0 flex-col gap-3 overflow-y-auto pr-1 lg:flex ${
+            tabSeluler === "peta" ? "hidden" : "flex"
+          }`}
           aria-label="Daftar laporan"
         >
           <AnimatePresence initial={false}>
@@ -618,6 +721,7 @@ export function Jelajah({
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
+                transition={transisiCepat}
               >
                 <Card
                   onClick={() => setTerpilihId(r.id)}
@@ -630,23 +734,22 @@ export function Jelajah({
                   tabIndex={0}
                   role="button"
                   aria-label={`Buka laporan ${r.judul}`}
-                  className={`cursor-pointer p-4 transition hover:border-daun-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600 ${
-                    terpilihId === r.id ? "ring-2 ring-daun-500" : ""
+                  className={`cursor-pointer rounded-[24px] p-5 transition hover:bg-panel-2/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action ${
+                    terpilihId === r.id ? "ring-1 ring-action" : ""
                   }`}
                 >
                   <div className="mb-1.5 flex items-center justify-between gap-2">
-                    <span
-                      className="flex items-center gap-1.5 text-xs font-semibold"
-                      style={{ color: r.categories?.warna }}
-                    >
-                      <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={13} />
+                    <span className="flex items-center gap-1.5 text-xs font-semibold">
+                      <span style={{ color: r.categories?.warna }} className="flex">
+                        <IkonKategori slug={r.categories?.slug ?? "lainnya"} ukuran={13} />
+                      </span>
                       {r.categories?.nama ?? "Lainnya"}
                     </span>
                     <span className="text-xs text-muted" suppressHydrationWarning>
                       {waktuRelatif(r.created_at)}
                     </span>
                   </div>
-                  <h3 className="font-display font-bold leading-snug">
+                  <h3 className="font-display text-[17px] font-semibold leading-snug tracking-[-0.02em]">
                     {r.judul}
                   </h3>
                   <p className="mt-1 line-clamp-2 text-sm text-muted">
@@ -672,13 +775,81 @@ export function Jelajah({
             </p>
           )}
           {tersaring.length === 0 && (
-            <Card className="flex flex-col items-center gap-2 p-8 text-center text-muted">
-              <MapPinOff size={28} />
-              <p className="text-sm">
-                {periodeIdx !== null
-                  ? `Belum ada laporan hingga ${BULAN[periodeIdx].label}.`
-                  : "Belum ada laporan yang cocok. Jadilah yang pertama melapor!"}
-              </p>
+            <Card className="p-2">
+              {(() => {
+                const adaSaringan =
+                  fKategori.length > 0 ||
+                  fStatus.length > 0 ||
+                  pusatSaya !== null ||
+                  layerFasilitas ||
+                  kueri.trim() !== "";
+                function hapusSaringan() {
+                  setFKategori([]);
+                  setFStatus([]);
+                  setKueri("");
+                  setPusatSaya(null);
+                  setPeriodeIdx(null);
+                  setMainkan(false);
+                }
+                if (laporan.length === 0) {
+                  return (
+                    <FeedbackState
+                      jenis="kosong"
+                      ikon={MapPinOff}
+                      judul="Belum ada laporan"
+                      deskripsi="Jadilah yang pertama melapor di lingkunganmu."
+                      aksi={
+                        <Button onClick={() => setModalBuka(true)}>
+                          <Plus size={15} strokeWidth={2.5} /> Buat laporan
+                        </Button>
+                      }
+                    />
+                  );
+                }
+                if (kueri.trim() !== "") {
+                  return (
+                    <FeedbackState
+                      jenis="tanpa-hasil"
+                      ikon={SearchX}
+                      judul="Tidak ada hasil pencarian"
+                      deskripsi={`Tidak ada laporan yang cocok dengan "${kueri.trim()}". Coba kata kunci lain atau hapus saringan.`}
+                      aksi={
+                        <Button variant="sekunder" onClick={hapusSaringan}>
+                          Hapus saringan
+                        </Button>
+                      }
+                    />
+                  );
+                }
+                if (periodeIdx !== null && !adaSaringan) {
+                  return (
+                    <FeedbackState
+                      jenis="kosong"
+                      ikon={MapPinOff}
+                      judul={`Belum ada laporan hingga ${BULAN[periodeIdx].label}`}
+                      deskripsi="Geser garis waktu ke periode yang lebih baru."
+                      aksi={
+                        <Button variant="sekunder" onClick={hapusSaringan}>
+                          Hapus saringan
+                        </Button>
+                      }
+                    />
+                  );
+                }
+                return (
+                  <FeedbackState
+                    jenis="tanpa-hasil"
+                    ikon={ListFilter}
+                    judul="Tidak ada laporan yang cocok"
+                    deskripsi="Coba longgarkan saringan kategori, status, atau periode."
+                    aksi={
+                      <Button variant="sekunder" onClick={hapusSaringan}>
+                        Hapus saringan
+                      </Button>
+                    }
+                  />
+                );
+              })()}
             </Card>
           )}
         </aside>
@@ -723,8 +894,11 @@ export function Jelajah({
                 className="max-h-64 w-full rounded-xl object-cover"
               />
             )}
-            <Link href={`/laporan/${terpilih.id}`} className="block pt-1">
-              <Button className="w-full">Buka halaman lengkap →</Button>
+            <Link
+              href={`/laporan/${terpilih.id}`}
+              className="mt-1 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-action px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-action-hover"
+            >
+              Buka detail laporan
             </Link>
           </div>
         )}
@@ -765,10 +939,10 @@ export function Jelajah({
               <p className="text-sm text-muted">Alamat: {fasTerpilih.alamat}</p>
             )}
             {fasTerpilih.jam_buka && (
-              <p className="text-sm text-muted">Jam: {fasTerpilih.jam_buka}</p>
+              <p className="text-sm text-muted">Jam buka: {fasTerpilih.jam_buka}</p>
             )}
             <p className="text-xs text-muted">
-              Lokasi titik perkiraan — konfirmasi ke pengelola sebelum berkunjung.
+              Lokasi titik perkiraan. Konfirmasi ke pengelola sebelum berkunjung.
             </p>
           </div>
         )}

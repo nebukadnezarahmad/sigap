@@ -3,19 +3,19 @@ import Link from "next/link";
 import {
   TrendingDown,
   TrendingUp,
-  Timer,
-  CheckCircle2,
-  AlertTriangle,
   FileSpreadsheet,
   ExternalLink,
-  ShieldCheck,
+  Inbox,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { KATEGORI, STATUS, SLA_KATEGORI, hitungSla, type StatusKey } from "@/lib/constants";
 import { IkonKategori } from "@/lib/ikon-vektor";
-import { Card, StatusChip, Button } from "@/components/ui";
+import { Card, StatusChip } from "@/components/ui";
+import { Progress } from "@/components/progress";
+import { FeedbackState } from "@/components/feedback-state";
+import { GalatMuatUlang, KontenUtama, PageHeader } from "@/components/layout-konten";
 import { formatTanggal } from "@/lib/utils";
-import { GrafikBulanan, GrafikKategori } from "./grafik";
+import { GrafikBulanan } from "./grafik";
 import { TombolCetak } from "./tombol-cetak";
 
 export const metadata: Metadata = { title: "Transparansi" };
@@ -56,15 +56,13 @@ export default async function HalamanTransparansi() {
   const supabase = await createClient();
   if (!supabase) {
     return (
-      <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-bold">
-          Database belum tersambung
-        </h1>
-      </main>
+      <KontenUtama>
+        <GalatMuatUlang judul="Transparansi belum bisa dimuat" />
+      </KontenUtama>
     );
   }
 
-  const { data: semua } = await supabase
+  const { data: semua, error: galatLaporan } = await supabase
     .from("reports")
     .select(
       `id, judul, status, created_at, lat, lng, alamat_teks, categories(slug,nama,warna),
@@ -72,6 +70,14 @@ export default async function HalamanTransparansi() {
     )
     .order("created_at", { ascending: false })
     .limit(1000);
+
+  if (galatLaporan) {
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Transparansi belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   const daftar = (semua ?? []) as unknown as BarisLaporan[];
 
@@ -170,232 +176,288 @@ export default async function HalamanTransparansi() {
       (statusCount[r.status as StatusKey] ?? 0) + 1;
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-daun-700 dark:text-daun-400">
-            <ShieldCheck size={16} /> Rapor Akuntabilitas Publik
-          </div>
-          <h1 className="mt-1 font-display text-3xl font-bold tracking-tight">
-            Transparansi & Kepatuhan SLA Dewan
-          </h1>
-          <p className="mt-2 max-w-2xl text-muted">
-            Data kinerja penanganan masalah lingkungan dari warga secara terbuka. Setiap kategori memiliki target waktu penanganan (*Service Level Agreement*) yang mengikat.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link href="/api/open-data" target="_blank">
-            <Button variant="sekunder" size="sm" className="hidden sm:inline-flex gap-1.5">
+    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <PageHeader
+        judul="Transparansi"
+        deskripsi="Kinerja penanganan laporan warga secara terbuka. Setiap kategori memiliki target waktu penanganan yang mengikat dewan."
+        aksi={
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/api/open-data"
+              target="_blank"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border garis-halus px-4 text-sm font-semibold transition hover:border-action hover:text-action"
+            >
               <FileSpreadsheet size={15} /> Open Data (JSON)
-            </Button>
-          </Link>
-          <TombolCetak />
-        </div>
-      </header>
-
-      {/* Ringkasan Metrik Utama */}
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {[
-          {
-            label: "Total laporan warga",
-            nilai: total,
-            ikon: <CheckCircle2 size={20} />,
-            warna: "text-muted bg-panel-2",
-          },
-          {
-            label: "Tingkat tuntas",
-            nilai: `${persenSelesai}%`,
-            ikon: <CheckCircle2 size={20} />,
-            warna: "text-daun-700 dark:text-daun-300 bg-daun-500/10",
-          },
-          {
-            label: "Median waktu beres",
-            nilai: medianHari ? `${medianHari} hari` : "<1 hari",
-            ikon: <Timer size={20} />,
-            warna: "text-kunyit-600 dark:text-kunyit-400 bg-kunyit-500/10",
-          },
-          {
-            label: "Melewati batas SLA",
-            nilai: laporanLewatSla.length,
-            ikon: <AlertTriangle size={20} />,
-            warna:
-              laporanLewatSla.length > 0
-                ? "text-danger bg-danger/10"
-                : "text-daun-700 dark:text-daun-300 bg-daun-500/10",
-          },
-        ].map((k) => (
-          <Card key={k.label} className="flex items-center gap-3.5 p-4">
-            <span
-              className={`flex size-11 items-center justify-center rounded-xl ${k.warna}`}
-            >
-              {k.ikon}
-            </span>
-            <div>
-              <p className="text-2xl font-extrabold leading-none tabular-nums">
-                {k.nilai}
-              </p>
-              <p className="mt-1 text-xs text-muted">{k.label}</p>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Standar SLA Kategori */}
-      <Card className="mb-6 border-panel-2 bg-panel-2/50 p-5">
-        <h2 className="font-display text-base font-bold">
-          Standar Target Waktu Penanganan (SLA Resmi per Kategori)
-        </h2>
-        <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-          {KATEGORI.filter((k) => k.slug !== "lainnya").map((k) => (
-            <div
-              key={k.slug}
-              className="rounded-2xl border garis-halus bg-panel p-3 text-left"
-            >
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted">
-                <IkonKategori slug={k.slug} ukuran={13} />
-                <span className="truncate">{k.nama}</span>
-              </div>
-              <p className="mt-1 text-xl font-black tabular-nums text-ink">
-                {SLA_KATEGORI[k.slug] ?? 7} Hari
-              </p>
-              <p className="text-[11px] text-muted">Target respon & beres</p>
-            </div>
-          ))}
-        </div>
-      </Card>
+            </Link>
+            <TombolCetak />
+          </div>
+        }
+      />
 
       {/* Papan Keterlambatan Publik (Overdue Watchlist) */}
-      <Card className="mb-6 border-danger/30 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b garis-halus pb-3">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="text-danger" size={18} />
-            <h2 className="font-display font-bold text-lg">
-              Papan Keterlambatan Publik (*Overdue Watchlist*)
-            </h2>
-          </div>
-          <span className="rounded-full bg-danger/10 px-2.5 py-0.5 text-xs font-bold text-danger">
-            {laporanLewatSla.length} Laporan Perlu Tindakan Cepat
+      {total === 0 ? (
+        <FeedbackState
+          jenis="kosong"
+          ikon={Inbox}
+          judul="Data belum tersedia"
+          deskripsi="Belum ada laporan yang bisa dihitung. Metrik kinerja akan muncul setelah warga mulai melapor."
+        />
+      ) : (
+      <>
+      <section aria-label="Laporan melewati batas waktu" className="mb-8">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-display text-xl font-semibold tracking-tight">
+            Perlu tindakan cepat
+          </h2>
+          <span className="rounded-full bg-danger/10 px-2.5 py-1 text-xs font-bold tabular-nums text-danger">
+            {laporanLewatSla.length} laporan
           </span>
         </div>
+        <Card className="overflow-hidden rounded-[24px] p-0">
 
         {laporanLewatSla.length === 0 ? (
-          <div className="py-8 text-center text-sm text-muted">
-            ✓ Luar biasa! Tidak ada laporan warga yang melewati batas waktu SLA saat ini.
+          <div className="px-5 py-8 text-center text-sm text-muted">
+            Tidak ada laporan yang melewati batas waktu saat ini.
           </div>
         ) : (
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <caption className="sr-only">
-                Daftar laporan warga yang melewati batas waktu SLA
-              </caption>
-              <thead>
-                <tr className="border-b garis-halus text-xs text-muted">
-                  <th scope="col" className="pb-2 font-semibold">Judul Masalah</th>
-                  <th scope="col" className="pb-2 font-semibold">Kategori</th>
-                  <th scope="col" className="pb-2 font-semibold">Tgl Lapor</th>
-                  <th scope="col" className="pb-2 font-semibold">Target SLA</th>
-                  <th scope="col" className="pb-2 font-semibold text-danger">Keterlambatan</th>
-                  <th scope="col" className="pb-2 font-semibold">Status</th>
-                  <th scope="col" className="pb-2 font-semibold text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-garis-halus">
-                {laporanLewatSla.slice(0, 10).map((r) => (
-                  <tr key={r.id} className="hover:bg-panel-2/40 transition">
-                    <td className="py-3 font-semibold text-ink max-w-xs truncate">
-                      {r.judul}
-                    </td>
-                    <td className="py-3 text-xs text-muted">
-                      {r.categories?.nama ?? "Lainnya"}
-                    </td>
-                    <td className="py-3 text-xs text-muted">
-                      {formatTanggal(r.created_at)}
-                    </td>
-                    <td className="py-3 text-xs font-medium tabular-nums">
-                      {r.sla.targetHari} hari
-                    </td>
-                    <td className="py-3 text-xs font-bold tabular-nums text-danger">
-                      +{r.sla.hariTerlambat} hari
-                    </td>
-                    <td className="py-3">
-                      <StatusChip status={r.status as StatusKey} />
-                    </td>
-                    <td className="py-3 text-right">
-                      <Link
-                        href={`/laporan/${r.id}`}
-                        aria-label={`Detail laporan ${r.judul}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-daun-700 hover:underline dark:text-daun-300"
-                      >
-                        Detail <ExternalLink size={12} />
-                      </Link>
-                    </td>
+          <>
+            <div className="hidden overflow-x-auto px-5 py-4 sm:block">
+              <table className="w-full text-left text-sm">
+                <caption className="sr-only">
+                  Daftar laporan warga yang melewati batas waktu SLA
+                </caption>
+                <thead>
+                  <tr className="border-b garis-halus text-xs text-muted">
+                    <th scope="col" className="pb-2 font-semibold">Judul Masalah</th>
+                    <th scope="col" className="pb-2 font-semibold">Kategori</th>
+                    <th scope="col" className="pb-2 font-semibold">Tgl Lapor</th>
+                    <th scope="col" className="pb-2 font-semibold">Target SLA</th>
+                    <th scope="col" className="pb-2 font-semibold text-danger">Keterlambatan</th>
+                    <th scope="col" className="pb-2 font-semibold">Status</th>
+                    <th scope="col" className="pb-2 font-semibold text-right">Aksi</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {laporanLewatSla.slice(0, 10).map((r) => (
+                    <tr key={r.id} className="hover:bg-panel-2/40 transition">
+                      <td className="py-3 font-semibold text-ink max-w-xs truncate">
+                        {r.judul}
+                      </td>
+                      <td className="py-3 text-xs text-muted">
+                        {r.categories?.nama ?? "Lainnya"}
+                      </td>
+                      <td className="py-3 text-xs text-muted">
+                        {formatTanggal(r.created_at)}
+                      </td>
+                      <td className="py-3 text-xs font-medium tabular-nums">
+                        {r.sla.targetHari} hari
+                      </td>
+                      <td className="py-3 text-xs font-bold tabular-nums text-danger">
+                        +{r.sla.hariTerlambat} hari
+                      </td>
+                      <td className="py-3">
+                        <StatusChip status={r.status as StatusKey} />
+                      </td>
+                      <td className="py-3 text-right">
+                        <Link
+                          href={`/laporan/${r.id}`}
+                          aria-label={`Detail laporan ${r.judul}`}
+                          className="inline-flex min-h-[44px] items-center text-xs font-semibold text-action hover:underline"
+                        >
+                          Detail
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <ul className="space-y-2.5 px-4 py-4 sm:hidden">
+              {laporanLewatSla.slice(0, 10).map((r) => (
+                <li
+                  key={r.id}
+                  className="rounded-2xl border garis-halus bg-panel-2/40 p-3.5"
+                >
+                  <p className="text-sm font-bold leading-snug">{r.judul}</p>
+                  <p className="mt-1 text-xs text-muted">
+                    {r.categories?.nama ?? "Lainnya"} ·{" "}
+                    {formatTanggal(r.created_at)}
+                  </p>
+                  <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-danger/10 px-2.5 py-1 text-[11px] font-bold tabular-nums text-danger">
+                      +{r.sla.hariTerlambat} hari
+                    </span>
+                    <StatusChip status={r.status as StatusKey} />
+                    <Link
+                      href={`/laporan/${r.id}`}
+                      aria-label={`Detail laporan ${r.judul}`}
+                      className="ml-auto inline-flex min-h-[44px] items-center text-xs font-semibold text-action hover:underline"
+                    >
+                      Detail
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </Card>
+      </section>
+
+      {/* Ringkasan Metrik Utama */}
+      <section aria-label="Ringkasan kinerja" className="mb-8">
+        <dl className="grid grid-cols-2 gap-6 rounded-[24px] bg-panel p-7 sm:p-8 lg:grid-cols-4">
+          <div>
+            <dt className="text-[11px] text-muted">Total laporan warga</dt>
+            <dd className="mt-1.5 text-[31px] font-semibold leading-none tabular-nums tracking-[-0.05em]">
+              {total}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[11px] text-muted">Tingkat tuntas</dt>
+            <dd className="mt-1.5 text-[31px] font-semibold leading-none tabular-nums tracking-[-0.05em] text-daun-700 dark:text-daun-300">
+              {persenSelesai}%
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[11px] text-muted">Median waktu beres</dt>
+            <dd className="mt-1.5 text-[31px] font-semibold leading-none tabular-nums tracking-[-0.05em]">
+              {medianHari ? `${medianHari} hari` : "<1 hari"}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[11px] text-muted">Melewati batas waktu</dt>
+            <dd
+              className={`mt-1.5 text-[31px] font-semibold leading-none tabular-nums tracking-[-0.05em] ${laporanLewatSla.length > 0 ? "text-danger" : ""}`}
+            >
+              {laporanLewatSla.length}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      {/* Standar SLA Kategori */}
+      <section aria-label="Target waktu penanganan" className="mb-8">
+        <h2 className="mb-1 font-display text-xl font-semibold tracking-tight">
+          Target waktu penanganan
+        </h2>
+        <p className="mb-3 text-sm text-muted">
+          Batas hari penyelesaian per kategori yang mengikat dewan.
+        </p>
+        <div className="rounded-[24px] bg-panel p-3 sm:p-4">
+          <dl className="flex flex-col gap-[7px]">
+            {KATEGORI.filter((k) => k.slug !== "lainnya").map((k) => (
+              <div
+                key={k.slug}
+                className="flex min-h-[53px] items-center gap-3 rounded-xl bg-panel-2 px-3.5 py-2 text-xs"
+              >
+                <dt className="flex min-w-0 flex-1 items-center gap-3 font-medium">
+                  <span className="flex text-muted">
+                    <IkonKategori slug={k.slug} ukuran={20} />
+                  </span>
+                  <span className="truncate">{k.nama}</span>
+                </dt>
+                <dd className="tabular-nums text-muted">
+                  {SLA_KATEGORI[k.slug] ?? 7} hari
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
 
       {/* Insight Otomatis */}
-      <div className="mb-6 grid gap-3 md:grid-cols-2">
+      {(teratas || tercepat) && (
+      <div className="mb-8 grid gap-3 md:grid-cols-2">
         {teratas && (
-          <Card className="flex items-start gap-3 border-kunyit-500/40 p-5">
-            <TrendingUp className="mt-0.5 text-kunyit-500" size={20} />
+          <Card className="flex items-start gap-3 rounded-[24px] p-6 sm:p-7">
+            <TrendingUp className="mt-0.5 shrink-0 text-muted" size={20} />
             <div>
-              <p className="font-display font-bold">Tren Kenaikan Laporan</p>
+              <p className="font-display font-semibold">Tren naik minggu ini</p>
               <p className="mt-1 text-sm text-muted">
                 Laporan{" "}
                 <b className="inline-flex items-center gap-1 text-ink">
                   <IkonKategori slug={teratas.slug} ukuran={13} /> {teratas.nama}
                 </b>{" "}
                 naik <b className="text-ink">{teratas.naik} laporan</b> dibanding
-                minggu lalu ({teratas.kini} vs {teratas.lalu}). Memerlukan alokasi petugas tambahan.
+                minggu lalu ({teratas.kini} vs {teratas.lalu}).
               </p>
             </div>
           </Card>
         )}
         {tercepat && (
-          <Card className="flex items-start gap-3 border-daun-500/40 p-5">
-            <TrendingDown className="mt-0.5 text-daun-600 dark:text-daun-400" size={20} />
+          <Card className="flex items-start gap-3 rounded-[24px] p-6 sm:p-7">
+            <TrendingDown className="mt-0.5 shrink-0 text-muted" size={20} />
             <div>
-              <p className="font-display font-bold">Kinerja Tertinggi</p>
+              <p className="font-display font-semibold">Ketuntasan tertinggi</p>
               <p className="mt-1 text-sm text-muted">
-                Kategori <b className="text-ink">{tercepat.nama}</b> memiliki tingkat ketuntasan tertinggi yaitu{" "}
+                <b className="text-ink">{tercepat.nama}</b> tuntas{" "}
                 <b className="text-ink">{tercepat.persen}%</b> ({tercepat.selesai}/
-                {tercepat.total} laporan diselesaikan).
+                {tercepat.total} laporan).
               </p>
             </div>
           </Card>
         )}
       </div>
+      )}
 
-      {/* Grafik Laporan & Kategori */}
-      <div className="mb-6 grid gap-4 lg:grid-cols-2">
-        <Card className="p-5">
-          <h2 className="mb-4 font-display font-bold">
-            Tren Laporan Masuk vs Selesai (6 Bulan)
+      {/* Grafik Laporan & Peringkat Kategori */}
+      <div className="mb-8 grid gap-5">
+        <Card className="rounded-[24px] p-6 sm:p-7">
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            Tren 6 bulan
           </h2>
-          <GrafikBulanan data={bulan} />
+          <p className="mb-4 mt-0.5 text-xs text-muted">Laporan masuk vs tuntas</p>
+          <div className="h-72">
+            <GrafikBulanan data={bulan} />
+          </div>
         </Card>
 
-        <Card className="p-5">
-          <h2 className="mb-4 font-display font-bold">
-            Tingkat Ketuntasan per Kategori
+        <Card className="rounded-[24px] p-6 sm:p-7">
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            Peringkat ketuntasan kategori
           </h2>
-          <GrafikKategori data={perKategori} />
+          <p className="mb-4 mt-0.5 text-xs text-muted">Diurutkan dari yang paling tuntas</p>
+          <p className="sr-only">
+            {perKategori.length === 0
+              ? "Belum ada data ketuntasan kategori."
+              : `Ketuntasan per kategori: ${[...perKategori].sort((a, b) => b.persen - a.persen).map((d) => `${d.nama} ${d.persen} persen`).join("; ")}.`}
+          </p>
+          <ol className="flex flex-col gap-4">
+            {[...perKategori]
+              .sort((a, b) => b.persen - a.persen)
+              .map((k, i) => (
+                <li key={k.nama}>
+                  <div className="mb-1.5 flex items-baseline justify-between gap-3">
+                    <p className="min-w-0 truncate text-sm font-semibold">
+                      <span className="mr-2 tabular-nums text-muted">{i + 1}</span>
+                      {k.nama}
+                    </p>
+                    <p className="shrink-0 text-sm font-bold tabular-nums">
+                      {k.persen}%
+                    </p>
+                  </div>
+                  <Progress
+                    nilai={k.persen}
+                    label={`Ketuntasan ${k.nama}: ${k.persen} persen`}
+                    varian="data"
+                  />
+                </li>
+              ))}
+          </ol>
         </Card>
       </div>
 
       {/* Distribusi Status & Open Data API Info */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="p-5 sm:col-span-2">
-          <h2 className="mb-4 font-display font-bold">Distribusi Status Penanganan</h2>
-          <div className="flex flex-wrap gap-3">
+        <Card className="rounded-[24px] p-6 sm:col-span-2 sm:p-7">
+          <h2 className="font-display text-lg font-semibold tracking-tight">Distribusi status</h2>
+          <p className="mb-4 mt-0.5 text-xs text-muted">Jumlah laporan per tahap</p>
+          <div className="flex flex-wrap gap-2.5">
             {(Object.keys(STATUS) as StatusKey[]).map((s) => (
               <div
                 key={s}
-                className="flex items-center gap-2 rounded-full bg-panel-2 px-4 py-2"
+                className="flex items-center gap-2 rounded-full bg-panel-2 px-3.5 py-2"
               >
                 <StatusChip status={s} />
                 <span className="font-bold tabular-nums">{statusCount[s] ?? 0}</span>
@@ -404,20 +466,24 @@ export default async function HalamanTransparansi() {
           </div>
         </Card>
 
-        <Card className="p-5 flex flex-col justify-between">
+        <Card className="flex flex-col justify-between rounded-[24px] p-6 sm:p-7">
           <div>
-            <h2 className="font-display font-bold text-base">Open Data API Warga</h2>
-            <p className="mt-2 text-xs text-muted leading-relaxed">
-              Seluruh data laporan dapat diakses secara publik dan gratis di bawah lisensi CC-BY untuk kepentingan riset akademis, jurnalisme warga, dan integrasi sistem kota.
+            <h2 className="font-display text-base font-semibold">Open data</h2>
+            <p className="mt-1.5 text-sm text-muted leading-relaxed">
+              Data publik gratis berlisensi CC-BY untuk riset, jurnalisme warga, dan integrasi sistem kota.
             </p>
           </div>
-          <Link href="/api/open-data" target="_blank" className="mt-4">
-            <Button variant="sekunder" size="sm" className="w-full gap-1.5 text-xs">
-              <ExternalLink size={13} /> Akses /api/open-data
-            </Button>
+          <Link
+            href="/api/open-data"
+            target="_blank"
+            className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-full border garis-halus px-4 text-xs font-semibold transition hover:border-action hover:text-action"
+          >
+            <ExternalLink size={13} /> Akses /api/open-data
           </Link>
         </Card>
       </div>
+      </>
+      )}
     </main>
   );
 }

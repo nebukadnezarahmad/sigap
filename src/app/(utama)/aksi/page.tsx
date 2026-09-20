@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { AksiKlien, GalatAksi } from "./aksi-klien";
+import { AksiKlien } from "./aksi-klien";
+import {
+  GalatMuatUlang,
+  KontenUtama,
+  PageHeader,
+} from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Aksi Bersama" };
 export const dynamic = "force-dynamic";
@@ -24,14 +29,18 @@ function batasLewat() {
 export default async function HalamanAksi() {
   const supabase = await createClient();
   if (!supabase) {
-    return <GalatAksi />;
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Aksi Bersama belum bisa dimuat" />
+      </KontenUtama>
+    );
   }
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: eventsRaw } = await supabase
+  const { data: eventsRaw, error: galatAksi } = await supabase
     .from("events")
     .select(
       `*, profiles!events_user_id_fkey(username, nama_lengkap),
@@ -40,6 +49,14 @@ export default async function HalamanAksi() {
     .gte("tanggal", batasLewat())
     .order("tanggal", { ascending: true })
     .limit(30);
+
+  if (galatAksi) {
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Aksi Bersama belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   const daftar: EventAksi[] = (eventsRaw ?? []).map((e) => {
     const rsvp = e.event_rsvp ?? [];
@@ -59,19 +76,11 @@ export default async function HalamanAksi() {
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-          Gerakan bersama
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-          Aksi Bersama
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Dari laporan menjadi aksi nyata. Ikut satu aksi = +5 poin; ikut dua
-          aksi membuka badge Relawan.
-        </p>
-      </header>
+    <main className="mx-auto max-w-4xl px-4 py-10">
+      <PageHeader
+        judul="Aksi Bersama"
+        deskripsi="Dari laporan menjadi aksi nyata. Ikut satu aksi = +5 poin; ikut dua aksi membuka lencana Relawan."
+      />
 
       <AksiKlien awal={daftar} masuk={!!user} />
     </main>

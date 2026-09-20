@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { MapPin, ShieldAlert, Sparkles } from "lucide-react";
+import { MapPin, ShieldAlert, LogIn } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isTujuanAman } from "@/lib/utils";
 import { Button, Card, Input, Label } from "@/components/ui";
@@ -15,10 +15,14 @@ function FormulirMasuk() {
   const tujuanMentah = params.get("next") ?? "/peta";
   const tujuan = isTujuanAman(tujuanMentah) ? tujuanMentah : "/peta";
   const butuhAdmin = tujuan.startsWith("/dewan");
+  const galat = params.get("galat");
   const [email, setEmail] = useState("");
   const [sandi, setSandi] = useState("");
-  const [pesan, setPesan] = useState<string | null>(null);
+  const [pesan, setPesan] = useState<string | null>(
+    galat ? "Sesi masuk gagal. Coba lagi atau pakai cara lain." : null
+  );
   const [proses, setProses] = useState(false);
+  const [prosesGoogle, setProsesGoogle] = useState(false);
 
   async function masuk(e: React.FormEvent) {
     e.preventDefault();
@@ -39,11 +43,20 @@ function FormulirMasuk() {
   }
 
   async function masukGoogle() {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(tujuan)}` },
-    });
+    setProsesGoogle(true);
+    setPesan(null);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(tujuan)}` },
+      });
+      if (error) throw error;
+    } catch (e) {
+      console.error("Gagal masuk dengan Google:", e);
+      setPesan("Masuk dengan Google belum berhasil. Periksa koneksi lalu coba lagi.");
+      setProsesGoogle(false);
+    }
   }
 
   return (
@@ -57,7 +70,7 @@ function FormulirMasuk() {
                 Akses Khusus Dashboard Dewan
               </p>
               <p className="mt-1 text-xs text-muted leading-relaxed">
-                Halaman yang Anda tuju memerlukan peran <b>Admin/Dewan</b>. Silakan gunakan tombol 1-Klik <b>Dewan (Admin)</b> di bawah.
+                Halaman yang kamu tuju memerlukan peran <b>Admin/Dewan</b>. Silakan gunakan tombol 1-klik <b>Dewan (Admin)</b> di bawah.
               </p>
             </div>
           </div>
@@ -66,7 +79,7 @@ function FormulirMasuk() {
 
       <Card className="p-7">
         <div className="mb-6 text-center">
-          <span className="mx-auto mb-3 flex size-11 items-center justify-center rounded-2xl bg-daun-600 text-white">
+          <span className="mx-auto mb-3 flex size-11 items-center justify-center rounded-2xl bg-action text-white">
             <MapPin size={22} strokeWidth={2.5} />
           </span>
           <h1 className="font-display text-2xl font-bold">Selamat datang kembali</h1>
@@ -76,14 +89,14 @@ function FormulirMasuk() {
         </div>
 
         {/* Section 1-Klik Demo untuk Juri */}
-        <div className="mb-6 rounded-2xl border border-daun-500/30 bg-daun-500/5 p-4">
+        <div className="mb-6 rounded-2xl border border-action/30 bg-action-soft p-4">
           <div className="mb-3 flex items-center justify-between">
-            <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-daun-700 dark:text-daun-300">
-              <Sparkles size={14} /> Akun Demo (1-Klik untuk Juri)
+            <p className="flex items-center gap-1.5 text-xs font-bold text-action">
+              <LogIn size={14} /> Akun demo (1-klik untuk juri)
             </p>
             <Link
               href="/demo"
-              className="text-[11px] font-semibold text-daun-700 hover:underline dark:text-daun-300"
+              className="text-[11px] font-semibold text-action hover:underline"
             >
               Lihat panduan →
             </Link>
@@ -136,13 +149,20 @@ function FormulirMasuk() {
           <span className="h-px flex-1 bg-line" />
         </div>
 
-        <Button variant="sekunder" onClick={masukGoogle} className="w-full">
+        <Button
+          variant="sekunder"
+          onClick={masukGoogle}
+          disabled={prosesGoogle}
+          loading={prosesGoogle}
+          loadingLabel="Menghubungkan…"
+          className="w-full"
+        >
           Lanjut dengan Google
         </Button>
 
         <p className="mt-6 text-center text-sm text-muted">
           Belum punya akun?{" "}
-          <Link href="/daftar" className="font-semibold text-daun-700 hover:underline dark:text-daun-300">
+          <Link href="/daftar" className="font-semibold text-action hover:underline">
             Daftar sekarang
           </Link>
         </p>

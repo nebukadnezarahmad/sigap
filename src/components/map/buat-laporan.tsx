@@ -7,7 +7,9 @@ import { AlertTriangle, ImagePlus, Loader2, MapPin, Send, ThumbsUp } from "lucid
 import { KATEGORI, STATUS, type StatusKey } from "@/lib/constants";
 import { useUser } from "@/lib/use-user";
 import { createClient } from "@/lib/supabase/client";
+import { ACCEPT_GAMBAR, pesanValidasiGambar } from "@/lib/validasi-gambar";
 import { Button, Input, Label, Select, Textarea } from "@/components/ui";
+import { SkeletonTeks } from "@/components/ui";
 import { PilihanAkunDemo } from "@/components/tombol-demo-login";
 
 const LeafletMap = dynamic(
@@ -49,7 +51,7 @@ type LaporanMirip = {
 
 export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, muat } = useUser();
   const [judul, setJudul] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [slugKategori, setSlugKategori] = useState(KATEGORI[0].slug);
@@ -167,18 +169,30 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
   async function handleDukungLaporanMirip(id: string) {
     if (!user) return;
     setProses(true);
+    setPesan(null);
     try {
       const supabase = createClient();
-      await supabase.from("votes").upsert(
+      const { error } = await supabase.from("votes").upsert(
         { report_id: id, user_id: user.id },
         { onConflict: "report_id,user_id" }
       );
+      if (error) throw error;
       selesai();
       router.push(`/laporan/${id}`);
-    } catch {
-      selesai();
-      router.push(`/laporan/${id}`);
+    } catch (e) {
+      console.error("Gagal mendukung laporan serupa:", e);
+      setPesan("Dukungan belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+      setProses(false);
     }
+  }
+
+  if (muat) {
+    return (
+      <div className="grid gap-5 lg:grid-cols-2">
+        <SkeletonTeks baris={4} label="Memuat formulir laporan…" />
+        <SkeletonTeks baris={3} label="Memuat peta…" />
+      </div>
+    );
   }
 
   if (!user) {
@@ -186,16 +200,16 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       <div className="space-y-4 py-2">
         <div className="text-center">
           <p className="font-display font-bold text-base">
-            Masuk untuk Melaporkan Masalah
+            Masuk untuk melaporkan masalah
           </p>
           <p className="mt-1 text-sm text-muted">
             Setiap laporan diikat dengan akun warga agar validitas dan poin partisipasi dapat tercatat.
           </p>
         </div>
 
-        <div className="rounded-2xl border border-daun-500/30 bg-daun-500/5 p-4">
-          <p className="mb-2.5 text-xs font-bold uppercase tracking-wider text-daun-700 dark:text-daun-300">
-            Masuk Cepat Mode Demo (1-Klik untuk Juri)
+        <div className="rounded-2xl border border-action/30 bg-action/5 p-4">
+          <p className="mb-2.5 text-xs font-bold text-action">
+            Masuk cepat mode demo (1-klik untuk juri)
           </p>
           <PilihanAkunDemo ringkas />
         </div>
@@ -204,10 +218,10 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           <span>Punya akun sendiri?</span>
           <div className="flex gap-2">
             <Button size="sm" variant="sekunder" onClick={() => router.push("/masuk?next=/peta?lapor=1")}>
-              Masuk Manual
+              Masuk manual
             </Button>
             <Button size="sm" onClick={() => router.push("/daftar?next=/peta?lapor=1")}>
-              Daftar Akun
+              Daftar akun
             </Button>
           </div>
         </div>
@@ -234,7 +248,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       fokusId ??= "deskripsi";
     }
     if (!posisi) {
-      setGalatPeta("Klik lokasi masalah di peta dulu, lalu kirim lagi.");
+      setGalatPeta("Pilih lokasi masalah di peta dulu, lalu kirim lagi.");
       fokusId ??= "peta-pilih";
     }
     if (fokusId) {
@@ -259,22 +273,38 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       const supabase = createClient();
 
       for (const f of files) {
-        if (f.size > 5 * 1024 * 1024) throw new Error("Setiap foto maksimal 5 MB. Pilih foto lebih kecil lalu coba lagi.");
+        const galatFile = await pesanValidasiGambar(f);
+        if (galatFile) throw new Error(galatFile);
       }
 
       // Unggah sekali per file langsung ke report_photos;
       // foto pertama juga dipakai sebagai foto_url (satu upload, dua referensi).
       const urls: string[] = [];
-      for (const [i, f] of files.entries()) {
-        const path = `${pelapor.id}/${Date.now()}-${i}-${f.name.replace(/[^\w.-]/g, "_")}`;
-        const { error: upErr } = await supabase.storage
-          .from("foto-laporan")
-          .upload(path, f, { contentType: f.type });
-        if (upErr) throw new Error(`Gagal unggah foto: ${upErr.message} Periksa koneksi lalu coba lagi.`);
-        const { data: pub } = supabase.storage
-          .from("foto-laporan")
-          .getPublicUrl(path);
-        urls.push(pub.publicUrl);
+      const uploadPaths: string[] = [];
+      try {
+        for (const [i, f] of files.entries()) {
+          const path = `${pelapor.id}/${Date.now()}-${i}-${f.name.replace(/[^\w.-]/g, "_")}`;
+          const { error: upErr } = await supabase.storage
+            .from("foto-laporan")
+            .upload(path, f, { contentType: f.type });
+          if (upErr) {
+            console.error("Gagal mengunggah foto:", upErr);
+            throw new Error("Foto belum bisa diunggah. Periksa koneksi lalu coba lagi.");
+          }
+          const { data: pub } = supabase.storage
+            .from("foto-laporan")
+            .getPublicUrl(path);
+          uploadPaths.push(path);
+          urls.push(pub.publicUrl);
+        }
+      } catch (error) {
+        if (uploadPaths.length > 0) {
+          const { error: bersihErr } = await supabase.storage
+            .from("foto-laporan")
+            .remove(uploadPaths);
+          if (bersihErr) console.error("Gagal membersihkan unggahan parsial:", bersihErr);
+        }
+        throw error;
       }
       const foto_url: string | null = urls[0] ?? null;
 
@@ -298,7 +328,16 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         })
         .select("id")
         .single();
-      if (error) throw new Error(`${error.message} Periksa koneksi lalu coba lagi.`);
+      if (error) {
+        console.error("Gagal mengirim laporan:", error);
+        if (uploadPaths.length > 0) {
+          const { error: bersihErr } = await supabase.storage
+            .from("foto-laporan")
+            .remove(uploadPaths);
+          if (bersihErr) console.error("Gagal membersihkan unggahan foto:", bersihErr);
+        }
+        throw new Error("Laporan belum bisa dikirim. Periksa koneksi lalu coba lagi.");
+      }
 
       if (urls.length > 0 && inserted) {
         const baris = urls.map((url) => ({
@@ -306,20 +345,39 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           url,
           fase: "sebelum",
         }));
-        await supabase.from("report_photos").insert(baris);
+        const { error: fotoErr } = await supabase.from("report_photos").insert(baris);
+        if (fotoErr) {
+          console.error("Gagal mengaitkan foto laporan:", fotoErr);
+          const { error: hapusErr } = await supabase
+            .from("reports")
+            .delete()
+            .eq("id", inserted.id);
+          if (hapusErr) {
+            console.error("Gagal membatalkan laporan parsial:", hapusErr);
+            router.push(`/laporan/${inserted.id}`);
+            router.refresh();
+            return;
+          }
+          const { error: bersihErr } = await supabase.storage
+            .from("foto-laporan")
+            .remove(uploadPaths);
+          if (bersihErr) console.error("Gagal membersihkan unggahan foto:", bersihErr);
+          throw new Error("Foto belum bisa disimpan. Periksa koneksi lalu coba lagi.");
+        }
       }
 
       selesai();
       router.refresh();
     } catch (err) {
-      setPesan(err instanceof Error ? `${err.message} Periksa koneksi lalu coba lagi.` : "Terjadi kesalahan. Periksa koneksi lalu coba lagi.");
+      console.error("Gagal mengirim laporan:", err);
+      setPesan(err instanceof Error ? err.message : "Laporan belum bisa dikirim. Periksa koneksi lalu coba lagi.");
     } finally {
       setProses(false);
     }
   }
 
   return (
-    <form onSubmit={kirim} className="grid gap-5 sm:grid-cols-2">
+    <form onSubmit={kirim} className="grid gap-5 lg:grid-cols-2">
       <div className="space-y-4">
         <div>
           <Label htmlFor="judul">Judul laporan</Label>
@@ -397,7 +455,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
           <Label htmlFor="foto">Foto kondisi (maks. 4, opsional)</Label>
           <label
             htmlFor="foto"
-            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed garis-halus px-3.5 py-3 text-sm text-muted transition hover:border-daun-400 hover:text-ink"
+            className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed garis-halus px-3.5 py-3 text-sm text-muted transition hover:border-action hover:text-ink"
           >
             <ImagePlus size={18} />
             {files.length > 0
@@ -407,7 +465,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
               id="foto"
               name="foto"
               type="file"
-              accept="image/*"
+              accept={ACCEPT_GAMBAR}
               multiple
               className="sr-only"
               onChange={(e) =>
@@ -433,7 +491,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
       <div className="flex flex-col">
         <Label>
           <span className="inline-flex items-center gap-1.5">
-            <MapPin size={13} /> Klik peta untuk menandai titik masalah
+            <MapPin size={13} /> Pilih peta untuk menandai titik masalah
           </span>
         </Label>
         <div className="min-h-64 flex-1 overflow-hidden rounded-xl border garis-halus">
@@ -483,8 +541,8 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
             <div className="flex items-start gap-2.5">
               <AlertTriangle size={17} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                  Laporan Serupa Ditemukan ({Math.round(laporanMirip[0].jarak_m)} m dari titikmu)
+                <p className="text-xs font-bold text-amber-700 dark:text-amber-400">
+                  Laporan serupa ditemukan ({Math.round(laporanMirip[0].jarak_m)} m dari titikmu)
                 </p>
                 <p className="mt-1 text-sm font-semibold truncate text-ink">
                   {laporanMirip[0].judul}
@@ -497,7 +555,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
                     size="sm"
                     type="button"
                     onClick={() => handleDukungLaporanMirip(laporanMirip[0].id)}
-                    className="bg-daun-600 hover:bg-daun-700 text-white"
+                    className="bg-action hover:bg-action-hover text-white"
                   >
                     <ThumbsUp size={12} /> Dukung laporan ini
                   </Button>
@@ -507,7 +565,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
                     type="button"
                     onClick={() => setAbaikanDuplikat(true)}
                   >
-                    Ini Masalah Berbeda
+                    Ini masalah berbeda
                   </Button>
                 </div>
               </div>
@@ -522,7 +580,7 @@ export function BuatLaporanFormulir({ selesai }: { selesai: () => void }) {
         )}
 
         <div className="mt-3 flex w-full flex-col gap-2">
-          <Button type="submit" disabled={proses} aria-busy={proses} size="lg" className="w-full">
+          <Button type="submit" disabled={proses} loading={proses} loadingLabel="Mengirim…" aria-busy={proses} size="lg" className="w-full">
             {proses ? (
               <Loader2 size={16} aria-hidden className="animate-spin" />
             ) : (

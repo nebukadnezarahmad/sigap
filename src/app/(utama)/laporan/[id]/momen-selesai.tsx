@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
+import { harusKurangiGerak, transisiSedang } from "@/lib/motion";
 import { PartyPopper } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
@@ -30,6 +31,8 @@ export function MomenSelesai({
           if (upd.id === reportId && upd.status === "selesai") {
             refSelesai.current = true;
             setBaru(true);
+            // Reduced motion: lewati confetti, tampilkan status sukses statis.
+            if (harusKurangiGerak()) return;
             void (async () => {
               const { default: confetti } = await import("canvas-confetti");
               confetti({
@@ -64,8 +67,10 @@ export function MomenSelesai({
 
   return (
     <motion.div
+      role="status"
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
+      transition={transisiSedang}
       className="mb-5 rounded-2xl border border-daun-500/40 bg-daun-500/10 p-6 text-center"
     >
       <PartyPopper size={44} className="mx-auto text-daun-700 dark:text-daun-300" />

@@ -1,0 +1,570 @@
+.stagePerspective {
+  position: relative;
+  perspective: 1100px;
+  transform-style: preserve-3d;
+}
+
+.stageInner {
+  transform-origin: center top;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.feyBadgeTop {
+  position: absolute;
+  top: -14px;
+  right: 28px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--foreground);
+  background: var(--liquid-glass-bg);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 12px 30px -6px rgb(0 0 0 / 0.2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.feyBadgeBottom {
+  position: absolute;
+  bottom: 22px;
+  left: 28px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--liquid-glass-bg);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 10px 24px -6px rgb(0 0 0 / 0.18);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.textReveal {
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.85;
+  color: var(--ink);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.word {
+  display: inline-block;
+  margin-right: 0.28em;
+  transition: opacity 0.15s ease;
+}
+
+/* Sticky Horizontal Showcase Section (Framer #9 + Interactive Controls) */
+.gallerySection {
+  position: relative;
+  height: 240vh;
+  margin: var(--section-space, 80px) auto 0;
+}
+
+.stickyContainer {
+  position: sticky;
+  top: 72px;
+  height: calc(100vh - 72px);
+  max-height: 880px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 24px 24px;
+  overflow-x: clip;
+}
+
+.galleryHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.galleryHeader h2 {
+  font-size: clamp(32px, 3.6vw, 48px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+
+.galleryHeader p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.galleryControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.navGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  background: var(--liquid-glass-bg);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow: inset 0 1px 0 var(--liquid-glass-border-specular);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background var(--dur-cepat, 0.15s), transform var(--dur-cepat, 0.15s), opacity var(--dur-cepat, 0.15s);
+}
+
+.navButton:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.15);
+  transform: scale(1.08);
+}
+
+.navButton:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.navButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--muted);
+  opacity: 0.35;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--dur-cepat, 0.2s) var(--ease-apple, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+.dotActive {
+  width: 22px;
+  background: var(--action);
+  opacity: 1;
+}
+
+.dot:hover:not(.dotActive) {
+  opacity: 0.8;
+}
+
+.progressPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.trackContainer {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 0 76px;
+  margin-bottom: -52px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+}
+
+.isDragging {
+  cursor: grabbing !important;
+}
+
+.isDragging .card {
+  pointer-events: none;
+}
+
+.horizontalTrack {
+  display: flex;
+  gap: 28px;
+  width: max-content;
+  padding: 0 16px;
+  will-change: transform;
+}
+
+.card {
+  position: relative;
+  width: clamp(320px, 42vw, 540px);
+  height: clamp(340px, 46vh, 430px);
+  border-radius: 28px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--liquid-glass-bg);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 16px 40px -10px rgb(0 0 0 / 0.12);
+  transition: transform var(--dur-cepat, 0.18s) var(--ease-apple, cubic-bezier(0.32, 0.72, 0, 1)),
+              box-shadow var(--dur-cepat, 0.18s) var(--ease-apple, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 24px 50px -10px rgb(0 0 0 / 0.2);
+}
+
+.cardImage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.1) 0%, rgb(0 0 0 / 0.4) 50%, rgb(0 0 0 / 0.85) 100%);
+}
+
+.cardContent {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 28px;
+  color: white;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgb(255 255 255 / 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / 0.35);
+  color: white;
+}
+
+.cardNumber {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+
+.cardBottom h3 {
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+}
+
+.cardBottom p {
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: 0.85;
+  max-width: 440px;
+}
+
+@media (max-width: 768px) {
+  .gallerySection {
+    height: auto;
+    margin: var(--section-space, 60px) auto 0;
+  }
+  .stickyContainer {
+    position: relative;
+    top: auto;
+    height: auto;
+    max-height: none;
+    padding: 0 16px;
+  }
+  .galleryHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .galleryControls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .trackContainer {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 16px 0 56px;
+    margin-bottom: -36px;
+  }
+  .trackContainer::-webkit-scrollbar {
+    display: none;
+  }
+  .horizontalTrack {
+    transform: none !important;
+  }
+  .feyBadgeTop,
+  .feyBadgeBottom {
+    display: none !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   ANIMASI 4: Tedy Exploding Card Stack Scroll Showcase (Framer #5)
+   ------------------------------------------------------------------------- */
+.tedySection {
+  position: relative;
+  height: 180vh;
+  margin: var(--section-space, 80px) auto 0;
+}
+
+.tedySectionReduced {
+  position: relative;
+  padding: var(--section-space, 80px) 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tedySticky {
+  position: sticky;
+  top: 72px;
+  height: calc(100vh - 72px);
+  max-height: 900px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 24px;
+  overflow: clip;
+}
+
+.tedyStage {
+  position: relative;
+  width: 100%;
+  max-width: 1240px;
+  min-height: 560px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tedyCenterContent {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 520px;
+  margin: 0 auto;
+  will-change: transform, opacity;
+}
+
+.tedyCenterContent h2 {
+  font-size: clamp(34px, 4.2vw, 56px);
+  line-height: 1.15;
+  letter-spacing: -0.055em;
+  font-weight: 600;
+  margin: 0;
+}
+
+.tedyCenterContent h2 > span {
+  color: var(--action);
+}
+
+.tedyCenterContent > p {
+  color: var(--muted);
+  margin-top: 22px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.closingAppIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  color: white;
+  background: linear-gradient(145deg, #3894ff, #0066cc 65%, #004da3);
+  border: 1px solid rgb(255 255 255 / 0.4);
+  box-shadow:
+    inset 0 1px 2px rgb(255 255 255 / 0.8),
+    inset 0 -2px 4px rgb(0 0 0 / 0.2),
+    0 16px 32px -8px rgb(0 102 204 / 0.45);
+  margin-bottom: 24px;
+  transition: transform var(--dur-cepat, 0.18s) var(--ease-apple, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+.closingAppIcon:hover {
+  transform: scale(1.06);
+}
+
+.tedyCard {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -85px;
+  margin-left: -120px;
+  width: 240px;
+  height: 170px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--panel-2);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 20px 40px -10px rgb(0 0 0 / 0.25);
+  pointer-events: none;
+  user-select: none;
+  will-change: transform, opacity;
+}
+
+.tedyCard1 { z-index: 4; }
+.tedyCard2 { z-index: 3; }
+.tedyCard3 { z-index: 2; }
+.tedyCard4 { z-index: 1; }
+
+.tedyCardOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.05) 0%, rgb(0 0 0 / 0.55) 100%);
+  z-index: 1;
+}
+
+.tedyCardTag {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  color: white;
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / 0.25);
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 768px) {
+  .tedySection {
+    height: 150vh;
+  }
+  .tedyStage {
+    min-height: 500px;
+  }
+  .tedyCard {
+    width: 140px;
+    height: 100px;
+    margin-top: -50px;
+    margin-left: -70px;
+    border-radius: 14px;
+  }
+  .tedyCardTag {
+    font-size: 8px;
+    padding: 3px 8px;
+    bottom: 8px;
+    left: 10px;
+  }
+  .closingAppIcon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+  }
+  .tedyCenterContent h2 {
+    font-size: clamp(28px, 6vw, 40px);
+    letter-spacing: -0.04em;
+  }
+  .tedyCenterContent > p {
+    margin-top: 16px;
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stageInner, .horizontalTrack, .card, .tedyCard, .tedyCenterContent {
+    transform: none !important;
+    transition: none !important;
+  }
+  .feyBadgeTop,
+  .feyBadgeBottom,
+  .tedyCard {
+    animation: none !important;
+    transform: none !important;
+    display: none !important;
+  }
+  .word {
+    opacity: 1 !important;
+  }
+  .gallerySection, .tedySection {
+    height: auto !important;
+  }
+  .stickyContainer, .tedySticky {
+    position: relative !important;
+    top: auto !important;
+    height: auto !important;
+  }
+  .closingAppIcon:hover {
+    transform: none !important;
+  }
+}

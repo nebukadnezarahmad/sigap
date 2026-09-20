@@ -23,7 +23,7 @@ export default function LayoutUtama({
         <div id="isi-utama" tabIndex={-1}>
           {children}
         </div>
-        <footer className="border-t garis-halus mt-16 print:hidden">
+        <footer className="border-t garis-halus mt-16 pb-[env(safe-area-inset-bottom)] print:hidden">
           <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-muted flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="font-display font-semibold text-base">
               SIGAP{" "}
@@ -36,7 +36,7 @@ export default function LayoutUtama({
                 <Link
                   key={t.href}
                   href={t.href}
-                  className="inline-flex min-h-[44px] items-center transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+                  className="inline-flex min-h-[44px] items-center transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
                 >
                   {t.label}
                 </Link>

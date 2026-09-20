@@ -1,33 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { BarChart3, Check, Plus, Users, X } from "lucide-react";
+import { transisiCepat, transisiReveal } from "@/lib/motion";
+import { BarChart3, Check, Plus, Users, Vote, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
 import type { Poll } from "./page";
 import { Button, Card, Input, Label } from "@/components/ui";
-
-export function GalatPolling() {
-  const router = useRouter();
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
-        <h1 className="font-display text-2xl font-bold">
-          Polling Warga belum bisa dimuat
-        </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
-        </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
-          Coba lagi
-        </Button>
-      </Card>
-    </main>
-  );
-}
+import { FeedbackState } from "@/components/feedback-state";
 
 function PersenBar({  persen,
   terpilih,
@@ -45,14 +28,14 @@ function PersenBar({  persen,
         className="absolute inset-y-0 left-0 bg-daun-500/15"
         initial={{ width: 0 }}
         animate={{ width: `${persen}%` }}
-        transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
+        transition={transisiReveal}
       />
       {terpilih && (
         <motion.div
           className="absolute inset-y-0 left-0 bg-daun-600/25"
           initial={{ width: 0 }}
           animate={{ width: `${persen}%` }}
-          transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
+          transition={transisiReveal}
         />
       )}
       <div className="relative flex items-center justify-between gap-3 text-sm">
@@ -61,7 +44,7 @@ function PersenBar({  persen,
           {label}
         </span>
         <span className="angka-tabular shrink-0 font-bold text-muted">
-          {persen}% · {jumlah}
+          {persen}% ({jumlah} suara)
         </span>
       </div>
     </div>
@@ -78,6 +61,7 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
     setData(poll);
   }
   const [proses, setProses] = useState(false);
+  const [pesan, setPesan] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -93,7 +77,7 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
         },
         (payload) => {
           const baru = payload.new as { opsi_idx: number; user_id: string };
-          // Suara sendiri sudah dihitung optimistis di pilih()
+          // Suara sendiri diterapkan setelah insert terkonfirmasi di pilih().
           if (baru.user_id && baru.user_id === pengguna?.id) return;
           setData((d) => {
             const perOpsi = [...d.perOpsi];
@@ -131,6 +115,7 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
   async function pilih(idx: number) {
     if (!masuk || proses || data.pilihanKu !== null) return;
     setProses(true);
+    setPesan(null);
     const supabase = createClient();
     const {
       data: { user },
@@ -139,26 +124,18 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
       setProses(false);
       return;
     }
-    setData((d) => {
-      const perOpsi = [...d.perOpsi];
-      perOpsi[idx] = (perOpsi[idx] ?? 0) + 1;
-      return { ...d, perOpsi, totalSuara: d.totalSuara + 1, pilihanKu: idx };
-    });
     const { error } = await supabase
       .from("poll_votes")
       .insert({ poll_id: data.id, user_id: user.id, opsi_idx: idx });
     if (error) {
+      console.error("Gagal menyimpan suara:", error);
+      setPesan("Suaramu belum tercatat. Periksa koneksi lalu coba lagi.");
+    } else {
       setData((d) => {
         const perOpsi = [...d.perOpsi];
-        perOpsi[idx] = Math.max(0, (perOpsi[idx] ?? 0) - 1);
-        return {
-          ...d,
-          perOpsi,
-          totalSuara: Math.max(0, d.totalSuara - 1),
-          pilihanKu: null,
-        };
+        perOpsi[idx] = (perOpsi[idx] ?? 0) + 1;
+        return { ...d, perOpsi, totalSuara: d.totalSuara + 1, pilihanKu: idx };
       });
-    } else {
       router.refresh();
     }
     setProses(false);
@@ -200,20 +177,34 @@ function KartuPolling({ poll, masuk }: { poll: Poll; masuk: boolean }) {
                 key={i}
                 onClick={() => pilih(i)}
                 disabled={proses}
-                className="w-full rounded-xl border garis-halus bg-panel-2 px-4 py-2.5 text-left text-sm font-medium transition hover:border-daun-400 hover:bg-daun-500/5 disabled:opacity-50"
+                className="w-full rounded-xl border garis-halus bg-panel-2 px-4 py-2.5 text-left text-sm font-medium transition hover:border-action hover:bg-action-soft disabled:opacity-50"
               >
                 {o}
               </button>
             ))}
       </div>
 
-      <p className="mt-3 text-xs text-muted">
-        {!masuk
-          ? "Masuk untuk memberi suara."
-          : sudahVote
-            ? "Terima kasih — suaramu tercatat."
-            : "Klik salah satu opsi untuk memberi suara."}
+      <p className="mt-3 text-xs text-muted" aria-live="polite">
+        {!masuk ? (
+          <span>
+            Masuk untuk memberi suara.{" "}
+            <Link href="/masuk?next=/polling" className="font-semibold text-action hover:underline">
+              Masuk sekarang
+            </Link>
+          </span>
+        ) : proses ? (
+          "Menyimpan suaramu…"
+        ) : sudahVote ? (
+          "Terima kasih — suaramu tercatat."
+        ) : (
+          "Pilih salah satu opsi untuk memberi suara."
+        )}
       </p>
+      {pesan && (
+        <p role="alert" className="mt-2 text-xs font-semibold text-danger">
+          {pesan}
+        </p>
+      )}
     </Card>
   );
 }
@@ -253,7 +244,8 @@ function FormBuatPolling({
       .single();
     setProses(false);
     if (error) {
-      setPesan(error.message);
+      console.error("Gagal menerbitkan jajak pendapat:", error);
+      setPesan("Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
       return;
     }
     const baru: Poll = {
@@ -326,8 +318,8 @@ function FormBuatPolling({
         <Button type="button" variant="sekunder" onClick={tutup}>
           Batal
         </Button>
-        <Button type="submit" disabled={proses}>
-          {proses ? "Menyimpan…" : "Terbitkan polling"}
+        <Button type="submit" disabled={proses} loading={proses} loadingLabel="Menerbitkan…">
+          {proses ? "Menerbitkan…" : "Terbitkan jajak pendapat"}
         </Button>
       </div>
     </form>
@@ -359,7 +351,7 @@ export function PollingKlien({
           {formBuka ? (
             <Card className="p-5">
               <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
-                <BarChart3 size={17} /> Polling baru
+                <BarChart3 size={17} /> Jajak pendapat baru
               </h2>
               <FormBuatPolling
                 tutup={() => setFormBuka(false)}
@@ -372,7 +364,7 @@ export function PollingKlien({
             </Card>
           ) : (
             <Button variant="sekunder" onClick={() => setFormBuka(true)}>
-              <Plus size={15} /> Buat polling baru
+              <Plus size={15} /> Buat jajak pendapat baru
             </Button>
           )}
         </div>
@@ -387,15 +379,19 @@ export function PollingKlien({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
+              transition={transisiCepat}
             >
               <KartuPolling poll={p} masuk={masuk} />
             </motion.div>
           ))}
         </AnimatePresence>
         {polls.length === 0 && (
-          <Card className="p-10 text-center text-sm text-muted">
-            Belum ada polling aktif.
-          </Card>
+          <FeedbackState
+            jenis="kosong"
+            ikon={Vote}
+            judul="Belum ada jajak pendapat aktif"
+            deskripsi="Dewan akan membuka jajak pendapat baru bila ada kebijakan yang perlu suaramu."
+          />
         )}
       </div>
     </div>

@@ -3,17 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import {
+  BadgeCheck,
   CookingPot,
   Flower2,
   Hammer,
   MessageCircle,
   Plus,
   ShoppingBag,
-  Sparkles,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
+import { Store } from "lucide-react";
 import { Modal } from "@/components/modal";
 
 type Usaha = {
@@ -49,7 +52,7 @@ function KartuUsaha({ usaha }: { usaha: Usaha }) {
   return (
     <Card className="flex h-full flex-col p-5">
       <div className="flex items-start gap-3">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-kunyit-500/15 text-kunyit-600 dark:text-kunyit-400">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-panel-2 text-ink">
           <meta.Ikon size={20} />
         </span>
         <div className="min-w-0 flex-1">
@@ -60,7 +63,7 @@ function KartuUsaha({ usaha }: { usaha: Usaha }) {
         </div>
         {usaha.verified && (
           <span className="flex shrink-0 items-center gap-1 rounded-full bg-daun-500/15 px-2.5 py-1 text-xs font-semibold text-daun-700 dark:text-daun-300">
-            <Sparkles size={11} /> Terverifikasi
+            <BadgeCheck size={11} /> Terverifikasi
           </span>
         )}
       </div>
@@ -76,9 +79,9 @@ function KartuUsaha({ usaha }: { usaha: Usaha }) {
           href={`https://wa.me/${wa}`}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 flex items-center justify-center gap-1.5 rounded-full bg-daun-600 py-2.5 text-sm font-semibold text-white transition hover:bg-daun-700"
+          className="mt-4 flex items-center justify-center gap-1.5 rounded-full bg-action py-2.5 text-sm font-semibold text-white transition hover:bg-action-hover"
         >
-          <MessageCircle size={15} /> Hubungi via WhatsApp
+          <MessageCircle size={15} /> Hubungi lewat WhatsApp
         </a>
       )}
     </Card>
@@ -124,7 +127,8 @@ function FormAjukanUsaha({
       .single();
     setProses(false);
     if (error) {
-      setPesan(error.message);
+      console.error("Gagal mengajukan usaha:", error);
+      setPesan("Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
       return;
     }
     selesai({
@@ -210,31 +214,11 @@ function FormAjukanUsaha({
         <Button type="button" variant="sekunder" onClick={tutup}>
           Batal
         </Button>
-        <Button type="submit" disabled={proses}>
-          {proses ? "Menyimpan…" : "Ajukan usaha"}
+        <Button type="submit" disabled={proses} loading={proses} loadingLabel="Menerbitkan…">
+          {proses ? "Menerbitkan…" : "Ajukan usaha"}
         </Button>
       </div>
     </form>
-  );
-}
-
-export function GalatUmkm() {
-  const router = useRouter();
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
-        <h1 className="font-display text-2xl font-bold">
-          UMKM Warga belum bisa dimuat
-        </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
-        </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
-          Coba lagi
-        </Button>
-      </Card>
-    </main>
   );
 }
 
@@ -269,6 +253,7 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
+              transition={transisiCepat}
               className="h-full"
             >
               <KartuUsaha usaha={u} />
@@ -277,9 +262,12 @@ export function UmkmKlien({ awal, masuk }: { awal: Usaha[]; masuk: boolean }) {
         </motion.div>
       </AnimatePresence>
       {tampil.length === 0 && (
-        <Card className="p-10 text-center text-sm text-muted">
-          Belum ada usaha terdaftar. Jadilah yang pertama!
-        </Card>
+        <FeedbackState
+          jenis="kosong"
+          ikon={Store}
+          judul="Belum ada usaha terdaftar"
+          deskripsi="Jadilah yang pertama mendaftarkan usaha warga di sini."
+        />
       )}
 
       <Modal terbuka={formBuka} tutup={() => setFormBuka(false)} judul="Daftarkan usaha">

@@ -17,7 +17,7 @@ export default function HalamanPrivasi() {
           <p className="mt-2 text-sm leading-relaxed text-muted">
             Nama, username, dan email akunmu; isi laporan (judul, deskripsi,
             foto, titik koordinat yang kamu pilih sendiri); serta aktivitas
-            partisipasi (dukungan, komentar, poin, badge).
+            partisipasi (dukungan, komentar, poin, lencana).
           </p>
         </Card>
         <Card className="p-5">

@@ -3,22 +3,56 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  color-scheme: light dark;
-  --paper: #f6f4ef;
+  color-scheme: light;
+  --paper: #f5f5f7;
   --panel: #ffffff;
-  --panel-2: #fbfaf7;
-  --ink: #1a2420;
-  --muted: #5c6b64;
-  --line: #e5e1d8;
+  --panel-2: #eeeef1;
+  --ink: #1d1d1f;
+  --muted: #64646b;
+  --line: #dedee3;
+  --action: #0066cc;
+  --action-hover: #0055ad;
+  --action-soft: #eaf3ff;
+  --on-action: #ffffff;
+  --success: #178a4c;
+  --warning: #b45309;
+  --danger: #dc2626;
+  --bg-elevated: #ffffff;
+  --glass: rgb(255 255 255 / 0.72);
+  --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.12);
+  --liquid-glass-bg: rgb(255 255 255 / 0.68);
+  --liquid-glass-border-specular: rgb(255 255 255 / 0.75);
+  --liquid-glass-border: rgb(222 222 227 / 0.7);
+  --liquid-glass-shadow: 0 12px 36px -4px rgb(0 0 0 / 0.1), 0 4px 12px -2px rgb(0 0 0 / 0.04);
+  --dur-instan: 100ms;
+  --dur-cepat: 180ms;
+  --dur-sedang: 300ms;
+  --dur-reveal: 500ms;
+  --ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .dark {
-  --paper: #0c1310;
-  --panel: #131d19;
-  --panel-2: #17241f;
-  --ink: #ecf2ee;
-  --muted: #93a39b;
-  --line: #24312b;
+  color-scheme: dark;
+  --paper: #111113;
+  --panel: #1c1c1f;
+  --panel-2: #252529;
+  --ink: #f5f5f7;
+  --muted: #a1a1a9;
+  --line: #35353b;
+  --action: #80baff;
+  --action-hover: #a3ceff;
+  --action-soft: #172c46;
+  --on-action: #0b1f33;
+  --success: #5fd08a;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --bg-elevated: #2c2c30;
+  --glass: rgb(28 28 31 / 0.72);
+  --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.45);
+  --liquid-glass-bg: rgb(28 28 31 / 0.72);
+  --liquid-glass-border-specular: rgb(255 255 255 / 0.16);
+  --liquid-glass-border: rgb(53 53 59 / 0.7);
+  --liquid-glass-shadow: 0 16px 40px -4px rgb(0 0 0 / 0.5), 0 4px 16px -2px rgb(0 0 0 / 0.3);
 }
 
 @theme inline {
@@ -28,6 +62,14 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-action: var(--action);
+  --color-action-hover: var(--action-hover);
+  --color-action-soft: var(--action-soft);
+  --color-on-action: var(--on-action);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-elevated: var(--bg-elevated);
 
   --color-daun-50: #f0f9f1;
   --color-daun-100: #dcf3e0;
@@ -48,11 +90,12 @@
   --color-kunyit-600: #d97706;
   --color-kunyit-700: #b45309;
 
-  --color-danger: #dc2626;
   --color-sdg11: #fd9d24;
 
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-poppins), sans-serif;
+  --font-display: var(--font-poppins), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
+  --font-sans: var(--font-poppins), -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --font-serif: var(--font-fraunces), Georgia, serif;
 
   --animate-muncul: muncul 0.5s ease-out both;
@@ -81,8 +124,22 @@
 }
 
 body {
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(at 100% 0%, color-mix(in srgb, var(--action) 9%, transparent) 0px, transparent 50%),
+    radial-gradient(at 0% 45%, color-mix(in srgb, var(--success) 7%, transparent) 0px, transparent 45%),
+    radial-gradient(at 85% 90%, color-mix(in srgb, #fd9d24 6%, transparent) 0px, transparent 45%);
+  background-attachment: fixed;
   color: var(--ink);
+}
+
+.dark body {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(at 100% 0%, color-mix(in srgb, var(--action) 16%, transparent) 0px, transparent 55%),
+    radial-gradient(at 0% 45%, color-mix(in srgb, var(--success) 12%, transparent) 0px, transparent 50%),
+    radial-gradient(at 85% 90%, color-mix(in srgb, #fd9d24 9%, transparent) 0px, transparent 50%);
+  background-attachment: fixed;
 }
 
 html {
@@ -126,12 +183,12 @@ h3 {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-daun-600);
+  outline: 2px solid var(--action);
   outline-offset: 2px;
 }
 
 .dark :focus-visible {
-  outline-color: var(--color-daun-300);
+  outline-color: var(--action);
 }
 
 .angka-tabular {
@@ -182,7 +239,7 @@ img.foto-laporan {
 
 .bg-pola-grid {
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(46, 158, 87, 0.08) 0%, transparent 65%),
+    radial-gradient(circle at 50% 0%, rgba(0, 102, 204, 0.08) 0%, transparent 65%),
     linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
   background-size: 100% 100%, 48px 48px, 48px 48px;
@@ -190,14 +247,14 @@ img.foto-laporan {
 
 .dark .bg-pola-grid {
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(46, 158, 87, 0.15) 0%, transparent 65%),
+    radial-gradient(circle at 50% 0%, rgba(0, 102, 204, 0.18) 0%, transparent 65%),
     linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
   background-size: 100% 100%, 48px 48px, 48px 48px;
 }
 
 .bg-pola-topografi {
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23237f45' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%230066cc' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
 }
 
 .lompat-ke-isi:focus-visible {
@@ -205,15 +262,15 @@ img.foto-laporan {
   top: 12px;
   padding: 8px 16px;
   border-radius: 999px;
-  background: var(--color-daun-700);
-  color: white;
+  background: var(--action);
+  color: var(--on-action);
   font-size: 13px;
   font-weight: 600;
 }
 
 ::selection {
-  background: var(--color-daun-500);
-  color: white;
+  background: var(--action);
+  color: var(--on-action);
 }
 
 .garis-halus {
@@ -252,6 +309,61 @@ img.foto-laporan {
   }
 }
 
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.px-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.py-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (forced-colors: active) {
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    forced-color-adjust: auto;
+    border: 1px solid ButtonText;
+  }
+  .garis-halus {
+    border-color: ButtonText;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  header[class*="backdrop-blur"],
+  [class*="backdrop-blur"] {
+    background-color: var(--panel) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  header[class*="backdrop-blur"],
+  [class*="backdrop-blur"] {
+    background-color: var(--panel) !important;
+    backdrop-filter: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -269,5 +381,135 @@ img.foto-laporan {
   .animate-ping,
   .animate-pulse {
     animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   Liquid Glass System — Terstandarisasi Apple HIG & Anti-Slop (R-10, R-25)
+   Diterapkan khusus pada floating functional chrome: Header, Peta Dock, Modal Sheets.
+   ========================================================================== */
+
+/* 1. Header Mengambang */
+.liquid-glass-header,
+.kaca-header {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 8px 32px -8px rgb(0 0 0 / 0.08);
+}
+.dark .liquid-glass-header,
+.dark .kaca-header {
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 12px 36px -8px rgb(0 0 0 / 0.45);
+}
+
+/* 2. Floating Dock & Pill Controls (Peta, Floating Action, Search Button) */
+.liquid-glass-dock,
+.kaca-chip {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 8px 24px -6px rgb(0 0 0 / 0.15);
+  transition: transform var(--dur-cepat) var(--ease-apple),
+              background var(--dur-cepat) var(--ease-apple),
+              box-shadow var(--dur-cepat) var(--ease-apple),
+              border-color var(--dur-cepat) var(--ease-apple);
+}
+.dark .liquid-glass-dock,
+.dark .kaca-chip {
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 12px 28px -6px rgb(0 0 0 / 0.5);
+}
+.liquid-glass-dock:active,
+.kaca-chip:active {
+  transform: scale(0.97);
+}
+
+/* 3. Floating Modal Sheet & Flyout Dialogs (Modal, Command Palette, Notification) */
+.liquid-glass-sheet {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    var(--liquid-glass-shadow);
+}
+
+/* 4. Large Liquid Glass Tile (Kartu Fitur, Stat Bar, Panggung Peta) */
+.liquid-glass-tile {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 16px 40px -8px rgb(0 0 0 / 0.07),
+    0 4px 12px -2px rgb(0 0 0 / 0.03);
+  transition: transform var(--dur-cepat) var(--ease-apple),
+              box-shadow var(--dur-cepat) var(--ease-apple),
+              border-color var(--dur-cepat) var(--ease-apple);
+}
+.dark .liquid-glass-tile {
+  box-shadow:
+    inset 0 1px 0 var(--liquid-glass-border-specular),
+    0 20px 48px -8px rgb(0 0 0 / 0.5),
+    0 4px 16px -2px rgb(0 0 0 / 0.3);
+}
+
+/* 5. Micro-Frosted Glass Pill (Lencana, Kategori, Counter Capsule) */
+.liquid-glass-pill {
+  background: rgb(255 255 255 / 0.55);
+  backdrop-filter: blur(16px) saturate(170%);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  border: 1px solid rgb(255 255 255 / 0.6);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.8),
+    0 4px 16px -4px rgb(0 0 0 / 0.06);
+  transition: transform var(--dur-cepat) var(--ease-apple),
+              background var(--dur-cepat) var(--ease-apple),
+              border-color var(--dur-cepat) var(--ease-apple);
+}
+.dark .liquid-glass-pill {
+  background: rgb(255 255 255 / 0.07);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.15),
+    0 4px 16px -4px rgb(0 0 0 / 0.4);
+}
+
+/* Fallback tanpa backdrop-filter */
+@supports not (backdrop-filter: blur(1px)) {
+  .liquid-glass-header,
+  .liquid-glass-dock,
+  .liquid-glass-sheet,
+  .liquid-glass-tile,
+  .liquid-glass-pill,
+  .kaca-header,
+  .kaca-chip {
+    background: var(--panel);
+  }
+}
+
+/* Aksesibilitas: Hormati prefers-reduced-transparency */
+@media (prefers-reduced-transparency: reduce) {
+  .liquid-glass-header,
+  .liquid-glass-dock,
+  .liquid-glass-sheet,
+  .liquid-glass-tile,
+  .liquid-glass-pill,
+  .kaca-header,
+  .kaca-chip {
+    background: var(--panel) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }

@@ -21,7 +21,7 @@ export function waktuRelatif(iso: string) {
   const jam = Math.floor(menit / 60);
   if (jam < 24) return `${jam} jam lalu`;
   const hari = Math.floor(jam / 24);
-  if (hari < 30) return `${hari} hr lalu`;
+  if (hari < 30) return `${hari} hari lalu`;
   return formatTanggal(iso);
 }
 

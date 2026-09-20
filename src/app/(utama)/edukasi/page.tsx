@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui";
 import { NODE_LAIN } from "@/lib/ikon-vektor";
-import { EdukasiKlien, GalatEdukasi } from "./edukasi-klien";
+import { EdukasiKlien } from "./edukasi-klien";
+import {
+  GalatMuatUlang,
+  KontenUtama,
+  PageHeader,
+} from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Edukasi" };
 export const dynamic = "force-dynamic";
@@ -16,7 +21,7 @@ const MATERI = [
     poin: [
       "Sediakan 3 wadah: organik, anorganik, residu",
       "Bilas kemasan sebelum dibuang agar tidak menarik lalat",
-      "Kardus dan botol punya nilai jual — kumpulkan terpisah",
+      "Kardus dan botol punya nilai jual, kumpulkan terpisah",
     ],
   },
   {
@@ -25,20 +30,20 @@ const MATERI = [
     ringkas:
       "Sisa makanan dan daun kering bisa jadi pupuk dalam 4–6 minggu memakai ember bekas.",
     poin: [
-      "Takashi: susun ember berlubang + kerajang kering",
+      "Takakura: susun ember berlubang + keranjang kering",
       "Aduk tiap 3 hari, jaga lembap seperti spons peras",
       "Kompos matang berwarna gelap dan tidak berbau",
     ],
   },
   {
     slug: "tiga-r",
-    judul: "Reduce, Reuse, Recycle",
+    judul: "Kurangi, pakai ulang, daur ulang (Reduce, Reuse, Recycle)",
     ringkas:
-      "Urutannya penting: kurangi dulu, pakai ulang, baru daur ulang — bukan sebaliknya.",
+      "Urutannya penting: kurangi dulu, pakai ulang, baru daur ulang. Bukan sebaliknya.",
     poin: [
-      "Reduce: bawa tas belanja & tumbler sendiri",
-      "Reuse: toples selai jadi wadah bumbu",
-      "Recycle: serahkan ke bank sampah, bukan tong campuran",
+      "Kurangi (reduce): bawa tas belanja & tumbler sendiri",
+      "Pakai ulang (reuse): toples selai jadi wadah bumbu",
+      "Daur ulang (recycle): serahkan ke bank sampah, bukan tong campuran",
     ],
   },
   {
@@ -101,7 +106,11 @@ const SOAL = [
 export default async function HalamanEdukasi() {
   const supabase = await createClient();
   if (!supabase) {
-    return <GalatEdukasi />;
+    return (
+      <KontenUtama lebar="lebar">
+        <GalatMuatUlang judul="Edukasi belum bisa dimuat" />
+      </KontenUtama>
+    );
   }
   const {
     data: { user },
@@ -109,8 +118,9 @@ export default async function HalamanEdukasi() {
 
   let lulusSebelumnya = false;
   let kgTahun: number | null = null;
+  let galatRiwayat = false;
   if (user) {
-    const [{ data: q }, { data: k }] = await Promise.all([
+    const [{ data: q, error: galatKuis }, { data: k, error: galatKalk }] = await Promise.all([
       supabase
         .from("quiz_results")
         .select("benar")
@@ -121,37 +131,27 @@ export default async function HalamanEdukasi() {
         .from("kalkulator_hasil")
         .select("kg_tahun")
         .eq("user_id", user.id)
-        .single(),
+        .maybeSingle(),
     ]);
-    lulusSebelumnya = (q ?? []).length > 0;
-    kgTahun = k?.kg_tahun ?? null;
+    if (galatKuis || galatKalk) {
+      galatRiwayat = true;
+    } else {
+      lulusSebelumnya = (q ?? []).length > 0;
+      kgTahun = k?.kg_tahun ?? null;
+    }
   }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <header className="mb-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-          Sekolah lingkungan
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-          Edukasi Permukiman
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Materi ringkas untuk memulai perubahan dari rumah — lengkap dengan quiz
-          dan kalkulator jejak sampah pribadi.
-        </p>
-      </header>
+      <PageHeader
+        judul="Edukasi Permukiman"
+        deskripsi="Materi ringkas untuk memulai perubahan dari rumah, lengkap dengan kuis dan kalkulator jejak sampah pribadi."
+      />
 
       <section aria-label="Materi" className="mb-12 grid gap-4 sm:grid-cols-2">
-        {MATERI.map((m, i) => (
+        {MATERI.map((m) => (
           <Card key={m.slug} className="flex flex-col p-6">
-            <span
-              aria-hidden
-              className="font-display text-4xl font-extrabold text-daun-600/15 dark:text-daun-300/15"
-            >
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <h2 className="mt-2 font-display text-lg font-bold">{m.judul}</h2>
+            <h2 className="font-display text-lg font-semibold">{m.judul}</h2>
             <p className="mt-1.5 text-sm leading-relaxed text-muted teks-pretty">
               {m.ringkas}
             </p>
@@ -167,13 +167,17 @@ export default async function HalamanEdukasi() {
         ))}
       </section>
 
-      <EdukasiKlien
-        soal={SOAL}
-        masuk={!!user}
-        lulusSebelumnya={lulusSebelumnya}
-        kgTahunAwal={kgTahun}
-        ikonHadiah={NODE_LAIN.cerdas_lingkungan ?? NODE_LAIN.semai}
-      />
+      {galatRiwayat ? (
+        <GalatMuatUlang judul="Progres belajarmu belum bisa dimuat" />
+      ) : (
+        <EdukasiKlien
+          soal={SOAL}
+          masuk={!!user}
+          lulusSebelumnya={lulusSebelumnya}
+          kgTahunAwal={kgTahun}
+          ikonHadiah={NODE_LAIN.cerdas_lingkungan ?? NODE_LAIN.semai}
+        />
+      )}
     </main>
   );
 }

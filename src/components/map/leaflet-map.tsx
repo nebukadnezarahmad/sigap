@@ -9,31 +9,22 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/lib/use-theme";
 import { svgUriKategori } from "@/lib/ikon-vektor";
 
-const KUNCI_CARTO = process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "";
+const KUNCI_CARTO = (process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "").trim();
 const ADA_KUNCI_CARTO = KUNCI_CARTO.length > 0;
+const PARAM_KUNCI = ADA_KUNCI_CARTO ? `?api_key=${encodeURIComponent(KUNCI_CARTO)}` : "";
 
-const TILE_TERANG = `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${
-  ADA_KUNCI_CARTO ? `?api_key=${KUNCI_CARTO}` : ""
-}`;
-const TILE_GELAP = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${
-  ADA_KUNCI_CARTO ? `?api_key=${KUNCI_CARTO}` : ""
-}`;
+const TILE_TERANG = `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${PARAM_KUNCI}`;
+const TILE_GELAP = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${PARAM_KUNCI}`;
 
-// Fallback ubin OSM standar saat kunci CARTO kosong. Tanpa ini, ubin CARTO
-// tanpa kunci menampilkan watermark "API KEY REQUIRED" dan peta terlihat kotor.
-const TILE_OSM = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-const ATRIBUSI_OSM =
-  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors';
 const ATRIBUSI_CARTO =
   '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>';
 
 function urlTile(gelap: boolean) {
-  if (!ADA_KUNCI_CARTO) return TILE_OSM;
   return gelap ? TILE_GELAP : TILE_TERANG;
 }
 
 function atribusiTile() {
-  return ADA_KUNCI_CARTO ? ATRIBUSI_CARTO : ATRIBUSI_OSM;
+  return ATRIBUSI_CARTO;
 }
 
 // Palet literal khusus Leaflet: gradien kanvas heatmap dan data-URI ikon SVG
@@ -98,11 +89,15 @@ export function LeafletMap({
   const refSudahFit = useRef(false);
   const gelap = useTheme();
   const cbRef = useRef({ onPilih, onKlikTitik });
+  // `gelap` dibaca lewat ref di efek init agar ganti tema tidak me-recreate
+  // seluruh peta; URL tile diperbarui oleh efek khusus di bawah.
+  const gelapRef = useRef(gelap);
   const [mencariLokasi, setMencariLokasi] = useState(false);
   const [statusLokasi, setStatusLokasi] = useState<string | null>(null);
 
   useEffect(() => {
     cbRef.current = { onPilih, onKlikTitik };
+    gelapRef.current = gelap;
   });
 
   useEffect(() => {
@@ -122,9 +117,15 @@ export function LeafletMap({
         zoom,
         zoomControl: false,
       });
-      L.control.zoom({ position: "bottomright" }).addTo(peta);
+      L.control.zoom({
+        position: "bottomright",
+        zoomInText: "+",
+        zoomInTitle: "Perbesar peta",
+        zoomOutText: "−",
+        zoomOutTitle: "Perkecil peta",
+      }).addTo(peta);
 
-      refTile.current = L.tileLayer(urlTile(gelap), {
+      refTile.current = L.tileLayer(urlTile(gelapRef.current), {
         attribution: atribusiTile(),
         maxZoom: 19,
       }).addTo(peta);
@@ -194,13 +195,16 @@ export function LeafletMap({
           maxClusterRadius: 42,
         });
         titik.forEach((t) => {
+          const adalahFasilitas =
+            t.id.startsWith("fas:") || t.slug.startsWith("fasilitas:");
+          const labelMarker = adalahFasilitas ? t.judul : `Pin laporan: ${t.judul}`;
           const m = L.marker([t.lat, t.lng], {
             icon: buatIkon(L, t.warna, t.slug, t.id === terpilih),
             // Marker Leaflet bisa difokus (Tab) dan diklik via Enter secara
             // bawaan; title/alt memberi nama yang terbaca pembaca layar.
             keyboard: true,
-            title: t.judul,
-            alt: `Pin laporan: ${t.judul}`,
+            title: labelMarker,
+            alt: labelMarker,
           }).bindTooltip(escapeHtml(t.judul), {
             direction: "top",
             offset: [0, -22],
@@ -234,11 +238,15 @@ export function LeafletMap({
       } else if (titik.length > 0) {
         const t = titik[titik.length - 1];
         const layer = L.layerGroup().addTo(peta);
+        const labelSatu =
+          t.id.startsWith("fas:") || t.slug.startsWith("fasilitas:")
+            ? t.judul
+            : `Pin laporan: ${t.judul}`;
         L.marker([t.lat, t.lng], {
           icon: buatIkon(L, t.warna, t.slug, true),
           keyboard: true,
-          title: t.judul,
-          alt: `Pin laporan: ${t.judul}`,
+          title: labelSatu,
+          alt: labelSatu,
         }).addTo(layer);
         refLayer.current = layer;
         peta.setView([t.lat, t.lng], Math.max(peta.getZoom(), 15));
@@ -312,11 +320,21 @@ export function LeafletMap({
         }
         cbRef.current.onPilih?.(lat, lng);
       },
-      () => {
+      (err) => {
         setMencariLokasi(false);
-        setStatusLokasi(
-          "Lokasi tidak ditemukan. Geser peta lalu tekan Enter."
-        );
+        if (err.code === err.PERMISSION_DENIED) {
+          setStatusLokasi(
+            "Akses lokasi ditolak. Izinkan akses lokasi di peramban, atau geser peta lalu tekan Enter."
+          );
+        } else if (err.code === err.TIMEOUT) {
+          setStatusLokasi(
+            "Pengambilan lokasi kehabisan waktu. Periksa koneksi lalu coba lagi."
+          );
+        } else {
+          setStatusLokasi(
+            "Lokasi tidak tersedia. Geser peta lalu tekan Enter."
+          );
+        }
       },
       { timeout: 8000 }
     );
@@ -344,7 +362,7 @@ export function LeafletMap({
       {/* Perbesar kontrol zoom bawaan Leaflet (30px) ke target 44px,
           plus cincin fokus yang jelas untuk marker keyboard. */}
       <style>{`.sigap-peta .leaflet-bar a{width:44px!important;height:44px!important;line-height:44px!important}
-.sigap-peta .leaflet-marker-icon:focus-visible{outline:3px solid var(--color-daun-600);outline-offset:3px;border-radius:12px}`}</style>
+.sigap-peta .leaflet-marker-icon:focus-visible{outline:3px solid var(--action);outline-offset:3px;border-radius:12px}`}</style>
       <div className="relative h-full w-full" onKeyDown={pilihTengah}>
         <div
           ref={refDiv}
@@ -362,18 +380,18 @@ export function LeafletMap({
               type="button"
               onClick={pakaiLokasiSaya}
               disabled={mencariLokasi}
-              className="pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full border garis-halus bg-panel/95 px-4 text-sm font-semibold shadow-lg backdrop-blur transition hover:border-daun-400 disabled:opacity-60"
+              className="liquid-glass-dock pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold transition hover:border-action disabled:opacity-60"
             >
               {mencariLokasi ? "Mencari…" : "Pakai lokasi saya"}
             </button>
-            <p className="rounded-lg bg-panel/90 px-2.5 py-1 text-[11px] leading-snug text-muted shadow backdrop-blur">
+            <p className="liquid-glass-dock rounded-xl px-3 py-1.5 text-[11px] leading-snug text-muted">
               Keyboard: geser dengan tombol panah, tekan Enter untuk menandai
               titik tengah.
             </p>
             {statusLokasi && (
               <p
                 role="status"
-                className="rounded-lg bg-panel/90 px-2.5 py-1 text-[11px] leading-snug text-ink shadow backdrop-blur"
+                className="liquid-glass-dock rounded-xl px-3 py-1.5 text-[11px] leading-snug text-ink"
               >
                 {statusLokasi}
               </p>
@@ -381,16 +399,16 @@ export function LeafletMap({
           </div>
         )}
       </div>
-      {/* Jalan pintas keyboard: setiap tombol membuka laporan yang sama
+      {/* Pintasan keyboard: setiap tombol membuka laporan yang sama
           seperti klik marker. Tersembunyi visual hingga difokus (pola
           skip-link) agar tidak membebani navigasi Tab pengguna awas. */}
-      <ul aria-label="Jalan pintas keyboard daftar laporan">
+      <ul aria-label="Pintasan keyboard daftar laporan">
         {titik.slice(0, 30).map((t) => (
           <li key={t.id}>
             <button
               type="button"
               onClick={() => cbRef.current.onKlikTitik?.(t.id)}
-              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[2000] focus:min-h-11 focus:rounded-full focus:bg-daun-700 focus:px-5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-xl"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[2000] focus:min-h-11 focus:rounded-full focus:bg-action focus:px-5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-xl"
             >
               Buka laporan: {t.judul}
             </button>

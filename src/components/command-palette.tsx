@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { animasiModal, transisiCepat, transisiModal } from "@/lib/motion";
 import {
   ArrowRight,
   LogOut,
@@ -44,7 +45,7 @@ export function CommandPalette() {
   const refPemicu = useRef<HTMLButtonElement>(null);
   const refDialog = useRef<HTMLDivElement>(null);
   const refInput = useRef<HTMLInputElement>(null);
-  const refFokusTerakhir = useRef<Element | null>(null);
+  const pernahBuka = useRef(false);
 
   const aksi: Aksi[] = useMemo(() => {
     const dasar: Aksi[] = [
@@ -154,14 +155,14 @@ export function CommandPalette() {
 
   useEffect(() => {
     if (buka) {
-      refFokusTerakhir.current = document.activeElement;
+      pernahBuka.current = true;
       const t = window.setTimeout(() => refInput.current?.focus(), 0);
       return () => window.clearTimeout(t);
     }
-    const pemicu = refFokusTerakhir.current as HTMLElement | null;
-    if (refFokusTerakhir.current) {
-      pemicu?.focus?.();
-      refFokusTerakhir.current = null;
+    // Kembalikan fokus ke pemicu setiap palet ditutup (Escape, backdrop,
+    // pilih aksi) — bukan saat mount awal agar tidak mencuri fokus.
+    if (pernahBuka.current) {
+      refPemicu.current?.focus();
     }
     return undefined;
   }, [buka]);
@@ -204,7 +205,7 @@ export function CommandPalette() {
         aria-label="Buka palet perintah"
         aria-haspopup="dialog"
         aria-expanded={buka}
-        className="fixed bottom-4 right-4 z-[1100] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border garis-halus bg-panel text-muted shadow-xl transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+        className="fixed bottom-4 right-4 z-[1100] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full liquid-glass-dock text-muted shadow-xl transition hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
       >
         <Search size={18} />
       </button>
@@ -214,6 +215,7 @@ export function CommandPalette() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={transisiCepat}
           className="fixed inset-0 z-[1200] flex items-start justify-center pt-[14vh]"
         >
           <div
@@ -221,13 +223,14 @@ export function CommandPalette() {
             onClick={() => setBuka(false)}
           />
           <motion.div
-            initial={{ y: -14, scale: 0.98 }}
-            animate={{ y: 0, scale: 1 }}
-            exit={{ y: -10, opacity: 0 }}
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl border garis-halus bg-panel shadow-2xl"
+            initial={animasiModal.initial}
+            animate={animasiModal.animate}
+            exit={animasiModal.exit}
+            transition={transisiModal}
+            className="relative w-full max-w-lg overflow-hidden rounded-2xl liquid-glass-sheet shadow-2xl"
             role="dialog"
             aria-modal="true"
-            aria-label="Command palette"
+            aria-label="Palet perintah"
             ref={refDialog}
             onKeyDown={onTrapTab}
           >
@@ -255,7 +258,7 @@ export function CommandPalette() {
                   }
                 }}
                 placeholder="Ketik perintah atau tujuan…"
-                className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:text-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600"
+                className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:text-muted/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
                 aria-label="Cari perintah"
                 role="combobox"
                 aria-expanded={buka}
@@ -277,7 +280,7 @@ export function CommandPalette() {
             >
               {hasil.length === 0 && (
                 <li className="px-3 py-6 text-center text-sm text-muted">
-                  Tidak ada perintah cocok.
+                  Tidak ada perintah yang cocok.
                 </li>
               )}
               {hasil.map((a, i) => (
@@ -293,9 +296,9 @@ export function CommandPalette() {
                     onMouseEnter={() => setKursor(i)}
                     onFocus={() => setKursor(i)}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-daun-600",
+                      "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action",
                       i === kursor
-                        ? "bg-daun-600/10 text-daun-800 dark:text-daun-200"
+                        ? "bg-action/10 text-action"
                         : "text-ink"
                     )}
                   >

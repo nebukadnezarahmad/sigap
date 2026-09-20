@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { GalatPolling, PollingKlien } from "./polling-klien";
+import { PollingKlien } from "./polling-klien";
+import {
+  GalatMuatUlang,
+  KontenUtama,
+  PageHeader,
+} from "@/components/layout-konten";
 
-export const metadata: Metadata = { title: "Polling Warga" };
+export const metadata: Metadata = { title: "Jajak pendapat warga" };
 export const dynamic = "force-dynamic";
 
 export type Poll = {
@@ -19,14 +24,18 @@ export default async function HalamanPolling() {
   const supabase = await createClient();
 
   if (!supabase) {
-    return <GalatPolling />;
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Jajak pendapat belum bisa dimuat" />
+      </KontenUtama>
+    );
   }
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: pollsRaw } = await supabase
+  const { data: pollsRaw, error: galatPolling } = await supabase
     .from("polls")
     .select("id, pertanyaan, opsi, created_by, created_at")
     .eq("aktif", true)
@@ -34,9 +43,18 @@ export default async function HalamanPolling() {
     .limit(20);
 
   const ids = (pollsRaw ?? []).map((p) => p.id);
-  const { data: votesRaw } = ids.length
+  const hasilSuara = ids.length
     ? await supabase.from("poll_votes").select("poll_id, user_id, opsi_idx").in("poll_id", ids)
-    : { data: [] };
+    : { data: [] as { poll_id: string; user_id: string; opsi_idx: number }[], error: null };
+  const votesRaw = hasilSuara.data;
+
+  if (galatPolling || hasilSuara.error) {
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Jajak pendapat belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   const polls: Poll[] = (pollsRaw ?? []).map((p) => {
     const opsi = p.opsi as string[];
@@ -61,19 +79,11 @@ export default async function HalamanPolling() {
     : { data: null };
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-          Suara warga
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-          Polling Partisipatif
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Pendapatmu menentukan arah kebijakan lingkungan. Satu warga, satu
-          suara per polling — hasilnya terbuka dan berjalan realtime.
-        </p>
-      </header>
+    <main className="mx-auto max-w-4xl px-4 py-10">
+      <PageHeader
+        judul="Jajak pendapat partisipatif"
+        deskripsi="Pendapatmu menentukan arah kebijakan lingkungan. Satu warga, satu suara per jajak pendapat — hasilnya terbuka dan berjalan langsung."
+      />
 
       <PollingKlien
         awal={polls}

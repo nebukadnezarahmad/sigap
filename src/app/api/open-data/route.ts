@@ -38,12 +38,12 @@ export async function GET(req: Request) {
   const supabase = await createClient();
   if (!supabase) {
     return NextResponse.json(
-      { error: "database belum dikonfigurasi" },
+      { error: "Data belum dapat dimuat. Coba lagi sebentar." },
       { status: 503 }
     );
   }
 
-  const { data } = await supabase
+  const { data, error: galat } = await supabase
     .from("reports")
     .select(
       `id, judul, deskripsi, status, lat, lng, created_at, updated_at,
@@ -52,6 +52,16 @@ export async function GET(req: Request) {
     )
     .order("created_at", { ascending: false })
     .limit(1000);
+
+  if (galat) {
+    return NextResponse.json(
+      { error: "Data belum dapat dimuat. Coba lagi sebentar." },
+      {
+        status: 500,
+        headers: { "Access-Control-Allow-Origin": "*" },
+      }
+    );
+  }
 
   const daftar = (data ?? []).map((r: Record<string, unknown>) => {
     const slug = (r.categories as { slug?: string; nama?: string } | null)?.slug ?? "lainnya";

@@ -1,22 +1,26 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import {
   Armchair,
   BookOpen,
   CheckCircle2,
   HandHeart,
   Laptop,
+  MapPin,
   PackageOpen,
   Plus,
   Shirt,
-  Sparkles,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Barang } from "./page";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
+import { PackageSearch } from "lucide-react";
 import { Modal } from "@/components/modal";
 
 const KATEGORI = [
@@ -36,7 +40,7 @@ const KONDISI_LABEL: Record<string, string> = {
 function IkonKategori({ kategori }: { kategori: string }) {
   const found = KATEGORI.find((k) => k.id === kategori) ?? KATEGORI[4];
   return (
-    <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-daun-500/10 text-daun-700 dark:text-daun-300">
+    <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-action-soft text-action">
       <found.Ikon size={20} />
     </span>
   );
@@ -94,7 +98,8 @@ function KartuBarang({
         .eq("status", "tersedia")
         .select("id");
       if (error) {
-        setPesan(error.message);
+        console.error("Gagal mengklaim barang:", error);
+        setPesan("Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
         setProses(false);
         return;
       }
@@ -141,7 +146,7 @@ function KartuBarang({
       )}
 
       <p className="mt-3 flex items-center gap-1.5 text-xs text-muted">
-        <Sparkles size={13} /> Ambil di: {data.titik_ambil}
+        <MapPin size={13} /> Ambil di: {data.titik_ambil}
       </p>
 
       {pesan && (
@@ -151,20 +156,26 @@ function KartuBarang({
       )}
 
       {tersedia && !data.milikKu && (
-        <Button
-          className="mt-4 w-full"
-          variant={masuk ? "utama" : "sekunder"}
-          disabled={proses || !masuk}
-          onClick={klaim}
-        >
-          {masuk ? (
-            <>
-              <HandHeart size={15} /> {proses ? "Mengklaim…" : "Klaim barang ini (+3 poin)"}
-            </>
-          ) : (
-            "Masuk untuk mengklaim"
-          )}
-        </Button>
+        masuk ? (
+          <Button
+            className="mt-4 w-full"
+            variant="utama"
+            disabled={proses}
+            loading={proses}
+            loadingLabel="Mengklaim…"
+            onClick={klaim}
+            aria-live="polite"
+          >
+            <HandHeart size={15} /> {proses ? "Mengklaim…" : "Klaim barang ini (+3 poin)"}
+          </Button>
+        ) : (
+          <Link
+            href="/masuk?next=/pasar"
+            className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border garis-halus px-5 text-sm font-semibold text-ink transition hover:border-action hover:text-action"
+          >
+            <HandHeart size={15} /> Masuk untuk mengklaim
+          </Link>
+        )
       )}
       {!tersedia && (
         <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-daun-700 dark:text-daun-300">
@@ -212,7 +223,8 @@ function FormPasangBarang({
       .single();
     setProses(false);
     if (error) {
-      setPesan(error.message);
+      console.error("Gagal memasang barang:", error);
+      setPesan("Data belum dapat disimpan. Periksa koneksi lalu coba lagi.");
       return;
     }
     selesai({
@@ -295,31 +307,11 @@ function FormPasangBarang({
         <Button type="button" variant="sekunder" onClick={tutup}>
           Batal
         </Button>
-        <Button type="submit" disabled={proses}>
-          {proses ? "Menyimpan…" : "Pasang barang (+10 poin)"}
+        <Button type="submit" disabled={proses} loading={proses} loadingLabel="Menerbitkan…">
+          {proses ? "Menerbitkan…" : "Pasang barang (+10 poin)"}
         </Button>
       </div>
     </form>
-  );
-}
-
-export function GalatPasar() {
-  const router = useRouter();
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
-        <h1 className="font-display text-2xl font-bold">
-          Pasar ReUse belum bisa dimuat
-        </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
-        </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
-          Coba lagi
-        </Button>
-      </Card>
-    </main>
   );
 }
 
@@ -368,7 +360,7 @@ export function PasarKlien({
           onClick={() => setFilter("semua")}
           className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
             filter === "semua"
-              ? "bg-daun-600 text-white"
+              ? "bg-action text-white"
               : "border garis-halus text-muted hover:bg-panel-2 hover:text-ink"
           }`}
         >
@@ -380,7 +372,7 @@ export function PasarKlien({
             onClick={() => setFilter(k.id)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
               filter === k.id
-                ? "bg-daun-600 text-white"
+                ? "bg-action text-white"
                 : "border garis-halus text-muted hover:bg-panel-2 hover:text-ink"
             }`}
           >
@@ -403,6 +395,7 @@ export function PasarKlien({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
+              transition={transisiCepat}
             >
               <KartuBarang barang={b} masuk={masuk} />
             </motion.div>
@@ -410,9 +403,21 @@ export function PasarKlien({
         </motion.div>
       </AnimatePresence>
       {tampil.length === 0 && (
-        <Card className="p-10 text-center text-sm text-muted">
-          Belum ada barang pada kategori ini.
-        </Card>
+        <FeedbackState
+          jenis={barang.length === 0 ? "kosong" : "tanpa-hasil"}
+          ikon={PackageSearch}
+          judul={barang.length === 0 ? "Belum ada barang" : "Tidak ada barang yang cocok"}
+          deskripsi={
+            barang.length === 0
+              ? "Jadilah yang pertama memberi barang bekas layak pakai."
+              : "Coba kategori lain atau pasang barangmu sendiri."
+          }
+          aksi={
+            <Button variant="sekunder" onClick={() => setFilter("semua")}>
+              Hapus saringan
+            </Button>
+          }
+        />
       )}
 
       <Modal terbuka={formBuka} tutup={() => setFormBuka(false)} judul="Pasang barang bekas">

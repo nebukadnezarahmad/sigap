@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { transisiCepat } from "@/lib/motion";
 import { MessageSquare, SendHorizonal } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/use-user";
@@ -23,6 +24,7 @@ export function KomentarSection({
   const [kirim, setKirim] = useState(false);
   const [terisi, setTerisi] = useState(false);
   const [modalAuth, setModalAuth] = useState(false);
+  const [pesan, setPesan] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -107,6 +109,7 @@ export function KomentarSection({
     e.preventDefault();
     if (!user || !teks.trim() || kirim) return;
     setKirim(true);
+    setPesan(null);
     const supabase = createClient();
     const { data, error } = await supabase
       .from("comments")
@@ -116,13 +119,16 @@ export function KomentarSection({
     if (!error && data) {
       setDaftar((s) => [...s, data]);
       setTeks("");
+    } else {
+      console.error("Gagal mengirim komentar:", error);
+      setPesan("Komentar belum bisa dikirim. Periksa koneksi lalu coba lagi.");
     }
     setKirim(false);
   }
 
   return (
-    <Card className="p-5">
-      <h2 className="mb-4 flex items-center gap-2 font-display font-bold">
+    <Card role="region" aria-labelledby="diskusi-warga" className="p-5 sm:p-6">
+      <h2 id="diskusi-warga" className="mb-5 flex items-center gap-2 font-display font-semibold">
         <MessageSquare size={17} />
         Diskusi warga
         <span className="text-sm font-normal text-muted">
@@ -145,6 +151,7 @@ export function KomentarSection({
               layout
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={transisiCepat}
               className="flex gap-3"
             >
               <Avatar
@@ -152,7 +159,7 @@ export function KomentarSection({
                 url={k.profiles?.avatar_url}
                 ukuran={32}
               />
-              <div className="min-w-0 flex-1 rounded-2xl rounded-tl-md bg-panel-2 px-4 py-2.5">
+              <div className="min-w-0 flex-1 border-l-2 border-line py-1 pl-4">
                 <p className="text-xs">
                   <span className="font-semibold">{k.profiles?.nama_lengkap ?? "Warga"}</span>{" "}
                   <span className="text-muted" suppressHydrationWarning>· {waktuRelatif(k.created_at)}</span>
@@ -166,27 +173,40 @@ export function KomentarSection({
         </AnimatePresence>
         {terisi && daftar.length === 0 && (
           <p className="text-sm text-muted">
-            Belum ada komentar — jadilah suara pertama.
+            Belum ada komentar. Jadilah suara pertama.
           </p>
         )}
       </div>
 
       {user ? (
-        <form onSubmit={kirimKomentar} className="mt-5 flex items-end gap-3">
-          <Textarea
-            rows={2}
-            value={teks}
-            maxLength={500}
-            onChange={(e) => setTeks(e.target.value)}
-            placeholder="Tulis tanggapan atau info tambahan…"
-            aria-label="Tulis komentar"
-          />
-          <Button type="submit" disabled={kirim || !teks.trim()} aria-label="Kirim komentar">
-            <SendHorizonal size={16} />
-          </Button>
+        <form onSubmit={kirimKomentar} className="mt-5">
+          <div className="flex items-end gap-3">
+            <Textarea
+              rows={2}
+              value={teks}
+              maxLength={500}
+              onChange={(e) => setTeks(e.target.value)}
+              placeholder="Tulis tanggapan atau info tambahan…"
+              aria-label="Tulis komentar"
+            />
+            <Button
+              type="submit"
+              disabled={kirim || !teks.trim()}
+              loading={kirim}
+              loadingLabel="Mengirim…"
+              aria-label="Kirim komentar"
+            >
+              <SendHorizonal size={16} />
+            </Button>
+          </div>
+          {pesan && (
+            <p role="alert" className="mt-2 text-xs font-semibold text-danger">
+              {pesan}
+            </p>
+          )}
         </form>
       ) : (
-        <div className="mt-5 rounded-2xl border border-daun-500/25 bg-daun-500/5 p-4">
+        <div className="mt-6 border-t garis-halus pt-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold">Ingin ikut berdiskusi?</p>
@@ -198,7 +218,7 @@ export function KomentarSection({
               size="sm"
               variant="sekunder"
               onClick={() => setModalAuth(true)}
-              className="border-daun-500/30 text-daun-700 hover:bg-daun-500/10 dark:text-daun-300"
+              className="border-action/30 text-action hover:bg-action/10"
             >
               Masuk 1-Klik Demo
             </Button>

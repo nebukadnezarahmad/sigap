@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import {
   Ambulance,
@@ -13,7 +12,9 @@ import {
   Search,
   Shield,
 } from "lucide-react";
-import { Button, Card } from "@/components/ui";
+import { Card } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
+import { SearchX } from "lucide-react";
 
 type Layanan = {
   id: string;
@@ -38,26 +39,6 @@ function nomorWa(telepon: string) {
   if (digit.startsWith("62")) return digit;
   if (digit.startsWith("0")) return `62${digit.slice(1)}`;
   return null;
-}
-
-export function GalatLayanan() {
-  const router = useRouter();
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <Card className="p-8">
-        <h1 className="font-display text-2xl font-bold">
-          Direktori Layanan belum bisa dimuat
-        </h1>
-        <p className="mt-2 text-sm text-muted">
-          Koneksi ke database terputus, periksa konfigurasi Supabase lalu coba
-          lagi.
-        </p>
-        <Button className="mt-5" onClick={() => router.refresh()}>
-          Coba lagi
-        </Button>
-      </Card>
-    </main>
-  );
 }
 
 export function LayananKlien({ awal }: { awal: Layanan[] }) {
@@ -97,7 +78,7 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
           onChange={(e) => setKueri(e.target.value)}
           placeholder="Cari layanan… (mis. damkar, PLN, sampah)"
           aria-label="Cari layanan"
-          className="w-full rounded-full border garis-halus bg-panel py-3 pl-11 pr-4 text-sm outline-none transition focus:border-daun-400"
+          className="w-full rounded-full border garis-halus bg-panel py-3 pl-11 pr-4 text-sm outline-none transition focus:border-action"
         />
       </div>
 
@@ -106,7 +87,7 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
           const meta = KATEGORI_META[kategori] ?? KATEGORI_META.utilitas;
           return (
             <section key={kategori}>
-              <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted">
+              <h2 className="mb-3 flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
                 <meta.Ikon size={15} /> {meta.label}
               </h2>
               <motion.div layout className="space-y-3">
@@ -127,7 +108,7 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
                       </div>
                       <a
                         href={`tel:${l.telepon.replace(/[^+\d]/g, "")}`}
-                        className="flex items-center gap-1.5 rounded-full bg-daun-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-daun-700"
+                        className="flex items-center gap-1.5 rounded-full bg-action px-4 py-2 text-sm font-semibold text-white transition hover:bg-action-hover"
                       >
                         <Phone size={14} /> Telepon
                       </a>
@@ -149,9 +130,20 @@ export function LayananKlien({ awal }: { awal: Layanan[] }) {
           );
         })}
         {grup.length === 0 && (
-          <Card className="p-10 text-center text-sm text-muted">
-            Tidak ada layanan yang cocok dengan pencarianmu.
-          </Card>
+          <FeedbackState
+            jenis="tanpa-hasil"
+            ikon={SearchX}
+            judul="Tidak ada layanan yang cocok"
+            deskripsi="Coba kata kunci lain, misalnya nama instansi atau jenis layanan."
+            aksi={
+              <button
+                onClick={() => setKueri("")}
+                className="inline-flex min-h-[44px] items-center justify-center rounded-full border garis-halus px-5 text-sm font-semibold text-ink transition hover:border-action hover:text-action"
+              >
+                Hapus saringan
+              </button>
+            }
+          />
         )}
       </div>
     </div>

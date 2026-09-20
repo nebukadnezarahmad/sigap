@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { GalatLayanan, LayananKlien } from "./layanan-klien";
+import { LayananKlien } from "./layanan-klien";
+import {
+  GalatMuatUlang,
+  KontenUtama,
+  PageHeader,
+} from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Direktori Layanan" };
 export const dynamic = "force-dynamic";
@@ -9,29 +14,32 @@ export default async function HalamanLayanan() {
   const supabase = await createClient();
 
   if (!supabase) {
-    return <GalatLayanan />;
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Direktori Layanan belum bisa dimuat" />
+      </KontenUtama>
+    );
   }
 
-  const { data: layanan } = await supabase
+  const { data: layanan, error: galatLayanan } = await supabase
     .from("layanan_penting")
     .select("id, nama, kategori, telepon, bisa_wa, alamat, jam_layanan")
     .order("urutan", { ascending: true });
 
+  if (galatLayanan) {
+    return (
+      <KontenUtama>
+        <GalatMuatUlang judul="Direktori Layanan belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
+
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-          Nomor yang wajib dihafal
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-          Direktori Layanan
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Kontak darurat dan layanan harian lingkunganmu — satu ketukan untuk
-          menelepon atau chat WhatsApp. Tidak perlu lagi mencari-cari saat
-          keadaan mendesak.
-        </p>
-      </header>
+    <main className="mx-auto max-w-4xl px-4 py-10">
+      <PageHeader
+        judul="Direktori Layanan"
+        deskripsi="Kontak darurat dan layanan harian lingkunganmu — satu ketukan untuk menelepon atau lewat WhatsApp. Tidak perlu lagi mencari-cari saat keadaan mendesak."
+      />
 
       <LayananKlien
         awal={

@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { Crown, Medal, ShieldCheck } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { BADGES } from "@/lib/constants";
-import { IkonVektor, nodeBadge } from "@/lib/ikon-vektor";
 import { Avatar, Card } from "@/components/ui";
+import { FeedbackState } from "@/components/feedback-state";
 import { BadgeSaya } from "./badge-saya";
 
 export const metadata: Metadata = {
-  title: "Daftar Kehormatan Warga",
+  title: "Papan skor",
 };
 
 export const dynamic = "force-dynamic";
@@ -39,94 +38,122 @@ export default async function HalamanPapanSkor() {
   }
 
   const podium = pemimpin.slice(0, 3);
-  const sisanya = pemimpin.slice(3);
-  const urutanPodium = [podium[1], podium[0], podium[2]].filter(Boolean);
+  const sisanya = pemimpin.slice(3, 10);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <header className="mb-10 text-center">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-daun-600/10 px-3 py-1 text-xs font-bold text-daun-700 dark:text-daun-300 uppercase tracking-wider mb-2">
-          <ShieldCheck size={14} /> Piagam Partisipasi Sipil
-        </div>
-        <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight">
-          Daftar Kehormatan Warga
+        <h1 className="font-display text-4xl font-semibold tracking-tight">
+          Papan skor
         </h1>
-        <p className="mt-2 text-sm text-muted max-w-lg mx-auto teks-pretty">
-          Apresiasi bagi warga yang aktif menjaga lingkungan: Melaporkan masalah (<b>+10</b>), komentar solusi (<b>+3</b>), dan mendukung laporan warga lain (<b>+1</b>).
+        <p className="mx-auto mt-3 max-w-2xl text-muted teks-pretty">
+          Apresiasi warga yang aktif menjaga lingkungan: melapor{" "}
+          <strong className="font-semibold text-action">(+10)</strong>, komentar solusi{" "}
+          <strong className="font-semibold text-action">(+3)</strong>, dan mendukung laporan lain{" "}
+          <strong className="font-semibold text-action">(+1)</strong>.
         </p>
       </header>
 
       {!dbAktif && (
         <Card className="mb-6 p-5 text-center text-sm text-muted">
-          Database belum tersambung — papan skor akan tampil setelah Supabase diatur.
+          Database belum tersambung, sambungkan Supabase untuk menampilkan papan skor.
         </Card>
       )}
 
-      {pemimpin.length > 0 && (
-        <div className="mb-10 grid grid-cols-3 items-end gap-3 sm:gap-5">
-          {urutanPodium.map((p) => {
-            const juara = podium.indexOf(p) + 1;
-            return (
-              <Card
-                key={p.id}
-                className={`flex flex-col items-center p-5 text-center ${
-                  juara === 1 ? "ring-2 ring-kunyit-500" : ""
-                }`}
-              >
-                <span className="mb-2">
-                  {juara === 1 ? (
-                    <Crown size={26} className="text-kunyit-500" />
-                  ) : (
-                    <Medal size={22} className={juara === 2 ? "text-slate-400" : "text-amber-700"} />
-                  )}
-                </span>
-                <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={juara === 1 ? 64 : 52} />
-                <p className="mt-2 truncate font-display font-bold">
-                  {p.nama_lengkap}
-                </p>
-                <p className="truncate text-xs text-muted">@{p.username}</p>
-                <p className="angka-tabular mt-1.5 rounded-full bg-daun-600/10 px-3 py-0.5 text-sm font-bold text-daun-700 dark:text-daun-300">
-                  {p.poin} poin
-                </p>
-              </Card>
-            );
-          })}
-        </div>
+      {dbAktif && pemimpin.length === 0 && (
+        <FeedbackState
+          jenis="kosong"
+          ikon={Trophy}
+          judul="Belum ada peringkat"
+          deskripsi="Jadilah yang pertama mengumpulkan poin dengan melapor, berkomentar, atau mendukung laporan warga."
+        />
       )}
 
-      {sisanya.length > 0 && (
-        <Card className="mb-10 divide-y garis-halus overflow-hidden">
-          {sisanya.map((p, i) => (
-            <div key={p.id} className="flex items-center gap-3 px-4 py-3">
-              <span className="w-6 text-center text-sm font-bold tabular-nums text-muted">
-                {i + 4}
-              </span>
-              <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={34} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{p.nama_lengkap}</p>
-                <p className="truncate text-xs text-muted">@{p.username}</p>
-              </div>
-              <span className="angka-tabular text-sm font-bold">{p.poin}</span>
-            </div>
-          ))}
-        </Card>
-      )}
-
-      <section aria-label="Koleksi badge">
-        <h2 className="mb-4 font-display text-xl font-bold">Koleksi Badge</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {BADGES.map((b) => (
-            <Card key={b.key} className="p-4">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-daun-600/10 text-daun-700 dark:text-daun-300">
-                <IkonVektor node={nodeBadge(b)} ukuran={20} />
-              </span>
-              <p className="mt-2 font-display text-sm font-bold">{b.nama}</p>
-              <p className="mt-0.5 text-xs text-muted">{b.deskripsi}</p>
-            </Card>
-          ))}
-        </div>
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
         <BadgeSaya />
-      </section>
+
+        {pemimpin.length > 0 && (
+          <section
+            aria-labelledby="judul-peringkat"
+            className="order-2 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:flex lg:h-full lg:self-stretch lg:flex-col"
+          >
+            <h2 id="judul-peringkat" className="font-display text-xl font-semibold tracking-tight">
+              10 besar
+            </h2>
+            <p className="mb-4 mt-1 text-sm text-muted">Warga dengan poin tertinggi.</p>
+
+            <Card className="overflow-hidden rounded-[24px] p-0 lg:flex lg:flex-1 lg:flex-col">
+              <ol aria-label="Peringkat 10 besar" className="lg:flex lg:flex-1 lg:flex-col">
+                {podium[0] && (
+                  <li className="m-3 rounded-[16px] bg-action p-5 text-[var(--on-action)]">
+                    <p className="text-xs font-semibold opacity-90">Juara pertama</p>
+                    <div className="mt-3 flex items-center gap-3.5">
+                      <span className="shrink-0 rounded-full ring-2 ring-white/25">
+                        <Avatar
+                          nama={podium[0].nama_lengkap}
+                          url={podium[0].avatar_url}
+                          ukuran={52}
+                        />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-display text-base font-bold" title={podium[0].nama_lengkap}>
+                          {podium[0].nama_lengkap}
+                        </p>
+                        <p className="truncate text-xs opacity-90" title={`@${podium[0].username}`}>
+                          @{podium[0].username}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className="text-2xl font-bold tracking-tight tabular-nums">{podium[0].poin}</p>
+                        <p className="text-xs opacity-90">poin</p>
+                      </div>
+                    </div>
+                  </li>
+                )}
+
+                {podium.slice(1).map((p, i) => (
+                  <li
+                    key={p.id}
+                    className="flex min-h-[68px] items-center gap-3 border-t border-line px-4 py-3 lg:flex-1"
+                  >
+                    <span className="w-5 shrink-0 text-center text-base font-semibold tabular-nums">
+                      {i + 2}
+                    </span>
+                    <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={38} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold" title={p.nama_lengkap}>
+                        {p.nama_lengkap}
+                      </p>
+                      <p className="truncate text-xs text-muted" title={`@${p.username}`}>
+                        @{p.username}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-sm font-semibold tabular-nums">{p.poin}</span>
+                  </li>
+                ))}
+
+                {sisanya.map((p, i) => (
+                  <li key={p.id} className="flex min-h-[58px] items-center gap-3 border-t border-line px-4 py-2.5 lg:flex-1">
+                    <span className="w-5 shrink-0 text-center text-xs font-semibold tabular-nums text-muted">
+                      {i + 4}
+                    </span>
+                    <Avatar nama={p.nama_lengkap} url={p.avatar_url} ukuran={34} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold" title={p.nama_lengkap}>
+                        {p.nama_lengkap}
+                      </p>
+                      <p className="truncate text-xs text-muted" title={`@${p.username}`}>
+                        @{p.username}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-sm font-semibold tabular-nums">{p.poin}</span>
+                  </li>
+                ))}
+              </ol>
+            </Card>
+          </section>
+        )}
+      </div>
     </main>
   );
 }

@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { GalatPasar, PasarKlien } from "./pasar-klien";
+import { PasarKlien } from "./pasar-klien";
+import {
+  GalatMuatUlang,
+  KontenUtama,
+  PageHeader,
+} from "@/components/layout-konten";
 
 export const metadata: Metadata = { title: "Pasar ReUse" };
 export const dynamic = "force-dynamic";
@@ -22,18 +27,30 @@ export default async function HalamanPasar() {
   const supabase = await createClient();
 
   if (!supabase) {
-    return <GalatPasar />;
+    return (
+      <KontenUtama lebar="lebar">
+        <GalatMuatUlang judul="Pasar ReUse belum bisa dimuat" />
+      </KontenUtama>
+    );
   }
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: raw } = await supabase
+  const { data: raw, error: galatPasar } = await supabase
     .from("pasar_barang")
     .select("id, user_id, judul, deskripsi, kategori, kondisi, titik_ambil, status, created_at, pemilik:profiles!pasar_barang_user_id_fkey(username)")
     .order("created_at", { ascending: false })
     .limit(60);
+
+  if (galatPasar) {
+    return (
+      <KontenUtama lebar="lebar">
+        <GalatMuatUlang judul="Pasar ReUse belum bisa dimuat" />
+      </KontenUtama>
+    );
+  }
 
   const barang: Barang[] = (raw ?? []).map((b) => {
     const pemilik = b.pemilik as
@@ -60,19 +77,10 @@ export default async function HalamanPasar() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-daun-600 dark:text-daun-400">
-          Ekonomi sirkular warga
-        </p>
-        <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight">
-          Pasar ReUse
-        </h1>
-        <p className="mt-3 max-w-xl text-muted teks-pretty">
-          Barang bekas layak pakai dipindahtangankan gratis antar-warga. Kurangi
-          tumpukan sampah, perpanjang usia barang. Pasang barangmu dan dapatkan
-          poin.
-        </p>
-      </header>
+      <PageHeader
+        judul="Pasar ReUse"
+        deskripsi="Barang bekas layak pakai dipindahtangankan gratis antar-warga. Kurangi tumpukan sampah, perpanjang usia barang. Pasang barangmu dan dapatkan poin."
+      />
 
       <PasarKlien awal={barang} masuk={!!user} />
     </main>
