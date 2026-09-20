@@ -43,11 +43,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-=======
-  description: DESKRIPSI_SIGAP,
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     title: "SIGAP — Lapor. Serentak. Selesai.",
     description: DESKRIPSI_SIGAP,
@@ -63,7 +58,6 @@ export const metadata: Metadata = {
     title: "SIGAP — Lapor. Serentak. Selesai.",
     description: DESKRIPSI_SIGAP,
     images: ["/ikon.svg"],
-  },
   },
 };
 
