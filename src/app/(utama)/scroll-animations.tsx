@@ -32,11 +32,6 @@ export function PanggungPetaScroll({ children }: { children: ReactNode }) {
   const scale = useTransform(scrollYProgress, [0, 1], [0.88, 1.0]);
   const y = useTransform(scrollYProgress, [0, 1], [18, 0]);
 
-  // Differential Parallax for Fey Floating Badges
-  const badgeYTop = useTransform(scrollYProgress, [0, 1], [32, 0]);
-  const badgeYBottom = useTransform(scrollYProgress, [0, 1], [-16, 0]);
-  const badgeOpacity = useTransform(scrollYProgress, [0, 0.35, 1], [0, 0.85, 1]);
-
   if (kurangiGerak) {
     return <div>{children}</div>;
   }
@@ -47,19 +42,7 @@ export function PanggungPetaScroll({ children }: { children: ReactNode }) {
       className={styles.stagePerspective}
       data-testid="panggung-peta-scroll"
     >
-      {/* Floating Badge Atas: Status Wilayah Aktif */}
-      <motion.div
-        className={styles.feyBadgeTop}
-        style={{
-          y: badgeYTop,
-          opacity: badgeOpacity,
-        }}
-        aria-hidden="true"
-      >
-        <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span>Pemantauan Wilayah Aktif</span>
-      </motion.div>
-
+      {/* Floating Badge Atas: Status Wilayah Aktif (dihapus) */}
       {/* Main 3D Tilted Stage */}
       <motion.div
         className={styles.stageInner}
@@ -72,18 +55,7 @@ export function PanggungPetaScroll({ children }: { children: ReactNode }) {
         {children}
       </motion.div>
 
-      {/* Floating Badge Bawah: Mode Tinjauan Real-Time */}
-      <motion.div
-        className={styles.feyBadgeBottom}
-        style={{
-          y: badgeYBottom,
-          opacity: badgeOpacity,
-        }}
-        aria-hidden="true"
-      >
-        <span className="inline-block w-2 h-2 rounded-full bg-action" />
-        <span>Peta Terverifikasi Warga</span>
-      </motion.div>
+      {/* Floating Badge Bawah: dihapus */}
     </div>
   );
 }
