@@ -24,7 +24,7 @@ const TUR = [
   {
     ikon: Scale,
     judul: "Transparansi Publik",
-    isi: "Kinerja penanganan dewan: median waktu tuntas, batas waktu layanan (SLA) per kategori, insight otomatis, dan ekspor open data.",
+    isi: "Kinerja penanganan dewan: median waktu tuntas, batas waktu layanan (SLA) per kategori (sampah 3, drainase 7, lampu 7, jalan 10, ruang hijau 12, lainnya 10 hari), insight otomatis, dan ekspor open data.",
     href: "/transparansi",
     label: "Lihat transparansi",
   },
@@ -151,7 +151,7 @@ export default function HalamanDemo() {
           <dl className="mt-3 space-y-2.5 text-sm">
             <div>
               <dt className="font-semibold">SLA (batas waktu layanan)</dt>
-              <dd className="text-muted">Target hari penyelesaian per kategori laporan yang mengikat dewan.</dd>
+              <dd className="text-muted">Target hari penyelesaian per kategori yang mengikat dewan: sampah 3, drainase 7, lampu 7, jalan 10, ruang hijau 12, lainnya 10 hari (maksimal 12 hari).</dd>
             </div>
             <div>
               <dt className="font-semibold">RLS (Row Level Security)</dt>
