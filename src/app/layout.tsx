@@ -25,13 +25,37 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const BASIS_URL = "https://sigap-murex-seven.vercel.app";
+
+const DESKRIPSI_SIGAP =
+  "Platform pelaporan masalah permukiman berbasis peta interaktif. Warga melapor, saling dukung, pemerintah menindaklanjuti — transparan dan terukur.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(BASIS_URL),
   title: {
     default: "SIGAP — Lapor. Serentak. Selesai.",
     template: "%s · SIGAP",
   },
-  description:
-    "Platform pelaporan masalah permukiman berbasis peta interaktif. Warga melapor, saling dukung, pemerintah menindaklanjuti — transparan dan terukur.",
+  description: DESKRIPSI_SIGAP,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "SIGAP — Lapor. Serentak. Selesai.",
+    description: DESKRIPSI_SIGAP,
+    type: "website",
+    locale: "id_ID",
+    siteName: "SIGAP",
+    url: "/",
+    // TODO(owner): rancang gambar OG khusus (1200×630 PNG). Sementara pakai ikon yang ada.
+    images: [{ url: "/ikon.svg", alt: "Logo SIGAP" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SIGAP — Lapor. Serentak. Selesai.",
+    description: DESKRIPSI_SIGAP,
+    images: ["/ikon.svg"],
+  },
 };
 
 const temaScript = `

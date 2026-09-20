@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
     remotePatterns: [
       {
@@ -28,6 +29,12 @@ const nextConfig: NextConfig = {
           {
             key: "X-Frame-Options",
             value: "SAMEORIGIN",
+          },
+          // Geolokasi dipakai peta (leaflet-map, jelajah, tombol-ikuti-area),
+          // jadi izinkan untuk origin sendiri; kamera/mikrofon tidak dipakai.
+          {
+            key: "Permissions-Policy",
+            value: "geolocation=(self), camera=(), microphone=()",
           },
         ],
       },
