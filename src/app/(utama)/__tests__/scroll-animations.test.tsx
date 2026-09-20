@@ -5,7 +5,6 @@ import {
   SorotTeksScroll,
   GaleriBuktiScroll,
   PenutupTedyScroll,
-  PenutupKineticOrbit,
 } from "../scroll-animations";
 
 describe("Scroll Animations", () => {
