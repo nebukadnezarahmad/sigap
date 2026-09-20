@@ -37,6 +37,14 @@ export const metadata: Metadata = {
     template: "%s · SIGAP",
   },
   description: DESKRIPSI_SIGAP,
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
+  alternates: {
+    canonical: "/",
+  },
+=======
+  description: DESKRIPSI_SIGAP,
   alternates: {
     canonical: "/",
   },
@@ -55,6 +63,7 @@ export const metadata: Metadata = {
     title: "SIGAP — Lapor. Serentak. Selesai.",
     description: DESKRIPSI_SIGAP,
     images: ["/ikon.svg"],
+  },
   },
 };
 
