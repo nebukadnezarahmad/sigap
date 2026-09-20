@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   },
   description:
     "Platform pelaporan masalah permukiman berbasis peta interaktif. Warga melapor, saling dukung, pemerintah menindaklanjuti — transparan dan terukur.",
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 const temaScript = `

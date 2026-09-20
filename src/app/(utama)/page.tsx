@@ -226,7 +226,7 @@ export default async function Beranda() {
 
       <section className={styles.community} aria-labelledby="judul-komunitas">
         <div className={styles.communityPhoto}>
-          <Image src="/images/lingkungan-permukiman.jpg" alt="Suasana jalan permukiman dengan pepohonan, rumah, dan aktivitas warga" fill sizes="(max-width: 760px) 100vw, 55vw" className="object-cover" />
+          <Image src="/images/lingkungan-permukiman.jpg" alt="Suasana jalan permukiman dengan pepohonan, rumah, dan aktivitas warga" fill sizes="(max-width: 760px) calc(100vw - 48px), 640px" className="object-cover" />
           <span className={styles.photoCaption}>Lingkungan yang kita rawat bersama.</span>
         </div>
         <div className={styles.communityCopy}>
