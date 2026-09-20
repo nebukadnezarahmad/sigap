@@ -380,7 +380,7 @@ export function GaleriBuktiScroll() {
                   src={item.foto}
                   alt={item.alt}
                   fill
-                  sizes="(max-width: 768px) 320px, 540px"
+                  sizes="(max-width: 768px) 85vw, 45vw"
                   className={`object-cover ${styles.cardImage}`}
                   loading="lazy"
                   draggable={false}
