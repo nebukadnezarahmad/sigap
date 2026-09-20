@@ -197,9 +197,9 @@ export const SLA_KATEGORI: Record<string, number> = {
   sampah: 3,
   drainase: 7,
   lampu: 7,
-  jalan: 14,
-  "ruang-hijau": 21,
-  lainnya: 14,
+  jalan: 10,
+  "ruang-hijau": 12,
+  lainnya: 10,
 };
 
 export const SLA_HARI = 7;
