@@ -83,14 +83,6 @@ sigap/
     └── seed.sql              # Data demo (jalankan kedua)
 ```
 
-## Checklist Lomba Infinitera 2.0
-
-- [x] Sudah deployed (Vercel)
-- [x] Repo publik di GitHub
-- [ ] Video demo 5–7 menit
-- [ ] Proposal PDF
-- [ ] Akun demo juri aktif
-
 ## Kredit Data
 
 Referensi data persampahan dan riset permukiman: SIPSN KLHK 2024–2025, BRIN.
