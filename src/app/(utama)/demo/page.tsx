@@ -24,7 +24,7 @@ const TUR = [
   {
     ikon: Scale,
     judul: "Transparansi Publik",
-    isi: "Kinerja penanganan dewan: median waktu tuntas, batas waktu layanan (SLA) per kategori (sampah 3, drainase 7, lampu 7, jalan 10, ruang hijau 12, lainnya 10 hari), insight otomatis, dan ekspor open data.",
+    isi: "Kinerja penanganan dewan: median waktu tuntas, batas waktu layanan (SLA) per kategori (sampah 3, drainase 7, lampu 7, jalan 10, ruang hijau 12, lainnya 10 hari), sorotan tren mingguan berbasis aturan, dan ekspor open data.",
     href: "/transparansi",
     label: "Lihat transparansi",
   },
