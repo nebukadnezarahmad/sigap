@@ -86,22 +86,32 @@ export default async function HalamanTransparansi() {
   const persenSelesai =
     total > 0 ? Math.round((selesaiList.length / total) * 100) : 0;
 
+  // Ambil event 'selesai' TERAKHIR, bukan yang pertama. Riwayat bisa memuat
+  // baris kembar (seed dan trigger trg_report_status_change sama-sama menulis),
+  // dan baris terlama bisa berisi tanggal basi yang menghasilkan durasi negatif.
   const durasiHari: number[] = [];
   for (const r of selesaiList) {
-    const evSelesai = (r.report_events ?? []).find(
-      (e) => e.status === "selesai"
-    );
-    if (evSelesai) {
-      durasiHari.push(
-        Math.round(
-          (new Date(evSelesai.created_at).getTime() -
-            new Date(r.created_at).getTime()) /
-            86400000
-        )
+    const evSelesai = (r.report_events ?? [])
+      .filter((e) => e.status === "selesai")
+      .sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       );
-    }
+    const terakhir = evSelesai[evSelesai.length - 1];
+    if (!terakhir) continue;
+
+    const hari = Math.round(
+      (new Date(terakhir.created_at).getTime() -
+        new Date(r.created_at).getTime()) /
+        86400000
+    );
+    // Waktu penyelesaian tidak mungkin negatif. Baris dengan tanggal tidak
+    // konsisten dilewati supaya angka mustahil tidak pernah tampil di halaman publik.
+    if (hari < 0) continue;
+    durasiHari.push(hari);
   }
   const medianHari = median(durasiHari);
+  const adaDurasi = durasiHari.length > 0;
 
   const perKategori = KATEGORI.map((k) => {
     const milik = daftar.filter(
@@ -322,7 +332,11 @@ export default async function HalamanTransparansi() {
           <div>
             <dt className="text-[11px] text-muted">Median waktu beres</dt>
             <dd className="mt-1.5 text-[31px] font-semibold leading-none tabular-nums tracking-[-0.05em]">
-              {medianHari ? `${medianHari} hari` : "<1 hari"}
+              {!adaDurasi
+                ? "—"
+                : medianHari < 1
+                  ? "<1 hari"
+                  : `${medianHari} hari`}
             </dd>
           </div>
           <div>
