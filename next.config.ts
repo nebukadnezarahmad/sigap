@@ -27,8 +27,8 @@ const nextConfig: NextConfig = {
             value: "strict-origin-when-cross-origin",
           },
           {
-            key: "X-Frame-Options",
-            value: "SAMEORIGIN",
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self' https://nebukadnezarahmad.github.io",
           },
           // Geolokasi dipakai peta (leaflet-map, jelajah, tombol-ikuti-area),
           // jadi izinkan untuk origin sendiri; kamera/mikrofon tidak dipakai.
